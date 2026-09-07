@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    <!--
+        Added the constraints for entity DemandePriseEnCharge.
+    -->
+    <changeSet id="20231225060347-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="agent_id"
+                                 baseTableName="demande_prise_en_charge"
+                                 constraintName="fk_demande_prise_en_charge__agent_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="agent"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="ayant_droit_id"
+                                 baseTableName="demande_prise_en_charge"
+                                 constraintName="fk_demande_prise_en_charge__ayant_droit_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="ayant_droit"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="type_soin_id"
+                                 baseTableName="demande_prise_en_charge"
+                                 constraintName="fk_demande_prise_en_charge__type_soin_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="type_soin"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="etablissement_sante_id"
+                                 baseTableName="demande_prise_en_charge"
+                                 constraintName="fk_demande_prise_en_charge__etablissement_sante_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="etablissement_sante"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="gestionnaire_createur_id"
+                                 baseTableName="demande_prise_en_charge"
+                                 constraintName="fk_demande_prise_en_charge__gestionnaire_createur_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="jhi_user"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="assignea_id"
+                                 baseTableName="demande_prise_en_charge"
+                                 constraintName="fk_demande_prise_en_charge__assignea_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="jhi_user"
+                                 />
+    </changeSet>
+</databaseChangeLog>

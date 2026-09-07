@@ -1,0 +1,214 @@
+// =========================================================
+// APPLICATION JHIPSTER
+// CNSS - PRISE EN CHARGE MEDICALE
+// Compatible JHipster 8.11.0
+// =========================================================
+
+application {
+  config {
+    baseName peccnss
+    applicationType monolith
+    authenticationType jwt
+    databaseType sql
+    devDatabaseType h2Disk
+    prodDatabaseType postgresql
+    buildTool maven
+    clientFramework angular
+  }
+
+  entities *
+}
+
+
+// =========================================================
+// ORGANISATION
+// =========================================================
+
+entity Gestion {
+  nom String required
+  type TypeGestion required
+}
+
+enum TypeGestion {
+  AS
+  OA
+}
+
+
+entity Region {
+  nom String required unique
+}
+
+
+entity Direction {
+  code String required unique
+  nom String required
+}
+
+
+entity Agent {
+  matricule String required unique
+  nom String required
+  prenom String required
+  dateNaissance LocalDate
+  telephone String
+  fonction String
+}
+
+
+// =========================================================
+// AYANT DROIT
+// =========================================================
+
+entity AyantDroit {
+  nom String required
+  prenom String required
+  dateNaissance LocalDate
+  lien LienParente required
+}
+
+
+enum LienParente {
+  CONJOINT
+  ENFANT
+  AUTRE
+}
+
+
+// =========================================================
+// TYPES DE SOINS
+// =========================================================
+
+entity TypeSoin {
+  libelle String required unique
+  description String
+  actif Boolean required
+}
+
+
+// =========================================================
+// ETABLISSEMENT DE SANTE
+// =========================================================
+
+entity EtablissementSante {
+  code String required unique
+  nom String required
+  adresse String
+  telephone String
+  actif Boolean required
+}
+
+
+// =========================================================
+// DEMANDE DE PRISE EN CHARGE
+// =========================================================
+
+entity DemandePriseEnCharge {
+  reference String required unique
+  dateCreation Instant required
+  dateModification Instant
+  typeBeneficiaire TypeBeneficiaire required
+  description String
+  statut StatutDemande required
+  dateAssignation Instant
+}
+
+
+enum TypeBeneficiaire {
+  AGENT
+  AYANT_DROIT
+}
+
+
+enum StatutDemande {
+  NOUVELLE
+  EN_ATTENTE_PIECES
+  EN_VALIDATION
+  VALIDEE
+  REJETEE
+  ANNULEE
+}
+
+
+// =========================================================
+// PIECES JUSTIFICATIVES
+// =========================================================
+
+entity PieceJustificative {
+  nomFichier String required
+  cheminFichier String required
+  dateAjout Instant required
+}
+
+
+// =========================================================
+// RELATIONS ORGANISATION
+// =========================================================
+
+relationship ManyToOne {
+
+  Direction{region} to Region
+
+  Agent{direction} to Direction
+
+  Agent{gestion} to Gestion
+
+  AyantDroit{agent} to Agent
+
+  Agent{user(login)} to User with builtInEntity
+}
+
+
+// =========================================================
+// RELATIONS DEMANDE
+// =========================================================
+
+relationship ManyToOne {
+
+  DemandePriseEnCharge{agent} to Agent
+
+  DemandePriseEnCharge{ayantDroit} to AyantDroit
+
+  DemandePriseEnCharge{typeSoin} to TypeSoin
+
+  DemandePriseEnCharge{etablissementSante} to EtablissementSante
+}
+
+
+// =========================================================
+// GESTIONNAIRE CREATEUR ET ASSIGNATION
+// Utilisateur JHipster ayant créé la demande / responsable actuel
+// =========================================================
+
+relationship ManyToOne {
+
+  DemandePriseEnCharge{gestionnaireCreateur(login) required} to User with builtInEntity
+
+  DemandePriseEnCharge{assigneA(login)} to User with builtInEntity
+}
+
+
+// =========================================================
+// PIECES JUSTIFICATIVES
+// =========================================================
+
+relationship ManyToOne {
+
+  PieceJustificative{demande(reference) required} to DemandePriseEnCharge
+}
+
+
+// =========================================================
+// OPTIONS JHIPSTER
+// =========================================================
+
+paginate Region, Direction, Gestion, Agent, AyantDroit, TypeSoin, EtablissementSante, DemandePriseEnCharge, PieceJustificative with pagination
+
+
+service Region, Direction, Gestion, Agent, AyantDroit, TypeSoin, EtablissementSante, DemandePriseEnCharge, PieceJustificative with serviceImpl
+
+
+dto Region, Direction, Gestion, Agent, AyantDroit, TypeSoin, EtablissementSante, DemandePriseEnCharge, PieceJustificative with mapstruct
+
+
+filter Region, Direction, Agent, AyantDroit, EtablissementSante, DemandePriseEnCharge

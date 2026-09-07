@@ -1,0 +1,118 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (demandePriseEnCharge(); as demandePriseEnChargeRef) {
+      <div>
+        <h2 data-cy="demandePriseEnChargeDetailsHeading">
+          <span jhiTranslate="peccnssApp.demandePriseEnCharge.detail.title">Demande Prise En Charge</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ demandePriseEnChargeRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.demandePriseEnCharge.reference">Reference</span></dt>
+          <dd>
+            <span>{{ demandePriseEnChargeRef.reference }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.demandePriseEnCharge.dateCreation">Date Creation</span></dt>
+          <dd>
+            <span>{{ demandePriseEnChargeRef.dateCreation | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.demandePriseEnCharge.dateModification">Date Modification</span></dt>
+          <dd>
+            <span>{{ demandePriseEnChargeRef.dateModification | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.demandePriseEnCharge.typeBeneficiaire">Type Beneficiaire</span></dt>
+          <dd>
+            <span [jhiTranslate]="'peccnssApp.TypeBeneficiaire.' + (demandePriseEnChargeRef.typeBeneficiaire ?? 'null')">{{
+              { null: '', AGENT: 'AGENT', AYANT_DROIT: 'AYANT_DROIT' }[demandePriseEnChargeRef.typeBeneficiaire ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.demandePriseEnCharge.description">Description</span></dt>
+          <dd>
+            <span>{{ demandePriseEnChargeRef.description }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.demandePriseEnCharge.statut">Statut</span></dt>
+          <dd>
+            <span [jhiTranslate]="'peccnssApp.StatutDemande.' + (demandePriseEnChargeRef.statut ?? 'null')">{{
+              {
+                null: '',
+                NOUVELLE: 'NOUVELLE',
+                EN_ATTENTE_PIECES: 'EN_ATTENTE_PIECES',
+                EN_VALIDATION: 'EN_VALIDATION',
+                VALIDEE: 'VALIDEE',
+                REJETEE: 'REJETEE',
+                ANNULEE: 'ANNULEE',
+              }[demandePriseEnChargeRef.statut ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.demandePriseEnCharge.dateAssignation">Date Assignation</span></dt>
+          <dd>
+            <span>{{ demandePriseEnChargeRef.dateAssignation | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.demandePriseEnCharge.agent">Agent</span></dt>
+          <dd>
+            @if (demandePriseEnCharge()!.agent) {
+              <div>
+                <a [routerLink]="['/agent', demandePriseEnCharge()!.agent?.id, 'view']">{{ demandePriseEnChargeRef.agent?.id }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.demandePriseEnCharge.ayantDroit">Ayant Droit</span></dt>
+          <dd>
+            @if (demandePriseEnCharge()!.ayantDroit) {
+              <div>
+                <a [routerLink]="['/ayant-droit', demandePriseEnCharge()!.ayantDroit?.id, 'view']">{{
+                  demandePriseEnChargeRef.ayantDroit?.id
+                }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.demandePriseEnCharge.typeSoin">Type Soin</span></dt>
+          <dd>
+            @if (demandePriseEnCharge()!.typeSoin) {
+              <div>
+                <a [routerLink]="['/type-soin', demandePriseEnCharge()!.typeSoin?.id, 'view']">{{
+                  demandePriseEnChargeRef.typeSoin?.id
+                }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.demandePriseEnCharge.etablissementSante">Etablissement Sante</span></dt>
+          <dd>
+            @if (demandePriseEnCharge()!.etablissementSante) {
+              <div>
+                <a [routerLink]="['/etablissement-sante', demandePriseEnCharge()!.etablissementSante?.id, 'view']">{{
+                  demandePriseEnChargeRef.etablissementSante?.id
+                }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.demandePriseEnCharge.gestionnaireCreateur">Gestionnaire Createur</span></dt>
+          <dd>
+            <span>{{ demandePriseEnChargeRef.gestionnaireCreateur?.login }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.demandePriseEnCharge.assigneA">Assigne A</span></dt>
+          <dd>
+            <span>{{ demandePriseEnChargeRef.assigneA?.login }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/demande-prise-en-charge', demandePriseEnChargeRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

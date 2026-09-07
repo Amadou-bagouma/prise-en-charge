@@ -1,0 +1,24 @@
+@if (agent) {
+  <form name="deleteForm" (ngSubmit)="confirmDelete(agent.id)">
+    <div class="modal-header">
+      <h4 class="modal-title" data-cy="agentDeleteDialogHeading" jhiTranslate="entity.delete.title">Confirm delete operation</h4>
+    </div>
+
+    <div class="modal-body">
+      <jhi-alert-error />
+      <p id="jhi-delete-agent-heading" jhiTranslate="peccnssApp.agent.delete.question" [translateValues]="{ id: agent.id }">
+        Are you sure you want to delete Agent {{ agent.id }}?
+      </p>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="cancel()">
+        <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+      </button>
+
+      <button id="jhi-confirm-delete-agent" data-cy="entityConfirmDeleteButton" type="submit" class="btn btn-danger">
+        <fa-icon icon="times" />&nbsp;<span jhiTranslate="entity.action.delete">Delete</span>
+      </button>
+    </div>
+  </form>
+}

@@ -1,0 +1,56 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (ayantDroit(); as ayantDroitRef) {
+      <div>
+        <h2 data-cy="ayantDroitDetailsHeading"><span jhiTranslate="peccnssApp.ayantDroit.detail.title">Ayant Droit</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ ayantDroitRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.ayantDroit.nom">Nom</span></dt>
+          <dd>
+            <span>{{ ayantDroitRef.nom }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.ayantDroit.prenom">Prenom</span></dt>
+          <dd>
+            <span>{{ ayantDroitRef.prenom }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.ayantDroit.dateNaissance">Date Naissance</span></dt>
+          <dd>
+            <span>{{ ayantDroitRef.dateNaissance | formatMediumDate }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.ayantDroit.lien">Lien</span></dt>
+          <dd>
+            <span [jhiTranslate]="'peccnssApp.LienParente.' + (ayantDroitRef.lien ?? 'null')">{{
+              { null: '', CONJOINT: 'CONJOINT', ENFANT: 'ENFANT', AUTRE: 'AUTRE' }[ayantDroitRef.lien ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.ayantDroit.agent">Agent</span></dt>
+          <dd>
+            @if (ayantDroit()!.agent) {
+              <div>
+                <a [routerLink]="['/agent', ayantDroit()!.agent?.id, 'view']">{{ ayantDroitRef.agent?.id }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/ayant-droit', ayantDroitRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

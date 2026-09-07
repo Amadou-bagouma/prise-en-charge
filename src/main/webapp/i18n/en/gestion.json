@@ -1,0 +1,25 @@
+{
+  "peccnssApp": {
+    "gestion": {
+      "home": {
+        "title": "Gestions",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Gestion",
+        "createOrEditLabel": "Create or edit a Gestion",
+        "notFound": "No Gestions found"
+      },
+      "created": "A new Gestion is created with identifier {{ param }}",
+      "updated": "A Gestion is updated with identifier {{ param }}",
+      "deleted": "A Gestion is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Gestion {{ id }}?"
+      },
+      "detail": {
+        "title": "Gestion"
+      },
+      "id": "ID",
+      "nom": "Nom",
+      "type": "Type"
+    }
+  }
+}

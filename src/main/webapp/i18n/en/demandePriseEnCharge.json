@@ -1,0 +1,36 @@
+{
+  "peccnssApp": {
+    "demandePriseEnCharge": {
+      "home": {
+        "title": "Demande Prise En Charges",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Demande Prise En Charge",
+        "createOrEditLabel": "Create or edit a Demande Prise En Charge",
+        "notFound": "No Demande Prise En Charges found"
+      },
+      "created": "A new Demande Prise En Charge is created with identifier {{ param }}",
+      "updated": "A Demande Prise En Charge is updated with identifier {{ param }}",
+      "deleted": "A Demande Prise En Charge is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Demande Prise En Charge {{ id }}?"
+      },
+      "detail": {
+        "title": "Demande Prise En Charge"
+      },
+      "id": "ID",
+      "reference": "Reference",
+      "dateCreation": "Date Creation",
+      "dateModification": "Date Modification",
+      "typeBeneficiaire": "Type Beneficiaire",
+      "description": "Description",
+      "statut": "Statut",
+      "dateAssignation": "Date Assignation",
+      "agent": "Agent",
+      "ayantDroit": "Ayant Droit",
+      "typeSoin": "Type Soin",
+      "etablissementSante": "Etablissement Sante",
+      "gestionnaireCreateur": "Gestionnaire Createur",
+      "assigneA": "Assigne A"
+    }
+  }
+}

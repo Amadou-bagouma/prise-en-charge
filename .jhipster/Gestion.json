@@ -1,0 +1,25 @@
+{
+  "annotations": {
+    "changelogDate": "20231225055647"
+  },
+  "applications": ["peccnss"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "nom",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "type",
+      "fieldType": "TypeGestion",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "AS,OA"
+    }
+  ],
+  "name": "Gestion",
+  "pagination": "pagination",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

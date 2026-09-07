@@ -1,0 +1,38 @@
+{
+  "annotations": {
+    "changelogDate": "20231225060447"
+  },
+  "applications": ["peccnss"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "nomFichier",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "cheminFichier",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "dateAjout",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "name": "PieceJustificative",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityField": "reference",
+      "otherEntityName": "demandePriseEnCharge",
+      "relationshipName": "demande",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

@@ -1,0 +1,297 @@
+package com.mycompany.myapp.domain;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.mycompany.myapp.domain.enumeration.StatutDemande;
+import com.mycompany.myapp.domain.enumeration.TypeBeneficiaire;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.Instant;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+/**
+ * A DemandePriseEnCharge.
+ */
+@Entity
+@Table(name = "demande_prise_en_charge")
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@SuppressWarnings("common-java:DuplicatedBlocks")
+public class DemandePriseEnCharge implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
+    @SequenceGenerator(name = "sequenceGenerator")
+    @Column(name = "id")
+    private Long id;
+
+    @NotNull
+    @Column(name = "reference", nullable = false, unique = true)
+    private String reference;
+
+    @NotNull
+    @Column(name = "date_creation", nullable = false)
+    private Instant dateCreation;
+
+    @Column(name = "date_modification")
+    private Instant dateModification;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type_beneficiaire", nullable = false)
+    private TypeBeneficiaire typeBeneficiaire;
+
+    @Column(name = "description")
+    private String description;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "statut", nullable = false)
+    private StatutDemande statut;
+
+    @Column(name = "date_assignation")
+    private Instant dateAssignation;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "direction", "gestion", "user" }, allowSetters = true)
+    private Agent agent;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "agent" }, allowSetters = true)
+    private AyantDroit ayantDroit;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private TypeSoin typeSoin;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private EtablissementSante etablissementSante;
+
+    @ManyToOne(optional = false)
+    @NotNull
+    private User gestionnaireCreateur;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User assigneA;
+
+    // jhipster-needle-entity-add-field - JHipster will add fields here
+
+    public Long getId() {
+        return this.id;
+    }
+
+    public DemandePriseEnCharge id(Long id) {
+        this.setId(id);
+        return this;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getReference() {
+        return this.reference;
+    }
+
+    public DemandePriseEnCharge reference(String reference) {
+        this.setReference(reference);
+        return this;
+    }
+
+    public void setReference(String reference) {
+        this.reference = reference;
+    }
+
+    public Instant getDateCreation() {
+        return this.dateCreation;
+    }
+
+    public DemandePriseEnCharge dateCreation(Instant dateCreation) {
+        this.setDateCreation(dateCreation);
+        return this;
+    }
+
+    public void setDateCreation(Instant dateCreation) {
+        this.dateCreation = dateCreation;
+    }
+
+    public Instant getDateModification() {
+        return this.dateModification;
+    }
+
+    public DemandePriseEnCharge dateModification(Instant dateModification) {
+        this.setDateModification(dateModification);
+        return this;
+    }
+
+    public void setDateModification(Instant dateModification) {
+        this.dateModification = dateModification;
+    }
+
+    public TypeBeneficiaire getTypeBeneficiaire() {
+        return this.typeBeneficiaire;
+    }
+
+    public DemandePriseEnCharge typeBeneficiaire(TypeBeneficiaire typeBeneficiaire) {
+        this.setTypeBeneficiaire(typeBeneficiaire);
+        return this;
+    }
+
+    public void setTypeBeneficiaire(TypeBeneficiaire typeBeneficiaire) {
+        this.typeBeneficiaire = typeBeneficiaire;
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
+
+    public DemandePriseEnCharge description(String description) {
+        this.setDescription(description);
+        return this;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public StatutDemande getStatut() {
+        return this.statut;
+    }
+
+    public DemandePriseEnCharge statut(StatutDemande statut) {
+        this.setStatut(statut);
+        return this;
+    }
+
+    public void setStatut(StatutDemande statut) {
+        this.statut = statut;
+    }
+
+    public Instant getDateAssignation() {
+        return this.dateAssignation;
+    }
+
+    public DemandePriseEnCharge dateAssignation(Instant dateAssignation) {
+        this.setDateAssignation(dateAssignation);
+        return this;
+    }
+
+    public void setDateAssignation(Instant dateAssignation) {
+        this.dateAssignation = dateAssignation;
+    }
+
+    public Agent getAgent() {
+        return this.agent;
+    }
+
+    public void setAgent(Agent agent) {
+        this.agent = agent;
+    }
+
+    public DemandePriseEnCharge agent(Agent agent) {
+        this.setAgent(agent);
+        return this;
+    }
+
+    public AyantDroit getAyantDroit() {
+        return this.ayantDroit;
+    }
+
+    public void setAyantDroit(AyantDroit ayantDroit) {
+        this.ayantDroit = ayantDroit;
+    }
+
+    public DemandePriseEnCharge ayantDroit(AyantDroit ayantDroit) {
+        this.setAyantDroit(ayantDroit);
+        return this;
+    }
+
+    public TypeSoin getTypeSoin() {
+        return this.typeSoin;
+    }
+
+    public void setTypeSoin(TypeSoin typeSoin) {
+        this.typeSoin = typeSoin;
+    }
+
+    public DemandePriseEnCharge typeSoin(TypeSoin typeSoin) {
+        this.setTypeSoin(typeSoin);
+        return this;
+    }
+
+    public EtablissementSante getEtablissementSante() {
+        return this.etablissementSante;
+    }
+
+    public void setEtablissementSante(EtablissementSante etablissementSante) {
+        this.etablissementSante = etablissementSante;
+    }
+
+    public DemandePriseEnCharge etablissementSante(EtablissementSante etablissementSante) {
+        this.setEtablissementSante(etablissementSante);
+        return this;
+    }
+
+    public User getGestionnaireCreateur() {
+        return this.gestionnaireCreateur;
+    }
+
+    public void setGestionnaireCreateur(User user) {
+        this.gestionnaireCreateur = user;
+    }
+
+    public DemandePriseEnCharge gestionnaireCreateur(User user) {
+        this.setGestionnaireCreateur(user);
+        return this;
+    }
+
+    public User getAssigneA() {
+        return this.assigneA;
+    }
+
+    public void setAssigneA(User user) {
+        this.assigneA = user;
+    }
+
+    public DemandePriseEnCharge assigneA(User user) {
+        this.setAssigneA(user);
+        return this;
+    }
+
+    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof DemandePriseEnCharge)) {
+            return false;
+        }
+        return getId() != null && getId().equals(((DemandePriseEnCharge) o).getId());
+    }
+
+    @Override
+    public int hashCode() {
+        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+        return getClass().hashCode();
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "DemandePriseEnCharge{" +
+            "id=" + getId() +
+            ", reference='" + getReference() + "'" +
+            ", dateCreation='" + getDateCreation() + "'" +
+            ", dateModification='" + getDateModification() + "'" +
+            ", typeBeneficiaire='" + getTypeBeneficiaire() + "'" +
+            ", description='" + getDescription() + "'" +
+            ", statut='" + getStatut() + "'" +
+            ", dateAssignation='" + getDateAssignation() + "'" +
+            "}";
+    }
+}

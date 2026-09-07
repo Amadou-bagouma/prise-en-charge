@@ -1,0 +1,28 @@
+{
+  "peccnssApp": {
+    "ayantDroit": {
+      "home": {
+        "title": "Ayant Droits",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Ayant Droit",
+        "createOrEditLabel": "Create or edit a Ayant Droit",
+        "notFound": "No Ayant Droits found"
+      },
+      "created": "A new Ayant Droit is created with identifier {{ param }}",
+      "updated": "A Ayant Droit is updated with identifier {{ param }}",
+      "deleted": "A Ayant Droit is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Ayant Droit {{ id }}?"
+      },
+      "detail": {
+        "title": "Ayant Droit"
+      },
+      "id": "ID",
+      "nom": "Nom",
+      "prenom": "Prenom",
+      "dateNaissance": "Date Naissance",
+      "lien": "Lien",
+      "agent": "Agent"
+    }
+  }
+}

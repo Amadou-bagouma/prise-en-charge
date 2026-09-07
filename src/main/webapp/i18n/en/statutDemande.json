@@ -1,0 +1,13 @@
+{
+  "peccnssApp": {
+    "StatutDemande": {
+      "null": "",
+      "NOUVELLE": "NOUVELLE",
+      "EN_ATTENTE_PIECES": "EN_ATTENTE_PIECES",
+      "EN_VALIDATION": "EN_VALIDATION",
+      "VALIDEE": "VALIDEE",
+      "REJETEE": "REJETEE",
+      "ANNULEE": "ANNULEE"
+    }
+  }
+}

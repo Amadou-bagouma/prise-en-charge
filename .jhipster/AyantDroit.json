@@ -1,0 +1,42 @@
+{
+  "annotations": {
+    "changelogDate": "20231225060047"
+  },
+  "applications": ["peccnss"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "nom",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "prenom",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "dateNaissance",
+      "fieldType": "LocalDate"
+    },
+    {
+      "fieldName": "lien",
+      "fieldType": "LienParente",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "CONJOINT,ENFANT,AUTRE"
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "AyantDroit",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "agent",
+      "relationshipName": "agent",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

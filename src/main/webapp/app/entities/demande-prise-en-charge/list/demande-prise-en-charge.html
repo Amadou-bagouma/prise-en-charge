@@ -1,0 +1,241 @@
+<div>
+  <h2 id="page-heading" data-cy="DemandePriseEnChargeHeading">
+    <span jhiTranslate="peccnssApp.demandePriseEnCharge.home.title">Demande Prise En Charges</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span jhiTranslate="peccnssApp.demandePriseEnCharge.home.refreshListLabel">Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-demande-prise-en-charge"
+        [routerLink]="['/demande-prise-en-charge/new']"
+      >
+        <fa-icon icon="plus" />
+        <span jhiTranslate="peccnssApp.demandePriseEnCharge.home.createLabel">Create a new Demande Prise En Charge</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  <jhi-filter [filters]="filters" />
+
+  @if (demandePriseEnCharges().length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span jhiTranslate="peccnssApp.demandePriseEnCharge.home.notFound">No Demande Prise En Charges found</span>
+    </div>
+  } @else {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span jhiTranslate="global.field.id">ID</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="reference">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.demandePriseEnCharge.reference">Reference</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="dateCreation">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.demandePriseEnCharge.dateCreation">Date Creation</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="dateModification">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.demandePriseEnCharge.dateModification">Date Modification</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="typeBeneficiaire">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.demandePriseEnCharge.typeBeneficiaire">Type Beneficiaire</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="description">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.demandePriseEnCharge.description">Description</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="statut">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.demandePriseEnCharge.statut">Statut</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="dateAssignation">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.demandePriseEnCharge.dateAssignation">Date Assignation</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="agent.id">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.demandePriseEnCharge.agent">Agent</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="ayantDroit.id">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.demandePriseEnCharge.ayantDroit">Ayant Droit</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="typeSoin.id">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.demandePriseEnCharge.typeSoin">Type Soin</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="etablissementSante.id">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.demandePriseEnCharge.etablissementSante">Etablissement Sante</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="gestionnaireCreateur.login">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.demandePriseEnCharge.gestionnaireCreateur">Gestionnaire Createur</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="assigneA.login">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.demandePriseEnCharge.assigneA">Assigne A</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (demandePriseEnCharge of demandePriseEnCharges(); track trackId(demandePriseEnCharge)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/demande-prise-en-charge', demandePriseEnCharge.id, 'view']">{{ demandePriseEnCharge.id }}</a>
+              </td>
+              <td>{{ demandePriseEnCharge.reference }}</td>
+              <td>{{ demandePriseEnCharge.dateCreation | formatMediumDatetime }}</td>
+              <td>{{ demandePriseEnCharge.dateModification | formatMediumDatetime }}</td>
+              <td [jhiTranslate]="'peccnssApp.TypeBeneficiaire.' + (demandePriseEnCharge.typeBeneficiaire ?? 'null')">
+                {{ { null: '', AGENT: 'AGENT', AYANT_DROIT: 'AYANT_DROIT' }[demandePriseEnCharge.typeBeneficiaire ?? 'null'] }}
+              </td>
+              <td>{{ demandePriseEnCharge.description }}</td>
+              <td [jhiTranslate]="'peccnssApp.StatutDemande.' + (demandePriseEnCharge.statut ?? 'null')">
+                {{
+                  {
+                    null: '',
+                    NOUVELLE: 'NOUVELLE',
+                    EN_ATTENTE_PIECES: 'EN_ATTENTE_PIECES',
+                    EN_VALIDATION: 'EN_VALIDATION',
+                    VALIDEE: 'VALIDEE',
+                    REJETEE: 'REJETEE',
+                    ANNULEE: 'ANNULEE',
+                  }[demandePriseEnCharge.statut ?? 'null']
+                }}
+              </td>
+              <td>{{ demandePriseEnCharge.dateAssignation | formatMediumDatetime }}</td>
+              <td>
+                @if (demandePriseEnCharge.agent) {
+                  <div>
+                    <a [routerLink]="['/agent', demandePriseEnCharge.agent.id, 'view']">{{ demandePriseEnCharge.agent.id }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (demandePriseEnCharge.ayantDroit) {
+                  <div>
+                    <a [routerLink]="['/ayant-droit', demandePriseEnCharge.ayantDroit.id, 'view']">{{
+                      demandePriseEnCharge.ayantDroit.id
+                    }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (demandePriseEnCharge.typeSoin) {
+                  <div>
+                    <a [routerLink]="['/type-soin', demandePriseEnCharge.typeSoin.id, 'view']">{{ demandePriseEnCharge.typeSoin.id }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (demandePriseEnCharge.etablissementSante) {
+                  <div>
+                    <a [routerLink]="['/etablissement-sante', demandePriseEnCharge.etablissementSante.id, 'view']">{{
+                      demandePriseEnCharge.etablissementSante.id
+                    }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                {{ demandePriseEnCharge.gestionnaireCreateur?.login }}
+              </td>
+              <td>
+                {{ demandePriseEnCharge.assigneA?.login }}
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a
+                    [routerLink]="['/demande-prise-en-charge', demandePriseEnCharge.id, 'view']"
+                    class="btn btn-info btn-sm"
+                    data-cy="entityDetailsButton"
+                  >
+                    <fa-icon icon="eye" />
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
+                  </a>
+
+                  <a
+                    [routerLink]="['/demande-prise-en-charge', demandePriseEnCharge.id, 'edit']"
+                    class="btn btn-primary btn-sm"
+                    data-cy="entityEditButton"
+                  >
+                    <fa-icon icon="pencil-alt" />
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
+                  </a>
+
+                  <button type="submit" (click)="delete(demandePriseEnCharge)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times" />
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+  @if (demandePriseEnCharges().length > 0) {
+    <div>
+      <div class="d-flex justify-content-center">
+        <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+      </div>
+
+      <div class="d-flex justify-content-center">
+        <ngb-pagination
+          [collectionSize]="totalItems()"
+          [page]="page()"
+          [pageSize]="itemsPerPage()"
+          [maxSize]="5"
+          [rotate]="true"
+          [boundaryLinks]="true"
+          (pageChange)="navigateToPage($event)"
+        />
+      </div>
+    </div>
+  }
+</div>

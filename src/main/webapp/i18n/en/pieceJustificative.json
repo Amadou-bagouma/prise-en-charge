@@ -1,0 +1,27 @@
+{
+  "peccnssApp": {
+    "pieceJustificative": {
+      "home": {
+        "title": "Piece Justificatives",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Piece Justificative",
+        "createOrEditLabel": "Create or edit a Piece Justificative",
+        "notFound": "No Piece Justificatives found"
+      },
+      "created": "A new Piece Justificative is created with identifier {{ param }}",
+      "updated": "A Piece Justificative is updated with identifier {{ param }}",
+      "deleted": "A Piece Justificative is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Piece Justificative {{ id }}?"
+      },
+      "detail": {
+        "title": "Piece Justificative"
+      },
+      "id": "ID",
+      "nomFichier": "Nom Fichier",
+      "cheminFichier": "Chemin Fichier",
+      "dateAjout": "Date Ajout",
+      "demande": "Demande"
+    }
+  }
+}

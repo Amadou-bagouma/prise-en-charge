@@ -1,0 +1,26 @@
+{
+  "peccnssApp": {
+    "direction": {
+      "home": {
+        "title": "Directions",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Direction",
+        "createOrEditLabel": "Create or edit a Direction",
+        "notFound": "No Directions found"
+      },
+      "created": "A new Direction is created with identifier {{ param }}",
+      "updated": "A Direction is updated with identifier {{ param }}",
+      "deleted": "A Direction is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Direction {{ id }}?"
+      },
+      "detail": {
+        "title": "Direction"
+      },
+      "id": "ID",
+      "code": "Code",
+      "nom": "Nom",
+      "region": "Region"
+    }
+  }
+}

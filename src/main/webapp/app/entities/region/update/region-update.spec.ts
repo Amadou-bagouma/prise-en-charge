@@ -1,0 +1,122 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ActivatedRoute } from '@angular/router';
+
+import { provideTranslateService } from '@ngx-translate/core';
+import { Subject, from, of } from 'rxjs';
+
+import { IRegion } from '../region.model';
+import { RegionService } from '../service/region.service';
+
+import { RegionFormService } from './region-form.service';
+import { RegionUpdate } from './region-update';
+
+describe('Region Management Update Component', () => {
+  let comp: RegionUpdate;
+  let fixture: ComponentFixture<RegionUpdate>;
+  let activatedRoute: ActivatedRoute;
+  let regionFormService: RegionFormService;
+  let regionService: RegionService;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideTranslateService(),
+        provideHttpClientTesting(),
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            params: from([{}]),
+          },
+        },
+      ],
+    });
+
+    fixture = TestBed.createComponent(RegionUpdate);
+    activatedRoute = TestBed.inject(ActivatedRoute);
+    regionFormService = TestBed.inject(RegionFormService);
+    regionService = TestBed.inject(RegionService);
+
+    comp = fixture.componentInstance;
+  });
+
+  describe('ngOnInit', () => {
+    it('should update editForm', () => {
+      const region: IRegion = { id: 30405 };
+
+      activatedRoute.data = of({ region });
+      comp.ngOnInit();
+
+      expect(comp.region).toEqual(region);
+    });
+  });
+
+  describe('save', () => {
+    it('should call update service on save for existing entity', () => {
+      // GIVEN
+      const saveSubject = new Subject<IRegion>();
+      const region = { id: 3454 };
+      vi.spyOn(regionFormService, 'getRegion').mockReturnValue(region);
+      vi.spyOn(regionService, 'update').mockReturnValue(saveSubject);
+      vi.spyOn(comp, 'previousState');
+      activatedRoute.data = of({ region });
+      comp.ngOnInit();
+
+      // WHEN
+      comp.save();
+      expect(comp.isSaving()).toEqual(true);
+      saveSubject.next(region);
+      saveSubject.complete();
+
+      // THEN
+      expect(regionFormService.getRegion).toHaveBeenCalled();
+      expect(comp.previousState).toHaveBeenCalled();
+      expect(regionService.update).toHaveBeenCalledWith(expect.objectContaining(region));
+      expect(comp.isSaving()).toEqual(false);
+    });
+
+    it('should call create service on save for new entity', () => {
+      // GIVEN
+      const saveSubject = new Subject<IRegion>();
+      const region = { id: 3454 };
+      vi.spyOn(regionFormService, 'getRegion').mockReturnValue({ id: null });
+      vi.spyOn(regionService, 'create').mockReturnValue(saveSubject);
+      vi.spyOn(comp, 'previousState');
+      activatedRoute.data = of({ region: null });
+      comp.ngOnInit();
+
+      // WHEN
+      comp.save();
+      expect(comp.isSaving()).toEqual(true);
+      saveSubject.next(region);
+      saveSubject.complete();
+
+      // THEN
+      expect(regionFormService.getRegion).toHaveBeenCalled();
+      expect(regionService.create).toHaveBeenCalled();
+      expect(comp.isSaving()).toEqual(false);
+      expect(comp.previousState).toHaveBeenCalled();
+    });
+
+    it('should set isSaving to false on error', () => {
+      // GIVEN
+      const saveSubject = new Subject<IRegion>();
+      const region = { id: 3454 };
+      vi.spyOn(regionService, 'update').mockReturnValue(saveSubject);
+      vi.spyOn(comp, 'previousState');
+      activatedRoute.data = of({ region });
+      comp.ngOnInit();
+
+      // WHEN
+      comp.save();
+      expect(comp.isSaving()).toEqual(true);
+      saveSubject.error('This is an error!');
+
+      // THEN
+      expect(regionService.update).toHaveBeenCalled();
+      expect(comp.isSaving()).toEqual(false);
+      expect(comp.previousState).not.toHaveBeenCalled();
+    });
+  });
+});

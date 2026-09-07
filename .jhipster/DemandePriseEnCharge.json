@@ -1,0 +1,91 @@
+{
+  "annotations": {
+    "changelogDate": "20231225060347"
+  },
+  "applications": ["peccnss"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "reference",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "unique"]
+    },
+    {
+      "fieldName": "dateCreation",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "dateModification",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "typeBeneficiaire",
+      "fieldType": "TypeBeneficiaire",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "AGENT,AYANT_DROIT"
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "statut",
+      "fieldType": "StatutDemande",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "NOUVELLE,EN_ATTENTE_PIECES,EN_VALIDATION,VALIDEE,REJETEE,ANNULEE"
+    },
+    {
+      "fieldName": "dateAssignation",
+      "fieldType": "Instant"
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "DemandePriseEnCharge",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "agent",
+      "relationshipName": "agent",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "ayantDroit",
+      "relationshipName": "ayantDroit",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "typeSoin",
+      "relationshipName": "typeSoin",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "etablissementSante",
+      "relationshipName": "etablissementSante",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityField": "login",
+      "otherEntityName": "user",
+      "relationshipName": "gestionnaireCreateur",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required",
+      "relationshipWithBuiltInEntity": true
+    },
+    {
+      "otherEntityField": "login",
+      "otherEntityName": "user",
+      "relationshipName": "assigneA",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one",
+      "relationshipWithBuiltInEntity": true
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

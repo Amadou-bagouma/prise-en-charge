@@ -1,0 +1,173 @@
+<div>
+  <h2 id="page-heading" data-cy="AgentHeading">
+    <span jhiTranslate="peccnssApp.agent.home.title">Agents</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span jhiTranslate="peccnssApp.agent.home.refreshListLabel">Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-agent"
+        [routerLink]="['/agent/new']"
+      >
+        <fa-icon icon="plus" />
+        <span jhiTranslate="peccnssApp.agent.home.createLabel">Create a new Agent</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  <jhi-filter [filters]="filters" />
+
+  @if (agents().length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span jhiTranslate="peccnssApp.agent.home.notFound">No Agents found</span>
+    </div>
+  } @else {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span jhiTranslate="global.field.id">ID</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="matricule">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.agent.matricule">Matricule</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="nom">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.agent.nom">Nom</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="prenom">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.agent.prenom">Prenom</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="dateNaissance">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.agent.dateNaissance">Date Naissance</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="telephone">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.agent.telephone">Telephone</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="fonction">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.agent.fonction">Fonction</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="direction.id">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.agent.direction">Direction</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="gestion.id">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.agent.gestion">Gestion</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="user.login">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.agent.user">User</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (agent of agents(); track trackId(agent)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/agent', agent.id, 'view']">{{ agent.id }}</a>
+              </td>
+              <td>{{ agent.matricule }}</td>
+              <td>{{ agent.nom }}</td>
+              <td>{{ agent.prenom }}</td>
+              <td>{{ agent.dateNaissance | formatMediumDate }}</td>
+              <td>{{ agent.telephone }}</td>
+              <td>{{ agent.fonction }}</td>
+              <td>
+                @if (agent.direction) {
+                  <div>
+                    <a [routerLink]="['/direction', agent.direction.id, 'view']">{{ agent.direction.id }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (agent.gestion) {
+                  <div>
+                    <a [routerLink]="['/gestion', agent.gestion.id, 'view']">{{ agent.gestion.id }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                {{ agent.user?.login }}
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a [routerLink]="['/agent', agent.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                    <fa-icon icon="eye" />
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
+                  </a>
+
+                  <a [routerLink]="['/agent', agent.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                    <fa-icon icon="pencil-alt" />
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
+                  </a>
+
+                  <button type="submit" (click)="delete(agent)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times" />
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+  @if (agents().length > 0) {
+    <div>
+      <div class="d-flex justify-content-center">
+        <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+      </div>
+
+      <div class="d-flex justify-content-center">
+        <ngb-pagination
+          [collectionSize]="totalItems()"
+          [page]="page()"
+          [pageSize]="itemsPerPage()"
+          [maxSize]="5"
+          [rotate]="true"
+          [boundaryLinks]="true"
+          (pageChange)="navigateToPage($event)"
+        />
+      </div>
+    </div>
+  }
+</div>

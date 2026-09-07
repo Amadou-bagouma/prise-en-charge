@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    <!--
+        Added the constraints for entity Agent.
+    -->
+    <changeSet id="20231225055947-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="direction_id"
+                                 baseTableName="agent"
+                                 constraintName="fk_agent__direction_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="direction"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="gestion_id"
+                                 baseTableName="agent"
+                                 constraintName="fk_agent__gestion_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="gestion"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="user_id"
+                                 baseTableName="agent"
+                                 constraintName="fk_agent__user_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="jhi_user"
+                                 />
+    </changeSet>
+</databaseChangeLog>

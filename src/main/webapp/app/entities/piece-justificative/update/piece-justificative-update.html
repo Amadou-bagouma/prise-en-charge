@@ -1,0 +1,137 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2
+        id="jhi-piece-justificative-heading"
+        data-cy="PieceJustificativeCreateUpdateHeading"
+        jhiTranslate="peccnssApp.pieceJustificative.home.createOrEditLabel"
+      >
+        Create or edit a Piece Justificative
+      </h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let nomFichierRef = editForm.get('nomFichier')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_nomFichier" jhiTranslate="peccnssApp.pieceJustificative.nomFichier">Nom Fichier</label>
+          <input
+            type="text"
+            class="form-control"
+            name="nomFichier"
+            id="field_nomFichier"
+            data-cy="nomFichier"
+            formControlName="nomFichier"
+          />
+          @if (nomFichierRef.invalid && (nomFichierRef.dirty || nomFichierRef.touched)) {
+            <div>
+              @if (nomFichierRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let cheminFichierRef = editForm.get('cheminFichier')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_cheminFichier" jhiTranslate="peccnssApp.pieceJustificative.cheminFichier"
+            >Chemin Fichier</label
+          >
+          <input
+            type="text"
+            class="form-control"
+            name="cheminFichier"
+            id="field_cheminFichier"
+            data-cy="cheminFichier"
+            formControlName="cheminFichier"
+          />
+          @if (cheminFichierRef.invalid && (cheminFichierRef.dirty || cheminFichierRef.touched)) {
+            <div>
+              @if (cheminFichierRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let dateAjoutRef = editForm.get('dateAjout')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_dateAjout" jhiTranslate="peccnssApp.pieceJustificative.dateAjout">Date Ajout</label>
+          <div class="d-flex">
+            <input
+              id="field_dateAjout"
+              data-cy="dateAjout"
+              type="datetime-local"
+              class="form-control"
+              name="dateAjout"
+              formControlName="dateAjout"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+          @if (dateAjoutRef.invalid && (dateAjoutRef.dirty || dateAjoutRef.touched)) {
+            <div>
+              @if (dateAjoutRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+              <small
+                class="form-text text-danger"
+                [hidden]="!dateAjoutRef.errors?.datetimelocal"
+                jhiTranslate="entity.validation.datetimelocal"
+                >This field should be a date and time.</small
+              >
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_demande" jhiTranslate="peccnssApp.pieceJustificative.demande">Demande</label>
+          <select
+            class="form-control"
+            id="field_demande"
+            data-cy="demande"
+            name="demande"
+            formControlName="demande"
+            [compareWith]="compareDemandePriseEnCharge"
+          >
+            @if (!editForm.get('demande')!.value) {
+              <option [ngValue]="null" selected></option>
+            }
+            @for (demandePriseEnChargeOption of demandePriseEnChargesSharedCollection(); track $index) {
+              <option [ngValue]="demandePriseEnChargeOption">{{ demandePriseEnChargeOption.reference }}</option>
+            }
+          </select>
+        </div>
+        @if (editForm.get(['demande'])!.invalid && (editForm.get(['demande'])!.dirty || editForm.get(['demande'])!.touched)) {
+          <div>
+            @if (editForm.get(['demande'])?.errors?.required) {
+              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+            }
+          </div>
+        }
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
