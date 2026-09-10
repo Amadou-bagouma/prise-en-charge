@@ -1,9 +1,11 @@
 <div>
-  <h2 id="page-heading" data-cy="PieceJustificativeHeading">
-    <span jhiTranslate="peccnssApp.pieceJustificative.home.title">Piece Justificatives</span>
+  <div class="jhi-page-header">
+    <h2 id="page-heading" data-cy="PieceJustificativeHeading">
+      <span jhiTranslate="peccnssApp.pieceJustificative.home.title">Piece Justificatives</span>
+    </h2>
 
-    <div class="d-flex justify-content-end">
-      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+    <div class="jhi-page-actions">
+      <button class="btn btn-outline-secondary" (click)="load()" [disabled]="isLoading()">
         <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
         <span jhiTranslate="peccnssApp.pieceJustificative.home.refreshListLabel">Refresh list</span>
       </button>
@@ -11,14 +13,14 @@
       <button
         id="jh-create-entity"
         data-cy="entityCreateButton"
-        class="btn btn-primary jh-create-entity create-piece-justificative"
+        class="btn btn-accent jh-create-entity create-piece-justificative"
         [routerLink]="['/piece-justificative/new']"
       >
         <fa-icon icon="plus" />
         <span jhiTranslate="peccnssApp.pieceJustificative.home.createLabel">Create a new Piece Justificative</span>
       </button>
     </div>
-  </h2>
+  </div>
 
   <jhi-alert-error />
 
@@ -29,37 +31,25 @@
       <span jhiTranslate="peccnssApp.pieceJustificative.home.notFound">No Piece Justificatives found</span>
     </div>
   } @else {
-    <div class="table-responsive table-entities" id="entities">
-      <table class="table table-striped" aria-describedby="page-heading">
+    <div class="jhi-table-panel table-responsive table-entities" id="entities">
+      <table class="table jhi-table" aria-describedby="page-heading">
         <thead>
           <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
-            <th scope="col" jhiSortBy="id">
-              <div class="d-flex">
-                <span jhiTranslate="global.field.id">ID</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
             <th scope="col" jhiSortBy="nomFichier">
               <div class="d-flex">
                 <span jhiTranslate="peccnssApp.pieceJustificative.nomFichier">Nom Fichier</span>
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
-            <th scope="col" jhiSortBy="cheminFichier">
+            <th scope="col" jhiSortBy="demande.reference">
               <div class="d-flex">
-                <span jhiTranslate="peccnssApp.pieceJustificative.cheminFichier">Chemin Fichier</span>
+                <span jhiTranslate="peccnssApp.pieceJustificative.demande">Demande</span>
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
             <th scope="col" jhiSortBy="dateAjout">
               <div class="d-flex">
                 <span jhiTranslate="peccnssApp.pieceJustificative.dateAjout">Date Ajout</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="demande.reference">
-              <div class="d-flex">
-                <span jhiTranslate="peccnssApp.pieceJustificative.demande">Demande</span>
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
@@ -70,20 +60,18 @@
           @for (pieceJustificative of pieceJustificatives(); track trackId(pieceJustificative)) {
             <tr data-cy="entityTable">
               <td>
-                <a [routerLink]="['/piece-justificative', pieceJustificative.id, 'view']">{{ pieceJustificative.id }}</a>
+                <a [routerLink]="['/piece-justificative', pieceJustificative.id, 'view']">
+                  <fa-icon icon="file" class="me-1" />{{ pieceJustificative.nomFichier }}
+                </a>
               </td>
-              <td>{{ pieceJustificative.nomFichier }}</td>
-              <td>{{ pieceJustificative.cheminFichier }}</td>
-              <td>{{ pieceJustificative.dateAjout | formatMediumDatetime }}</td>
               <td>
                 @if (pieceJustificative.demande) {
-                  <div>
-                    <a [routerLink]="['/demande-prise-en-charge', pieceJustificative.demande.id, 'view']">{{
-                      pieceJustificative.demande.reference
-                    }}</a>
-                  </div>
+                  <a [routerLink]="['/demande-prise-en-charge', pieceJustificative.demande.id, 'view']">{{
+                    pieceJustificative.demande.reference
+                  }}</a>
                 }
               </td>
+              <td>{{ pieceJustificative.dateAjout | formatMediumDatetime }}</td>
               <td class="text-end">
                 <div class="btn-group">
                   <a

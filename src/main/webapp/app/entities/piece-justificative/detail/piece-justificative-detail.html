@@ -1,7 +1,7 @@
 <div class="d-flex justify-content-center">
   <div class="col-8">
     @if (pieceJustificative(); as pieceJustificativeRef) {
-      <div>
+      <div class="jhi-form-panel">
         <h2 data-cy="pieceJustificativeDetailsHeading">
           <span jhiTranslate="peccnssApp.pieceJustificative.detail.title">Piece Justificative</span>
         </h2>
@@ -45,7 +45,7 @@
           <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
         </button>
 
-        <button type="button" [routerLink]="['/piece-justificative', pieceJustificativeRef.id, 'edit']" class="btn btn-primary">
+        <button type="button" [routerLink]="['/piece-justificative', pieceJustificativeRef.id, 'edit']" class="btn btn-accent">
           <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
         </button>
       </div>

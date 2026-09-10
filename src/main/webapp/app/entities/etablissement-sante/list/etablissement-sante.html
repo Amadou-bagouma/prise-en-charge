@@ -1,9 +1,11 @@
 <div>
-  <h2 id="page-heading" data-cy="EtablissementSanteHeading">
-    <span jhiTranslate="peccnssApp.etablissementSante.home.title">Etablissement Santes</span>
+  <div class="jhi-page-header">
+    <h2 id="page-heading" data-cy="EtablissementSanteHeading">
+      <span jhiTranslate="peccnssApp.etablissementSante.home.title">Etablissement Santes</span>
+    </h2>
 
-    <div class="d-flex justify-content-end">
-      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+    <div class="jhi-page-actions">
+      <button class="btn btn-outline-secondary" (click)="load()" [disabled]="isLoading()">
         <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
         <span jhiTranslate="peccnssApp.etablissementSante.home.refreshListLabel">Refresh list</span>
       </button>
@@ -11,14 +13,14 @@
       <button
         id="jh-create-entity"
         data-cy="entityCreateButton"
-        class="btn btn-primary jh-create-entity create-etablissement-sante"
+        class="btn btn-accent jh-create-entity create-etablissement-sante"
         [routerLink]="['/etablissement-sante/new']"
       >
         <fa-icon icon="plus" />
         <span jhiTranslate="peccnssApp.etablissementSante.home.createLabel">Create a new Etablissement Sante</span>
       </button>
     </div>
-  </h2>
+  </div>
 
   <jhi-alert-error />
 
@@ -31,16 +33,10 @@
       <span jhiTranslate="peccnssApp.etablissementSante.home.notFound">No Etablissement Santes found</span>
     </div>
   } @else {
-    <div class="table-responsive table-entities" id="entities">
-      <table class="table table-striped" aria-describedby="page-heading">
+    <div class="jhi-table-panel table-responsive table-entities" id="entities">
+      <table class="table jhi-table" aria-describedby="page-heading">
         <thead>
           <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
-            <th scope="col" jhiSortBy="id">
-              <div class="d-flex">
-                <span jhiTranslate="global.field.id">ID</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
             <th scope="col" jhiSortBy="code">
               <div class="d-flex">
                 <span jhiTranslate="peccnssApp.etablissementSante.code">Code</span>
@@ -78,13 +74,16 @@
           @for (etablissementSante of etablissementSantes(); track trackId(etablissementSante)) {
             <tr data-cy="entityTable">
               <td>
-                <a [routerLink]="['/etablissement-sante', etablissementSante.id, 'view']">{{ etablissementSante.id }}</a>
+                <a [routerLink]="['/etablissement-sante', etablissementSante.id, 'view']">{{ etablissementSante.code }}</a>
               </td>
-              <td>{{ etablissementSante.code }}</td>
               <td>{{ etablissementSante.nom }}</td>
               <td>{{ etablissementSante.adresse }}</td>
               <td>{{ etablissementSante.telephone }}</td>
-              <td>{{ etablissementSante.actif }}</td>
+              <td>
+                <span class="jhi-badge" [ngClass]="etablissementSante.actif ? 'jhi-badge-actif-true' : 'jhi-badge-actif-false'">
+                  {{ etablissementSante.actif ? 'Actif' : 'Inactif' }}
+                </span>
+              </td>
               <td class="text-end">
                 <div class="btn-group">
                   <a

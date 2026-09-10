@@ -1,7 +1,7 @@
 <div class="d-flex justify-content-center">
   <div class="col-8">
     @if (region(); as regionRef) {
-      <div>
+      <div class="jhi-form-panel">
         <h2 data-cy="regionDetailsHeading"><span jhiTranslate="peccnssApp.region.detail.title">Region</span></h2>
 
         <hr />
@@ -25,7 +25,7 @@
           <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
         </button>
 
-        <button type="button" [routerLink]="['/region', regionRef.id, 'edit']" class="btn btn-primary">
+        <button type="button" [routerLink]="['/region', regionRef.id, 'edit']" class="btn btn-accent">
           <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
         </button>
       </div>

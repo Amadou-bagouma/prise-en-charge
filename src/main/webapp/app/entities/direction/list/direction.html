@@ -1,9 +1,11 @@
 <div>
-  <h2 id="page-heading" data-cy="DirectionHeading">
-    <span jhiTranslate="peccnssApp.direction.home.title">Directions</span>
+  <div class="jhi-page-header">
+    <h2 id="page-heading" data-cy="DirectionHeading">
+      <span jhiTranslate="peccnssApp.direction.home.title">Directions</span>
+    </h2>
 
-    <div class="d-flex justify-content-end">
-      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+    <div class="jhi-page-actions">
+      <button class="btn btn-outline-secondary" (click)="load()" [disabled]="isLoading()">
         <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
         <span jhiTranslate="peccnssApp.direction.home.refreshListLabel">Refresh list</span>
       </button>
@@ -11,14 +13,14 @@
       <button
         id="jh-create-entity"
         data-cy="entityCreateButton"
-        class="btn btn-primary jh-create-entity create-direction"
+        class="btn btn-accent jh-create-entity create-direction"
         [routerLink]="['/direction/new']"
       >
         <fa-icon icon="plus" />
         <span jhiTranslate="peccnssApp.direction.home.createLabel">Create a new Direction</span>
       </button>
     </div>
-  </h2>
+  </div>
 
   <jhi-alert-error />
 
@@ -31,16 +33,10 @@
       <span jhiTranslate="peccnssApp.direction.home.notFound">No Directions found</span>
     </div>
   } @else {
-    <div class="table-responsive table-entities" id="entities">
-      <table class="table table-striped" aria-describedby="page-heading">
+    <div class="jhi-table-panel table-responsive table-entities" id="entities">
+      <table class="table jhi-table" aria-describedby="page-heading">
         <thead>
           <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
-            <th scope="col" jhiSortBy="id">
-              <div class="d-flex">
-                <span jhiTranslate="global.field.id">ID</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
             <th scope="col" jhiSortBy="code">
               <div class="d-flex">
                 <span jhiTranslate="peccnssApp.direction.code">Code</span>
@@ -66,15 +62,12 @@
           @for (direction of directions(); track trackId(direction)) {
             <tr data-cy="entityTable">
               <td>
-                <a [routerLink]="['/direction', direction.id, 'view']">{{ direction.id }}</a>
+                <a [routerLink]="['/direction', direction.id, 'view']">{{ direction.code }}</a>
               </td>
-              <td>{{ direction.code }}</td>
               <td>{{ direction.nom }}</td>
               <td>
                 @if (direction.region) {
-                  <div>
-                    <a [routerLink]="['/region', direction.region.id, 'view']">{{ direction.region.nom }}</a>
-                  </div>
+                  <a [routerLink]="['/region', direction.region.id, 'view']">{{ direction.region.nom }}</a>
                 }
               </td>
               <td class="text-end">

@@ -1,7 +1,7 @@
 <div class="d-flex justify-content-center">
-  <div class="col-8">
+  <div class="col-12 col-xl-6">
     @if (typeSoin(); as typeSoinRef) {
-      <div>
+      <div class="jhi-form-panel">
         <h2 data-cy="typeSoinDetailsHeading"><span jhiTranslate="peccnssApp.typeSoin.detail.title">Type Soin</span></h2>
 
         <hr />
@@ -25,7 +25,9 @@
           </dd>
           <dt><span jhiTranslate="peccnssApp.typeSoin.actif">Actif</span></dt>
           <dd>
-            <span>{{ typeSoinRef.actif }}</span>
+            <span class="jhi-badge" [ngClass]="typeSoinRef.actif ? 'jhi-badge-actif-true' : 'jhi-badge-actif-false'">
+              {{ typeSoinRef.actif ? 'Actif' : 'Inactif' }}
+            </span>
           </dd>
         </dl>
 
@@ -33,7 +35,7 @@
           <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
         </button>
 
-        <button type="button" [routerLink]="['/type-soin', typeSoinRef.id, 'edit']" class="btn btn-primary">
+        <button type="button" [routerLink]="['/type-soin', typeSoinRef.id, 'edit']" class="btn btn-accent">
           <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
         </button>
       </div>

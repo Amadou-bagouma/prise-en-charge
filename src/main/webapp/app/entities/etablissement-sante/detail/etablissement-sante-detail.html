@@ -1,7 +1,7 @@
 <div class="d-flex justify-content-center">
-  <div class="col-8">
+  <div class="col-12 col-xl-6">
     @if (etablissementSante(); as etablissementSanteRef) {
-      <div>
+      <div class="jhi-form-panel">
         <h2 data-cy="etablissementSanteDetailsHeading">
           <span jhiTranslate="peccnssApp.etablissementSante.detail.title">Etablissement Sante</span>
         </h2>
@@ -35,7 +35,9 @@
           </dd>
           <dt><span jhiTranslate="peccnssApp.etablissementSante.actif">Actif</span></dt>
           <dd>
-            <span>{{ etablissementSanteRef.actif }}</span>
+            <span class="jhi-badge" [ngClass]="etablissementSanteRef.actif ? 'jhi-badge-actif-true' : 'jhi-badge-actif-false'">
+              {{ etablissementSanteRef.actif ? 'Actif' : 'Inactif' }}
+            </span>
           </dd>
         </dl>
 
@@ -43,7 +45,7 @@
           <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
         </button>
 
-        <button type="button" [routerLink]="['/etablissement-sante', etablissementSanteRef.id, 'edit']" class="btn btn-primary">
+        <button type="button" [routerLink]="['/etablissement-sante', etablissementSanteRef.id, 'edit']" class="btn btn-accent">
           <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
         </button>
       </div>

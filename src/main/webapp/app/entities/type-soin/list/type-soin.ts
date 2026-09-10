@@ -1,3 +1,4 @@
+import { NgClass } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
 import { Component, effect, inject, signal, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -20,7 +21,18 @@ import { ITypeSoin } from '../type-soin.model';
 @Component({
   selector: 'jhi-type-soin',
   templateUrl: './type-soin.html',
-  imports: [RouterLink, FontAwesomeModule, AlertError, Alert, SortDirective, SortByDirective, TranslateDirective, NgbPagination, ItemCount],
+  imports: [
+    NgClass,
+    RouterLink,
+    FontAwesomeModule,
+    AlertError,
+    Alert,
+    SortDirective,
+    SortByDirective,
+    TranslateDirective,
+    NgbPagination,
+    ItemCount,
+  ],
 })
 export class TypeSoin {
   readonly typeSoins = signal<ITypeSoin[]>([]);

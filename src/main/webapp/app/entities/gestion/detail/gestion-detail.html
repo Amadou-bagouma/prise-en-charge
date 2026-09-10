@@ -1,7 +1,7 @@
 <div class="d-flex justify-content-center">
   <div class="col-8">
     @if (gestion(); as gestionRef) {
-      <div>
+      <div class="jhi-form-panel">
         <h2 data-cy="gestionDetailsHeading"><span jhiTranslate="peccnssApp.gestion.detail.title">Gestion</span></h2>
 
         <hr />
@@ -21,9 +21,12 @@
           </dd>
           <dt><span jhiTranslate="peccnssApp.gestion.type">Type</span></dt>
           <dd>
-            <span [jhiTranslate]="'peccnssApp.TypeGestion.' + (gestionRef.type ?? 'null')">{{
-              { null: '', AS: 'AS', OA: 'OA' }[gestionRef.type ?? 'null']
-            }}</span>
+            <span
+              class="jhi-badge"
+              [ngClass]="'jhi-badge-type-' + gestionRef.type"
+              [jhiTranslate]="'peccnssApp.TypeGestion.' + (gestionRef.type ?? 'null')"
+              >{{ { null: '', AS: 'AS', OA: 'OA' }[gestionRef.type ?? 'null'] }}</span
+            >
           </dd>
         </dl>
 
@@ -31,7 +34,7 @@
           <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
         </button>
 
-        <button type="button" [routerLink]="['/gestion', gestionRef.id, 'edit']" class="btn btn-primary">
+        <button type="button" [routerLink]="['/gestion', gestionRef.id, 'edit']" class="btn btn-accent">
           <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
         </button>
       </div>

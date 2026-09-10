@@ -631,6 +631,26 @@ Entity pages (list / form) design system
   color: var(--jhi-muted);
 }
 
+.jhi-badge-actif-true {
+  background: var(--jhi-accent-soft);
+  color: var(--jhi-accent-dark);
+}
+
+.jhi-badge-actif-false {
+  background: var(--jhi-muted-soft);
+  color: var(--jhi-muted);
+}
+
+.jhi-badge-type-AS {
+  background: var(--jhi-info-soft);
+  color: var(--jhi-info);
+}
+
+.jhi-badge-type-OA {
+  background: var(--jhi-accent-soft);
+  color: var(--jhi-accent-dark);
+}
+
 /* ---- Form ---- */
 
 .jhi-form-panel {

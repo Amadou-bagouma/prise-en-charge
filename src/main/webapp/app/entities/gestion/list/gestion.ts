@@ -1,3 +1,4 @@
+import { NgClass } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
 import { Component, effect, inject, signal, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -20,7 +21,18 @@ import { GestionService } from '../service/gestion.service';
 @Component({
   selector: 'jhi-gestion',
   templateUrl: './gestion.html',
-  imports: [RouterLink, FontAwesomeModule, AlertError, Alert, SortDirective, SortByDirective, TranslateDirective, NgbPagination, ItemCount],
+  imports: [
+    NgClass,
+    RouterLink,
+    FontAwesomeModule,
+    AlertError,
+    Alert,
+    SortDirective,
+    SortByDirective,
+    TranslateDirective,
+    NgbPagination,
+    ItemCount,
+  ],
 })
 export class Gestion {
   readonly gestions = signal<IGestion[]>([]);
