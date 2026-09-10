@@ -1,14 +1,89 @@
-<button
-  type="button"
-  class="sidebar-mobile-toggle d-md-none"
-  (click)="isNavbarCollapsed.update(collapsed => !collapsed)"
-  [attr.aria-expanded]="!isNavbarCollapsed()"
-  aria-controls="appSidebar"
-  aria-label="Toggle navigation"
-  data-cy="navbar"
->
-  <fa-icon icon="bars" />
-</button>
+<header class="app-topbar" data-cy="navbar">
+  <button
+    type="button"
+    class="sidebar-mobile-toggle d-md-none"
+    (click)="isNavbarCollapsed.update(collapsed => !collapsed)"
+    [attr.aria-expanded]="!isNavbarCollapsed()"
+    aria-controls="appSidebar"
+    aria-label="Toggle navigation"
+  >
+    <fa-icon icon="bars" />
+  </button>
+
+  <div class="topbar-spacer"></div>
+
+  <div class="topbar-right">
+    @if (languages.length > 1) {
+      <div ngbDropdown class="topbar-dropdown" display="static" placement="bottom-end">
+        <button type="button" class="topbar-link" ngbDropdownToggle id="languagesnavBarDropdown">
+          <fa-icon icon="flag" [fixedWidth]="true" />
+          <span jhiTranslate="global.menu.language">Language</span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end" ngbDropdownMenu aria-labelledby="languagesnavBarDropdown">
+          @for (language of languages; track $index) {
+            <li>
+              <a
+                class="dropdown-item"
+                [jhiActiveMenu]="language"
+                href="javascript:void(0);"
+                (click)="changeLanguage(language); collapseNavbar()"
+                >{{ language | findLanguageFromKey }}</a
+              >
+            </li>
+          }
+        </ul>
+      </div>
+    }
+
+    <div ngbDropdown class="topbar-dropdown" display="static" placement="bottom-end" data-cy="accountMenu">
+      @let accountRef = account();
+      <button type="button" class="topbar-link" ngbDropdownToggle id="account-menu">
+        @if (!accountRef?.imageUrl) {
+          <fa-icon icon="user" [fixedWidth]="true" />
+          <span jhiTranslate="global.menu.account.main">Account</span>
+        } @else {
+          <img [src]="accountRef.imageUrl" class="profile-image rounded-circle" alt="Avatar" />
+          <span>{{ accountRef.login }}</span>
+        }
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end" ngbDropdownMenu aria-labelledby="account-menu">
+        @if (accountRef !== null) {
+          <li>
+            <a class="dropdown-item" routerLink="/account/settings" (click)="collapseNavbar()" data-cy="settings">
+              <fa-icon icon="wrench" [fixedWidth]="true" />
+              <span jhiTranslate="global.menu.account.settings">Settings</span>
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item" routerLink="/account/password" (click)="collapseNavbar()" data-cy="passwordItem">
+              <fa-icon icon="lock" [fixedWidth]="true" />
+              <span jhiTranslate="global.menu.account.password">Password</span>
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item" (click)="logout()" id="logout" data-cy="logout">
+              <fa-icon icon="sign-out-alt" [fixedWidth]="true" />
+              <span jhiTranslate="global.menu.account.logout">Sign out</span>
+            </a>
+          </li>
+        } @else {
+          <li>
+            <a class="dropdown-item" (click)="login()" id="login" data-cy="login">
+              <fa-icon icon="sign-in-alt" [fixedWidth]="true" />
+              <span jhiTranslate="global.menu.account.login">Sign in</span>
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item" routerLink="/account/register" (click)="collapseNavbar()" data-cy="register">
+              <fa-icon icon="user-plus" [fixedWidth]="true" />
+              <span jhiTranslate="global.menu.account.register">Register</span>
+            </a>
+          </li>
+        }
+      </ul>
+    </div>
+  </div>
+</header>
 
 @if (!isNavbarCollapsed()) {
   <div class="sidebar-backdrop d-md-none" (click)="collapseNavbar()"></div>
@@ -214,77 +289,5 @@
         </ul>
       </li>
     </ul>
-  </div>
-
-  <div class="sidebar-footer">
-    @if (languages.length > 1) {
-      <div ngbDropdown class="sidebar-dropup" display="static" placement="top-start">
-        <button type="button" class="sidebar-link sidebar-link-btn" ngbDropdownToggle id="languagesnavBarDropdown">
-          <fa-icon icon="flag" [fixedWidth]="true" />
-          <span jhiTranslate="global.menu.language">Language</span>
-        </button>
-        <ul class="dropdown-menu" ngbDropdownMenu aria-labelledby="languagesnavBarDropdown">
-          @for (language of languages; track $index) {
-            <li>
-              <a
-                class="dropdown-item"
-                [jhiActiveMenu]="language"
-                href="javascript:void(0);"
-                (click)="changeLanguage(language); collapseNavbar()"
-                >{{ language | findLanguageFromKey }}</a
-              >
-            </li>
-          }
-        </ul>
-      </div>
-    }
-
-    <div ngbDropdown class="sidebar-dropup" display="static" placement="top-start" data-cy="accountMenu">
-      @let accountRef = account();
-      <button type="button" class="sidebar-link sidebar-link-btn" ngbDropdownToggle id="account-menu">
-        @if (!accountRef?.imageUrl) {
-          <fa-icon icon="user" [fixedWidth]="true" />
-          <span jhiTranslate="global.menu.account.main">Account</span>
-        } @else {
-          <img [src]="accountRef.imageUrl" class="profile-image rounded-circle" alt="Avatar" />
-          <span>{{ accountRef.login }}</span>
-        }
-      </button>
-      <ul class="dropdown-menu" ngbDropdownMenu aria-labelledby="account-menu">
-        @if (accountRef !== null) {
-          <li>
-            <a class="dropdown-item" routerLink="/account/settings" (click)="collapseNavbar()" data-cy="settings">
-              <fa-icon icon="wrench" [fixedWidth]="true" />
-              <span jhiTranslate="global.menu.account.settings">Settings</span>
-            </a>
-          </li>
-          <li>
-            <a class="dropdown-item" routerLink="/account/password" (click)="collapseNavbar()" data-cy="passwordItem">
-              <fa-icon icon="lock" [fixedWidth]="true" />
-              <span jhiTranslate="global.menu.account.password">Password</span>
-            </a>
-          </li>
-          <li>
-            <a class="dropdown-item" (click)="logout()" id="logout" data-cy="logout">
-              <fa-icon icon="sign-out-alt" [fixedWidth]="true" />
-              <span jhiTranslate="global.menu.account.logout">Sign out</span>
-            </a>
-          </li>
-        } @else {
-          <li>
-            <a class="dropdown-item" (click)="login()" id="login" data-cy="login">
-              <fa-icon icon="sign-in-alt" [fixedWidth]="true" />
-              <span jhiTranslate="global.menu.account.login">Sign in</span>
-            </a>
-          </li>
-          <li>
-            <a class="dropdown-item" routerLink="/account/register" (click)="collapseNavbar()" data-cy="register">
-              <fa-icon icon="user-plus" [fixedWidth]="true" />
-              <span jhiTranslate="global.menu.account.register">Register</span>
-            </a>
-          </li>
-        }
-      </ul>
-    </div>
   </div>
 </nav>

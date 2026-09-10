@@ -2,7 +2,7 @@
 @import 'bootstrap/scss/variables';
 
 /* ==========================================================================
-Vertical sidebar
+Topbar + vertical sidebar
 ========================================================================== */
 
 $sidebar-width: 260px;
@@ -10,24 +10,80 @@ $sidebar-bg: #212529;
 $sidebar-color: rgba(255, 255, 255, 0.75);
 $sidebar-color-hover: #ffffff;
 
+$topbar-height: 56px;
+$topbar-bg: #0d6efd;
+$topbar-color: rgba(255, 255, 255, 0.85);
+$topbar-color-hover: #ffffff;
+
 :host {
   display: contents;
 }
 
+/* ---- Topbar ---- */
+
+.app-topbar {
+  grid-area: topbar;
+  display: flex;
+  align-items: center;
+  height: $topbar-height;
+  padding: 0 1rem;
+  background: $topbar-bg;
+  color: $topbar-color;
+  position: sticky;
+  top: 0;
+  z-index: 1032;
+}
+
+.topbar-spacer {
+  flex: 1 1 auto;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: auto;
+}
+
+.topbar-dropdown {
+  .dropdown-menu {
+    min-width: 200px;
+  }
+}
+
+.topbar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.45rem 0.75rem;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: $topbar-color;
+  font-weight: 400;
+  font-size: 0.92rem;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: $topbar-color-hover;
+  }
+}
+
 .sidebar-mobile-toggle {
   display: none;
-  position: fixed;
-  top: 12px;
-  left: 12px;
-  z-index: 1031;
   width: 40px;
   height: 40px;
   align-items: center;
   justify-content: center;
   border: none;
   border-radius: 8px;
-  background: $sidebar-bg;
-  color: $sidebar-color-hover;
+  background: transparent;
+  color: $topbar-color-hover;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
 }
 
 .sidebar-backdrop {
@@ -37,14 +93,17 @@ $sidebar-color-hover: #ffffff;
   background: rgba(0, 0, 0, 0.4);
 }
 
+/* ---- Sidebar ---- */
+
 .app-sidebar {
+  grid-area: sidebar;
   display: flex;
   flex-direction: column;
   width: $sidebar-width;
   min-width: $sidebar-width;
-  height: 100vh;
+  height: calc(100vh - #{$topbar-height});
   position: sticky;
-  top: 0;
+  top: $topbar-height;
   background: $sidebar-bg;
   color: $sidebar-color;
 }
@@ -142,10 +201,6 @@ $sidebar-color-hover: #ffffff;
   }
 }
 
-.sidebar-link-btn {
-  width: 100%;
-}
-
 .sidebar-link-toggle {
   width: 100%;
 }
@@ -176,22 +231,6 @@ $sidebar-color-hover: #ffffff;
   }
 }
 
-.sidebar-footer {
-  padding: 0.6rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-}
-
-.sidebar-dropup {
-  width: 100%;
-
-  .dropdown-menu {
-    min-width: 200px;
-  }
-}
-
 .profile-image {
   height: 1.6em;
   width: 1.6em;
@@ -208,8 +247,9 @@ Responsive behaviour
 
   .app-sidebar {
     position: fixed;
-    top: 0;
+    top: $topbar-height;
     left: 0;
+    height: calc(100vh - #{$topbar-height});
     z-index: 1030;
     transform: translateX(-100%);
     transition: transform 0.2s ease-in-out;
