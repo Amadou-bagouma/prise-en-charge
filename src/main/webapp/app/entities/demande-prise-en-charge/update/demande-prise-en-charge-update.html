@@ -217,7 +217,7 @@
           <select class="form-control" id="field_agent" data-cy="agent" name="agent" formControlName="agent" [compareWith]="compareAgent">
             <option [ngValue]="null"></option>
             @for (agentOption of agentsSharedCollection(); track $index) {
-              <option [ngValue]="agentOption">{{ agentOption.id }}</option>
+              <option [ngValue]="agentOption">{{ agentOption.matricule }}</option>
             }
           </select>
         </div>
@@ -234,7 +234,7 @@
           >
             <option [ngValue]="null"></option>
             @for (ayantDroitOption of ayantDroitsSharedCollection(); track $index) {
-              <option [ngValue]="ayantDroitOption">{{ ayantDroitOption.id }}</option>
+              <option [ngValue]="ayantDroitOption">{{ ayantDroitOption.nom }}</option>
             }
           </select>
         </div>
@@ -251,7 +251,7 @@
           >
             <option [ngValue]="null"></option>
             @for (typeSoinOption of typeSoinsSharedCollection(); track $index) {
-              <option [ngValue]="typeSoinOption">{{ typeSoinOption.id }}</option>
+              <option [ngValue]="typeSoinOption">{{ typeSoinOption.libelle }}</option>
             }
           </select>
         </div>
@@ -270,7 +270,7 @@
           >
             <option [ngValue]="null"></option>
             @for (etablissementSanteOption of etablissementSantesSharedCollection(); track $index) {
-              <option [ngValue]="etablissementSanteOption">{{ etablissementSanteOption.id }}</option>
+              <option [ngValue]="etablissementSanteOption">{{ etablissementSanteOption.nom }}</option>
             }
           </select>
         </div>

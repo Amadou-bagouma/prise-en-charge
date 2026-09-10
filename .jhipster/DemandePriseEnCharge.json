@@ -63,24 +63,28 @@
   "pagination": "pagination",
   "relationships": [
     {
+      "otherEntityField": "matricule",
       "otherEntityName": "agent",
       "relationshipName": "agent",
       "relationshipSide": "left",
       "relationshipType": "many-to-one"
     },
     {
+      "otherEntityField": "nom",
       "otherEntityName": "ayantDroit",
       "relationshipName": "ayantDroit",
       "relationshipSide": "left",
       "relationshipType": "many-to-one"
     },
     {
+      "otherEntityField": "libelle",
       "otherEntityName": "typeSoin",
       "relationshipName": "typeSoin",
       "relationshipSide": "left",
       "relationshipType": "many-to-one"
     },
     {
+      "otherEntityField": "nom",
       "otherEntityName": "etablissementSante",
       "relationshipName": "etablissementSante",
       "relationshipSide": "left",

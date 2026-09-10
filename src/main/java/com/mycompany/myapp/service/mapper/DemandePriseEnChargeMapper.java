@@ -19,33 +19,37 @@ import org.mapstruct.*;
  */
 @Mapper(componentModel = "spring")
 public interface DemandePriseEnChargeMapper extends EntityMapper<DemandePriseEnChargeDTO, DemandePriseEnCharge> {
-    @Mapping(target = "agent", source = "agent", qualifiedByName = "agentId")
-    @Mapping(target = "ayantDroit", source = "ayantDroit", qualifiedByName = "ayantDroitId")
-    @Mapping(target = "typeSoin", source = "typeSoin", qualifiedByName = "typeSoinId")
-    @Mapping(target = "etablissementSante", source = "etablissementSante", qualifiedByName = "etablissementSanteId")
+    @Mapping(target = "agent", source = "agent", qualifiedByName = "agentMatricule")
+    @Mapping(target = "ayantDroit", source = "ayantDroit", qualifiedByName = "ayantDroitNom")
+    @Mapping(target = "typeSoin", source = "typeSoin", qualifiedByName = "typeSoinLibelle")
+    @Mapping(target = "etablissementSante", source = "etablissementSante", qualifiedByName = "etablissementSanteNom")
     @Mapping(target = "gestionnaireCreateur", source = "gestionnaireCreateur", qualifiedByName = "userLogin")
     @Mapping(target = "assigneA", source = "assigneA", qualifiedByName = "userLogin")
     DemandePriseEnChargeDTO toDto(DemandePriseEnCharge s);
 
-    @Named("agentId")
+    @Named("agentMatricule")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
-    AgentDTO toDtoAgentId(Agent agent);
+    @Mapping(target = "matricule", source = "matricule")
+    AgentDTO toDtoAgentMatricule(Agent agent);
 
-    @Named("ayantDroitId")
+    @Named("ayantDroitNom")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
-    AyantDroitDTO toDtoAyantDroitId(AyantDroit ayantDroit);
+    @Mapping(target = "nom", source = "nom")
+    AyantDroitDTO toDtoAyantDroitNom(AyantDroit ayantDroit);
 
-    @Named("typeSoinId")
+    @Named("typeSoinLibelle")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
-    TypeSoinDTO toDtoTypeSoinId(TypeSoin typeSoin);
+    @Mapping(target = "libelle", source = "libelle")
+    TypeSoinDTO toDtoTypeSoinLibelle(TypeSoin typeSoin);
 
-    @Named("etablissementSanteId")
+    @Named("etablissementSanteNom")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
-    EtablissementSanteDTO toDtoEtablissementSanteId(EtablissementSante etablissementSante);
+    @Mapping(target = "nom", source = "nom")
+    EtablissementSanteDTO toDtoEtablissementSanteNom(EtablissementSante etablissementSante);
 
     @Named("userLogin")
     @BeanMapping(ignoreByDefault = true)

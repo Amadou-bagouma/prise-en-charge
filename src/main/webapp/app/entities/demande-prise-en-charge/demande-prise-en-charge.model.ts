@@ -22,10 +22,10 @@ export interface IDemandePriseEnCharge {
   dateEcheance?: dayjs.Dayjs | null;
   motifRejet?: string | null;
   observation?: string | null;
-  agent?: Pick<IAgent, 'id'> | null;
-  ayantDroit?: Pick<IAyantDroit, 'id'> | null;
-  typeSoin?: Pick<ITypeSoin, 'id'> | null;
-  etablissementSante?: Pick<IEtablissementSante, 'id'> | null;
+  agent?: Pick<IAgent, 'id' | 'matricule'> | null;
+  ayantDroit?: Pick<IAyantDroit, 'id' | 'nom'> | null;
+  typeSoin?: Pick<ITypeSoin, 'id' | 'libelle'> | null;
+  etablissementSante?: Pick<IEtablissementSante, 'id' | 'nom'> | null;
   gestionnaireCreateur?: Pick<IUser, 'id' | 'login'> | null;
   assigneA?: Pick<IUser, 'id' | 'login'> | null;
 }

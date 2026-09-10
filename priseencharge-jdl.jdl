@@ -274,13 +274,13 @@ relationship ManyToOne {
 
 relationship ManyToOne {
 
-  DemandePriseEnCharge{agent} to Agent
+  DemandePriseEnCharge{agent(matricule)} to Agent
 
-  DemandePriseEnCharge{ayantDroit} to AyantDroit
+  DemandePriseEnCharge{ayantDroit(nom)} to AyantDroit
 
-  DemandePriseEnCharge{typeSoin} to TypeSoin
+  DemandePriseEnCharge{typeSoin(libelle)} to TypeSoin
 
-  DemandePriseEnCharge{etablissementSante} to EtablissementSante
+  DemandePriseEnCharge{etablissementSante(nom)} to EtablissementSante
 }
 
 

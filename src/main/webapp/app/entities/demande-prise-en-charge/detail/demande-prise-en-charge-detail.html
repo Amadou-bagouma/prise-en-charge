@@ -83,7 +83,7 @@
           <dd>
             @if (demandePriseEnCharge()!.agent) {
               <div>
-                <a [routerLink]="['/agent', demandePriseEnCharge()!.agent?.id, 'view']">{{ demandePriseEnChargeRef.agent?.id }}</a>
+                <a [routerLink]="['/agent', demandePriseEnCharge()!.agent?.id, 'view']">{{ demandePriseEnChargeRef.agent?.matricule }}</a>
               </div>
             }
           </dd>
@@ -92,7 +92,7 @@
             @if (demandePriseEnCharge()!.ayantDroit) {
               <div>
                 <a [routerLink]="['/ayant-droit', demandePriseEnCharge()!.ayantDroit?.id, 'view']">{{
-                  demandePriseEnChargeRef.ayantDroit?.id
+                  demandePriseEnChargeRef.ayantDroit?.nom
                 }}</a>
               </div>
             }
@@ -102,7 +102,7 @@
             @if (demandePriseEnCharge()!.typeSoin) {
               <div>
                 <a [routerLink]="['/type-soin', demandePriseEnCharge()!.typeSoin?.id, 'view']">{{
-                  demandePriseEnChargeRef.typeSoin?.id
+                  demandePriseEnChargeRef.typeSoin?.libelle
                 }}</a>
               </div>
             }
@@ -112,7 +112,7 @@
             @if (demandePriseEnCharge()!.etablissementSante) {
               <div>
                 <a [routerLink]="['/etablissement-sante', demandePriseEnCharge()!.etablissementSante?.id, 'view']">{{
-                  demandePriseEnChargeRef.etablissementSante?.id
+                  demandePriseEnChargeRef.etablissementSante?.nom
                 }}</a>
               </div>
             }

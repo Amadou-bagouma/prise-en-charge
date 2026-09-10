@@ -232,521 +232,228 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
       margin-left: 0.5em;
     }
   }
+}
 
-  /* Page entière */
+/* ==========================================================================
+Login page
+========================================================================== */
+
+.login-page {
+  min-height: 100vh;
+  width: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: #f5f5f5;
+
+  box-sizing: border-box;
+}
+
+.login-card {
+  width: 590px;
+  height: auto;
+
+  background: #ffffff;
+
+  border-radius: 10px;
+
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.12);
+
+  overflow: hidden;
+
+  box-sizing: border-box;
+}
+
+.login-header {
+  height: 60px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #f5f5f5;
+
+  border-bottom: 1px solid #dedede;
+
+  box-sizing: border-box;
+}
+
+.login-header h1 {
+  margin: 0;
+
+  color: #222222;
+
+  font-family: Georgia, 'Times New Roman', serif;
+
+  font-size: 21px;
+  font-weight: bold;
+
+  text-align: center;
+}
+
+.login-form {
+  padding: 25px 28px 34px;
+
+  box-sizing: border-box;
+}
+
+.input-box {
+  position: relative;
+
+  width: 100%;
+  height: 48px;
+
+  margin-bottom: 20px;
+
+  background: #ffffff;
+
+  border: 1px solid #cccccc;
+
+  border-radius: 5px;
+
+  box-sizing: border-box;
+}
+
+/* Champ matricule : bordure bleue */
+.matricule-box {
+  border-left: 6px solid #a8c9e5;
+}
+
+/* Champ mot de passe : bordure rouge */
+.password-box {
+  border-left: 6px solid #f00000;
+}
+
+.input-box input {
+  width: 100%;
+  height: 100%;
+
+  padding: 0 55px 0 14px;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+
+  color: #555555;
+
+  font-family: Arial, sans-serif;
+
+  font-size: 19px;
+
+  box-sizing: border-box;
+}
+
+.input-box input::placeholder {
+  color: #6f777d;
+
+  opacity: 1;
+}
+
+.user-icon {
+  position: absolute;
+
+  right: 12px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  color: #777777;
+
+  font-size: 21px;
+
+  line-height: 1;
+}
+
+.password-icons {
+  position: absolute;
+
+  right: 11px;
+  top: 50%;
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  transform: translateY(-50%);
+
+  color: #777777;
+}
+
+.eye-icon {
+  font-size: 20px;
+
+  line-height: 1;
+}
+
+.lock-icon {
+  font-size: 19px;
+
+  line-height: 1;
+}
+
+.login-button {
+  display: block;
+
+  width: 340px;
+  height: 48px;
+
+  margin: 20px auto 0;
+
+  border: none;
+  border-radius: 4px;
+
+  background: #70c486;
+
+  color: #ffffff;
+
+  font-family: Arial, sans-serif;
+
+  font-size: 20px;
+  font-weight: 400;
+
+  cursor: pointer;
+
+  transition: background 0.2s ease;
+}
+
+.login-button:hover {
+  background: #61b577;
+}
+
+.login-button:active {
+  transform: translateY(1px);
+}
+
+.login-error {
+  margin: 20px 28px 0;
+
+  padding: 10px;
+
+  font-size: 14px;
+}
+
+@media (max-width: 620px) {
   .login-page {
-    min-height: 100vh;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-
-    padding-top: 10px;
-
-    background: #f7f7f7;
+    padding: 10px;
   }
 
-  /* Carte */
   .login-card {
-    width: 590px;
-    max-width: calc(100% - 30px);
-
-    background: #fff;
-
-    border-radius: 0 0 10px 10px;
-
-    box-shadow:
-      0 2px 8px rgba(0, 0, 0, 0.08),
-      0 8px 20px rgba(0, 0, 0, 0.05);
-
-    overflow: hidden;
+    width: 100%;
   }
 
-  /* Header */
-  .login-header {
-    height: 60px;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    background: #f5f5f5;
-
-    border-bottom: 1px solid #ddd;
-  }
-
-  .login-header h1 {
-    margin: 0;
-
-    color: #222;
-
-    font-family: Georgia, 'Times New Roman', serif;
-    font-size: 21px;
-    font-weight: 700;
-
-    text-align: center;
-  }
-
-  /* Formulaire */
   .login-form {
-    padding: 25px 28px 34px;
+    padding-left: 20px;
+    padding-right: 20px;
   }
 
-  /* Champs */
-  .input-container {
-    position: relative;
-
-    width: 100%;
-    height: 48px;
-
-    margin-bottom: 20px;
-
-    background: #fff;
-
-    border: 1px solid #cfcfcf;
-    border-radius: 5px;
-
-    transition:
-      border-color 0.2s,
-      box-shadow 0.2s;
-  }
-
-  /* Bordure bleue du matricule */
-  .input-container.matricule {
-    border-left: 6px solid #a9cbe9;
-  }
-
-  /* Bordure rouge du mot de passe */
-  .input-container.password {
-    border-left: 6px solid #ef1d25;
-  }
-
-  .input-container:focus-within {
-    box-shadow: 0 0 0 2px rgba(100, 160, 220, 0.12);
-  }
-
-  .input-container input {
-    width: 100%;
-    height: 100%;
-
-    padding: 0 55px 0 15px;
-
-    border: 0;
-    outline: none;
-
-    background: transparent;
-
-    color: #555;
-
-    font-size: 19px;
-    font-family: Arial, sans-serif;
-
-    box-sizing: border-box;
-  }
-
-  .input-container input::placeholder {
-    color: #6f777d;
-    opacity: 1;
-  }
-
-  /* Icône utilisateur */
-  .input-icon {
-    position: absolute;
-
-    right: 12px;
-    top: 50%;
-
-    transform: translateY(-50%);
-
-    width: 24px;
-    height: 24px;
-
-    color: #737373;
-  }
-
-  .input-icon svg,
-  .eye-button svg,
-  .lock-icon svg {
-    width: 100%;
-    height: 100%;
-
-    fill: currentColor;
-  }
-
-  /* Œil */
-  .eye-button {
-    position: absolute;
-
-    right: 42px;
-    top: 50%;
-
-    transform: translateY(-50%);
-
-    width: 23px;
-    height: 23px;
-
-    padding: 0;
-
-    border: 0;
-    background: transparent;
-
-    color: #777;
-
-    cursor: pointer;
-  }
-
-  .eye-button:hover {
-    color: #555;
-  }
-
-  /* Cadenas */
-  .lock-icon {
-    position: absolute;
-
-    right: 12px;
-    top: 50%;
-
-    transform: translateY(-50%);
-
-    width: 22px;
-    height: 22px;
-
-    color: #777;
-  }
-
-  /* Bouton connexion */
   .login-button {
-    display: block;
-
     width: 340px;
     max-width: 100%;
-
-    height: 48px;
-
-    margin: 20px auto 0;
-
-    border: none;
-    border-radius: 4px;
-
-    background: #70c486;
-
-    color: white;
-
-    font-size: 20px;
-    font-weight: 400;
-
-    cursor: pointer;
-
-    transition:
-      background 0.2s ease,
-      transform 0.1s ease;
-  }
-
-  .login-button:hover {
-    background: #62b978;
-  }
-
-  .login-button:active {
-    transform: translateY(1px);
-  }
-
-  .login-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-
-  /* Message d'erreur */
-  .login-error {
-    margin-bottom: 20px;
-  }
-
-  /* Responsive */
-  @media (max-width: 600px) {
-    .login-page {
-      padding-top: 0;
-    }
-
-    .login-card {
-      width: 100%;
-      max-width: 100%;
-      min-height: 100vh;
-
-      border-radius: 0;
-    }
-
-    .login-form {
-      padding: 25px 20px 30px;
-    }
-
-    .login-button {
-      width: 100%;
-    }
-
-    .login-header h1 {
-      font-size: 19px;
-    }
-
-    .input-container input {
-      font-size: 17px;
-    }
-  }
-
-  /* =========================================
-   PAGE
-   ========================================= */
-
-  .login-page {
-    min-height: 100vh;
-    width: 100%;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    background: #f5f5f5;
-
-    box-sizing: border-box;
-  }
-
-  /* =========================================
-   CARTE PRINCIPALE
-   ========================================= */
-
-  .login-card {
-    width: 590px;
-    height: auto;
-
-    background: #ffffff;
-
-    border-radius: 10px;
-
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.12);
-
-    overflow: hidden;
-
-    box-sizing: border-box;
-  }
-
-  /* =========================================
-   EN-TÊTE
-   ========================================= */
-
-  .login-header {
-    height: 60px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: #f5f5f5;
-
-    border-bottom: 1px solid #dedede;
-
-    box-sizing: border-box;
-  }
-
-  .login-header h1 {
-    margin: 0;
-
-    color: #222222;
-
-    font-family: Georgia, 'Times New Roman', serif;
-
-    font-size: 21px;
-    font-weight: bold;
-
-    text-align: center;
-  }
-
-  /* =========================================
-   FORMULAIRE
-   ========================================= */
-
-  .login-form {
-    padding: 25px 28px 34px;
-
-    box-sizing: border-box;
-  }
-
-  /* =========================================
-   CHAMPS
-   ========================================= */
-
-  .input-box {
-    position: relative;
-
-    width: 100%;
-    height: 48px;
-
-    margin-bottom: 20px;
-
-    background: #ffffff;
-
-    border: 1px solid #cccccc;
-
-    border-radius: 5px;
-
-    box-sizing: border-box;
-  }
-
-  /* Champ matricule : bordure bleue */
-  .matricule-box {
-    border-left: 6px solid #a8c9e5;
-  }
-
-  /* Champ mot de passe : bordure rouge */
-  .password-box {
-    border-left: 6px solid #f00000;
-  }
-
-  .input-box input {
-    width: 100%;
-    height: 100%;
-
-    padding: 0 55px 0 14px;
-
-    border: none;
-    outline: none;
-
-    background: transparent;
-
-    color: #555555;
-
-    font-family: Arial, sans-serif;
-
-    font-size: 19px;
-
-    box-sizing: border-box;
-  }
-
-  .input-box input::placeholder {
-    color: #6f777d;
-
-    opacity: 1;
-  }
-
-  /* =========================================
-   ICÔNE UTILISATEUR
-   ========================================= */
-
-  .user-icon {
-    position: absolute;
-
-    right: 12px;
-    top: 50%;
-
-    transform: translateY(-50%);
-
-    color: #777777;
-
-    font-size: 21px;
-
-    line-height: 1;
-  }
-
-  /* =========================================
-   ICÔNES MOT DE PASSE
-   ========================================= */
-
-  .password-icons {
-    position: absolute;
-
-    right: 11px;
-    top: 50%;
-
-    display: flex;
-    align-items: center;
-
-    gap: 12px;
-
-    transform: translateY(-50%);
-
-    color: #777777;
-  }
-
-  .eye-icon {
-    font-size: 20px;
-
-    line-height: 1;
-  }
-
-  .lock-icon {
-    font-size: 19px;
-
-    line-height: 1;
-  }
-
-  /* =========================================
-   BOUTON
-   ========================================= */
-
-  .login-button {
-    display: block;
-
-    width: 340px;
-    height: 48px;
-
-    margin: 20px auto 0;
-
-    border: none;
-    border-radius: 4px;
-
-    background: #70c486;
-
-    color: #ffffff;
-
-    font-family: Arial, sans-serif;
-
-    font-size: 20px;
-    font-weight: 400;
-
-    cursor: pointer;
-
-    transition: background 0.2s ease;
-  }
-
-  .login-button:hover {
-    background: #61b577;
-  }
-
-  .login-button:active {
-    transform: translateY(1px);
-  }
-
-  /* =========================================
-   MESSAGE D'ERREUR
-   ========================================= */
-
-  .login-error {
-    margin: 20px 28px 0;
-
-    padding: 10px;
-
-    font-size: 14px;
-  }
-
-  /* =========================================
-   RESPONSIVE
-   ========================================= */
-
-  @media (max-width: 620px) {
-    .login-page {
-      padding: 10px;
-    }
-
-    .login-card {
-      width: 100%;
-    }
-
-    .login-form {
-      padding-left: 20px;
-      padding-right: 20px;
-    }
-
-    .login-button {
-      width: 340px;
-      max-width: 100%;
-    }
   }
 }
+
 /* jhipster-needle-scss-add-main JHipster will add new css style */
