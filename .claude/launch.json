@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "peccnss-webapp",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "webapp:dev"],
+      "port": 4200
+    }
+  ]
+}

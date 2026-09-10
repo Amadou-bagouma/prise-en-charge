@@ -1,3 +1,4 @@
+import { NgClass } from '@angular/common';
 import { Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
@@ -11,7 +12,7 @@ import { IDemandePriseEnCharge } from '../demande-prise-en-charge.model';
 @Component({
   selector: 'jhi-demande-prise-en-charge-detail',
   templateUrl: './demande-prise-en-charge-detail.html',
-  imports: [FontAwesomeModule, Alert, AlertError, TranslateDirective, RouterLink, FormatMediumDatetimePipe],
+  imports: [NgClass, FontAwesomeModule, Alert, AlertError, TranslateDirective, RouterLink, FormatMediumDatetimePipe],
 })
 export class DemandePriseEnChargeDetail {
   readonly demandePriseEnCharge = input<IDemandePriseEnCharge | null>(null);

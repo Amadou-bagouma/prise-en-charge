@@ -29,6 +29,7 @@
       "dateEcheance": "Date Echeance",
       "motifRejet": "Motif Rejet",
       "observation": "Observation",
+      "beneficiaire": "Beneficiaire",
       "agent": "Agent",
       "ayantDroit": "Ayant Droit",
       "typeSoin": "Type Soin",

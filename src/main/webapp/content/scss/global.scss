@@ -456,4 +456,231 @@ Login page
   }
 }
 
+/* ==========================================================================
+Entity pages (list / form) design system
+========================================================================== */
+
+:root {
+  --jhi-accent: #61b577;
+  --jhi-accent-dark: #4a9a5f;
+  --jhi-accent-soft: #e8f7ee;
+  --jhi-danger: #ef1d25;
+  --jhi-danger-soft: #fdeaea;
+  --jhi-warning: #e08a00;
+  --jhi-warning-soft: #fdf1dc;
+  --jhi-info: #3d7fc4;
+  --jhi-info-soft: #e8f1fb;
+  --jhi-muted: #6c757d;
+  --jhi-muted-soft: #eceef0;
+  --jhi-card-radius: 12px;
+  --jhi-card-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 8px 20px rgba(0, 0, 0, 0.05);
+}
+
+.jhi-page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+
+  h2 {
+    margin: 0;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #222;
+  }
+}
+
+.jhi-page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.btn-accent {
+  background-color: var(--jhi-accent);
+  border-color: var(--jhi-accent);
+  color: #fff;
+
+  &:hover,
+  &:focus {
+    background-color: var(--jhi-accent-dark);
+    border-color: var(--jhi-accent-dark);
+    color: #fff;
+  }
+}
+
+.jhi-panel {
+  background: #fff;
+  border-radius: var(--jhi-card-radius);
+  box-shadow: var(--jhi-card-shadow);
+  overflow: hidden;
+}
+
+/* ---- List / table ---- */
+
+.jhi-table-panel {
+  @extend .jhi-panel;
+  padding: 4px;
+}
+
+.jhi-table {
+  margin-bottom: 0;
+
+  thead th {
+    background: var(--jhi-muted-soft);
+    border-bottom: none;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #555;
+    white-space: nowrap;
+  }
+
+  tbody tr {
+    transition: background-color 0.15s ease;
+  }
+
+  tbody tr:hover {
+    background-color: var(--jhi-accent-soft);
+  }
+
+  td,
+  th {
+    padding: 0.75rem 0.9rem;
+    vertical-align: middle;
+  }
+
+  td a {
+    color: var(--jhi-accent-dark);
+  }
+}
+
+/* ---- Status / priority badges ---- */
+
+.jhi-badge {
+  display: inline-block;
+  padding: 0.3em 0.75em;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  background: var(--jhi-muted-soft);
+  color: var(--jhi-muted);
+}
+
+.jhi-badge-statut-NOUVELLE,
+.jhi-badge-statut-A_TRAITER {
+  background: var(--jhi-info-soft);
+  color: var(--jhi-info);
+}
+
+.jhi-badge-statut-EN_ATTENTE_PIECES,
+.jhi-badge-statut-EN_COURS_TRAITEMENT,
+.jhi-badge-statut-EN_ATTENTE_AVIS_MEDICAL,
+.jhi-badge-statut-EN_ATTENTE_DECISION {
+  background: var(--jhi-warning-soft);
+  color: var(--jhi-warning);
+}
+
+.jhi-badge-statut-VALIDEE {
+  background: var(--jhi-accent-soft);
+  color: var(--jhi-accent-dark);
+}
+
+.jhi-badge-statut-REJETEE {
+  background: var(--jhi-danger-soft);
+  color: var(--jhi-danger);
+}
+
+.jhi-badge-statut-ANNULEE,
+.jhi-badge-statut-CLOTUREE {
+  background: var(--jhi-muted-soft);
+  color: var(--jhi-muted);
+}
+
+.jhi-badge-priorite-NORMALE {
+  background: var(--jhi-muted-soft);
+  color: var(--jhi-muted);
+}
+
+.jhi-badge-priorite-IMPORTANTE {
+  background: var(--jhi-warning-soft);
+  color: var(--jhi-warning);
+}
+
+.jhi-badge-priorite-URGENTE {
+  background: var(--jhi-danger-soft);
+  color: var(--jhi-danger);
+}
+
+/* ---- Form ---- */
+
+.jhi-form-panel {
+  @extend .jhi-panel;
+  padding: 28px 32px 32px;
+}
+
+.jhi-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px 24px;
+
+  @media (max-width: 767px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.jhi-form-section {
+  margin: 28px 0 12px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--jhi-accent-soft);
+
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--jhi-accent-dark);
+
+  &:first-of-type {
+    margin-top: 4px;
+  }
+}
+
+.jhi-field {
+  margin-bottom: 18px;
+
+  &.jhi-field-full {
+    grid-column: 1 / -1;
+  }
+
+  .form-label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #444;
+    margin-bottom: 0.35rem;
+  }
+
+  .form-control,
+  .form-select {
+    border-radius: 6px;
+    border-color: #d5d8dc;
+
+    &:focus {
+      border-color: var(--jhi-accent);
+      box-shadow: 0 0 0 0.2rem var(--jhi-accent-soft);
+    }
+  }
+}
+
+.jhi-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
 /* jhipster-needle-scss-add-main JHipster will add new css style */

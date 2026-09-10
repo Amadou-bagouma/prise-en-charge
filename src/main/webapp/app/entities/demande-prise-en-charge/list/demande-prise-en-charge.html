@@ -1,9 +1,11 @@
 <div>
-  <h2 id="page-heading" data-cy="DemandePriseEnChargeHeading">
-    <span jhiTranslate="peccnssApp.demandePriseEnCharge.home.title">Demande Prise En Charges</span>
+  <div class="jhi-page-header">
+    <h2 id="page-heading" data-cy="DemandePriseEnChargeHeading">
+      <span jhiTranslate="peccnssApp.demandePriseEnCharge.home.title">Demande Prise En Charges</span>
+    </h2>
 
-    <div class="d-flex justify-content-end">
-      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+    <div class="jhi-page-actions">
+      <button class="btn btn-outline-secondary" (click)="load()" [disabled]="isLoading()">
         <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
         <span jhiTranslate="peccnssApp.demandePriseEnCharge.home.refreshListLabel">Refresh list</span>
       </button>
@@ -11,14 +13,14 @@
       <button
         id="jh-create-entity"
         data-cy="entityCreateButton"
-        class="btn btn-primary jh-create-entity create-demande-prise-en-charge"
+        class="btn btn-accent jh-create-entity create-demande-prise-en-charge"
         [routerLink]="['/demande-prise-en-charge/new']"
       >
         <fa-icon icon="plus" />
         <span jhiTranslate="peccnssApp.demandePriseEnCharge.home.createLabel">Create a new Demande Prise En Charge</span>
       </button>
     </div>
-  </h2>
+  </div>
 
   <jhi-alert-error />
 
@@ -31,91 +33,19 @@
       <span jhiTranslate="peccnssApp.demandePriseEnCharge.home.notFound">No Demande Prise En Charges found</span>
     </div>
   } @else {
-    <div class="table-responsive table-entities" id="entities">
-      <table class="table table-striped" aria-describedby="page-heading">
+    <div class="jhi-table-panel table-responsive table-entities" id="entities">
+      <table class="table jhi-table" aria-describedby="page-heading">
         <thead>
           <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
-            <th scope="col" jhiSortBy="id">
-              <div class="d-flex">
-                <span jhiTranslate="global.field.id">ID</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
             <th scope="col" jhiSortBy="reference">
               <div class="d-flex">
                 <span jhiTranslate="peccnssApp.demandePriseEnCharge.reference">Reference</span>
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
-            <th scope="col" jhiSortBy="dateCreation">
-              <div class="d-flex">
-                <span jhiTranslate="peccnssApp.demandePriseEnCharge.dateCreation">Date Creation</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="dateModification">
-              <div class="d-flex">
-                <span jhiTranslate="peccnssApp.demandePriseEnCharge.dateModification">Date Modification</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="typeBeneficiaire">
-              <div class="d-flex">
-                <span jhiTranslate="peccnssApp.demandePriseEnCharge.typeBeneficiaire">Type Beneficiaire</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="description">
-              <div class="d-flex">
-                <span jhiTranslate="peccnssApp.demandePriseEnCharge.description">Description</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="statut">
-              <div class="d-flex">
-                <span jhiTranslate="peccnssApp.demandePriseEnCharge.statut">Statut</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="priorite">
-              <div class="d-flex">
-                <span jhiTranslate="peccnssApp.demandePriseEnCharge.priorite">Priorite</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="dateAssignation">
-              <div class="d-flex">
-                <span jhiTranslate="peccnssApp.demandePriseEnCharge.dateAssignation">Date Assignation</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="dateEcheance">
-              <div class="d-flex">
-                <span jhiTranslate="peccnssApp.demandePriseEnCharge.dateEcheance">Date Echeance</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="motifRejet">
-              <div class="d-flex">
-                <span jhiTranslate="peccnssApp.demandePriseEnCharge.motifRejet">Motif Rejet</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="observation">
-              <div class="d-flex">
-                <span jhiTranslate="peccnssApp.demandePriseEnCharge.observation">Observation</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
             <th scope="col" jhiSortBy="agent.matricule">
               <div class="d-flex">
-                <span jhiTranslate="peccnssApp.demandePriseEnCharge.agent">Agent</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="ayantDroit.nom">
-              <div class="d-flex">
-                <span jhiTranslate="peccnssApp.demandePriseEnCharge.ayantDroit">Ayant Droit</span>
+                <span jhiTranslate="peccnssApp.demandePriseEnCharge.beneficiaire">Beneficiaire</span>
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
@@ -131,9 +61,27 @@
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
-            <th scope="col" jhiSortBy="gestionnaireCreateur.login">
+            <th scope="col" jhiSortBy="statut">
               <div class="d-flex">
-                <span jhiTranslate="peccnssApp.demandePriseEnCharge.gestionnaireCreateur">Gestionnaire Createur</span>
+                <span jhiTranslate="peccnssApp.demandePriseEnCharge.statut">Statut</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="priorite">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.demandePriseEnCharge.priorite">Priorite</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="dateCreation">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.demandePriseEnCharge.dateCreation">Date Creation</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="dateEcheance">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.demandePriseEnCharge.dateEcheance">Date Echeance</span>
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
@@ -150,78 +98,58 @@
           @for (demandePriseEnCharge of demandePriseEnCharges(); track trackId(demandePriseEnCharge)) {
             <tr data-cy="entityTable">
               <td>
-                <a [routerLink]="['/demande-prise-en-charge', demandePriseEnCharge.id, 'view']">{{ demandePriseEnCharge.id }}</a>
+                <a [routerLink]="['/demande-prise-en-charge', demandePriseEnCharge.id, 'view']">{{ demandePriseEnCharge.reference }}</a>
               </td>
-              <td>{{ demandePriseEnCharge.reference }}</td>
+              <td>
+                @if (demandePriseEnCharge.typeBeneficiaire === 'AGENT' && demandePriseEnCharge.agent) {
+                  <a [routerLink]="['/agent', demandePriseEnCharge.agent.id, 'view']">{{ demandePriseEnCharge.agent.matricule }}</a>
+                } @else if (demandePriseEnCharge.typeBeneficiaire === 'AYANT_DROIT' && demandePriseEnCharge.ayantDroit) {
+                  <a [routerLink]="['/ayant-droit', demandePriseEnCharge.ayantDroit.id, 'view']">{{
+                    demandePriseEnCharge.ayantDroit.nom
+                  }}</a>
+                }
+                <div class="jhi-badge" [jhiTranslate]="'peccnssApp.TypeBeneficiaire.' + (demandePriseEnCharge.typeBeneficiaire ?? 'null')">
+                  {{ { null: '', AGENT: 'Agent', AYANT_DROIT: 'Ayant droit' }[demandePriseEnCharge.typeBeneficiaire ?? 'null'] }}
+                </div>
+              </td>
+              <td>{{ demandePriseEnCharge.typeSoin?.libelle }}</td>
+              <td>{{ demandePriseEnCharge.etablissementSante?.nom }}</td>
+              <td>
+                <span
+                  class="jhi-badge"
+                  [ngClass]="'jhi-badge-statut-' + demandePriseEnCharge.statut"
+                  [jhiTranslate]="'peccnssApp.StatutDemande.' + (demandePriseEnCharge.statut ?? 'null')"
+                >
+                  {{
+                    {
+                      null: '',
+                      NOUVELLE: 'NOUVELLE',
+                      EN_ATTENTE_PIECES: 'EN_ATTENTE_PIECES',
+                      A_TRAITER: 'A_TRAITER',
+                      EN_COURS_TRAITEMENT: 'EN_COURS_TRAITEMENT',
+                      EN_ATTENTE_AVIS_MEDICAL: 'EN_ATTENTE_AVIS_MEDICAL',
+                      EN_ATTENTE_DECISION: 'EN_ATTENTE_DECISION',
+                      VALIDEE: 'VALIDEE',
+                      REJETEE: 'REJETEE',
+                      ANNULEE: 'ANNULEE',
+                      CLOTUREE: 'CLOTUREE',
+                    }[demandePriseEnCharge.statut ?? 'null']
+                  }}
+                </span>
+              </td>
+              <td>
+                <span
+                  class="jhi-badge"
+                  [ngClass]="'jhi-badge-priorite-' + demandePriseEnCharge.priorite"
+                  [jhiTranslate]="'peccnssApp.PrioriteDemande.' + (demandePriseEnCharge.priorite ?? 'null')"
+                >
+                  {{
+                    { null: '', NORMALE: 'NORMALE', IMPORTANTE: 'IMPORTANTE', URGENTE: 'URGENTE' }[demandePriseEnCharge.priorite ?? 'null']
+                  }}
+                </span>
+              </td>
               <td>{{ demandePriseEnCharge.dateCreation | formatMediumDatetime }}</td>
-              <td>{{ demandePriseEnCharge.dateModification | formatMediumDatetime }}</td>
-              <td [jhiTranslate]="'peccnssApp.TypeBeneficiaire.' + (demandePriseEnCharge.typeBeneficiaire ?? 'null')">
-                {{ { null: '', AGENT: 'AGENT', AYANT_DROIT: 'AYANT_DROIT' }[demandePriseEnCharge.typeBeneficiaire ?? 'null'] }}
-              </td>
-              <td>{{ demandePriseEnCharge.description }}</td>
-              <td [jhiTranslate]="'peccnssApp.StatutDemande.' + (demandePriseEnCharge.statut ?? 'null')">
-                {{
-                  {
-                    null: '',
-                    NOUVELLE: 'NOUVELLE',
-                    EN_ATTENTE_PIECES: 'EN_ATTENTE_PIECES',
-                    A_TRAITER: 'A_TRAITER',
-                    EN_COURS_TRAITEMENT: 'EN_COURS_TRAITEMENT',
-                    EN_ATTENTE_AVIS_MEDICAL: 'EN_ATTENTE_AVIS_MEDICAL',
-                    EN_ATTENTE_DECISION: 'EN_ATTENTE_DECISION',
-                    VALIDEE: 'VALIDEE',
-                    REJETEE: 'REJETEE',
-                    ANNULEE: 'ANNULEE',
-                    CLOTUREE: 'CLOTUREE',
-                  }[demandePriseEnCharge.statut ?? 'null']
-                }}
-              </td>
-              <td [jhiTranslate]="'peccnssApp.PrioriteDemande.' + (demandePriseEnCharge.priorite ?? 'null')">
-                {{
-                  { null: '', NORMALE: 'NORMALE', IMPORTANTE: 'IMPORTANTE', URGENTE: 'URGENTE' }[demandePriseEnCharge.priorite ?? 'null']
-                }}
-              </td>
-              <td>{{ demandePriseEnCharge.dateAssignation | formatMediumDatetime }}</td>
               <td>{{ demandePriseEnCharge.dateEcheance | formatMediumDatetime }}</td>
-              <td>{{ demandePriseEnCharge.motifRejet }}</td>
-              <td>{{ demandePriseEnCharge.observation }}</td>
-              <td>
-                @if (demandePriseEnCharge.agent) {
-                  <div>
-                    <a [routerLink]="['/agent', demandePriseEnCharge.agent.id, 'view']">{{ demandePriseEnCharge.agent.matricule }}</a>
-                  </div>
-                }
-              </td>
-              <td>
-                @if (demandePriseEnCharge.ayantDroit) {
-                  <div>
-                    <a [routerLink]="['/ayant-droit', demandePriseEnCharge.ayantDroit.id, 'view']">{{
-                      demandePriseEnCharge.ayantDroit.nom
-                    }}</a>
-                  </div>
-                }
-              </td>
-              <td>
-                @if (demandePriseEnCharge.typeSoin) {
-                  <div>
-                    <a [routerLink]="['/type-soin', demandePriseEnCharge.typeSoin.id, 'view']">{{
-                      demandePriseEnCharge.typeSoin.libelle
-                    }}</a>
-                  </div>
-                }
-              </td>
-              <td>
-                @if (demandePriseEnCharge.etablissementSante) {
-                  <div>
-                    <a [routerLink]="['/etablissement-sante', demandePriseEnCharge.etablissementSante.id, 'view']">{{
-                      demandePriseEnCharge.etablissementSante.nom
-                    }}</a>
-                  </div>
-                }
-              </td>
-              <td>
-                {{ demandePriseEnCharge.gestionnaireCreateur?.login }}
-              </td>
               <td>
                 {{ demandePriseEnCharge.assigneA?.login }}
               </td>
