@@ -135,6 +135,7 @@ export class Direction {
     const queryObject: any = {
       page: pageToLoad - 1,
       size: this.itemsPerPage(),
+      eagerload: true,
       sort: this.sortService.buildSortParam(this.sortState()),
     };
     for (const filterOption of this.filters.filterOptions) {

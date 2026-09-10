@@ -2,6 +2,8 @@ package com.mycompany.myapp.service;
 
 import com.mycompany.myapp.service.dto.DirectionDTO;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Service Interface for managing {@link com.mycompany.myapp.domain.Direction}.
@@ -30,6 +32,14 @@ public interface DirectionService {
      * @return the persisted entity.
      */
     Optional<DirectionDTO> partialUpdate(DirectionDTO directionDTO);
+
+    /**
+     * Get all the directions with eager load of many-to-many relationships.
+     *
+     * @param pageable the pagination information.
+     * @return the list of entities.
+     */
+    Page<DirectionDTO> findAllWithEagerRelationships(Pageable pageable);
 
     /**
      * Get the "id" direction.

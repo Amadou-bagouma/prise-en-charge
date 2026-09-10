@@ -27,7 +27,7 @@
           <dd>
             @if (direction()!.region) {
               <div>
-                <a [routerLink]="['/region', direction()!.region?.id, 'view']">{{ directionRef.region?.id }}</a>
+                <a [routerLink]="['/region', direction()!.region?.id, 'view']">{{ directionRef.region?.nom }}</a>
               </div>
             }
           </dd>

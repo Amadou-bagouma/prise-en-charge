@@ -53,7 +53,7 @@
           >
             <option [ngValue]="null"></option>
             @for (regionOption of regionsSharedCollection(); track $index) {
-              <option [ngValue]="regionOption">{{ regionOption.id }}</option>
+              <option [ngValue]="regionOption">{{ regionOption.nom }}</option>
             }
           </select>
         </div>

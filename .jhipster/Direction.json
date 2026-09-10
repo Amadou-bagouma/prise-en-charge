@@ -21,6 +21,7 @@
   "pagination": "pagination",
   "relationships": [
     {
+      "otherEntityField": "nom",
       "otherEntityName": "region",
       "relationshipName": "region",
       "relationshipSide": "left",

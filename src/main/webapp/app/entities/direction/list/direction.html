@@ -53,7 +53,7 @@
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
-            <th scope="col" jhiSortBy="region.id">
+            <th scope="col" jhiSortBy="region.nom">
               <div class="d-flex">
                 <span jhiTranslate="peccnssApp.direction.region">Region</span>
                 <fa-icon class="p-1" icon="sort" />
@@ -73,7 +73,7 @@
               <td>
                 @if (direction.region) {
                   <div>
-                    <a [routerLink]="['/region', direction.region.id, 'view']">{{ direction.region.id }}</a>
+                    <a [routerLink]="['/region', direction.region.id, 'view']">{{ direction.region.nom }}</a>
                   </div>
                 }
               </td>

@@ -11,11 +11,12 @@ import org.mapstruct.*;
  */
 @Mapper(componentModel = "spring")
 public interface DirectionMapper extends EntityMapper<DirectionDTO, Direction> {
-    @Mapping(target = "region", source = "region", qualifiedByName = "regionId")
+    @Mapping(target = "region", source = "region", qualifiedByName = "regionNom")
     DirectionDTO toDto(Direction s);
 
-    @Named("regionId")
+    @Named("regionNom")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
-    RegionDTO toDtoRegionId(Region region);
+    @Mapping(target = "nom", source = "nom")
+    RegionDTO toDtoRegionNom(Region region);
 }

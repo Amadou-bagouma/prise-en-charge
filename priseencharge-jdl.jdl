@@ -256,7 +256,7 @@ entity HistoriqueAction {
 
 relationship ManyToOne {
 
-  Direction{region} to Region
+  Direction{region(nom)} to Region
 
   Agent{direction(nom)} to Direction
 
