@@ -1,0 +1,28 @@
+{
+  "peccnssApp": {
+    "boiteReception": {
+      "home": {
+        "title": "Boite Receptions",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Boite Reception",
+        "createOrEditLabel": "Create or edit a Boite Reception",
+        "notFound": "No Boite Receptions found"
+      },
+      "created": "A new Boite Reception is created with identifier {{ param }}",
+      "updated": "A Boite Reception is updated with identifier {{ param }}",
+      "deleted": "A Boite Reception is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Boite Reception {{ id }}?"
+      },
+      "detail": {
+        "title": "Boite Reception"
+      },
+      "id": "ID",
+      "dateCreation": "Date Creation",
+      "dateDerniereLecture": "Date Derniere Lecture",
+      "nombreNonLus": "Nombre Non Lus",
+      "actif": "Actif",
+      "utilisateur": "Utilisateur"
+    }
+  }
+}

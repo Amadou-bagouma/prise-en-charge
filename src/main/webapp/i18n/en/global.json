@@ -17,7 +17,11 @@
         "typeSoin": "Type Soin",
         "etablissementSante": "Etablissement Sante",
         "demandePriseEnCharge": "Demande Prise En Charge",
-        "pieceJustificative": "Piece Justificative"
+        "pieceJustificative": "Piece Justificative",
+        "tache": "Tache",
+        "boiteReception": "Boite Reception",
+        "notification": "Notification",
+        "historiqueAction": "Historique Action"
       },
       "account": {
         "main": "Account",

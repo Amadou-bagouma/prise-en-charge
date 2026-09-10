@@ -1,7 +1,7 @@
 package com.mycompany.myapp;
 
 import com.mycompany.myapp.config.AsyncSyncConfiguration;
-import com.mycompany.myapp.config.EmbeddedSQL;
+import com.mycompany.myapp.config.DatabaseTestcontainer;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -14,7 +14,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @SpringBootTest(
-    classes = { PeccnssApp.class, AsyncSyncConfiguration.class, com.mycompany.myapp.config.JacksonHibernateConfiguration.class }
+    classes = {
+        PeccnssApp.class,
+        AsyncSyncConfiguration.class,
+        com.mycompany.myapp.config.JacksonHibernateConfiguration.class,
+        DatabaseTestcontainer.class,
+    }
 )
-@EmbeddedSQL
 public @interface IntegrationTest {}

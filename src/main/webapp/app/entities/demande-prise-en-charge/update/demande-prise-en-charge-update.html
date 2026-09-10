@@ -136,6 +136,24 @@
           }
         </div>
 
+        @let prioriteRef = editForm.get('priorite')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_priorite" jhiTranslate="peccnssApp.demandePriseEnCharge.priorite">Priorite</label>
+          <select class="form-control" name="priorite" formControlName="priorite" id="field_priorite" data-cy="priorite">
+            <option [ngValue]="null">{{ 'peccnssApp.PrioriteDemande.null' | translate }}</option>
+            @for (prioriteDemande of prioriteDemandeValues; track $index) {
+              <option [value]="prioriteDemande">{{ 'peccnssApp.PrioriteDemande.' + prioriteDemande | translate }}</option>
+            }
+          </select>
+          @if (prioriteRef.invalid && (prioriteRef.dirty || prioriteRef.touched)) {
+            <div>
+              @if (prioriteRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
         <div class="mb-3">
           <label class="form-label" for="field_dateAssignation" jhiTranslate="peccnssApp.demandePriseEnCharge.dateAssignation"
             >Date Assignation</label
@@ -151,6 +169,47 @@
               placeholder="YYYY-MM-DD HH:mm"
             />
           </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_dateEcheance" jhiTranslate="peccnssApp.demandePriseEnCharge.dateEcheance"
+            >Date Echeance</label
+          >
+          <div class="d-flex">
+            <input
+              id="field_dateEcheance"
+              data-cy="dateEcheance"
+              type="datetime-local"
+              class="form-control"
+              name="dateEcheance"
+              formControlName="dateEcheance"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_motifRejet" jhiTranslate="peccnssApp.demandePriseEnCharge.motifRejet">Motif Rejet</label>
+          <input
+            type="text"
+            class="form-control"
+            name="motifRejet"
+            id="field_motifRejet"
+            data-cy="motifRejet"
+            formControlName="motifRejet"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_observation" jhiTranslate="peccnssApp.demandePriseEnCharge.observation">Observation</label>
+          <input
+            type="text"
+            class="form-control"
+            name="observation"
+            id="field_observation"
+            data-cy="observation"
+            formControlName="observation"
+          />
         </div>
 
         <div class="mb-3">

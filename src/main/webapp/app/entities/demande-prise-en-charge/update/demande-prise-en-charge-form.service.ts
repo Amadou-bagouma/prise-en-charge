@@ -22,18 +22,22 @@ type DemandePriseEnChargeFormGroupInput = IDemandePriseEnCharge | PartialWithReq
  */
 type FormValueOf<T extends IDemandePriseEnCharge | NewDemandePriseEnCharge> = Omit<
   T,
-  'dateCreation' | 'dateModification' | 'dateAssignation'
+  'dateCreation' | 'dateModification' | 'dateAssignation' | 'dateEcheance'
 > & {
   dateCreation?: string | null;
   dateModification?: string | null;
   dateAssignation?: string | null;
+  dateEcheance?: string | null;
 };
 
 type DemandePriseEnChargeFormRawValue = FormValueOf<IDemandePriseEnCharge>;
 
 type NewDemandePriseEnChargeFormRawValue = FormValueOf<NewDemandePriseEnCharge>;
 
-type DemandePriseEnChargeFormDefaults = Pick<NewDemandePriseEnCharge, 'id' | 'dateCreation' | 'dateModification' | 'dateAssignation'>;
+type DemandePriseEnChargeFormDefaults = Pick<
+  NewDemandePriseEnCharge,
+  'id' | 'dateCreation' | 'dateModification' | 'dateAssignation' | 'dateEcheance'
+>;
 
 type DemandePriseEnChargeFormGroupContent = {
   id: FormControl<DemandePriseEnChargeFormRawValue['id'] | NewDemandePriseEnCharge['id']>;
@@ -43,7 +47,11 @@ type DemandePriseEnChargeFormGroupContent = {
   typeBeneficiaire: FormControl<DemandePriseEnChargeFormRawValue['typeBeneficiaire']>;
   description: FormControl<DemandePriseEnChargeFormRawValue['description']>;
   statut: FormControl<DemandePriseEnChargeFormRawValue['statut']>;
+  priorite: FormControl<DemandePriseEnChargeFormRawValue['priorite']>;
   dateAssignation: FormControl<DemandePriseEnChargeFormRawValue['dateAssignation']>;
+  dateEcheance: FormControl<DemandePriseEnChargeFormRawValue['dateEcheance']>;
+  motifRejet: FormControl<DemandePriseEnChargeFormRawValue['motifRejet']>;
+  observation: FormControl<DemandePriseEnChargeFormRawValue['observation']>;
   agent: FormControl<DemandePriseEnChargeFormRawValue['agent']>;
   ayantDroit: FormControl<DemandePriseEnChargeFormRawValue['ayantDroit']>;
   typeSoin: FormControl<DemandePriseEnChargeFormRawValue['typeSoin']>;
@@ -84,7 +92,13 @@ export class DemandePriseEnChargeFormService {
       statut: new FormControl(demandePriseEnChargeRawValue.statut, {
         validators: [Validators.required],
       }),
+      priorite: new FormControl(demandePriseEnChargeRawValue.priorite, {
+        validators: [Validators.required],
+      }),
       dateAssignation: new FormControl(demandePriseEnChargeRawValue.dateAssignation),
+      dateEcheance: new FormControl(demandePriseEnChargeRawValue.dateEcheance),
+      motifRejet: new FormControl(demandePriseEnChargeRawValue.motifRejet),
+      observation: new FormControl(demandePriseEnChargeRawValue.observation),
       agent: new FormControl(demandePriseEnChargeRawValue.agent),
       ayantDroit: new FormControl(demandePriseEnChargeRawValue.ayantDroit),
       typeSoin: new FormControl(demandePriseEnChargeRawValue.typeSoin),
@@ -119,6 +133,7 @@ export class DemandePriseEnChargeFormService {
       dateCreation: currentTime,
       dateModification: currentTime,
       dateAssignation: currentTime,
+      dateEcheance: currentTime,
     };
   }
 
@@ -130,6 +145,7 @@ export class DemandePriseEnChargeFormService {
       dateCreation: dayjs(rawDemandePriseEnCharge.dateCreation, DATE_TIME_FORMAT),
       dateModification: dayjs(rawDemandePriseEnCharge.dateModification, DATE_TIME_FORMAT),
       dateAssignation: dayjs(rawDemandePriseEnCharge.dateAssignation, DATE_TIME_FORMAT),
+      dateEcheance: dayjs(rawDemandePriseEnCharge.dateEcheance, DATE_TIME_FORMAT),
     };
   }
 
@@ -141,6 +157,7 @@ export class DemandePriseEnChargeFormService {
       dateCreation: demandePriseEnCharge.dateCreation ? demandePriseEnCharge.dateCreation.format(DATE_TIME_FORMAT) : undefined,
       dateModification: demandePriseEnCharge.dateModification ? demandePriseEnCharge.dateModification.format(DATE_TIME_FORMAT) : undefined,
       dateAssignation: demandePriseEnCharge.dateAssignation ? demandePriseEnCharge.dateAssignation.format(DATE_TIME_FORMAT) : undefined,
+      dateEcheance: demandePriseEnCharge.dateEcheance ? demandePriseEnCharge.dateEcheance.format(DATE_TIME_FORMAT) : undefined,
     };
   }
 }

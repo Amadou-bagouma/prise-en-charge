@@ -77,9 +77,33 @@
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
+            <th scope="col" jhiSortBy="priorite">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.demandePriseEnCharge.priorite">Priorite</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
             <th scope="col" jhiSortBy="dateAssignation">
               <div class="d-flex">
                 <span jhiTranslate="peccnssApp.demandePriseEnCharge.dateAssignation">Date Assignation</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="dateEcheance">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.demandePriseEnCharge.dateEcheance">Date Echeance</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="motifRejet">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.demandePriseEnCharge.motifRejet">Motif Rejet</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="observation">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.demandePriseEnCharge.observation">Observation</span>
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
@@ -141,14 +165,26 @@
                     null: '',
                     NOUVELLE: 'NOUVELLE',
                     EN_ATTENTE_PIECES: 'EN_ATTENTE_PIECES',
-                    EN_VALIDATION: 'EN_VALIDATION',
+                    A_TRAITER: 'A_TRAITER',
+                    EN_COURS_TRAITEMENT: 'EN_COURS_TRAITEMENT',
+                    EN_ATTENTE_AVIS_MEDICAL: 'EN_ATTENTE_AVIS_MEDICAL',
+                    EN_ATTENTE_DECISION: 'EN_ATTENTE_DECISION',
                     VALIDEE: 'VALIDEE',
                     REJETEE: 'REJETEE',
                     ANNULEE: 'ANNULEE',
+                    CLOTUREE: 'CLOTUREE',
                   }[demandePriseEnCharge.statut ?? 'null']
                 }}
               </td>
+              <td [jhiTranslate]="'peccnssApp.PrioriteDemande.' + (demandePriseEnCharge.priorite ?? 'null')">
+                {{
+                  { null: '', NORMALE: 'NORMALE', IMPORTANTE: 'IMPORTANTE', URGENTE: 'URGENTE' }[demandePriseEnCharge.priorite ?? 'null']
+                }}
+              </td>
               <td>{{ demandePriseEnCharge.dateAssignation | formatMediumDatetime }}</td>
+              <td>{{ demandePriseEnCharge.dateEcheance | formatMediumDatetime }}</td>
+              <td>{{ demandePriseEnCharge.motifRejet }}</td>
+              <td>{{ demandePriseEnCharge.observation }}</td>
               <td>
                 @if (demandePriseEnCharge.agent) {
                   <div>

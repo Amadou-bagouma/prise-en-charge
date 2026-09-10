@@ -1,5 +1,6 @@
 package com.mycompany.myapp.service.criteria;
 
+import com.mycompany.myapp.domain.enumeration.PrioriteDemande;
 import com.mycompany.myapp.domain.enumeration.StatutDemande;
 import com.mycompany.myapp.domain.enumeration.TypeBeneficiaire;
 import java.io.Serial;
@@ -57,6 +58,23 @@ public class DemandePriseEnChargeCriteria implements Serializable, Criteria {
         }
     }
 
+    /**
+     * Class for filtering PrioriteDemande
+     */
+    public static class PrioriteDemandeFilter extends Filter<PrioriteDemande> {
+
+        public PrioriteDemandeFilter() {}
+
+        public PrioriteDemandeFilter(PrioriteDemandeFilter filter) {
+            super(filter);
+        }
+
+        @Override
+        public PrioriteDemandeFilter copy() {
+            return new PrioriteDemandeFilter(this);
+        }
+    }
+
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -74,7 +92,15 @@ public class DemandePriseEnChargeCriteria implements Serializable, Criteria {
 
     private StatutDemandeFilter statut;
 
+    private PrioriteDemandeFilter priorite;
+
     private InstantFilter dateAssignation;
+
+    private InstantFilter dateEcheance;
+
+    private StringFilter motifRejet;
+
+    private StringFilter observation;
 
     private LongFilter agentId;
 
@@ -100,7 +126,11 @@ public class DemandePriseEnChargeCriteria implements Serializable, Criteria {
         this.typeBeneficiaire = other.optionalTypeBeneficiaire().map(TypeBeneficiaireFilter::copy).orElse(null);
         this.description = other.optionalDescription().map(StringFilter::copy).orElse(null);
         this.statut = other.optionalStatut().map(StatutDemandeFilter::copy).orElse(null);
+        this.priorite = other.optionalPriorite().map(PrioriteDemandeFilter::copy).orElse(null);
         this.dateAssignation = other.optionalDateAssignation().map(InstantFilter::copy).orElse(null);
+        this.dateEcheance = other.optionalDateEcheance().map(InstantFilter::copy).orElse(null);
+        this.motifRejet = other.optionalMotifRejet().map(StringFilter::copy).orElse(null);
+        this.observation = other.optionalObservation().map(StringFilter::copy).orElse(null);
         this.agentId = other.optionalAgentId().map(LongFilter::copy).orElse(null);
         this.ayantDroitId = other.optionalAyantDroitId().map(LongFilter::copy).orElse(null);
         this.typeSoinId = other.optionalTypeSoinId().map(LongFilter::copy).orElse(null);
@@ -248,6 +278,25 @@ public class DemandePriseEnChargeCriteria implements Serializable, Criteria {
         this.statut = statut;
     }
 
+    public PrioriteDemandeFilter getPriorite() {
+        return priorite;
+    }
+
+    public Optional<PrioriteDemandeFilter> optionalPriorite() {
+        return Optional.ofNullable(priorite);
+    }
+
+    public PrioriteDemandeFilter priorite() {
+        if (priorite == null) {
+            setPriorite(new PrioriteDemandeFilter());
+        }
+        return priorite;
+    }
+
+    public void setPriorite(PrioriteDemandeFilter priorite) {
+        this.priorite = priorite;
+    }
+
     public InstantFilter getDateAssignation() {
         return dateAssignation;
     }
@@ -265,6 +314,63 @@ public class DemandePriseEnChargeCriteria implements Serializable, Criteria {
 
     public void setDateAssignation(InstantFilter dateAssignation) {
         this.dateAssignation = dateAssignation;
+    }
+
+    public InstantFilter getDateEcheance() {
+        return dateEcheance;
+    }
+
+    public Optional<InstantFilter> optionalDateEcheance() {
+        return Optional.ofNullable(dateEcheance);
+    }
+
+    public InstantFilter dateEcheance() {
+        if (dateEcheance == null) {
+            setDateEcheance(new InstantFilter());
+        }
+        return dateEcheance;
+    }
+
+    public void setDateEcheance(InstantFilter dateEcheance) {
+        this.dateEcheance = dateEcheance;
+    }
+
+    public StringFilter getMotifRejet() {
+        return motifRejet;
+    }
+
+    public Optional<StringFilter> optionalMotifRejet() {
+        return Optional.ofNullable(motifRejet);
+    }
+
+    public StringFilter motifRejet() {
+        if (motifRejet == null) {
+            setMotifRejet(new StringFilter());
+        }
+        return motifRejet;
+    }
+
+    public void setMotifRejet(StringFilter motifRejet) {
+        this.motifRejet = motifRejet;
+    }
+
+    public StringFilter getObservation() {
+        return observation;
+    }
+
+    public Optional<StringFilter> optionalObservation() {
+        return Optional.ofNullable(observation);
+    }
+
+    public StringFilter observation() {
+        if (observation == null) {
+            setObservation(new StringFilter());
+        }
+        return observation;
+    }
+
+    public void setObservation(StringFilter observation) {
+        this.observation = observation;
     }
 
     public LongFilter getAgentId() {
@@ -417,7 +523,11 @@ public class DemandePriseEnChargeCriteria implements Serializable, Criteria {
             Objects.equals(typeBeneficiaire, that.typeBeneficiaire) &&
             Objects.equals(description, that.description) &&
             Objects.equals(statut, that.statut) &&
+            Objects.equals(priorite, that.priorite) &&
             Objects.equals(dateAssignation, that.dateAssignation) &&
+            Objects.equals(dateEcheance, that.dateEcheance) &&
+            Objects.equals(motifRejet, that.motifRejet) &&
+            Objects.equals(observation, that.observation) &&
             Objects.equals(agentId, that.agentId) &&
             Objects.equals(ayantDroitId, that.ayantDroitId) &&
             Objects.equals(typeSoinId, that.typeSoinId) &&
@@ -438,7 +548,11 @@ public class DemandePriseEnChargeCriteria implements Serializable, Criteria {
             typeBeneficiaire,
             description,
             statut,
+            priorite,
             dateAssignation,
+            dateEcheance,
+            motifRejet,
+            observation,
             agentId,
             ayantDroitId,
             typeSoinId,
@@ -460,7 +574,11 @@ public class DemandePriseEnChargeCriteria implements Serializable, Criteria {
             optionalTypeBeneficiaire().map(f -> "typeBeneficiaire=" + f + ", ").orElse("") +
             optionalDescription().map(f -> "description=" + f + ", ").orElse("") +
             optionalStatut().map(f -> "statut=" + f + ", ").orElse("") +
+            optionalPriorite().map(f -> "priorite=" + f + ", ").orElse("") +
             optionalDateAssignation().map(f -> "dateAssignation=" + f + ", ").orElse("") +
+            optionalDateEcheance().map(f -> "dateEcheance=" + f + ", ").orElse("") +
+            optionalMotifRejet().map(f -> "motifRejet=" + f + ", ").orElse("") +
+            optionalObservation().map(f -> "observation=" + f + ", ").orElse("") +
             optionalAgentId().map(f -> "agentId=" + f + ", ").orElse("") +
             optionalAyantDroitId().map(f -> "ayantDroitId=" + f + ", ").orElse("") +
             optionalTypeSoinId().map(f -> "typeSoinId=" + f + ", ").orElse("") +

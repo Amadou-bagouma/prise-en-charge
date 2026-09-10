@@ -1,0 +1,214 @@
+<div>
+  <h2 id="page-heading" data-cy="TacheHeading">
+    <span jhiTranslate="peccnssApp.tache.home.title">Taches</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span jhiTranslate="peccnssApp.tache.home.refreshListLabel">Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-tache"
+        [routerLink]="['/tache/new']"
+      >
+        <fa-icon icon="plus" />
+        <span jhiTranslate="peccnssApp.tache.home.createLabel">Create a new Tache</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  <jhi-filter [filters]="filters" />
+
+  @if (taches().length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span jhiTranslate="peccnssApp.tache.home.notFound">No Taches found</span>
+    </div>
+  } @else {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span jhiTranslate="global.field.id">ID</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="titre">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.tache.titre">Titre</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="description">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.tache.description">Description</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="dateCreation">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.tache.dateCreation">Date Creation</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="dateAssignation">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.tache.dateAssignation">Date Assignation</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="dateEcheance">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.tache.dateEcheance">Date Echeance</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="dateTerminaison">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.tache.dateTerminaison">Date Terminaison</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="statut">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.tache.statut">Statut</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="priorite">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.tache.priorite">Priorite</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="lu">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.tache.lu">Lu</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="commentaire">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.tache.commentaire">Commentaire</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="demande.reference">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.tache.demande">Demande</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="utilisateur.login">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.tache.utilisateur">Utilisateur</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="boiteReception.id">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.tache.boiteReception">Boite Reception</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (tache of taches(); track trackId(tache)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/tache', tache.id, 'view']">{{ tache.id }}</a>
+              </td>
+              <td>{{ tache.titre }}</td>
+              <td>{{ tache.description }}</td>
+              <td>{{ tache.dateCreation | formatMediumDatetime }}</td>
+              <td>{{ tache.dateAssignation | formatMediumDatetime }}</td>
+              <td>{{ tache.dateEcheance | formatMediumDatetime }}</td>
+              <td>{{ tache.dateTerminaison | formatMediumDatetime }}</td>
+              <td [jhiTranslate]="'peccnssApp.StatutTache.' + (tache.statut ?? 'null')">
+                {{
+                  {
+                    null: '',
+                    A_FAIRE: 'A_FAIRE',
+                    EN_COURS: 'EN_COURS',
+                    EN_ATTENTE: 'EN_ATTENTE',
+                    TERMINEE: 'TERMINEE',
+                    ANNULEE: 'ANNULEE',
+                  }[tache.statut ?? 'null']
+                }}
+              </td>
+              <td [jhiTranslate]="'peccnssApp.PrioriteTache.' + (tache.priorite ?? 'null')">
+                {{ { null: '', NORMALE: 'NORMALE', IMPORTANTE: 'IMPORTANTE', URGENTE: 'URGENTE' }[tache.priorite ?? 'null'] }}
+              </td>
+              <td>{{ tache.lu }}</td>
+              <td>{{ tache.commentaire }}</td>
+              <td>
+                @if (tache.demande) {
+                  <div>
+                    <a [routerLink]="['/demande-prise-en-charge', tache.demande.id, 'view']">{{ tache.demande.reference }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                {{ tache.utilisateur?.login }}
+              </td>
+              <td>
+                @if (tache.boiteReception) {
+                  <div>
+                    <a [routerLink]="['/boite-reception', tache.boiteReception.id, 'view']">{{ tache.boiteReception.id }}</a>
+                  </div>
+                }
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a [routerLink]="['/tache', tache.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                    <fa-icon icon="eye" />
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
+                  </a>
+
+                  <a [routerLink]="['/tache', tache.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                    <fa-icon icon="pencil-alt" />
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
+                  </a>
+
+                  <button type="submit" (click)="delete(tache)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times" />
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+  @if (taches().length > 0) {
+    <div>
+      <div class="d-flex justify-content-center">
+        <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+      </div>
+
+      <div class="d-flex justify-content-center">
+        <ngb-pagination
+          [collectionSize]="totalItems()"
+          [page]="page()"
+          [pageSize]="itemsPerPage()"
+          [maxSize]="5"
+          [rotate]="true"
+          [boundaryLinks]="true"
+          (pageChange)="navigateToPage($event)"
+        />
+      </div>
+    </div>
+  }
+</div>

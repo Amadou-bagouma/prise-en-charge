@@ -1,0 +1,10 @@
+{
+  "peccnssApp": {
+    "PrioriteTache": {
+      "null": "",
+      "NORMALE": "NORMALE",
+      "IMPORTANTE": "IMPORTANTE",
+      "URGENTE": "URGENTE"
+    }
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "annotations": {
+    "changelogDate": "20260910080342"
+  },
+  "applications": ["peccnss"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "titre",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "dateCreation",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "dateAssignation",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "dateEcheance",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "dateTerminaison",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "statut",
+      "fieldType": "StatutTache",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "A_FAIRE,EN_COURS,EN_ATTENTE,TERMINEE,ANNULEE"
+    },
+    {
+      "fieldName": "priorite",
+      "fieldType": "PrioriteTache",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "NORMALE,IMPORTANTE,URGENTE"
+    },
+    {
+      "fieldName": "lu",
+      "fieldType": "Boolean",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "commentaire",
+      "fieldType": "String"
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "Tache",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityField": "reference",
+      "otherEntityName": "demandePriseEnCharge",
+      "relationshipName": "demande",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    },
+    {
+      "otherEntityField": "login",
+      "otherEntityName": "user",
+      "relationshipName": "utilisateur",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required",
+      "relationshipWithBuiltInEntity": true
+    },
+    {
+      "otherEntityName": "boiteReception",
+      "relationshipName": "boiteReception",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

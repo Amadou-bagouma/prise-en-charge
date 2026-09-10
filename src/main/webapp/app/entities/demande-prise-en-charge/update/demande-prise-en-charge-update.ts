@@ -11,11 +11,12 @@ import { IAgent } from 'app/entities/agent/agent.model';
 import { AgentService } from 'app/entities/agent/service/agent.service';
 import { IAyantDroit } from 'app/entities/ayant-droit/ayant-droit.model';
 import { AyantDroitService } from 'app/entities/ayant-droit/service/ayant-droit.service';
+import { PrioriteDemande } from 'app/entities/enumerations/priorite-demande.model';
 import { StatutDemande } from 'app/entities/enumerations/statut-demande.model';
 import { TypeBeneficiaire } from 'app/entities/enumerations/type-beneficiaire.model';
 import { IEtablissementSante } from 'app/entities/etablissement-sante/etablissement-sante.model';
-import { EtablissementSanteService } from 'app/entities/etablissement-sante/service/etablissement-sante.service';
 import { TypeSoinService } from 'app/entities/type-soin/service/type-soin.service';
+import { EtablissementSanteService } from 'app/entities/etablissement-sante/service/etablissement-sante.service';
 import { UserService } from 'app/entities/user/service/user.service';
 import { IUser } from 'app/entities/user/user.model';
 import { ITypeSoin } from 'app/entities/type-soin/type-soin.model';
@@ -36,6 +37,7 @@ export class DemandePriseEnChargeUpdate implements OnInit {
   demandePriseEnCharge: IDemandePriseEnCharge | null = null;
   typeBeneficiaireValues = Object.keys(TypeBeneficiaire);
   statutDemandeValues = Object.keys(StatutDemande);
+  prioriteDemandeValues = Object.keys(PrioriteDemande);
 
   agentsSharedCollection = signal<IAgent[]>([]);
   ayantDroitsSharedCollection = signal<IAyantDroit[]>([]);

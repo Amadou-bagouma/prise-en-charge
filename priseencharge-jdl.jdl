@@ -1,4 +1,4 @@
-// =========================================================
+//=========================
 // APPLICATION JHIPSTER
 // CNSS - PRISE EN CHARGE MEDICALE
 // Compatible JHipster 8.11.0
@@ -10,7 +10,7 @@ application {
     applicationType monolith
     authenticationType jwt
     databaseType sql
-    devDatabaseType h2Disk
+    devDatabaseType postgresql
     prodDatabaseType postgresql
     buildTool maven
     clientFramework angular
@@ -110,7 +110,11 @@ entity DemandePriseEnCharge {
   typeBeneficiaire TypeBeneficiaire required
   description String
   statut StatutDemande required
+  priorite PrioriteDemande required
   dateAssignation Instant
+  dateEcheance Instant
+  motifRejet String
+  observation String
 }
 
 
@@ -123,10 +127,21 @@ enum TypeBeneficiaire {
 enum StatutDemande {
   NOUVELLE
   EN_ATTENTE_PIECES
-  EN_VALIDATION
+  A_TRAITER
+  EN_COURS_TRAITEMENT
+  EN_ATTENTE_AVIS_MEDICAL
+  EN_ATTENTE_DECISION
   VALIDEE
   REJETEE
   ANNULEE
+  CLOTUREE
+}
+
+
+enum PrioriteDemande {
+  NORMALE
+  IMPORTANTE
+  URGENTE
 }
 
 
@@ -138,6 +153,100 @@ entity PieceJustificative {
   nomFichier String required
   cheminFichier String required
   dateAjout Instant required
+}
+
+
+// =========================================================
+// TACHES
+// =========================================================
+// Une tâche représente une action à effectuer par un utilisateur.
+// Elle constitue l'élément principal de la boîte de réception.
+// =========================================================
+
+entity Tache {
+  titre String required
+  description String
+  dateCreation Instant required
+  dateAssignation Instant
+  dateEcheance Instant
+  dateTerminaison Instant
+  statut StatutTache required
+  priorite PrioriteTache required
+  lu Boolean required
+  commentaire String
+}
+
+
+enum StatutTache {
+  A_FAIRE
+  EN_COURS
+  EN_ATTENTE
+  TERMINEE
+  ANNULEE
+}
+
+
+enum PrioriteTache {
+  NORMALE
+  IMPORTANTE
+  URGENTE
+}
+
+
+// =========================================================
+// BOITE DE RECEPTION
+// =========================================================
+// Une boîte de réception appartient à un utilisateur JHipster.
+// Elle regroupe les tâches et informations qui lui sont destinées.
+// =========================================================
+
+entity BoiteReception {
+  dateCreation Instant required
+  dateDerniereLecture Instant
+  nombreNonLus Integer required
+  actif Boolean required
+}
+
+
+// =========================================================
+// NOTIFICATIONS
+// =========================================================
+
+entity Notification {
+  titre String required
+  message String required
+  dateCreation Instant required
+  dateLecture Instant
+  lu Boolean required
+  type TypeNotification required
+}
+
+
+enum TypeNotification {
+  NOUVELLE_TACHE
+  NOUVELLE_DEMANDE
+  DEMANDE_ASSIGNEE
+  DEMANDE_MODIFIEE
+  ECHEANCE_PROCHE
+  DEMANDE_VALIDEE
+  DEMANDE_REJETEE
+  INFORMATION
+}
+
+
+// =========================================================
+// HISTORIQUE DES ACTIONS
+// =========================================================
+// ATTENTION :
+// Il ne s'agit PAS d'un historique des validations.
+// Cette entité permet uniquement de tracer les actions
+// effectuées sur une demande.
+// =========================================================
+
+entity HistoriqueAction {
+  action String required
+  description String
+  dateAction Instant required
 }
 
 
@@ -176,8 +285,7 @@ relationship ManyToOne {
 
 
 // =========================================================
-// GESTIONNAIRE CREATEUR ET ASSIGNATION
-// Utilisateur JHipster ayant créé la demande / responsable actuel
+// CREATEUR ET RESPONSABLE DE LA DEMANDE
 // =========================================================
 
 relationship ManyToOne {
@@ -199,16 +307,79 @@ relationship ManyToOne {
 
 
 // =========================================================
-// OPTIONS JHIPSTER
+// TACHES
 // =========================================================
 
-paginate Region, Direction, Gestion, Agent, AyantDroit, TypeSoin, EtablissementSante, DemandePriseEnCharge, PieceJustificative with pagination
+relationship ManyToOne {
+
+  Tache{demande(reference) required} to DemandePriseEnCharge
+
+  Tache{utilisateur(login) required} to User with builtInEntity
+
+  Tache{boiteReception} to BoiteReception
+}
 
 
-service Region, Direction, Gestion, Agent, AyantDroit, TypeSoin, EtablissementSante, DemandePriseEnCharge, PieceJustificative with serviceImpl
+// =========================================================
+// BOITE DE RECEPTION
+// =========================================================
+
+relationship OneToOne {
+
+  BoiteReception{utilisateur(login) required} to User with builtInEntity
+}
 
 
-dto Region, Direction, Gestion, Agent, AyantDroit, TypeSoin, EtablissementSante, DemandePriseEnCharge, PieceJustificative with mapstruct
+// =========================================================
+// NOTIFICATIONS
+// =========================================================
+
+relationship ManyToOne {
+
+  Notification{utilisateur(login) required} to User with builtInEntity
+
+  Notification{demande(reference)} to DemandePriseEnCharge
+
+  Notification{tache} to Tache
+}
 
 
-filter Region, Direction, Agent, AyantDroit, EtablissementSante, DemandePriseEnCharge
+// =========================================================
+// HISTORIQUE DES ACTIONS
+// =========================================================
+
+relationship ManyToOne {
+
+  HistoriqueAction{demande(reference) required} to DemandePriseEnCharge
+
+  HistoriqueAction{utilisateur(login) required} to User with builtInEntity
+}
+
+
+// =========================================================
+// PAGINATION
+// =========================================================
+
+paginate Region, Direction, Gestion, Agent, AyantDroit, TypeSoin, EtablissementSante, DemandePriseEnCharge, PieceJustificative, Tache, BoiteReception, Notification, HistoriqueAction with pagination
+
+
+// =========================================================
+// SERVICES
+// =========================================================
+
+service Region, Direction, Gestion, Agent, AyantDroit, TypeSoin, EtablissementSante, DemandePriseEnCharge, PieceJustificative, Tache, BoiteReception, Notification, HistoriqueAction with serviceImpl
+
+
+// =========================================================
+// DTO MAPSTRUCT
+// =========================================================
+
+dto Region, Direction, Gestion, Agent, AyantDroit, TypeSoin, EtablissementSante, DemandePriseEnCharge, PieceJustificative, Tache, BoiteReception, Notification, HistoriqueAction with mapstruct
+
+
+// =========================================================
+// FILTRES
+// =========================================================
+
+filter Region, Direction, Agent, AyantDroit, EtablissementSante, DemandePriseEnCharge, Tache, Notification, HistoriqueAction
+

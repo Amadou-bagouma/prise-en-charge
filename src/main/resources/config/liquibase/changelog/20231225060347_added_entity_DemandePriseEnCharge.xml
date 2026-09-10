@@ -32,7 +32,19 @@
             <column name="statut" type="varchar(255)">
                 <constraints nullable="false" />
             </column>
+            <column name="priorite" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
             <column name="date_assignation" type="${datetimeType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="date_echeance" type="${datetimeType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="motif_rejet" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="observation" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
             <column name="agent_id" type="bigint">
@@ -58,6 +70,7 @@
         <dropDefaultValue tableName="demande_prise_en_charge" columnName="date_creation" columnDataType="${datetimeType}"/>
         <dropDefaultValue tableName="demande_prise_en_charge" columnName="date_modification" columnDataType="${datetimeType}"/>
         <dropDefaultValue tableName="demande_prise_en_charge" columnName="date_assignation" columnDataType="${datetimeType}"/>
+        <dropDefaultValue tableName="demande_prise_en_charge" columnName="date_echeance" columnDataType="${datetimeType}"/>
     </changeSet>
 
     <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
@@ -84,7 +97,11 @@
             <column name="type_beneficiaire" type="string"/>
             <column name="description" type="string"/>
             <column name="statut" type="string"/>
+            <column name="priorite" type="string"/>
             <column name="date_assignation" type="date"/>
+            <column name="date_echeance" type="date"/>
+            <column name="motif_rejet" type="string"/>
+            <column name="observation" type="string"/>
             <column name="gestionnaire_createur_id" type="numeric"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>

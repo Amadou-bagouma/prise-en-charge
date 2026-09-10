@@ -46,16 +46,38 @@
                 null: '',
                 NOUVELLE: 'NOUVELLE',
                 EN_ATTENTE_PIECES: 'EN_ATTENTE_PIECES',
-                EN_VALIDATION: 'EN_VALIDATION',
+                A_TRAITER: 'A_TRAITER',
+                EN_COURS_TRAITEMENT: 'EN_COURS_TRAITEMENT',
+                EN_ATTENTE_AVIS_MEDICAL: 'EN_ATTENTE_AVIS_MEDICAL',
+                EN_ATTENTE_DECISION: 'EN_ATTENTE_DECISION',
                 VALIDEE: 'VALIDEE',
                 REJETEE: 'REJETEE',
                 ANNULEE: 'ANNULEE',
+                CLOTUREE: 'CLOTUREE',
               }[demandePriseEnChargeRef.statut ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.demandePriseEnCharge.priorite">Priorite</span></dt>
+          <dd>
+            <span [jhiTranslate]="'peccnssApp.PrioriteDemande.' + (demandePriseEnChargeRef.priorite ?? 'null')">{{
+              { null: '', NORMALE: 'NORMALE', IMPORTANTE: 'IMPORTANTE', URGENTE: 'URGENTE' }[demandePriseEnChargeRef.priorite ?? 'null']
             }}</span>
           </dd>
           <dt><span jhiTranslate="peccnssApp.demandePriseEnCharge.dateAssignation">Date Assignation</span></dt>
           <dd>
             <span>{{ demandePriseEnChargeRef.dateAssignation | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.demandePriseEnCharge.dateEcheance">Date Echeance</span></dt>
+          <dd>
+            <span>{{ demandePriseEnChargeRef.dateEcheance | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.demandePriseEnCharge.motifRejet">Motif Rejet</span></dt>
+          <dd>
+            <span>{{ demandePriseEnChargeRef.motifRejet }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.demandePriseEnCharge.observation">Observation</span></dt>
+          <dd>
+            <span>{{ demandePriseEnChargeRef.observation }}</span>
           </dd>
           <dt><span jhiTranslate="peccnssApp.demandePriseEnCharge.agent">Agent</span></dt>
           <dd>

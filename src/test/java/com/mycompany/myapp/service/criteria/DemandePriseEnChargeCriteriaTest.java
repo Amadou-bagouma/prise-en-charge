@@ -78,7 +78,11 @@ class DemandePriseEnChargeCriteriaTest {
         demandePriseEnChargeCriteria.typeBeneficiaire();
         demandePriseEnChargeCriteria.description();
         demandePriseEnChargeCriteria.statut();
+        demandePriseEnChargeCriteria.priorite();
         demandePriseEnChargeCriteria.dateAssignation();
+        demandePriseEnChargeCriteria.dateEcheance();
+        demandePriseEnChargeCriteria.motifRejet();
+        demandePriseEnChargeCriteria.observation();
         demandePriseEnChargeCriteria.agentId();
         demandePriseEnChargeCriteria.ayantDroitId();
         demandePriseEnChargeCriteria.typeSoinId();
@@ -98,7 +102,11 @@ class DemandePriseEnChargeCriteriaTest {
                 condition.apply(criteria.getTypeBeneficiaire()) &&
                 condition.apply(criteria.getDescription()) &&
                 condition.apply(criteria.getStatut()) &&
+                condition.apply(criteria.getPriorite()) &&
                 condition.apply(criteria.getDateAssignation()) &&
+                condition.apply(criteria.getDateEcheance()) &&
+                condition.apply(criteria.getMotifRejet()) &&
+                condition.apply(criteria.getObservation()) &&
                 condition.apply(criteria.getAgentId()) &&
                 condition.apply(criteria.getAyantDroitId()) &&
                 condition.apply(criteria.getTypeSoinId()) &&
@@ -123,7 +131,11 @@ class DemandePriseEnChargeCriteriaTest {
                 condition.apply(criteria.getTypeBeneficiaire(), copy.getTypeBeneficiaire()) &&
                 condition.apply(criteria.getDescription(), copy.getDescription()) &&
                 condition.apply(criteria.getStatut(), copy.getStatut()) &&
+                condition.apply(criteria.getPriorite(), copy.getPriorite()) &&
                 condition.apply(criteria.getDateAssignation(), copy.getDateAssignation()) &&
+                condition.apply(criteria.getDateEcheance(), copy.getDateEcheance()) &&
+                condition.apply(criteria.getMotifRejet(), copy.getMotifRejet()) &&
+                condition.apply(criteria.getObservation(), copy.getObservation()) &&
                 condition.apply(criteria.getAgentId(), copy.getAgentId()) &&
                 condition.apply(criteria.getAyantDroitId(), copy.getAyantDroitId()) &&
                 condition.apply(criteria.getTypeSoinId(), copy.getTypeSoinId()) &&

@@ -7,7 +7,8 @@
     "clientFramework": "angular",
     "creationTimestamp": 1703483747250,
     "databaseType": "sql",
-    "devDatabaseType": "h2Disk",
+    "defaultCommand": "app",
+    "devDatabaseType": "postgresql",
     "entities": [
       "Gestion",
       "Region",
@@ -17,12 +18,16 @@
       "TypeSoin",
       "EtablissementSante",
       "DemandePriseEnCharge",
-      "PieceJustificative"
+      "PieceJustificative",
+      "Tache",
+      "BoiteReception",
+      "Notification",
+      "HistoriqueAction"
     ],
     "jhipsterVersion": "9.3.0",
     "jwtSecretKey": "ZWM2Yzg0MjM2ODI2ZDJkM2E3YTU5NjNmZWQzMzNiMjg0OGIwOTlmNzgzZDU4YTg3MzRiNDgwYTE4MzRlMzc1ODI2ODJiZTA4MTc2M2IwMDc5Y2RmOGU0MTE2NDQzNzBkNDJhZWMzOGZkODA2NmIyNTNkNjgyZjYyYmZmYjhiNmU=",
     "languages": ["en"],
-    "lastLiquibaseTimestamp": 1703484287000,
+    "lastLiquibaseTimestamp": 1789027425000,
     "nativeLanguage": "en",
     "prodDatabaseType": "postgresql"
   }

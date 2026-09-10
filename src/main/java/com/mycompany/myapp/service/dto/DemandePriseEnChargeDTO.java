@@ -1,5 +1,6 @@
 package com.mycompany.myapp.service.dto;
 
+import com.mycompany.myapp.domain.enumeration.PrioriteDemande;
 import com.mycompany.myapp.domain.enumeration.StatutDemande;
 import com.mycompany.myapp.domain.enumeration.TypeBeneficiaire;
 import jakarta.validation.constraints.*;
@@ -31,7 +32,16 @@ public class DemandePriseEnChargeDTO implements Serializable {
     @NotNull
     private StatutDemande statut;
 
+    @NotNull
+    private PrioriteDemande priorite;
+
     private Instant dateAssignation;
+
+    private Instant dateEcheance;
+
+    private String motifRejet;
+
+    private String observation;
 
     private AgentDTO agent;
 
@@ -102,12 +112,44 @@ public class DemandePriseEnChargeDTO implements Serializable {
         this.statut = statut;
     }
 
+    public PrioriteDemande getPriorite() {
+        return priorite;
+    }
+
+    public void setPriorite(PrioriteDemande priorite) {
+        this.priorite = priorite;
+    }
+
     public Instant getDateAssignation() {
         return dateAssignation;
     }
 
     public void setDateAssignation(Instant dateAssignation) {
         this.dateAssignation = dateAssignation;
+    }
+
+    public Instant getDateEcheance() {
+        return dateEcheance;
+    }
+
+    public void setDateEcheance(Instant dateEcheance) {
+        this.dateEcheance = dateEcheance;
+    }
+
+    public String getMotifRejet() {
+        return motifRejet;
+    }
+
+    public void setMotifRejet(String motifRejet) {
+        this.motifRejet = motifRejet;
+    }
+
+    public String getObservation() {
+        return observation;
+    }
+
+    public void setObservation(String observation) {
+        this.observation = observation;
     }
 
     public AgentDTO getAgent() {
@@ -190,7 +232,11 @@ public class DemandePriseEnChargeDTO implements Serializable {
             ", typeBeneficiaire='" + getTypeBeneficiaire() + "'" +
             ", description='" + getDescription() + "'" +
             ", statut='" + getStatut() + "'" +
+            ", priorite='" + getPriorite() + "'" +
             ", dateAssignation='" + getDateAssignation() + "'" +
+            ", dateEcheance='" + getDateEcheance() + "'" +
+            ", motifRejet='" + getMotifRejet() + "'" +
+            ", observation='" + getObservation() + "'" +
             ", agent=" + getAgent() +
             ", ayantDroit=" + getAyantDroit() +
             ", typeSoin=" + getTypeSoin() +

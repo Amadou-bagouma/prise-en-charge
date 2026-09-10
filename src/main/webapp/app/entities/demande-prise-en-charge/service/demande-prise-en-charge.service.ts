@@ -12,11 +12,12 @@ export type PartialUpdateDemandePriseEnCharge = Partial<IDemandePriseEnCharge> &
 
 type RestOf<T extends IDemandePriseEnCharge | NewDemandePriseEnCharge> = Omit<
   T,
-  'dateCreation' | 'dateModification' | 'dateAssignation'
+  'dateCreation' | 'dateModification' | 'dateAssignation' | 'dateEcheance'
 > & {
   dateCreation?: string | null;
   dateModification?: string | null;
   dateAssignation?: string | null;
+  dateEcheance?: string | null;
 };
 
 export type RestDemandePriseEnCharge = RestOf<IDemandePriseEnCharge>;
@@ -54,6 +55,7 @@ export class DemandePriseEnChargesService {
       dateCreation: restDemandePriseEnCharge.dateCreation ? dayjs(restDemandePriseEnCharge.dateCreation) : undefined,
       dateModification: restDemandePriseEnCharge.dateModification ? dayjs(restDemandePriseEnCharge.dateModification) : undefined,
       dateAssignation: restDemandePriseEnCharge.dateAssignation ? dayjs(restDemandePriseEnCharge.dateAssignation) : undefined,
+      dateEcheance: restDemandePriseEnCharge.dateEcheance ? dayjs(restDemandePriseEnCharge.dateEcheance) : undefined,
     };
   }
 }
@@ -144,6 +146,7 @@ export class DemandePriseEnChargeService extends DemandePriseEnChargesService {
       dateCreation: demandePriseEnCharge.dateCreation?.toJSON() ?? null,
       dateModification: demandePriseEnCharge.dateModification?.toJSON() ?? null,
       dateAssignation: demandePriseEnCharge.dateAssignation?.toJSON() ?? null,
+      dateEcheance: demandePriseEnCharge.dateEcheance?.toJSON() ?? null,
     };
   }
 

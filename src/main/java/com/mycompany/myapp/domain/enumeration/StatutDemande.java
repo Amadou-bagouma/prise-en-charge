@@ -6,8 +6,12 @@ package com.mycompany.myapp.domain.enumeration;
 public enum StatutDemande {
     NOUVELLE,
     EN_ATTENTE_PIECES,
-    EN_VALIDATION,
+    A_TRAITER,
+    EN_COURS_TRAITEMENT,
+    EN_ATTENTE_AVIS_MEDICAL,
+    EN_ATTENTE_DECISION,
     VALIDEE,
     REJETEE,
     ANNULEE,
+    CLOTUREE,
 }

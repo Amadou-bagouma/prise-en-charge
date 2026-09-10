@@ -5,6 +5,3 @@ services:
     extends:
       file: ./postgresql.yml
       service: postgresql
-    profiles:
-      - ''
-      - prod

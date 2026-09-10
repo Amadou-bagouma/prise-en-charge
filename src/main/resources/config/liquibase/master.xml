@@ -3,13 +3,6 @@
     xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
-    <property name="now" value="now()" dbms="h2"/>
-    <property name="floatType" value="float4" dbms="h2"/>
-    <property name="uuidType" value="uuid" dbms="h2"/>
-    <property name="datetimeType" value="datetime(6)" dbms="h2"/>
-    <property name="timeType" value="time(6)" dbms="h2"/>
-    <property name="clobType" value="longvarchar" dbms="h2"/>
-    <property name="blobType" value="blob" dbms="h2"/>
     <property name="now" value="current_timestamp" dbms="postgresql"/>
     <property name="floatType" value="float4" dbms="postgresql"/>
     <property name="clobType" value="clob" dbms="postgresql"/>
@@ -28,12 +21,20 @@
     <include file="config/liquibase/changelog/20231225060247_added_entity_EtablissementSante.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20231225060347_added_entity_DemandePriseEnCharge.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20231225060447_added_entity_PieceJustificative.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260910080342_added_entity_Tache.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260910080343_added_entity_BoiteReception.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260910080344_added_entity_Notification.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260910080345_added_entity_HistoriqueAction.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <include file="config/liquibase/changelog/20231225055847_added_entity_constraints_Direction.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20231225055947_added_entity_constraints_Agent.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20231225060047_added_entity_constraints_AyantDroit.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20231225060347_added_entity_constraints_DemandePriseEnCharge.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20231225060447_added_entity_constraints_PieceJustificative.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260910080342_added_entity_constraints_Tache.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260910080343_added_entity_constraints_BoiteReception.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260910080344_added_entity_constraints_Notification.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260910080345_added_entity_constraints_HistoriqueAction.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>

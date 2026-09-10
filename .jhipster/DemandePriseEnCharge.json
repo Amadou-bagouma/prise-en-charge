@@ -33,11 +33,29 @@
       "fieldName": "statut",
       "fieldType": "StatutDemande",
       "fieldValidateRules": ["required"],
-      "fieldValues": "NOUVELLE,EN_ATTENTE_PIECES,EN_VALIDATION,VALIDEE,REJETEE,ANNULEE"
+      "fieldValues": "NOUVELLE,EN_ATTENTE_PIECES,A_TRAITER,EN_COURS_TRAITEMENT,EN_ATTENTE_AVIS_MEDICAL,EN_ATTENTE_DECISION,VALIDEE,REJETEE,ANNULEE,CLOTUREE"
+    },
+    {
+      "fieldName": "priorite",
+      "fieldType": "PrioriteDemande",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "NORMALE,IMPORTANTE,URGENTE"
     },
     {
       "fieldName": "dateAssignation",
       "fieldType": "Instant"
+    },
+    {
+      "fieldName": "dateEcheance",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "motifRejet",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "observation",
+      "fieldType": "String"
     }
   ],
   "jpaMetamodelFiltering": true,

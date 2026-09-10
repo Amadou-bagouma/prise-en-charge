@@ -17,6 +17,7 @@ const requireRestSample: RestDemandePriseEnCharge = {
   dateCreation: sampleWithRequiredData.dateCreation?.toJSON(),
   dateModification: sampleWithRequiredData.dateModification?.toJSON(),
   dateAssignation: sampleWithRequiredData.dateAssignation?.toJSON(),
+  dateEcheance: sampleWithRequiredData.dateEcheance?.toJSON(),
 };
 
 describe('DemandePriseEnCharge Service', () => {

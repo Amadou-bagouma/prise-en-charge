@@ -56,6 +56,26 @@ const routes: Routes = [
     title: 'peccnssApp.pieceJustificative.home.title',
     loadChildren: () => import('./piece-justificative/piece-justificative.routes'),
   },
+  {
+    path: 'tache',
+    title: 'peccnssApp.tache.home.title',
+    loadChildren: () => import('./tache/tache.routes'),
+  },
+  {
+    path: 'boite-reception',
+    title: 'peccnssApp.boiteReception.home.title',
+    loadChildren: () => import('./boite-reception/boite-reception.routes'),
+  },
+  {
+    path: 'notification',
+    title: 'peccnssApp.notification.home.title',
+    loadChildren: () => import('./notification/notification.routes'),
+  },
+  {
+    path: 'historique-action',
+    title: 'peccnssApp.historiqueAction.home.title',
+    loadChildren: () => import('./historique-action/historique-action.routes'),
+  },
   // jhipster-needle-add-entity-route - JHipster will add entity modules routes here
 ];
 

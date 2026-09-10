@@ -7,18 +7,22 @@ export const sampleWithRequiredData: IDemandePriseEnCharge = {
   reference: 'showboat',
   dateCreation: dayjs('2023-12-24T13:27'),
   typeBeneficiaire: 'AYANT_DROIT',
-  statut: 'EN_VALIDATION',
+  statut: 'EN_ATTENTE_AVIS_MEDICAL',
+  priorite: 'URGENTE',
 };
 
 export const sampleWithPartialData: IDemandePriseEnCharge = {
-  id: 3640,
-  reference: 'as',
-  dateCreation: dayjs('2023-12-24T10:25'),
-  dateModification: dayjs('2023-12-25T02:19'),
-  typeBeneficiaire: 'AYANT_DROIT',
-  description: 'an',
+  id: 28349,
+  reference: 'that whenever limp',
+  dateCreation: dayjs('2023-12-24T09:32'),
+  dateModification: dayjs('2023-12-24T20:58'),
+  typeBeneficiaire: 'AGENT',
+  description: 'definite',
   statut: 'EN_ATTENTE_PIECES',
-  dateAssignation: dayjs('2023-12-24T14:17'),
+  priorite: 'NORMALE',
+  dateAssignation: dayjs('2023-12-25T04:21'),
+  dateEcheance: dayjs('2023-12-24T07:42'),
+  motifRejet: 'potentially abacus',
 };
 
 export const sampleWithFullData: IDemandePriseEnCharge = {
@@ -28,15 +32,20 @@ export const sampleWithFullData: IDemandePriseEnCharge = {
   dateModification: dayjs('2023-12-24T19:36'),
   typeBeneficiaire: 'AGENT',
   description: 'since wealthy',
-  statut: 'EN_VALIDATION',
-  dateAssignation: dayjs('2023-12-25T04:36'),
+  statut: 'EN_COURS_TRAITEMENT',
+  priorite: 'URGENTE',
+  dateAssignation: dayjs('2023-12-24T23:44'),
+  dateEcheance: dayjs('2023-12-24T10:15'),
+  motifRejet: 'anenst',
+  observation: 'uh-huh elegantly questionably',
 };
 
 export const sampleWithNewData: NewDemandePriseEnCharge = {
   reference: 'bemuse shore coarse',
   dateCreation: dayjs('2023-12-24T09:39'),
   typeBeneficiaire: 'AYANT_DROIT',
-  statut: 'EN_ATTENTE_PIECES',
+  statut: 'A_TRAITER',
+  priorite: 'IMPORTANTE',
   id: null,
 };
 

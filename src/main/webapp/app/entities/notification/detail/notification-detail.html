@@ -1,0 +1,88 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (notification(); as notificationRef) {
+      <div>
+        <h2 data-cy="notificationDetailsHeading"><span jhiTranslate="peccnssApp.notification.detail.title">Notification</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ notificationRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.notification.titre">Titre</span></dt>
+          <dd>
+            <span>{{ notificationRef.titre }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.notification.message">Message</span></dt>
+          <dd>
+            <span>{{ notificationRef.message }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.notification.dateCreation">Date Creation</span></dt>
+          <dd>
+            <span>{{ notificationRef.dateCreation | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.notification.dateLecture">Date Lecture</span></dt>
+          <dd>
+            <span>{{ notificationRef.dateLecture | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.notification.lu">Lu</span></dt>
+          <dd>
+            <span>{{ notificationRef.lu }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.notification.type">Type</span></dt>
+          <dd>
+            <span [jhiTranslate]="'peccnssApp.TypeNotification.' + (notificationRef.type ?? 'null')">{{
+              {
+                null: '',
+                NOUVELLE_TACHE: 'NOUVELLE_TACHE',
+                NOUVELLE_DEMANDE: 'NOUVELLE_DEMANDE',
+                DEMANDE_ASSIGNEE: 'DEMANDE_ASSIGNEE',
+                DEMANDE_MODIFIEE: 'DEMANDE_MODIFIEE',
+                ECHEANCE_PROCHE: 'ECHEANCE_PROCHE',
+                DEMANDE_VALIDEE: 'DEMANDE_VALIDEE',
+                DEMANDE_REJETEE: 'DEMANDE_REJETEE',
+                INFORMATION: 'INFORMATION',
+              }[notificationRef.type ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.notification.utilisateur">Utilisateur</span></dt>
+          <dd>
+            <span>{{ notificationRef.utilisateur?.login }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.notification.demande">Demande</span></dt>
+          <dd>
+            @if (notification()!.demande) {
+              <div>
+                <a [routerLink]="['/demande-prise-en-charge', notification()!.demande?.id, 'view']">{{
+                  notificationRef.demande?.reference
+                }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.notification.tache">Tache</span></dt>
+          <dd>
+            @if (notification()!.tache) {
+              <div>
+                <a [routerLink]="['/tache', notification()!.tache?.id, 'view']">{{ notificationRef.tache?.id }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/notification', notificationRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

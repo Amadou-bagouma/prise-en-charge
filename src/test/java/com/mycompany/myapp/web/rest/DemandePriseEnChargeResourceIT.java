@@ -15,6 +15,7 @@ import com.mycompany.myapp.domain.DemandePriseEnCharge;
 import com.mycompany.myapp.domain.EtablissementSante;
 import com.mycompany.myapp.domain.TypeSoin;
 import com.mycompany.myapp.domain.User;
+import com.mycompany.myapp.domain.enumeration.PrioriteDemande;
 import com.mycompany.myapp.domain.enumeration.StatutDemande;
 import com.mycompany.myapp.domain.enumeration.TypeBeneficiaire;
 import com.mycompany.myapp.repository.DemandePriseEnChargeRepository;
@@ -70,8 +71,20 @@ class DemandePriseEnChargeResourceIT {
     private static final StatutDemande DEFAULT_STATUT = StatutDemande.NOUVELLE;
     private static final StatutDemande UPDATED_STATUT = StatutDemande.EN_ATTENTE_PIECES;
 
+    private static final PrioriteDemande DEFAULT_PRIORITE = PrioriteDemande.NORMALE;
+    private static final PrioriteDemande UPDATED_PRIORITE = PrioriteDemande.IMPORTANTE;
+
     private static final Instant DEFAULT_DATE_ASSIGNATION = Instant.ofEpochMilli(0L);
     private static final Instant UPDATED_DATE_ASSIGNATION = Instant.ofEpochMilli(1703483747250L);
+
+    private static final Instant DEFAULT_DATE_ECHEANCE = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_DATE_ECHEANCE = Instant.ofEpochMilli(1703483747250L);
+
+    private static final String DEFAULT_MOTIF_REJET = "AAAAAAAAAA";
+    private static final String UPDATED_MOTIF_REJET = "BBBBBBBBBB";
+
+    private static final String DEFAULT_OBSERVATION = "AAAAAAAAAA";
+    private static final String UPDATED_OBSERVATION = "BBBBBBBBBB";
 
     private static final String ENTITY_API_URL = "/api/demande-prise-en-charges";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -121,7 +134,11 @@ class DemandePriseEnChargeResourceIT {
             .typeBeneficiaire(DEFAULT_TYPE_BENEFICIAIRE)
             .description(DEFAULT_DESCRIPTION)
             .statut(DEFAULT_STATUT)
-            .dateAssignation(DEFAULT_DATE_ASSIGNATION);
+            .priorite(DEFAULT_PRIORITE)
+            .dateAssignation(DEFAULT_DATE_ASSIGNATION)
+            .dateEcheance(DEFAULT_DATE_ECHEANCE)
+            .motifRejet(DEFAULT_MOTIF_REJET)
+            .observation(DEFAULT_OBSERVATION);
         // Add required entity
         User user = UserResourceIT.createEntity();
         em.persist(user);
@@ -144,7 +161,11 @@ class DemandePriseEnChargeResourceIT {
             .typeBeneficiaire(UPDATED_TYPE_BENEFICIAIRE)
             .description(UPDATED_DESCRIPTION)
             .statut(UPDATED_STATUT)
-            .dateAssignation(UPDATED_DATE_ASSIGNATION);
+            .priorite(UPDATED_PRIORITE)
+            .dateAssignation(UPDATED_DATE_ASSIGNATION)
+            .dateEcheance(UPDATED_DATE_ECHEANCE)
+            .motifRejet(UPDATED_MOTIF_REJET)
+            .observation(UPDATED_OBSERVATION);
         // Add required entity
         User user = UserResourceIT.createEntity();
         em.persist(user);
@@ -283,6 +304,23 @@ class DemandePriseEnChargeResourceIT {
 
     @Test
     @Transactional
+    void checkPrioriteIsRequired() throws Exception {
+        long databaseSizeBeforeTest = getRepositoryCount();
+        // set the field null
+        demandePriseEnCharge.setPriorite(null);
+
+        // Create the DemandePriseEnCharge, which fails.
+        DemandePriseEnChargeDTO demandePriseEnChargeDTO = demandePriseEnChargeMapper.toDto(demandePriseEnCharge);
+
+        restDemandePriseEnChargeMockMvc
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(demandePriseEnChargeDTO)))
+            .andExpect(status().isBadRequest());
+
+        assertSameRepositoryCount(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
     void getAllDemandePriseEnCharges() throws Exception {
         // Initialize the database
         insertedDemandePriseEnCharge = demandePriseEnChargeRepository.saveAndFlush(demandePriseEnCharge);
@@ -299,7 +337,11 @@ class DemandePriseEnChargeResourceIT {
             .andExpect(jsonPath("$.[*].typeBeneficiaire").value(hasItem(DEFAULT_TYPE_BENEFICIAIRE.toString())))
             .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
             .andExpect(jsonPath("$.[*].statut").value(hasItem(DEFAULT_STATUT.toString())))
-            .andExpect(jsonPath("$.[*].dateAssignation").value(hasItem(DEFAULT_DATE_ASSIGNATION.toString())));
+            .andExpect(jsonPath("$.[*].priorite").value(hasItem(DEFAULT_PRIORITE.toString())))
+            .andExpect(jsonPath("$.[*].dateAssignation").value(hasItem(DEFAULT_DATE_ASSIGNATION.toString())))
+            .andExpect(jsonPath("$.[*].dateEcheance").value(hasItem(DEFAULT_DATE_ECHEANCE.toString())))
+            .andExpect(jsonPath("$.[*].motifRejet").value(hasItem(DEFAULT_MOTIF_REJET)))
+            .andExpect(jsonPath("$.[*].observation").value(hasItem(DEFAULT_OBSERVATION)));
     }
 
     @SuppressWarnings({ "unchecked" })
@@ -337,7 +379,11 @@ class DemandePriseEnChargeResourceIT {
             .andExpect(jsonPath("$.typeBeneficiaire").value(DEFAULT_TYPE_BENEFICIAIRE.toString()))
             .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION))
             .andExpect(jsonPath("$.statut").value(DEFAULT_STATUT.toString()))
-            .andExpect(jsonPath("$.dateAssignation").value(DEFAULT_DATE_ASSIGNATION.toString()));
+            .andExpect(jsonPath("$.priorite").value(DEFAULT_PRIORITE.toString()))
+            .andExpect(jsonPath("$.dateAssignation").value(DEFAULT_DATE_ASSIGNATION.toString()))
+            .andExpect(jsonPath("$.dateEcheance").value(DEFAULT_DATE_ECHEANCE.toString()))
+            .andExpect(jsonPath("$.motifRejet").value(DEFAULT_MOTIF_REJET))
+            .andExpect(jsonPath("$.observation").value(DEFAULT_OBSERVATION));
     }
 
     @Test
@@ -607,6 +653,36 @@ class DemandePriseEnChargeResourceIT {
 
     @Test
     @Transactional
+    void getAllDemandePriseEnChargesByPrioriteIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedDemandePriseEnCharge = demandePriseEnChargeRepository.saveAndFlush(demandePriseEnCharge);
+
+        // Get all the demandePriseEnChargeList where priorite equals to
+        defaultDemandePriseEnChargeFiltering("priorite.equals=" + DEFAULT_PRIORITE, "priorite.equals=" + UPDATED_PRIORITE);
+    }
+
+    @Test
+    @Transactional
+    void getAllDemandePriseEnChargesByPrioriteIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedDemandePriseEnCharge = demandePriseEnChargeRepository.saveAndFlush(demandePriseEnCharge);
+
+        // Get all the demandePriseEnChargeList where priorite in
+        defaultDemandePriseEnChargeFiltering("priorite.in=" + DEFAULT_PRIORITE + "," + UPDATED_PRIORITE, "priorite.in=" + UPDATED_PRIORITE);
+    }
+
+    @Test
+    @Transactional
+    void getAllDemandePriseEnChargesByPrioriteIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedDemandePriseEnCharge = demandePriseEnChargeRepository.saveAndFlush(demandePriseEnCharge);
+
+        // Get all the demandePriseEnChargeList where priorite is not null
+        defaultDemandePriseEnChargeFiltering("priorite.specified=true", "priorite.specified=false");
+    }
+
+    @Test
+    @Transactional
     void getAllDemandePriseEnChargesByDateAssignationIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedDemandePriseEnCharge = demandePriseEnChargeRepository.saveAndFlush(demandePriseEnCharge);
@@ -639,6 +715,154 @@ class DemandePriseEnChargeResourceIT {
 
         // Get all the demandePriseEnChargeList where dateAssignation is not null
         defaultDemandePriseEnChargeFiltering("dateAssignation.specified=true", "dateAssignation.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllDemandePriseEnChargesByDateEcheanceIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedDemandePriseEnCharge = demandePriseEnChargeRepository.saveAndFlush(demandePriseEnCharge);
+
+        // Get all the demandePriseEnChargeList where dateEcheance equals to
+        defaultDemandePriseEnChargeFiltering(
+            "dateEcheance.equals=" + DEFAULT_DATE_ECHEANCE,
+            "dateEcheance.equals=" + UPDATED_DATE_ECHEANCE
+        );
+    }
+
+    @Test
+    @Transactional
+    void getAllDemandePriseEnChargesByDateEcheanceIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedDemandePriseEnCharge = demandePriseEnChargeRepository.saveAndFlush(demandePriseEnCharge);
+
+        // Get all the demandePriseEnChargeList where dateEcheance in
+        defaultDemandePriseEnChargeFiltering(
+            "dateEcheance.in=" + DEFAULT_DATE_ECHEANCE + "," + UPDATED_DATE_ECHEANCE,
+            "dateEcheance.in=" + UPDATED_DATE_ECHEANCE
+        );
+    }
+
+    @Test
+    @Transactional
+    void getAllDemandePriseEnChargesByDateEcheanceIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedDemandePriseEnCharge = demandePriseEnChargeRepository.saveAndFlush(demandePriseEnCharge);
+
+        // Get all the demandePriseEnChargeList where dateEcheance is not null
+        defaultDemandePriseEnChargeFiltering("dateEcheance.specified=true", "dateEcheance.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllDemandePriseEnChargesByMotifRejetIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedDemandePriseEnCharge = demandePriseEnChargeRepository.saveAndFlush(demandePriseEnCharge);
+
+        // Get all the demandePriseEnChargeList where motifRejet equals to
+        defaultDemandePriseEnChargeFiltering("motifRejet.equals=" + DEFAULT_MOTIF_REJET, "motifRejet.equals=" + UPDATED_MOTIF_REJET);
+    }
+
+    @Test
+    @Transactional
+    void getAllDemandePriseEnChargesByMotifRejetIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedDemandePriseEnCharge = demandePriseEnChargeRepository.saveAndFlush(demandePriseEnCharge);
+
+        // Get all the demandePriseEnChargeList where motifRejet in
+        defaultDemandePriseEnChargeFiltering(
+            "motifRejet.in=" + DEFAULT_MOTIF_REJET + "," + UPDATED_MOTIF_REJET,
+            "motifRejet.in=" + UPDATED_MOTIF_REJET
+        );
+    }
+
+    @Test
+    @Transactional
+    void getAllDemandePriseEnChargesByMotifRejetIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedDemandePriseEnCharge = demandePriseEnChargeRepository.saveAndFlush(demandePriseEnCharge);
+
+        // Get all the demandePriseEnChargeList where motifRejet is not null
+        defaultDemandePriseEnChargeFiltering("motifRejet.specified=true", "motifRejet.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllDemandePriseEnChargesByMotifRejetContainsSomething() throws Exception {
+        // Initialize the database
+        insertedDemandePriseEnCharge = demandePriseEnChargeRepository.saveAndFlush(demandePriseEnCharge);
+
+        // Get all the demandePriseEnChargeList where motifRejet contains
+        defaultDemandePriseEnChargeFiltering("motifRejet.contains=" + DEFAULT_MOTIF_REJET, "motifRejet.contains=" + UPDATED_MOTIF_REJET);
+    }
+
+    @Test
+    @Transactional
+    void getAllDemandePriseEnChargesByMotifRejetNotContainsSomething() throws Exception {
+        // Initialize the database
+        insertedDemandePriseEnCharge = demandePriseEnChargeRepository.saveAndFlush(demandePriseEnCharge);
+
+        // Get all the demandePriseEnChargeList where motifRejet does not contain
+        defaultDemandePriseEnChargeFiltering(
+            "motifRejet.doesNotContain=" + UPDATED_MOTIF_REJET,
+            "motifRejet.doesNotContain=" + DEFAULT_MOTIF_REJET
+        );
+    }
+
+    @Test
+    @Transactional
+    void getAllDemandePriseEnChargesByObservationIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedDemandePriseEnCharge = demandePriseEnChargeRepository.saveAndFlush(demandePriseEnCharge);
+
+        // Get all the demandePriseEnChargeList where observation equals to
+        defaultDemandePriseEnChargeFiltering("observation.equals=" + DEFAULT_OBSERVATION, "observation.equals=" + UPDATED_OBSERVATION);
+    }
+
+    @Test
+    @Transactional
+    void getAllDemandePriseEnChargesByObservationIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedDemandePriseEnCharge = demandePriseEnChargeRepository.saveAndFlush(demandePriseEnCharge);
+
+        // Get all the demandePriseEnChargeList where observation in
+        defaultDemandePriseEnChargeFiltering(
+            "observation.in=" + DEFAULT_OBSERVATION + "," + UPDATED_OBSERVATION,
+            "observation.in=" + UPDATED_OBSERVATION
+        );
+    }
+
+    @Test
+    @Transactional
+    void getAllDemandePriseEnChargesByObservationIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedDemandePriseEnCharge = demandePriseEnChargeRepository.saveAndFlush(demandePriseEnCharge);
+
+        // Get all the demandePriseEnChargeList where observation is not null
+        defaultDemandePriseEnChargeFiltering("observation.specified=true", "observation.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllDemandePriseEnChargesByObservationContainsSomething() throws Exception {
+        // Initialize the database
+        insertedDemandePriseEnCharge = demandePriseEnChargeRepository.saveAndFlush(demandePriseEnCharge);
+
+        // Get all the demandePriseEnChargeList where observation contains
+        defaultDemandePriseEnChargeFiltering("observation.contains=" + DEFAULT_OBSERVATION, "observation.contains=" + UPDATED_OBSERVATION);
+    }
+
+    @Test
+    @Transactional
+    void getAllDemandePriseEnChargesByObservationNotContainsSomething() throws Exception {
+        // Initialize the database
+        insertedDemandePriseEnCharge = demandePriseEnChargeRepository.saveAndFlush(demandePriseEnCharge);
+
+        // Get all the demandePriseEnChargeList where observation does not contain
+        defaultDemandePriseEnChargeFiltering(
+            "observation.doesNotContain=" + UPDATED_OBSERVATION,
+            "observation.doesNotContain=" + DEFAULT_OBSERVATION
+        );
     }
 
     @Test
@@ -793,7 +1017,11 @@ class DemandePriseEnChargeResourceIT {
             .andExpect(jsonPath("$.[*].typeBeneficiaire").value(hasItem(DEFAULT_TYPE_BENEFICIAIRE.toString())))
             .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
             .andExpect(jsonPath("$.[*].statut").value(hasItem(DEFAULT_STATUT.toString())))
-            .andExpect(jsonPath("$.[*].dateAssignation").value(hasItem(DEFAULT_DATE_ASSIGNATION.toString())));
+            .andExpect(jsonPath("$.[*].priorite").value(hasItem(DEFAULT_PRIORITE.toString())))
+            .andExpect(jsonPath("$.[*].dateAssignation").value(hasItem(DEFAULT_DATE_ASSIGNATION.toString())))
+            .andExpect(jsonPath("$.[*].dateEcheance").value(hasItem(DEFAULT_DATE_ECHEANCE.toString())))
+            .andExpect(jsonPath("$.[*].motifRejet").value(hasItem(DEFAULT_MOTIF_REJET)))
+            .andExpect(jsonPath("$.[*].observation").value(hasItem(DEFAULT_OBSERVATION)));
 
         // Check, that the count call also returns 1
         restDemandePriseEnChargeMockMvc
@@ -850,7 +1078,11 @@ class DemandePriseEnChargeResourceIT {
             .typeBeneficiaire(UPDATED_TYPE_BENEFICIAIRE)
             .description(UPDATED_DESCRIPTION)
             .statut(UPDATED_STATUT)
-            .dateAssignation(UPDATED_DATE_ASSIGNATION);
+            .priorite(UPDATED_PRIORITE)
+            .dateAssignation(UPDATED_DATE_ASSIGNATION)
+            .dateEcheance(UPDATED_DATE_ECHEANCE)
+            .motifRejet(UPDATED_MOTIF_REJET)
+            .observation(UPDATED_OBSERVATION);
         DemandePriseEnChargeDTO demandePriseEnChargeDTO = demandePriseEnChargeMapper.toDto(updatedDemandePriseEnCharge);
 
         restDemandePriseEnChargeMockMvc
@@ -943,7 +1175,9 @@ class DemandePriseEnChargeResourceIT {
         partialUpdatedDemandePriseEnCharge
             .reference(UPDATED_REFERENCE)
             .typeBeneficiaire(UPDATED_TYPE_BENEFICIAIRE)
-            .description(UPDATED_DESCRIPTION);
+            .description(UPDATED_DESCRIPTION)
+            .dateAssignation(UPDATED_DATE_ASSIGNATION)
+            .dateEcheance(UPDATED_DATE_ECHEANCE);
 
         restDemandePriseEnChargeMockMvc
             .perform(
@@ -981,7 +1215,11 @@ class DemandePriseEnChargeResourceIT {
             .typeBeneficiaire(UPDATED_TYPE_BENEFICIAIRE)
             .description(UPDATED_DESCRIPTION)
             .statut(UPDATED_STATUT)
-            .dateAssignation(UPDATED_DATE_ASSIGNATION);
+            .priorite(UPDATED_PRIORITE)
+            .dateAssignation(UPDATED_DATE_ASSIGNATION)
+            .dateEcheance(UPDATED_DATE_ECHEANCE)
+            .motifRejet(UPDATED_MOTIF_REJET)
+            .observation(UPDATED_OBSERVATION);
 
         restDemandePriseEnChargeMockMvc
             .perform(

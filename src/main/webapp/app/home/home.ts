@@ -1,14 +1,13 @@
 import { Component, inject } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 
 import { AccountService } from 'app/core/auth';
-import { TranslateDirective } from 'app/shared/language';
 
 @Component({
   selector: 'jhi-home',
   templateUrl: './home.html',
   styleUrl: './home.scss',
-  imports: [TranslateDirective, RouterLink],
+  imports: [],
 })
 export default class Home {
   public readonly account = inject(AccountService).account;

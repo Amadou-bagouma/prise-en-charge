@@ -95,7 +95,11 @@ public class DemandePriseEnChargeQueryService extends QueryService<DemandePriseE
                     buildSpecification(criteria.getTypeBeneficiaire(), DemandePriseEnCharge_.typeBeneficiaire),
                     buildStringSpecification(criteria.getDescription(), DemandePriseEnCharge_.description),
                     buildSpecification(criteria.getStatut(), DemandePriseEnCharge_.statut),
+                    buildSpecification(criteria.getPriorite(), DemandePriseEnCharge_.priorite),
                     buildRangeSpecification(criteria.getDateAssignation(), DemandePriseEnCharge_.dateAssignation),
+                    buildRangeSpecification(criteria.getDateEcheance(), DemandePriseEnCharge_.dateEcheance),
+                    buildStringSpecification(criteria.getMotifRejet(), DemandePriseEnCharge_.motifRejet),
+                    buildStringSpecification(criteria.getObservation(), DemandePriseEnCharge_.observation),
                     buildSpecification(criteria.getAgentId(), root -> root.join(DemandePriseEnCharge_.agent, JoinType.LEFT).get(Agent_.id)),
                     buildSpecification(criteria.getAyantDroitId(), root ->
                         root.join(DemandePriseEnCharge_.ayantDroit, JoinType.LEFT).get(AyantDroit_.id)

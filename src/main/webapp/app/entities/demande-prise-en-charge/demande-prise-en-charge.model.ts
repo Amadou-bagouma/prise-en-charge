@@ -2,6 +2,7 @@ import dayjs from 'dayjs/esm';
 
 import { IAgent } from 'app/entities/agent/agent.model';
 import { IAyantDroit } from 'app/entities/ayant-droit/ayant-droit.model';
+import { PrioriteDemande } from 'app/entities/enumerations/priorite-demande.model';
 import { StatutDemande } from 'app/entities/enumerations/statut-demande.model';
 import { TypeBeneficiaire } from 'app/entities/enumerations/type-beneficiaire.model';
 import { IEtablissementSante } from 'app/entities/etablissement-sante/etablissement-sante.model';
@@ -16,7 +17,11 @@ export interface IDemandePriseEnCharge {
   typeBeneficiaire?: keyof typeof TypeBeneficiaire | null;
   description?: string | null;
   statut?: keyof typeof StatutDemande | null;
+  priorite?: keyof typeof PrioriteDemande | null;
   dateAssignation?: dayjs.Dayjs | null;
+  dateEcheance?: dayjs.Dayjs | null;
+  motifRejet?: string | null;
+  observation?: string | null;
   agent?: Pick<IAgent, 'id'> | null;
   ayantDroit?: Pick<IAyantDroit, 'id'> | null;
   typeSoin?: Pick<ITypeSoin, 'id'> | null;

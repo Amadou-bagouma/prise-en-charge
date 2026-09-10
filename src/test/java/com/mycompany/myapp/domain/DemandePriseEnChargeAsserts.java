@@ -53,7 +53,11 @@ public class DemandePriseEnChargeAsserts {
             .satisfies(a -> assertThat(a.getTypeBeneficiaire()).as("check typeBeneficiaire").isEqualTo(expected.getTypeBeneficiaire()))
             .satisfies(a -> assertThat(a.getDescription()).as("check description").isEqualTo(expected.getDescription()))
             .satisfies(a -> assertThat(a.getStatut()).as("check statut").isEqualTo(expected.getStatut()))
-            .satisfies(a -> assertThat(a.getDateAssignation()).as("check dateAssignation").isEqualTo(expected.getDateAssignation()));
+            .satisfies(a -> assertThat(a.getPriorite()).as("check priorite").isEqualTo(expected.getPriorite()))
+            .satisfies(a -> assertThat(a.getDateAssignation()).as("check dateAssignation").isEqualTo(expected.getDateAssignation()))
+            .satisfies(a -> assertThat(a.getDateEcheance()).as("check dateEcheance").isEqualTo(expected.getDateEcheance()))
+            .satisfies(a -> assertThat(a.getMotifRejet()).as("check motifRejet").isEqualTo(expected.getMotifRejet()))
+            .satisfies(a -> assertThat(a.getObservation()).as("check observation").isEqualTo(expected.getObservation()));
     }
 
     /**

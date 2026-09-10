@@ -1,0 +1,265 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-tache-heading" data-cy="TacheCreateUpdateHeading" jhiTranslate="peccnssApp.tache.home.createOrEditLabel">
+        Create or edit a Tache
+      </h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let titreRef = editForm.get('titre')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_titre" jhiTranslate="peccnssApp.tache.titre">Titre</label>
+          <input type="text" class="form-control" name="titre" id="field_titre" data-cy="titre" formControlName="titre" />
+          @if (titreRef.invalid && (titreRef.dirty || titreRef.touched)) {
+            <div>
+              @if (titreRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_description" jhiTranslate="peccnssApp.tache.description">Description</label>
+          <input
+            type="text"
+            class="form-control"
+            name="description"
+            id="field_description"
+            data-cy="description"
+            formControlName="description"
+          />
+        </div>
+
+        @let dateCreationRef = editForm.get('dateCreation')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_dateCreation" jhiTranslate="peccnssApp.tache.dateCreation">Date Creation</label>
+          <div class="d-flex">
+            <input
+              id="field_dateCreation"
+              data-cy="dateCreation"
+              type="datetime-local"
+              class="form-control"
+              name="dateCreation"
+              formControlName="dateCreation"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+          @if (dateCreationRef.invalid && (dateCreationRef.dirty || dateCreationRef.touched)) {
+            <div>
+              @if (dateCreationRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+              <small
+                class="form-text text-danger"
+                [hidden]="!dateCreationRef.errors?.datetimelocal"
+                jhiTranslate="entity.validation.datetimelocal"
+                >This field should be a date and time.</small
+              >
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_dateAssignation" jhiTranslate="peccnssApp.tache.dateAssignation">Date Assignation</label>
+          <div class="d-flex">
+            <input
+              id="field_dateAssignation"
+              data-cy="dateAssignation"
+              type="datetime-local"
+              class="form-control"
+              name="dateAssignation"
+              formControlName="dateAssignation"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_dateEcheance" jhiTranslate="peccnssApp.tache.dateEcheance">Date Echeance</label>
+          <div class="d-flex">
+            <input
+              id="field_dateEcheance"
+              data-cy="dateEcheance"
+              type="datetime-local"
+              class="form-control"
+              name="dateEcheance"
+              formControlName="dateEcheance"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_dateTerminaison" jhiTranslate="peccnssApp.tache.dateTerminaison">Date Terminaison</label>
+          <div class="d-flex">
+            <input
+              id="field_dateTerminaison"
+              data-cy="dateTerminaison"
+              type="datetime-local"
+              class="form-control"
+              name="dateTerminaison"
+              formControlName="dateTerminaison"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+        </div>
+
+        @let statutRef = editForm.get('statut')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_statut" jhiTranslate="peccnssApp.tache.statut">Statut</label>
+          <select class="form-control" name="statut" formControlName="statut" id="field_statut" data-cy="statut">
+            <option [ngValue]="null">{{ 'peccnssApp.StatutTache.null' | translate }}</option>
+            @for (statutTache of statutTacheValues; track $index) {
+              <option [value]="statutTache">{{ 'peccnssApp.StatutTache.' + statutTache | translate }}</option>
+            }
+          </select>
+          @if (statutRef.invalid && (statutRef.dirty || statutRef.touched)) {
+            <div>
+              @if (statutRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let prioriteRef = editForm.get('priorite')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_priorite" jhiTranslate="peccnssApp.tache.priorite">Priorite</label>
+          <select class="form-control" name="priorite" formControlName="priorite" id="field_priorite" data-cy="priorite">
+            <option [ngValue]="null">{{ 'peccnssApp.PrioriteTache.null' | translate }}</option>
+            @for (prioriteTache of prioriteTacheValues; track $index) {
+              <option [value]="prioriteTache">{{ 'peccnssApp.PrioriteTache.' + prioriteTache | translate }}</option>
+            }
+          </select>
+          @if (prioriteRef.invalid && (prioriteRef.dirty || prioriteRef.touched)) {
+            <div>
+              @if (prioriteRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let luRef = editForm.get('lu')!;
+        <div class="mb-3 form-check">
+          <input type="checkbox" class="form-check-input" name="lu" id="field_lu" data-cy="lu" formControlName="lu" />
+          <label class="form-check-label" for="field_lu" jhiTranslate="peccnssApp.tache.lu">Lu</label>
+          @if (luRef.invalid && (luRef.dirty || luRef.touched)) {
+            <div>
+              @if (luRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_commentaire" jhiTranslate="peccnssApp.tache.commentaire">Commentaire</label>
+          <input
+            type="text"
+            class="form-control"
+            name="commentaire"
+            id="field_commentaire"
+            data-cy="commentaire"
+            formControlName="commentaire"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_demande" jhiTranslate="peccnssApp.tache.demande">Demande</label>
+          <select
+            class="form-control"
+            id="field_demande"
+            data-cy="demande"
+            name="demande"
+            formControlName="demande"
+            [compareWith]="compareDemandePriseEnCharge"
+          >
+            @if (!editForm.get('demande')!.value) {
+              <option [ngValue]="null" selected></option>
+            }
+            @for (demandePriseEnChargeOption of demandePriseEnChargesSharedCollection(); track $index) {
+              <option [ngValue]="demandePriseEnChargeOption">{{ demandePriseEnChargeOption.reference }}</option>
+            }
+          </select>
+        </div>
+        @if (editForm.get(['demande'])!.invalid && (editForm.get(['demande'])!.dirty || editForm.get(['demande'])!.touched)) {
+          <div>
+            @if (editForm.get(['demande'])?.errors?.required) {
+              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+            }
+          </div>
+        }
+
+        <div class="mb-3">
+          <label class="form-label" for="field_utilisateur" jhiTranslate="peccnssApp.tache.utilisateur">Utilisateur</label>
+          <select
+            class="form-control"
+            id="field_utilisateur"
+            data-cy="utilisateur"
+            name="utilisateur"
+            formControlName="utilisateur"
+            [compareWith]="compareUser"
+          >
+            @if (!editForm.get('utilisateur')!.value) {
+              <option [ngValue]="null" selected></option>
+            }
+            @for (userOption of usersSharedCollection(); track $index) {
+              <option [ngValue]="userOption">{{ userOption.login }}</option>
+            }
+          </select>
+        </div>
+        @if (editForm.get(['utilisateur'])!.invalid && (editForm.get(['utilisateur'])!.dirty || editForm.get(['utilisateur'])!.touched)) {
+          <div>
+            @if (editForm.get(['utilisateur'])?.errors?.required) {
+              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+            }
+          </div>
+        }
+
+        <div class="mb-3">
+          <label class="form-label" for="field_boiteReception" jhiTranslate="peccnssApp.tache.boiteReception">Boite Reception</label>
+          <select
+            class="form-control"
+            id="field_boiteReception"
+            data-cy="boiteReception"
+            name="boiteReception"
+            formControlName="boiteReception"
+            [compareWith]="compareBoiteReception"
+          >
+            <option [ngValue]="null"></option>
+            @for (boiteReceptionOption of boiteReceptionsSharedCollection(); track $index) {
+              <option [ngValue]="boiteReceptionOption">{{ boiteReceptionOption.id }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

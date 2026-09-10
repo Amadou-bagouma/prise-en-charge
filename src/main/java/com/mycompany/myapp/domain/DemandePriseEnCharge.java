@@ -1,6 +1,7 @@
 package com.mycompany.myapp.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.mycompany.myapp.domain.enumeration.PrioriteDemande;
 import com.mycompany.myapp.domain.enumeration.StatutDemande;
 import com.mycompany.myapp.domain.enumeration.TypeBeneficiaire;
 import jakarta.persistence.*;
@@ -53,8 +54,22 @@ public class DemandePriseEnCharge implements Serializable {
     @Column(name = "statut", nullable = false)
     private StatutDemande statut;
 
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "priorite", nullable = false)
+    private PrioriteDemande priorite;
+
     @Column(name = "date_assignation")
     private Instant dateAssignation;
+
+    @Column(name = "date_echeance")
+    private Instant dateEcheance;
+
+    @Column(name = "motif_rejet")
+    private String motifRejet;
+
+    @Column(name = "observation")
+    private String observation;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "direction", "gestion", "user" }, allowSetters = true)
@@ -170,6 +185,19 @@ public class DemandePriseEnCharge implements Serializable {
         this.statut = statut;
     }
 
+    public PrioriteDemande getPriorite() {
+        return this.priorite;
+    }
+
+    public DemandePriseEnCharge priorite(PrioriteDemande priorite) {
+        this.setPriorite(priorite);
+        return this;
+    }
+
+    public void setPriorite(PrioriteDemande priorite) {
+        this.priorite = priorite;
+    }
+
     public Instant getDateAssignation() {
         return this.dateAssignation;
     }
@@ -181,6 +209,45 @@ public class DemandePriseEnCharge implements Serializable {
 
     public void setDateAssignation(Instant dateAssignation) {
         this.dateAssignation = dateAssignation;
+    }
+
+    public Instant getDateEcheance() {
+        return this.dateEcheance;
+    }
+
+    public DemandePriseEnCharge dateEcheance(Instant dateEcheance) {
+        this.setDateEcheance(dateEcheance);
+        return this;
+    }
+
+    public void setDateEcheance(Instant dateEcheance) {
+        this.dateEcheance = dateEcheance;
+    }
+
+    public String getMotifRejet() {
+        return this.motifRejet;
+    }
+
+    public DemandePriseEnCharge motifRejet(String motifRejet) {
+        this.setMotifRejet(motifRejet);
+        return this;
+    }
+
+    public void setMotifRejet(String motifRejet) {
+        this.motifRejet = motifRejet;
+    }
+
+    public String getObservation() {
+        return this.observation;
+    }
+
+    public DemandePriseEnCharge observation(String observation) {
+        this.setObservation(observation);
+        return this;
+    }
+
+    public void setObservation(String observation) {
+        this.observation = observation;
     }
 
     public Agent getAgent() {
@@ -291,7 +358,11 @@ public class DemandePriseEnCharge implements Serializable {
             ", typeBeneficiaire='" + getTypeBeneficiaire() + "'" +
             ", description='" + getDescription() + "'" +
             ", statut='" + getStatut() + "'" +
+            ", priorite='" + getPriorite() + "'" +
             ", dateAssignation='" + getDateAssignation() + "'" +
+            ", dateEcheance='" + getDateEcheance() + "'" +
+            ", motifRejet='" + getMotifRejet() + "'" +
+            ", observation='" + getObservation() + "'" +
             "}";
     }
 }
