@@ -57,6 +57,7 @@
       "relationshipType": "many-to-one"
     },
     {
+      "otherEntityField": "titre",
       "otherEntityName": "tache",
       "relationshipName": "tache",
       "relationshipSide": "left",

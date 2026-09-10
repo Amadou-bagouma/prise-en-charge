@@ -17,7 +17,7 @@ import org.mapstruct.*;
 public interface NotificationMapper extends EntityMapper<NotificationDTO, Notification> {
     @Mapping(target = "utilisateur", source = "utilisateur", qualifiedByName = "userLogin")
     @Mapping(target = "demande", source = "demande", qualifiedByName = "demandePriseEnChargeReference")
-    @Mapping(target = "tache", source = "tache", qualifiedByName = "tacheId")
+    @Mapping(target = "tache", source = "tache", qualifiedByName = "tacheTitre")
     NotificationDTO toDto(Notification s);
 
     @Named("userLogin")
@@ -32,8 +32,9 @@ public interface NotificationMapper extends EntityMapper<NotificationDTO, Notifi
     @Mapping(target = "reference", source = "reference")
     DemandePriseEnChargeDTO toDtoDemandePriseEnChargeReference(DemandePriseEnCharge demandePriseEnCharge);
 
-    @Named("tacheId")
+    @Named("tacheTitre")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
-    TacheDTO toDtoTacheId(Tache tache);
+    @Mapping(target = "titre", source = "titre")
+    TacheDTO toDtoTacheTitre(Tache tache);
 }

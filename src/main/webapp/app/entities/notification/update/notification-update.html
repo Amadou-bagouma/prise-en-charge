@@ -168,7 +168,7 @@
           <select class="form-control" id="field_tache" data-cy="tache" name="tache" formControlName="tache" [compareWith]="compareTache">
             <option [ngValue]="null"></option>
             @for (tacheOption of tachesSharedCollection(); track $index) {
-              <option [ngValue]="tacheOption">{{ tacheOption.id }}</option>
+              <option [ngValue]="tacheOption">{{ tacheOption.titre }}</option>
             }
           </select>
         </div>

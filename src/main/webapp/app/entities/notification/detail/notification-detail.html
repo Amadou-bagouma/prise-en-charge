@@ -69,7 +69,7 @@
           <dd>
             @if (notification()!.tache) {
               <div>
-                <a [routerLink]="['/tache', notification()!.tache?.id, 'view']">{{ notificationRef.tache?.id }}</a>
+                <a [routerLink]="['/tache', notification()!.tache?.id, 'view']">{{ notificationRef.tache?.titre }}</a>
               </div>
             }
           </dd>

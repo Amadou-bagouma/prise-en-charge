@@ -89,7 +89,7 @@
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
-            <th scope="col" jhiSortBy="tache.id">
+            <th scope="col" jhiSortBy="tache.titre">
               <div class="d-flex">
                 <span jhiTranslate="peccnssApp.notification.tache">Tache</span>
                 <fa-icon class="p-1" icon="sort" />
@@ -137,7 +137,7 @@
               <td>
                 @if (notification.tache) {
                   <div>
-                    <a [routerLink]="['/tache', notification.tache.id, 'view']">{{ notification.tache.id }}</a>
+                    <a [routerLink]="['/tache', notification.tache.id, 'view']">{{ notification.tache.titre }}</a>
                   </div>
                 }
               </td>

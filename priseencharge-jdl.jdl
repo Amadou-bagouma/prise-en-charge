@@ -340,7 +340,7 @@ relationship ManyToOne {
 
   Notification{demande(reference)} to DemandePriseEnCharge
 
-  Notification{tache} to Tache
+  Notification{tache(titre)} to Tache
 }
 
 
