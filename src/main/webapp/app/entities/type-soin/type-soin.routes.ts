@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 
 import { DESC } from 'app/config';
 import { userRouteAccessService } from 'app/core/auth';
+import { Authority } from 'app/shared/jhipster/constants';
 
 import TypeSoinResolve from './route/type-soin-routing-resolve.service';
 
@@ -11,6 +12,7 @@ const typeSoinRoute: Routes = [
     loadComponent: () => import('./list/type-soin').then(m => m.TypeSoin),
     data: {
       defaultSort: `id,${DESC}`,
+      authorities: [Authority.ADMIN],
     },
     canActivate: [userRouteAccessService],
   },
@@ -20,6 +22,9 @@ const typeSoinRoute: Routes = [
     resolve: {
       typeSoin: TypeSoinResolve,
     },
+    data: {
+      authorities: [Authority.ADMIN],
+    },
     canActivate: [userRouteAccessService],
   },
   {
@@ -28,6 +33,9 @@ const typeSoinRoute: Routes = [
     resolve: {
       typeSoin: TypeSoinResolve,
     },
+    data: {
+      authorities: [Authority.ADMIN],
+    },
     canActivate: [userRouteAccessService],
   },
   {
@@ -35,6 +43,9 @@ const typeSoinRoute: Routes = [
     loadComponent: () => import('./update/type-soin-update').then(m => m.TypeSoinUpdate),
     resolve: {
       typeSoin: TypeSoinResolve,
+    },
+    data: {
+      authorities: [Authority.ADMIN],
     },
     canActivate: [userRouteAccessService],
   },

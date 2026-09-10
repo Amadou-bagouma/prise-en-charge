@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 
 import { DESC } from 'app/config';
 import { userRouteAccessService } from 'app/core/auth';
+import { Authority } from 'app/shared/jhipster/constants';
 
 import DirectionResolve from './route/direction-routing-resolve.service';
 
@@ -11,6 +12,7 @@ const directionRoute: Routes = [
     loadComponent: () => import('./list/direction').then(m => m.Direction),
     data: {
       defaultSort: `id,${DESC}`,
+      authorities: [Authority.ADMIN],
     },
     canActivate: [userRouteAccessService],
   },
@@ -20,6 +22,9 @@ const directionRoute: Routes = [
     resolve: {
       direction: DirectionResolve,
     },
+    data: {
+      authorities: [Authority.ADMIN],
+    },
     canActivate: [userRouteAccessService],
   },
   {
@@ -28,6 +33,9 @@ const directionRoute: Routes = [
     resolve: {
       direction: DirectionResolve,
     },
+    data: {
+      authorities: [Authority.ADMIN],
+    },
     canActivate: [userRouteAccessService],
   },
   {
@@ -35,6 +43,9 @@ const directionRoute: Routes = [
     loadComponent: () => import('./update/direction-update').then(m => m.DirectionUpdate),
     resolve: {
       direction: DirectionResolve,
+    },
+    data: {
+      authorities: [Authority.ADMIN],
     },
     canActivate: [userRouteAccessService],
   },

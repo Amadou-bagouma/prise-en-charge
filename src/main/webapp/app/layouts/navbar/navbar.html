@@ -48,19 +48,34 @@
           </button>
 
           <ul id="entitiesSubmenu" class="sidebar-submenu" [ngbCollapse]="entitiesCollapsed()">
-            <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <li
+              class="sidebar-nav-item"
+              *jhiHasAnyAuthority="'ROLE_ADMIN'"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+            >
               <a class="sidebar-link" routerLink="/gestion" (click)="collapseNavbar()">
                 <fa-icon icon="asterisk" [fixedWidth]="true" />
                 <span jhiTranslate="global.menu.entities.gestion">Gestion</span>
               </a>
             </li>
-            <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <li
+              class="sidebar-nav-item"
+              *jhiHasAnyAuthority="'ROLE_ADMIN'"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+            >
               <a class="sidebar-link" routerLink="/region" (click)="collapseNavbar()">
                 <fa-icon icon="asterisk" [fixedWidth]="true" />
                 <span jhiTranslate="global.menu.entities.region">Region</span>
               </a>
             </li>
-            <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <li
+              class="sidebar-nav-item"
+              *jhiHasAnyAuthority="'ROLE_ADMIN'"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+            >
               <a class="sidebar-link" routerLink="/direction" (click)="collapseNavbar()">
                 <fa-icon icon="asterisk" [fixedWidth]="true" />
                 <span jhiTranslate="global.menu.entities.direction">Direction</span>
@@ -78,7 +93,12 @@
                 <span jhiTranslate="global.menu.entities.ayantDroit">Ayant Droit</span>
               </a>
             </li>
-            <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <li
+              class="sidebar-nav-item"
+              *jhiHasAnyAuthority="'ROLE_ADMIN'"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+            >
               <a class="sidebar-link" routerLink="/type-soin" (click)="collapseNavbar()">
                 <fa-icon icon="asterisk" [fixedWidth]="true" />
                 <span jhiTranslate="global.menu.entities.typeSoin">Type Soin</span>
