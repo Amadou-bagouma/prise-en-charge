@@ -1,9 +1,11 @@
 <div>
-  <h2 id="page-heading" data-cy="UserManagementHeading">
-    <span jhiTranslate="userManagement.home.title">Users</span>
+  <div class="jhi-page-header">
+    <h2 id="page-heading" data-cy="UserManagementHeading">
+      <span jhiTranslate="userManagement.home.title">Users</span>
+    </h2>
 
-    <div class="d-flex justify-content-end">
-      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+    <div class="jhi-page-actions">
+      <button class="btn btn-outline-secondary" (click)="load()" [disabled]="isLoading()">
         <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
         <span jhiTranslate="userManagement.home.refreshListLabel">Refresh list</span>
       </button>
@@ -11,14 +13,14 @@
       <button
         id="jh-create-entity"
         data-cy="entityCreateButton"
-        class="btn btn-primary jh-create-entity create-user-management"
+        class="btn btn-accent jh-create-entity create-user-management"
         [routerLink]="['/user-management/new']"
       >
         <fa-icon icon="plus" />
         <span jhiTranslate="userManagement.home.createLabel">Create a new user</span>
       </button>
     </div>
-  </h2>
+  </div>
 
   <jhi-alert-error />
 
@@ -29,8 +31,8 @@
       <span jhiTranslate="userManagement.home.notFound">No user found</span>
     </div>
   } @else {
-    <div class="table-responsive table-entities" id="entities">
-      <table class="table table-striped" aria-describedby="page-heading">
+    <div class="jhi-table-panel table-responsive table-entities" id="entities">
+      <table class="table jhi-table" aria-describedby="page-heading">
         <thead>
           <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
             <th scope="col" jhiSortBy="login">
@@ -52,27 +54,15 @@
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
+            <th scope="col">
+              <div class="d-flex">
+                <span jhiTranslate="userManagement.profiles">Profiles</span>
+              </div>
+            </th>
             <th scope="col" jhiSortBy="createdDate">
               <div class="d-flex">
                 <span jhiTranslate="userManagement.createdDate">Created date</span>
                 <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="lastModifiedBy">
-              <div class="d-flex">
-                <span jhiTranslate="userManagement.lastModifiedBy">Modified by</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="lastModifiedDate">
-              <div class="d-flex">
-                <span jhiTranslate="userManagement.lastModifiedDate">Modified date</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col">
-              <div class="d-flex">
-                <span jhiTranslate="userManagement.profiles">Profiles</span>
               </div>
             </th>
             <th scope="col"></th>
@@ -102,17 +92,15 @@
                 }
               </td>
               <td>{{ userManagement.langKey }}</td>
-              <td>{{ userManagement.createdDate | formatMediumDatetime }}</td>
-              <td>{{ userManagement.lastModifiedBy }}</td>
-              <td>{{ userManagement.lastModifiedDate | formatMediumDatetime }}</td>
               <td>
                 @for (authority of userManagement.authorities; track $index; let last = $last) {
                   <span>
-                    <a class="badge bg-info" [routerLink]="['/authority', authority, 'view']">{{ authority }}</a
-                    >{{ last ? '' : ', ' }}
+                    <a class="jhi-badge jhi-badge-type-AS" [routerLink]="['/authority', authority, 'view']">{{ authority }}</a
+                    >{{ last ? '' : ' ' }}
                   </span>
                 }
               </td>
+              <td>{{ userManagement.createdDate | formatMediumDatetime }}</td>
               <td class="text-end">
                 <div class="btn-group">
                   <a

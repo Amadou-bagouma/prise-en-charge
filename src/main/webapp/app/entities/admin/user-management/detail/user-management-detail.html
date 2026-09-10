@@ -1,7 +1,7 @@
 <div class="d-flex justify-content-center">
   <div class="col-8">
     @if (userManagement(); as userManagementRef) {
-      <div>
+      <div class="jhi-form-panel">
         <h2 data-cy="userManagementDetailsHeading"><span jhiTranslate="userManagement.detail.title">User</span></h2>
 
         <hr />
@@ -15,9 +15,9 @@
           <dd>
             <span>{{ userManagementRef.login }}</span>
             @if (userManagementRef.activated) {
-              <span class="badge bg-success" jhiTranslate="userManagement.activated">Activated</span>
+              <span class="jhi-badge jhi-badge-actif-true" jhiTranslate="userManagement.activated">Activated</span>
             } @else {
-              <span class="badge bg-danger" jhiTranslate="userManagement.deactivated">Deactivated</span>
+              <span class="jhi-badge jhi-badge-actif-false" jhiTranslate="userManagement.deactivated">Deactivated</span>
             }
           </dd>
           <dt><span jhiTranslate="userManagement.firstName">First name</span></dt>
@@ -51,13 +51,11 @@
 
           <dt><span jhiTranslate="userManagement.profiles">Profiles</span></dt>
           <dd>
-            <ul class="list-unstyled">
+            <div class="d-flex flex-wrap gap-2">
               @for (authority of userManagementRef.authorities; track $index) {
-                <li>
-                  <span class="badge bg-info">{{ authority }}</span>
-                </li>
+                <span class="jhi-badge jhi-badge-type-AS">{{ authority }}</span>
               }
-            </ul>
+            </div>
           </dd>
         </dl>
 
@@ -65,7 +63,7 @@
           <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
         </button>
 
-        <button type="button" [routerLink]="['/user-management', userManagementRef.login, 'edit']" class="btn btn-primary">
+        <button type="button" [routerLink]="['/user-management', userManagementRef.login, 'edit']" class="btn btn-accent">
           <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
         </button>
       </div>

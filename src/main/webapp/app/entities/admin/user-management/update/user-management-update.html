@@ -1,15 +1,15 @@
 <div class="d-flex justify-content-center">
-  <div class="col-8">
-    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+  <div class="col-12 col-xl-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm" class="jhi-form-panel">
       <h2 id="jhi-user-management-heading" data-cy="UserManagementCreateUpdateHeading" jhiTranslate="userManagement.home.createOrEditLabel">
         Create or edit a user
       </h2>
 
-      <div>
-        <jhi-alert-error />
+      <jhi-alert-error />
 
+      <div class="jhi-form-grid">
         @let loginRef = editForm.get('login')!;
-        <div class="mb-3">
+        <div class="jhi-field">
           <label class="form-label" for="field_login" jhiTranslate="userManagement.login">Login</label>
           <input type="text" class="form-control" name="login" id="field_login" data-cy="login" formControlName="login" />
           @if (loginRef.invalid && (loginRef.dirty || loginRef.touched)) {
@@ -31,38 +31,8 @@
           }
         </div>
 
-        @let firstNameRef = editForm.get('firstName')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_firstName" jhiTranslate="userManagement.firstName">First name</label>
-          <input type="text" class="form-control" name="firstName" id="field_firstName" data-cy="firstName" formControlName="firstName" />
-          @if (firstNameRef.invalid && (firstNameRef.dirty || firstNameRef.touched)) {
-            <div>
-              @if (firstNameRef.errors?.maxlength) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '50' }"
-                  >This field cannot be longer than 50 characters.</small
-                >
-              }
-            </div>
-          }
-        </div>
-
-        @let lastNameRef = editForm.get('lastName')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_lastName" jhiTranslate="userManagement.lastName">Last name</label>
-          <input type="text" class="form-control" name="lastName" id="field_lastName" data-cy="lastName" formControlName="lastName" />
-          @if (lastNameRef.invalid && (lastNameRef.dirty || lastNameRef.touched)) {
-            <div>
-              @if (lastNameRef.errors?.maxlength) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '50' }"
-                  >This field cannot be longer than 50 characters.</small
-                >
-              }
-            </div>
-          }
-        </div>
-
         @let emailRef = editForm.get('email')!;
-        <div class="mb-3">
+        <div class="jhi-field">
           <label class="form-label" for="field_email" jhiTranslate="userManagement.email">Email</label>
           <input type="text" class="form-control" name="email" id="field_email" data-cy="email" formControlName="email" />
           @if (emailRef.invalid && (emailRef.dirty || emailRef.touched)) {
@@ -87,22 +57,38 @@
           }
         </div>
 
-        @if (editForm.controls.activated.value !== null) {
-          <div class="mb-3 form-check">
-            <input
-              type="checkbox"
-              class="form-check-input"
-              name="activated"
-              id="field_activated"
-              data-cy="activated"
-              formControlName="activated"
-            />
-            <label class="form-check-label" for="field_activated" jhiTranslate="userManagement.activated">Activated</label>
-          </div>
-        }
+        @let firstNameRef = editForm.get('firstName')!;
+        <div class="jhi-field">
+          <label class="form-label" for="field_firstName" jhiTranslate="userManagement.firstName">First name</label>
+          <input type="text" class="form-control" name="firstName" id="field_firstName" data-cy="firstName" formControlName="firstName" />
+          @if (firstNameRef.invalid && (firstNameRef.dirty || firstNameRef.touched)) {
+            <div>
+              @if (firstNameRef.errors?.maxlength) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '50' }"
+                  >This field cannot be longer than 50 characters.</small
+                >
+              }
+            </div>
+          }
+        </div>
+
+        @let lastNameRef = editForm.get('lastName')!;
+        <div class="jhi-field">
+          <label class="form-label" for="field_lastName" jhiTranslate="userManagement.lastName">Last name</label>
+          <input type="text" class="form-control" name="lastName" id="field_lastName" data-cy="lastName" formControlName="lastName" />
+          @if (lastNameRef.invalid && (lastNameRef.dirty || lastNameRef.touched)) {
+            <div>
+              @if (lastNameRef.errors?.maxlength) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '50' }"
+                  >This field cannot be longer than 50 characters.</small
+                >
+              }
+            </div>
+          }
+        </div>
 
         @let langKeyRef = editForm.get('langKey')!;
-        <div class="mb-3">
+        <div class="jhi-field">
           <label class="form-label" for="field_langKey" jhiTranslate="userManagement.langKey">Language</label>
           <select class="form-control" name="langKey" formControlName="langKey" id="field_langKey" data-cy="langKey">
             <option [ngValue]="null"></option>
@@ -121,7 +107,21 @@
           }
         </div>
 
-        <div class="mb-3">
+        @if (editForm.controls.activated.value !== null) {
+          <div class="jhi-field form-check">
+            <input
+              type="checkbox"
+              class="form-check-input"
+              name="activated"
+              id="field_activated"
+              data-cy="activated"
+              formControlName="activated"
+            />
+            <label class="form-check-label" for="field_activated" jhiTranslate="userManagement.activated">Activated</label>
+          </div>
+        }
+
+        <div class="jhi-field jhi-field-full">
           <label class="form-label" for="field_authority" jhiTranslate="userManagement.profiles">Profiles</label>
           <select class="form-control" id="field_authority" multiple name="authority" formControlName="authorities">
             @for (authority of authorities(); track $index) {
@@ -131,7 +131,7 @@
         </div>
       </div>
 
-      <div>
+      <div class="jhi-form-actions">
         <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
           <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
         </button>
@@ -141,7 +141,7 @@
           id="save-entity"
           data-cy="entityCreateSaveButton"
           [disabled]="editForm.invalid || isSaving()"
-          class="btn btn-primary"
+          class="btn btn-accent"
         >
           <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
         </button>
