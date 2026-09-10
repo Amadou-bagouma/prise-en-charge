@@ -1,23 +1,130 @@
 /* ==========================================================================
-Main page styles
+Home page - "prise en charge médicale" landing page
 ========================================================================== */
 
-.hipster {
-  display: inline-block;
-  width: 347px;
-  height: 497px;
-  background: url('../../content/images/jhipster_family_member_3.svg') no-repeat center top;
-  background-size: contain;
+.home-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+
+  padding: 12px 4px 32px;
 }
 
-/* wait autoprefixer update to allow simple generation of high pixel density media query */
-@media only screen and (-webkit-min-device-pixel-ratio: 2),
-  only screen and (-moz-min-device-pixel-ratio: 2),
-  only screen and (-o-min-device-pixel-ratio: 2/1),
-  only screen and (min-resolution: 192dpi),
-  only screen and (min-resolution: 2dppx) {
-  .hipster {
-    background: url('../../content/images/jhipster_family_member_3.svg') no-repeat center top;
-    background-size: contain;
+.home-hero {
+  width: 100%;
+  max-width: 640px;
+
+  text-align: center;
+
+  background: #fff;
+  border-radius: var(--jhi-card-radius, 12px);
+  box-shadow: var(--jhi-card-shadow, 0 2px 10px rgba(0, 0, 0, 0.08));
+
+  padding: 40px 32px;
+  box-sizing: border-box;
+}
+
+.home-hero-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 64px;
+  height: 64px;
+  margin-bottom: 16px;
+
+  border-radius: 50%;
+  background: var(--jhi-accent-soft, #e8f7ee);
+  color: var(--jhi-accent-dark, #4a9a5f);
+  font-size: 26px;
+}
+
+.home-hero h1 {
+  margin: 0;
+
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 700;
+  font-size: 1.9rem;
+  color: #222;
+}
+
+.home-hero h2 {
+  margin: 4px 0 0;
+
+  font-weight: 400;
+  font-size: 0.9rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--jhi-muted, #6c757d);
+}
+
+.home-hero-text {
+  margin: 20px 0 0;
+
+  color: #555;
+  line-height: 1.6;
+}
+
+.home-hero-welcome {
+  margin: 24px 0 0;
+
+  font-weight: 600;
+  color: var(--jhi-accent-dark, #4a9a5f);
+}
+
+.home-quick-links {
+  width: 100%;
+  max-width: 920px;
+
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .home-quick-links {
+    grid-template-columns: repeat(2, 1fr);
   }
+}
+
+@media (max-width: 480px) {
+  .home-quick-links {
+    grid-template-columns: 1fr;
+  }
+}
+
+.home-quick-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+
+  padding: 24px 12px;
+
+  background: #fff;
+  border-radius: var(--jhi-card-radius, 12px);
+  box-shadow: var(--jhi-card-shadow, 0 2px 10px rgba(0, 0, 0, 0.08));
+
+  color: #333;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-align: center;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    color 0.15s ease;
+}
+
+.home-quick-link fa-icon {
+  font-size: 22px;
+  color: var(--jhi-accent-dark, #4a9a5f);
+}
+
+.home-quick-link:hover {
+  color: var(--jhi-accent-dark, #4a9a5f);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }

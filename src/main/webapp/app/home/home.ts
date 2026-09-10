@@ -1,5 +1,7 @@
 import { Component, inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 import { AccountService } from 'app/core/auth';
 
@@ -7,7 +9,7 @@ import { AccountService } from 'app/core/auth';
   selector: 'jhi-home',
   templateUrl: './home.html',
   styleUrl: './home.scss',
-  imports: [],
+  imports: [RouterLink, FontAwesomeModule],
 })
 export default class Home {
   public readonly account = inject(AccountService).account;
