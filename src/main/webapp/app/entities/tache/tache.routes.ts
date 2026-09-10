@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { ASC } from 'app/config';
+import { DESC } from 'app/config';
 import { userRouteAccessService } from 'app/core/auth';
 
 import TacheResolve from './route/tache-routing-resolve.service';
@@ -10,7 +10,7 @@ const tacheRoute: Routes = [
     path: '',
     loadComponent: () => import('./list/tache').then(m => m.Tache),
     data: {
-      defaultSort: `id,${ASC}`,
+      defaultSort: `id,${DESC}`,
     },
     canActivate: [userRouteAccessService],
   },

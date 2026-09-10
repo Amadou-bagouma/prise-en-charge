@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { ASC } from 'app/config';
+import { DESC } from 'app/config';
 import { userRouteAccessService } from 'app/core/auth';
 
 import DirectionResolve from './route/direction-routing-resolve.service';
@@ -10,7 +10,7 @@ const directionRoute: Routes = [
     path: '',
     loadComponent: () => import('./list/direction').then(m => m.Direction),
     data: {
-      defaultSort: `id,${ASC}`,
+      defaultSort: `id,${DESC}`,
     },
     canActivate: [userRouteAccessService],
   },

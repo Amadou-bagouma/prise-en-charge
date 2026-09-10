@@ -37,6 +37,8 @@ import ActiveMenuDirective from './active-menu.directive';
 export default class Navbar implements OnInit {
   readonly inProduction = signal(true);
   readonly isNavbarCollapsed = signal(true);
+  readonly entitiesCollapsed = signal(true);
+  readonly adminCollapsed = signal(true);
   readonly languages = LANGUAGES;
   readonly openAPIEnabled = signal(false);
   readonly version: string;
@@ -71,6 +73,14 @@ export default class Navbar implements OnInit {
 
   collapseNavbar(): void {
     this.isNavbarCollapsed.set(true);
+  }
+
+  toggleEntities(): void {
+    this.entitiesCollapsed.update(collapsed => !collapsed);
+  }
+
+  toggleAdmin(): void {
+    this.adminCollapsed.update(collapsed => !collapsed);
   }
 
   login(): void {

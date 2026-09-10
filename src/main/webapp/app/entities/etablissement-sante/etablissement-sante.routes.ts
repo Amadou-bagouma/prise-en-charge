@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { ASC } from 'app/config';
+import { DESC } from 'app/config';
 import { userRouteAccessService } from 'app/core/auth';
 
 import EtablissementSanteResolve from './route/etablissement-sante-routing-resolve.service';
@@ -10,7 +10,7 @@ const etablissementSanteRoute: Routes = [
     path: '',
     loadComponent: () => import('./list/etablissement-sante').then(m => m.EtablissementSante),
     data: {
-      defaultSort: `id,${ASC}`,
+      defaultSort: `id,${DESC}`,
     },
     canActivate: [userRouteAccessService],
   },

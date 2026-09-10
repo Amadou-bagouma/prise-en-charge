@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { ASC } from 'app/config';
+import { DESC } from 'app/config';
 import { userRouteAccessService } from 'app/core/auth';
 
 import GestionResolve from './route/gestion-routing-resolve.service';
@@ -10,7 +10,7 @@ const gestionRoute: Routes = [
     path: '',
     loadComponent: () => import('./list/gestion').then(m => m.Gestion),
     data: {
-      defaultSort: `id,${ASC}`,
+      defaultSort: `id,${DESC}`,
     },
     canActivate: [userRouteAccessService],
   },

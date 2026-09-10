@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { ASC } from 'app/config';
+import { DESC } from 'app/config';
 import { userRouteAccessService } from 'app/core/auth';
 
 import RegionResolve from './route/region-routing-resolve.service';
@@ -10,7 +10,7 @@ const regionRoute: Routes = [
     path: '',
     loadComponent: () => import('./list/region').then(m => m.Region),
     data: {
-      defaultSort: `id,${ASC}`,
+      defaultSort: `id,${DESC}`,
     },
     canActivate: [userRouteAccessService],
   },

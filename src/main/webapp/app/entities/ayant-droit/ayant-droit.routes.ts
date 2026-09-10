@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { ASC } from 'app/config';
+import { DESC } from 'app/config';
 import { userRouteAccessService } from 'app/core/auth';
 
 import AyantDroitResolve from './route/ayant-droit-routing-resolve.service';
@@ -10,7 +10,7 @@ const ayantDroitRoute: Routes = [
     path: '',
     loadComponent: () => import('./list/ayant-droit').then(m => m.AyantDroit),
     data: {
-      defaultSort: `id,${ASC}`,
+      defaultSort: `id,${DESC}`,
     },
     canActivate: [userRouteAccessService],
   },

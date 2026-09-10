@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { ASC } from 'app/config';
+import { DESC } from 'app/config';
 import { userRouteAccessService } from 'app/core/auth';
 
 import HistoriqueActionResolve from './route/historique-action-routing-resolve.service';
@@ -10,7 +10,7 @@ const historiqueActionRoute: Routes = [
     path: '',
     loadComponent: () => import('./list/historique-action').then(m => m.HistoriqueAction),
     data: {
-      defaultSort: `id,${ASC}`,
+      defaultSort: `id,${DESC}`,
     },
     canActivate: [userRouteAccessService],
   },

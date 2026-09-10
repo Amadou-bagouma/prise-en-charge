@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { ASC } from 'app/config';
+import { DESC } from 'app/config';
 import { userRouteAccessService } from 'app/core/auth';
 
 import NotificationResolve from './route/notification-routing-resolve.service';
@@ -10,7 +10,7 @@ const notificationRoute: Routes = [
     path: '',
     loadComponent: () => import('./list/notification').then(m => m.Notification),
     data: {
-      defaultSort: `id,${ASC}`,
+      defaultSort: `id,${DESC}`,
     },
     canActivate: [userRouteAccessService],
   },

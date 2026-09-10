@@ -53,21 +53,25 @@
                 <a [routerLink]="['/region', region.id, 'view']">{{ region.nom }}</a>
               </td>
               <td class="text-end">
-                <div class="btn-group">
-                  <a [routerLink]="['/region', region.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
-                    <fa-icon icon="eye" />
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
-                  </a>
-
-                  <a [routerLink]="['/region', region.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
-                    <fa-icon icon="pencil-alt" />
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
-                  </a>
-
-                  <button type="submit" (click)="delete(region)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
-                    <fa-icon icon="times" />
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
+                <div ngbDropdown class="d-inline-block" container="body">
+                  <button type="button" class="btn btn-secondary btn-sm" ngbDropdownToggle data-cy="entityActionsButton">
+                    <fa-icon icon="ellipsis-vertical" />
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.actions">Actions</span>
                   </button>
+                  <div ngbDropdownMenu>
+                    <a ngbDropdownItem [routerLink]="['/region', region.id, 'view']" data-cy="entityDetailsButton">
+                      <fa-icon icon="eye" class="me-1" />
+                      <span jhiTranslate="entity.action.view">View</span>
+                    </a>
+                    <a ngbDropdownItem [routerLink]="['/region', region.id, 'edit']" data-cy="entityEditButton">
+                      <fa-icon icon="pencil-alt" class="me-1" />
+                      <span jhiTranslate="entity.action.edit">Edit</span>
+                    </a>
+                    <button ngbDropdownItem type="button" (click)="delete(region)" data-cy="entityDeleteButton">
+                      <fa-icon icon="times" class="me-1" />
+                      <span jhiTranslate="entity.action.delete">Delete</span>
+                    </button>
+                  </div>
                 </div>
               </td>
             </tr>

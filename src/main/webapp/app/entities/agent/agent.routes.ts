@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { ASC } from 'app/config';
+import { DESC } from 'app/config';
 import { userRouteAccessService } from 'app/core/auth';
 
 import AgentResolve from './route/agent-routing-resolve.service';
@@ -10,7 +10,7 @@ const agentRoute: Routes = [
     path: '',
     loadComponent: () => import('./list/agent').then(m => m.Agent),
     data: {
-      defaultSort: `id,${ASC}`,
+      defaultSort: `id,${DESC}`,
     },
     canActivate: [userRouteAccessService],
   },

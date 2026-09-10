@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { ASC } from 'app/config';
+import { DESC } from 'app/config';
 import { userRouteAccessService } from 'app/core/auth';
 
 import TypeSoinResolve from './route/type-soin-routing-resolve.service';
@@ -10,7 +10,7 @@ const typeSoinRoute: Routes = [
     path: '',
     loadComponent: () => import('./list/type-soin').then(m => m.TypeSoin),
     data: {
-      defaultSort: `id,${ASC}`,
+      defaultSort: `id,${DESC}`,
     },
     canActivate: [userRouteAccessService],
   },

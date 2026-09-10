@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { ASC } from 'app/config';
+import { DESC } from 'app/config';
 import { userRouteAccessService } from 'app/core/auth';
 
 import DemandePriseEnChargeResolve from './route/demande-prise-en-charge-routing-resolve.service';
@@ -10,7 +10,7 @@ const demandePriseEnChargeRoute: Routes = [
     path: '',
     loadComponent: () => import('./list/demande-prise-en-charge').then(m => m.DemandePriseEnCharge),
     data: {
-      defaultSort: `id,${ASC}`,
+      defaultSort: `id,${DESC}`,
     },
     canActivate: [userRouteAccessService],
   },

@@ -4,6 +4,7 @@ import static com.mycompany.myapp.domain.TacheAsserts.*;
 import static com.mycompany.myapp.web.rest.TestUtil.createUpdateProxyForBean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -17,6 +18,7 @@ import com.mycompany.myapp.domain.enumeration.PrioriteTache;
 import com.mycompany.myapp.domain.enumeration.StatutTache;
 import com.mycompany.myapp.repository.TacheRepository;
 import com.mycompany.myapp.repository.UserRepository;
+import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.service.TacheService;
 import com.mycompany.myapp.service.dto.TacheDTO;
 import com.mycompany.myapp.service.mapper.TacheMapper;
@@ -47,7 +49,10 @@ import tools.jackson.databind.ObjectMapper;
 @IntegrationTest
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
-@WithMockUser
+// Most tests below only exercise field filtering and are unrelated to task ownership,
+// so they run as an admin to keep the pre-existing "see everything" behavior.
+// The task-ownership restriction itself is covered by getAllTachesAsNonAdminOnlyReturnsOwnTasks().
+@WithMockUser(authorities = AuthoritiesConstants.ADMIN)
 class TacheResourceIT {
 
     private static final String DEFAULT_TITRE = "AAAAAAAAAA";
@@ -1146,6 +1151,39 @@ class TacheResourceIT {
 
         // Validate the database contains one less item
         assertDecrementedRepositoryCount(databaseSizeBeforeDelete);
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser(username = "nonadmintaskowner")
+    void getAllTachesAsNonAdminOnlyReturnsOwnTasks() throws Exception {
+        // A task assigned to the currently authenticated (non-admin) user
+        User currentUser = UserResourceIT.createEntity();
+        currentUser.setLogin("nonadmintaskowner");
+        em.persist(currentUser);
+        Tache ownTache = createEntity(em);
+        ownTache.setUtilisateur(currentUser);
+        insertedTache = tacheRepository.saveAndFlush(ownTache);
+
+        // A task assigned to a different user
+        Tache otherTache = tacheRepository.saveAndFlush(createEntity(em));
+
+        try {
+            // The list only contains the current user's own task
+            restTacheMockMvc
+                .perform(get(ENTITY_API_URL + "?sort=id,desc"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[*].id").value(hasItem(ownTache.getId().intValue())))
+                .andExpect(jsonPath("$.[*].id").value(not(hasItem(otherTache.getId().intValue()))));
+
+            // Fetching another user's task directly by id is not found either
+            restTacheMockMvc.perform(get(ENTITY_API_URL_ID, otherTache.getId())).andExpect(status().isNotFound());
+
+            // The current user's own task remains reachable by id
+            restTacheMockMvc.perform(get(ENTITY_API_URL_ID, ownTache.getId())).andExpect(status().isOk());
+        } finally {
+            tacheRepository.delete(otherTache);
+        }
     }
 
     protected long getRepositoryCount() {

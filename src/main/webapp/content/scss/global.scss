@@ -235,6 +235,21 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 }
 
 /* ==========================================================================
+App shell: vertical sidebar + content
+========================================================================== */
+
+.app-shell {
+  display: flex;
+  align-items: stretch;
+  min-height: 100vh;
+}
+
+.app-content {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* ==========================================================================
 Login page
 ========================================================================== */
 

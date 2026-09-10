@@ -51,16 +51,21 @@
                 <a [routerLink]="['/authority', authority.name, 'view']">{{ authority.name }}</a>
               </td>
               <td class="text-end">
-                <div class="btn-group">
-                  <a [routerLink]="['/authority', authority.name, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
-                    <fa-icon icon="eye" />
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
-                  </a>
-
-                  <button type="submit" (click)="delete(authority)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
-                    <fa-icon icon="times" />
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
+                <div ngbDropdown class="d-inline-block" container="body">
+                  <button type="button" class="btn btn-secondary btn-sm" ngbDropdownToggle data-cy="entityActionsButton">
+                    <fa-icon icon="ellipsis-vertical" />
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.actions">Actions</span>
                   </button>
+                  <div ngbDropdownMenu>
+                    <a ngbDropdownItem [routerLink]="['/authority', authority.name, 'view']" data-cy="entityDetailsButton">
+                      <fa-icon icon="eye" class="me-1" />
+                      <span jhiTranslate="entity.action.view">View</span>
+                    </a>
+                    <button ngbDropdownItem type="button" (click)="delete(authority)" data-cy="entityDeleteButton">
+                      <fa-icon icon="times" class="me-1" />
+                      <span jhiTranslate="entity.action.delete">Delete</span>
+                    </button>
+                  </div>
                 </div>
               </td>
             </tr>

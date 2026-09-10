@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { ASC } from 'app/config';
+import { DESC } from 'app/config';
 import { userRouteAccessService } from 'app/core/auth';
 
 import PieceJustificativeResolve from './route/piece-justificative-routing-resolve.service';
@@ -10,7 +10,7 @@ const pieceJustificativeRoute: Routes = [
     path: '',
     loadComponent: () => import('./list/piece-justificative').then(m => m.PieceJustificative),
     data: {
-      defaultSort: `id,${ASC}`,
+      defaultSort: `id,${DESC}`,
     },
     canActivate: [userRouteAccessService],
   },

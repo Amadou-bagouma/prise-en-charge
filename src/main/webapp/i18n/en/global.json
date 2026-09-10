@@ -103,6 +103,7 @@
   },
   "entity": {
     "action": {
+      "actions": "Actions",
       "addblob": "Add blob",
       "addimage": "Add image",
       "back": "Back",

@@ -2,35 +2,221 @@
 @import 'bootstrap/scss/variables';
 
 /* ==========================================================================
-Navbar
+Vertical sidebar
 ========================================================================== */
 
-.navbar-version {
-  font-size: 0.65em;
-  color: $navbar-dark-color;
+$sidebar-width: 260px;
+$sidebar-bg: #212529;
+$sidebar-color: rgba(255, 255, 255, 0.75);
+$sidebar-color-hover: #ffffff;
+
+:host {
+  display: contents;
 }
 
-.profile-image {
-  height: 1.75em;
-  width: 1.75em;
+.sidebar-mobile-toggle {
+  display: none;
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 1031;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 8px;
+  background: $sidebar-bg;
+  color: $sidebar-color-hover;
 }
 
-.navbar {
-  padding: 0.2rem 1rem;
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1029;
+  background: rgba(0, 0, 0, 0.4);
+}
 
-  a.nav-link {
-    font-weight: 400;
+.app-sidebar {
+  display: flex;
+  flex-direction: column;
+  width: $sidebar-width;
+  min-width: $sidebar-width;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  background: $sidebar-bg;
+  color: $sidebar-color;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.9rem 1rem;
+  text-decoration: none;
+  color: $sidebar-color-hover;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  &:hover {
+    color: $sidebar-color-hover;
   }
 }
 
-/* ==========================================================================
-Logo styles
-========================================================================== */
+.sidebar-brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.navbar-version {
+  font-size: 0.65em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
 .logo-img {
-  height: 45px;
-  width: 45px;
+  height: 40px;
+  width: 40px;
+  flex: none;
   display: inline-block;
-  vertical-align: middle;
   background: url('/content/images/logo-jhipster.png') no-repeat center center;
   background-size: contain;
+}
+
+.sidebar-scroll {
+  flex: 1 1 auto;
+  overflow-y: auto;
+}
+
+.sidebar-nav {
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem 0;
+}
+
+.sidebar-nav-title {
+  margin: 0.9rem 1rem 0.3rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.sidebar-nav-item {
+  margin: 0 0.6rem;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: $sidebar-color;
+  text-decoration: none;
+  font-weight: 400;
+  font-size: 0.92rem;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: $sidebar-color-hover;
+  }
+
+  fa-icon {
+    opacity: 0.85;
+  }
+}
+
+.sidebar-nav-item.active > .sidebar-link {
+  background: var(--jhi-accent, #61b577);
+  color: #ffffff;
+
+  fa-icon {
+    opacity: 1;
+  }
+}
+
+.sidebar-link-btn {
+  width: 100%;
+}
+
+.sidebar-link-toggle {
+  width: 100%;
+}
+
+.sidebar-link-text {
+  flex: 1 1 auto;
+}
+
+.sidebar-link-caret {
+  flex: none;
+  font-size: 0.75em;
+  opacity: 0.6;
+  transition: transform 0.15s ease-in-out;
+}
+
+.sidebar-link-caret--open {
+  transform: rotate(180deg);
+}
+
+.sidebar-submenu {
+  list-style: none;
+  margin: 0.15rem 0 0.35rem;
+  padding: 0;
+
+  .sidebar-link {
+    padding-left: 2.2rem;
+    font-size: 0.88rem;
+  }
+}
+
+.sidebar-footer {
+  padding: 0.6rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.sidebar-dropup {
+  width: 100%;
+
+  .dropdown-menu {
+    min-width: 200px;
+  }
+}
+
+.profile-image {
+  height: 1.6em;
+  width: 1.6em;
+}
+
+/* ==========================================================================
+Responsive behaviour
+========================================================================== */
+
+@media (max-width: 767.98px) {
+  .sidebar-mobile-toggle {
+    display: flex;
+  }
+
+  .app-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1030;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease-in-out;
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.25);
+  }
+
+  .app-sidebar--open {
+    transform: translateX(0);
+  }
 }

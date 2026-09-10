@@ -1,6 +1,10 @@
 package com.mycompany.myapp.web.rest;
 
+import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.repository.TacheRepository;
+import com.mycompany.myapp.repository.UserRepository;
+import com.mycompany.myapp.security.AuthoritiesConstants;
+import com.mycompany.myapp.security.SecurityUtils;
 import com.mycompany.myapp.service.TacheQueryService;
 import com.mycompany.myapp.service.TacheService;
 import com.mycompany.myapp.service.criteria.TacheCriteria;
@@ -19,9 +23,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import tech.jhipster.service.filter.LongFilter;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
@@ -46,10 +53,38 @@ public class TacheResource {
 
     private final TacheQueryService tacheQueryService;
 
-    public TacheResource(TacheService tacheService, TacheRepository tacheRepository, TacheQueryService tacheQueryService) {
+    private final UserRepository userRepository;
+
+    public TacheResource(
+        TacheService tacheService,
+        TacheRepository tacheRepository,
+        TacheQueryService tacheQueryService,
+        UserRepository userRepository
+    ) {
         this.tacheService = tacheService;
         this.tacheRepository = tacheRepository;
         this.tacheQueryService = tacheQueryService;
+        this.userRepository = userRepository;
+    }
+
+    /**
+     * Restricts the given criteria to the tasks assigned to the currently authenticated user,
+     * unless that user has the {@code ROLE_ADMIN} authority.
+     */
+    private TacheCriteria restrictToCurrentUser(TacheCriteria criteria) {
+        if (SecurityUtils.hasCurrentUserAnyOfAuthorities(AuthoritiesConstants.ADMIN)) {
+            return criteria;
+        }
+        Long currentUserId = SecurityUtils.getCurrentUserLogin()
+            .flatMap(userRepository::findOneByLogin)
+            .map(User::getId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Current user could not be found"));
+
+        TacheCriteria restricted = criteria != null ? criteria.copy() : new TacheCriteria();
+        LongFilter utilisateurIdFilter = new LongFilter();
+        utilisateurIdFilter.setEquals(currentUserId);
+        restricted.setUtilisateurId(utilisateurIdFilter);
+        return restricted;
     }
 
     /**
@@ -154,6 +189,7 @@ public class TacheResource {
     ) {
         LOG.debug("REST request to get Taches by criteria: {}", criteria);
 
+        criteria = restrictToCurrentUser(criteria);
         Page<TacheDTO> page = tacheQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
@@ -168,6 +204,7 @@ public class TacheResource {
     @GetMapping("/count")
     public ResponseEntity<Long> countTaches(TacheCriteria criteria) {
         LOG.debug("REST request to count Taches by criteria: {}", criteria);
+        criteria = restrictToCurrentUser(criteria);
         return ResponseEntity.ok().body(tacheQueryService.countByCriteria(criteria));
     }
 
@@ -181,6 +218,13 @@ public class TacheResource {
     public ResponseEntity<TacheDTO> getTache(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Tache : {}", id);
         Optional<TacheDTO> tacheDTO = tacheService.findOne(id);
+        if (!SecurityUtils.hasCurrentUserAnyOfAuthorities(AuthoritiesConstants.ADMIN)) {
+            Long currentUserId = SecurityUtils.getCurrentUserLogin()
+                .flatMap(userRepository::findOneByLogin)
+                .map(User::getId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Current user could not be found"));
+            tacheDTO = tacheDTO.filter(dto -> dto.getUtilisateur() != null && currentUserId.equals(dto.getUtilisateur().getId()));
+        }
         return ResponseUtil.wrapOrNotFound(tacheDTO);
     }
 
