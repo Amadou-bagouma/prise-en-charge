@@ -1,3 +1,4 @@
+import { NgClass } from '@angular/common';
 import { Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
@@ -11,7 +12,7 @@ import { IAyantDroit } from '../ayant-droit.model';
 @Component({
   selector: 'jhi-ayant-droit-detail',
   templateUrl: './ayant-droit-detail.html',
-  imports: [FontAwesomeModule, Alert, AlertError, TranslateDirective, RouterLink, FormatMediumDatePipe],
+  imports: [NgClass, FontAwesomeModule, Alert, AlertError, TranslateDirective, RouterLink, FormatMediumDatePipe],
 })
 export class AyantDroitDetail {
   readonly ayantDroit = input<IAyantDroit | null>(null);

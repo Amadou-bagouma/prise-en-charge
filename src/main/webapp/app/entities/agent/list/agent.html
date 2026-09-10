@@ -1,9 +1,11 @@
 <div>
-  <h2 id="page-heading" data-cy="AgentHeading">
-    <span jhiTranslate="peccnssApp.agent.home.title">Agents</span>
+  <div class="jhi-page-header">
+    <h2 id="page-heading" data-cy="AgentHeading">
+      <span jhiTranslate="peccnssApp.agent.home.title">Agents</span>
+    </h2>
 
-    <div class="d-flex justify-content-end">
-      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+    <div class="jhi-page-actions">
+      <button class="btn btn-outline-secondary" (click)="load()" [disabled]="isLoading()">
         <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
         <span jhiTranslate="peccnssApp.agent.home.refreshListLabel">Refresh list</span>
       </button>
@@ -11,14 +13,14 @@
       <button
         id="jh-create-entity"
         data-cy="entityCreateButton"
-        class="btn btn-primary jh-create-entity create-agent"
+        class="btn btn-accent jh-create-entity create-agent"
         [routerLink]="['/agent/new']"
       >
         <fa-icon icon="plus" />
         <span jhiTranslate="peccnssApp.agent.home.createLabel">Create a new Agent</span>
       </button>
     </div>
-  </h2>
+  </div>
 
   <jhi-alert-error />
 
@@ -31,16 +33,10 @@
       <span jhiTranslate="peccnssApp.agent.home.notFound">No Agents found</span>
     </div>
   } @else {
-    <div class="table-responsive table-entities" id="entities">
-      <table class="table table-striped" aria-describedby="page-heading">
+    <div class="jhi-table-panel table-responsive table-entities" id="entities">
+      <table class="table jhi-table" aria-describedby="page-heading">
         <thead>
           <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
-            <th scope="col" jhiSortBy="id">
-              <div class="d-flex">
-                <span jhiTranslate="global.field.id">ID</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
             <th scope="col" jhiSortBy="matricule">
               <div class="d-flex">
                 <span jhiTranslate="peccnssApp.agent.matricule">Matricule</span>
@@ -59,21 +55,15 @@
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
-            <th scope="col" jhiSortBy="dateNaissance">
+            <th scope="col" jhiSortBy="fonction">
               <div class="d-flex">
-                <span jhiTranslate="peccnssApp.agent.dateNaissance">Date Naissance</span>
+                <span jhiTranslate="peccnssApp.agent.fonction">Fonction</span>
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
             <th scope="col" jhiSortBy="telephone">
               <div class="d-flex">
                 <span jhiTranslate="peccnssApp.agent.telephone">Telephone</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="fonction">
-              <div class="d-flex">
-                <span jhiTranslate="peccnssApp.agent.fonction">Fonction</span>
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
@@ -89,9 +79,9 @@
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
-            <th scope="col" jhiSortBy="user.login">
+            <th scope="col" jhiSortBy="dateNaissance">
               <div class="d-flex">
-                <span jhiTranslate="peccnssApp.agent.user">User</span>
+                <span jhiTranslate="peccnssApp.agent.dateNaissance">Date Naissance</span>
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
@@ -102,31 +92,23 @@
           @for (agent of agents(); track trackId(agent)) {
             <tr data-cy="entityTable">
               <td>
-                <a [routerLink]="['/agent', agent.id, 'view']">{{ agent.id }}</a>
+                <a [routerLink]="['/agent', agent.id, 'view']">{{ agent.matricule }}</a>
               </td>
-              <td>{{ agent.matricule }}</td>
               <td>{{ agent.nom }}</td>
               <td>{{ agent.prenom }}</td>
-              <td>{{ agent.dateNaissance | formatMediumDate }}</td>
-              <td>{{ agent.telephone }}</td>
               <td>{{ agent.fonction }}</td>
+              <td>{{ agent.telephone }}</td>
               <td>
                 @if (agent.direction) {
-                  <div>
-                    <a [routerLink]="['/direction', agent.direction.id, 'view']">{{ agent.direction.nom }}</a>
-                  </div>
+                  <a [routerLink]="['/direction', agent.direction.id, 'view']">{{ agent.direction.nom }}</a>
                 }
               </td>
               <td>
                 @if (agent.gestion) {
-                  <div>
-                    <a [routerLink]="['/gestion', agent.gestion.id, 'view']">{{ agent.gestion.nom }}</a>
-                  </div>
+                  <a [routerLink]="['/gestion', agent.gestion.id, 'view']">{{ agent.gestion.nom }}</a>
                 }
               </td>
-              <td>
-                {{ agent.user?.login }}
-              </td>
+              <td>{{ agent.dateNaissance | formatMediumDate }}</td>
               <td class="text-end">
                 <div class="btn-group">
                   <a [routerLink]="['/agent', agent.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">

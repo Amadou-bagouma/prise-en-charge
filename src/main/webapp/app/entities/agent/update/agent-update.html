@@ -1,22 +1,22 @@
 <div class="d-flex justify-content-center">
-  <div class="col-8">
-    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+  <div class="col-12 col-xl-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm" class="jhi-form-panel">
       <h2 id="jhi-agent-heading" data-cy="AgentCreateUpdateHeading" jhiTranslate="peccnssApp.agent.home.createOrEditLabel">
         Create or edit a Agent
       </h2>
 
-      <div>
-        <jhi-alert-error />
+      <jhi-alert-error />
 
-        @if (editForm.controls.id.value !== null) {
-          <div class="mb-3">
-            <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
-            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
-          </div>
-        }
+      @if (editForm.controls.id.value !== null) {
+        <div class="jhi-field mb-3">
+          <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
+          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+        </div>
+      }
 
+      <div class="jhi-form-grid">
         @let matriculeRef = editForm.get('matricule')!;
-        <div class="mb-3">
+        <div class="jhi-field">
           <label class="form-label" for="field_matricule" jhiTranslate="peccnssApp.agent.matricule">Matricule</label>
           <input type="text" class="form-control" name="matricule" id="field_matricule" data-cy="matricule" formControlName="matricule" />
           @if (matriculeRef.invalid && (matriculeRef.dirty || matriculeRef.touched)) {
@@ -28,33 +28,7 @@
           }
         </div>
 
-        @let nomRef = editForm.get('nom')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_nom" jhiTranslate="peccnssApp.agent.nom">Nom</label>
-          <input type="text" class="form-control" name="nom" id="field_nom" data-cy="nom" formControlName="nom" />
-          @if (nomRef.invalid && (nomRef.dirty || nomRef.touched)) {
-            <div>
-              @if (nomRef.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-            </div>
-          }
-        </div>
-
-        @let prenomRef = editForm.get('prenom')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_prenom" jhiTranslate="peccnssApp.agent.prenom">Prenom</label>
-          <input type="text" class="form-control" name="prenom" id="field_prenom" data-cy="prenom" formControlName="prenom" />
-          @if (prenomRef.invalid && (prenomRef.dirty || prenomRef.touched)) {
-            <div>
-              @if (prenomRef.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-            </div>
-          }
-        </div>
-
-        <div class="mb-3">
+        <div class="jhi-field">
           <label class="form-label" for="field_dateNaissance" jhiTranslate="peccnssApp.agent.dateNaissance">Date Naissance</label>
           <div class="input-group">
             <input
@@ -71,17 +45,43 @@
           </div>
         </div>
 
-        <div class="mb-3">
+        @let nomRef = editForm.get('nom')!;
+        <div class="jhi-field">
+          <label class="form-label" for="field_nom" jhiTranslate="peccnssApp.agent.nom">Nom</label>
+          <input type="text" class="form-control" name="nom" id="field_nom" data-cy="nom" formControlName="nom" />
+          @if (nomRef.invalid && (nomRef.dirty || nomRef.touched)) {
+            <div>
+              @if (nomRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let prenomRef = editForm.get('prenom')!;
+        <div class="jhi-field">
+          <label class="form-label" for="field_prenom" jhiTranslate="peccnssApp.agent.prenom">Prenom</label>
+          <input type="text" class="form-control" name="prenom" id="field_prenom" data-cy="prenom" formControlName="prenom" />
+          @if (prenomRef.invalid && (prenomRef.dirty || prenomRef.touched)) {
+            <div>
+              @if (prenomRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="jhi-field">
           <label class="form-label" for="field_telephone" jhiTranslate="peccnssApp.agent.telephone">Telephone</label>
           <input type="text" class="form-control" name="telephone" id="field_telephone" data-cy="telephone" formControlName="telephone" />
         </div>
 
-        <div class="mb-3">
+        <div class="jhi-field">
           <label class="form-label" for="field_fonction" jhiTranslate="peccnssApp.agent.fonction">Fonction</label>
           <input type="text" class="form-control" name="fonction" id="field_fonction" data-cy="fonction" formControlName="fonction" />
         </div>
 
-        <div class="mb-3">
+        <div class="jhi-field">
           <label class="form-label" for="field_direction" jhiTranslate="peccnssApp.agent.direction">Direction</label>
           <select
             class="form-control"
@@ -98,7 +98,7 @@
           </select>
         </div>
 
-        <div class="mb-3">
+        <div class="jhi-field">
           <label class="form-label" for="field_gestion" jhiTranslate="peccnssApp.agent.gestion">Gestion</label>
           <select
             class="form-control"
@@ -115,7 +115,7 @@
           </select>
         </div>
 
-        <div class="mb-3">
+        <div class="jhi-field">
           <label class="form-label" for="field_user" jhiTranslate="peccnssApp.agent.user">User</label>
           <select class="form-control" id="field_user" data-cy="user" name="user" formControlName="user" [compareWith]="compareUser">
             <option [ngValue]="null"></option>
@@ -126,7 +126,7 @@
         </div>
       </div>
 
-      <div>
+      <div class="jhi-form-actions">
         <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
           <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
         </button>
@@ -136,7 +136,7 @@
           id="save-entity"
           data-cy="entityCreateSaveButton"
           [disabled]="editForm.invalid || isSaving()"
-          class="btn btn-primary"
+          class="btn btn-accent"
         >
           <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
         </button>

@@ -1,22 +1,22 @@
 <div class="d-flex justify-content-center">
-  <div class="col-8">
-    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+  <div class="col-12 col-xl-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm" class="jhi-form-panel">
       <h2 id="jhi-ayant-droit-heading" data-cy="AyantDroitCreateUpdateHeading" jhiTranslate="peccnssApp.ayantDroit.home.createOrEditLabel">
         Create or edit a Ayant Droit
       </h2>
 
-      <div>
-        <jhi-alert-error />
+      <jhi-alert-error />
 
-        @if (editForm.controls.id.value !== null) {
-          <div class="mb-3">
-            <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
-            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
-          </div>
-        }
+      @if (editForm.controls.id.value !== null) {
+        <div class="jhi-field mb-3">
+          <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
+          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+        </div>
+      }
 
+      <div class="jhi-form-grid">
         @let nomRef = editForm.get('nom')!;
-        <div class="mb-3">
+        <div class="jhi-field">
           <label class="form-label" for="field_nom" jhiTranslate="peccnssApp.ayantDroit.nom">Nom</label>
           <input type="text" class="form-control" name="nom" id="field_nom" data-cy="nom" formControlName="nom" />
           @if (nomRef.invalid && (nomRef.dirty || nomRef.touched)) {
@@ -29,7 +29,7 @@
         </div>
 
         @let prenomRef = editForm.get('prenom')!;
-        <div class="mb-3">
+        <div class="jhi-field">
           <label class="form-label" for="field_prenom" jhiTranslate="peccnssApp.ayantDroit.prenom">Prenom</label>
           <input type="text" class="form-control" name="prenom" id="field_prenom" data-cy="prenom" formControlName="prenom" />
           @if (prenomRef.invalid && (prenomRef.dirty || prenomRef.touched)) {
@@ -41,7 +41,7 @@
           }
         </div>
 
-        <div class="mb-3">
+        <div class="jhi-field">
           <label class="form-label" for="field_dateNaissance" jhiTranslate="peccnssApp.ayantDroit.dateNaissance">Date Naissance</label>
           <div class="input-group">
             <input
@@ -59,7 +59,7 @@
         </div>
 
         @let lienRef = editForm.get('lien')!;
-        <div class="mb-3">
+        <div class="jhi-field">
           <label class="form-label" for="field_lien" jhiTranslate="peccnssApp.ayantDroit.lien">Lien</label>
           <select class="form-control" name="lien" formControlName="lien" id="field_lien" data-cy="lien">
             <option [ngValue]="null">{{ 'peccnssApp.LienParente.null' | translate }}</option>
@@ -76,18 +76,18 @@
           }
         </div>
 
-        <div class="mb-3">
+        <div class="jhi-field">
           <label class="form-label" for="field_agent" jhiTranslate="peccnssApp.ayantDroit.agent">Agent</label>
           <select class="form-control" id="field_agent" data-cy="agent" name="agent" formControlName="agent" [compareWith]="compareAgent">
             <option [ngValue]="null"></option>
             @for (agentOption of agentsSharedCollection(); track $index) {
-              <option [ngValue]="agentOption">{{ agentOption.matricule }}</option>
+              <option [ngValue]="agentOption">{{ agentOption.matricule }} - {{ agentOption.nom }} {{ agentOption.prenom }}</option>
             }
           </select>
         </div>
       </div>
 
-      <div>
+      <div class="jhi-form-actions">
         <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
           <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
         </button>
@@ -97,7 +97,7 @@
           id="save-entity"
           data-cy="entityCreateSaveButton"
           [disabled]="editForm.invalid || isSaving()"
-          class="btn btn-primary"
+          class="btn btn-accent"
         >
           <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
         </button>

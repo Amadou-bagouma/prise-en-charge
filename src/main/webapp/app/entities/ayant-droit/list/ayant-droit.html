@@ -1,9 +1,11 @@
 <div>
-  <h2 id="page-heading" data-cy="AyantDroitHeading">
-    <span jhiTranslate="peccnssApp.ayantDroit.home.title">Ayant Droits</span>
+  <div class="jhi-page-header">
+    <h2 id="page-heading" data-cy="AyantDroitHeading">
+      <span jhiTranslate="peccnssApp.ayantDroit.home.title">Ayant Droits</span>
+    </h2>
 
-    <div class="d-flex justify-content-end">
-      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+    <div class="jhi-page-actions">
+      <button class="btn btn-outline-secondary" (click)="load()" [disabled]="isLoading()">
         <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
         <span jhiTranslate="peccnssApp.ayantDroit.home.refreshListLabel">Refresh list</span>
       </button>
@@ -11,14 +13,14 @@
       <button
         id="jh-create-entity"
         data-cy="entityCreateButton"
-        class="btn btn-primary jh-create-entity create-ayant-droit"
+        class="btn btn-accent jh-create-entity create-ayant-droit"
         [routerLink]="['/ayant-droit/new']"
       >
         <fa-icon icon="plus" />
         <span jhiTranslate="peccnssApp.ayantDroit.home.createLabel">Create a new Ayant Droit</span>
       </button>
     </div>
-  </h2>
+  </div>
 
   <jhi-alert-error />
 
@@ -31,16 +33,10 @@
       <span jhiTranslate="peccnssApp.ayantDroit.home.notFound">No Ayant Droits found</span>
     </div>
   } @else {
-    <div class="table-responsive table-entities" id="entities">
-      <table class="table table-striped" aria-describedby="page-heading">
+    <div class="jhi-table-panel table-responsive table-entities" id="entities">
+      <table class="table jhi-table" aria-describedby="page-heading">
         <thead>
           <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
-            <th scope="col" jhiSortBy="id">
-              <div class="d-flex">
-                <span jhiTranslate="global.field.id">ID</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
             <th scope="col" jhiSortBy="nom">
               <div class="d-flex">
                 <span jhiTranslate="peccnssApp.ayantDroit.nom">Nom</span>
@@ -53,15 +49,15 @@
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
-            <th scope="col" jhiSortBy="dateNaissance">
-              <div class="d-flex">
-                <span jhiTranslate="peccnssApp.ayantDroit.dateNaissance">Date Naissance</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
             <th scope="col" jhiSortBy="lien">
               <div class="d-flex">
                 <span jhiTranslate="peccnssApp.ayantDroit.lien">Lien</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="dateNaissance">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.ayantDroit.dateNaissance">Date Naissance</span>
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
@@ -78,19 +74,22 @@
           @for (ayantDroit of ayantDroits(); track trackId(ayantDroit)) {
             <tr data-cy="entityTable">
               <td>
-                <a [routerLink]="['/ayant-droit', ayantDroit.id, 'view']">{{ ayantDroit.id }}</a>
+                <a [routerLink]="['/ayant-droit', ayantDroit.id, 'view']">{{ ayantDroit.nom }}</a>
               </td>
-              <td>{{ ayantDroit.nom }}</td>
               <td>{{ ayantDroit.prenom }}</td>
-              <td>{{ ayantDroit.dateNaissance | formatMediumDate }}</td>
-              <td [jhiTranslate]="'peccnssApp.LienParente.' + (ayantDroit.lien ?? 'null')">
-                {{ { null: '', CONJOINT: 'CONJOINT', ENFANT: 'ENFANT', AUTRE: 'AUTRE' }[ayantDroit.lien ?? 'null'] }}
+              <td>
+                <span
+                  class="jhi-badge"
+                  [ngClass]="'jhi-badge-lien-' + ayantDroit.lien"
+                  [jhiTranslate]="'peccnssApp.LienParente.' + (ayantDroit.lien ?? 'null')"
+                >
+                  {{ { null: '', CONJOINT: 'CONJOINT', ENFANT: 'ENFANT', AUTRE: 'AUTRE' }[ayantDroit.lien ?? 'null'] }}
+                </span>
               </td>
+              <td>{{ ayantDroit.dateNaissance | formatMediumDate }}</td>
               <td>
                 @if (ayantDroit.agent) {
-                  <div>
-                    <a [routerLink]="['/agent', ayantDroit.agent.id, 'view']">{{ ayantDroit.agent.matricule }}</a>
-                  </div>
+                  <a [routerLink]="['/agent', ayantDroit.agent.id, 'view']">{{ ayantDroit.agent.matricule }}</a>
                 }
               </td>
               <td class="text-end">
