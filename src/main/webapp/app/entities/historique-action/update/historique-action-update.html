@@ -1,6 +1,6 @@
 <div class="d-flex justify-content-center">
-  <div class="col-8">
-    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+  <div class="col-12 col-xl-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm" class="jhi-form-panel">
       <h2
         id="jhi-historique-action-heading"
         data-cy="HistoriqueActionCreateUpdateHeading"
@@ -9,18 +9,18 @@
         Create or edit a Historique Action
       </h2>
 
-      <div>
-        <jhi-alert-error />
+      <jhi-alert-error />
 
-        @if (editForm.controls.id.value !== null) {
-          <div class="mb-3">
-            <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
-            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
-          </div>
-        }
+      @if (editForm.controls.id.value !== null) {
+        <div class="jhi-field mb-3">
+          <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
+          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+        </div>
+      }
 
+      <div class="jhi-form-grid">
         @let actionRef = editForm.get('action')!;
-        <div class="mb-3">
+        <div class="jhi-field">
           <label class="form-label" for="field_action" jhiTranslate="peccnssApp.historiqueAction.action">Action</label>
           <input type="text" class="form-control" name="action" id="field_action" data-cy="action" formControlName="action" />
           @if (actionRef.invalid && (actionRef.dirty || actionRef.touched)) {
@@ -32,32 +32,18 @@
           }
         </div>
 
-        <div class="mb-3">
-          <label class="form-label" for="field_description" jhiTranslate="peccnssApp.historiqueAction.description">Description</label>
-          <input
-            type="text"
-            class="form-control"
-            name="description"
-            id="field_description"
-            data-cy="description"
-            formControlName="description"
-          />
-        </div>
-
         @let dateActionRef = editForm.get('dateAction')!;
-        <div class="mb-3">
+        <div class="jhi-field">
           <label class="form-label" for="field_dateAction" jhiTranslate="peccnssApp.historiqueAction.dateAction">Date Action</label>
-          <div class="d-flex">
-            <input
-              id="field_dateAction"
-              data-cy="dateAction"
-              type="datetime-local"
-              class="form-control"
-              name="dateAction"
-              formControlName="dateAction"
-              placeholder="YYYY-MM-DD HH:mm"
-            />
-          </div>
+          <input
+            id="field_dateAction"
+            data-cy="dateAction"
+            type="datetime-local"
+            class="form-control"
+            name="dateAction"
+            formControlName="dateAction"
+            placeholder="YYYY-MM-DD HH:mm"
+          />
           @if (dateActionRef.invalid && (dateActionRef.dirty || dateActionRef.touched)) {
             <div>
               @if (dateActionRef.errors?.required) {
@@ -73,7 +59,19 @@
           }
         </div>
 
-        <div class="mb-3">
+        <div class="jhi-field jhi-field-full">
+          <label class="form-label" for="field_description" jhiTranslate="peccnssApp.historiqueAction.description">Description</label>
+          <textarea
+            class="form-control"
+            name="description"
+            id="field_description"
+            data-cy="description"
+            rows="2"
+            formControlName="description"
+          ></textarea>
+        </div>
+
+        <div class="jhi-field">
           <label class="form-label" for="field_demande" jhiTranslate="peccnssApp.historiqueAction.demande">Demande</label>
           <select
             class="form-control"
@@ -90,16 +88,16 @@
               <option [ngValue]="demandePriseEnChargeOption">{{ demandePriseEnChargeOption.reference }}</option>
             }
           </select>
+          @if (editForm.get(['demande'])!.invalid && (editForm.get(['demande'])!.dirty || editForm.get(['demande'])!.touched)) {
+            <div>
+              @if (editForm.get(['demande'])?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
         </div>
-        @if (editForm.get(['demande'])!.invalid && (editForm.get(['demande'])!.dirty || editForm.get(['demande'])!.touched)) {
-          <div>
-            @if (editForm.get(['demande'])?.errors?.required) {
-              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-            }
-          </div>
-        }
 
-        <div class="mb-3">
+        <div class="jhi-field">
           <label class="form-label" for="field_utilisateur" jhiTranslate="peccnssApp.historiqueAction.utilisateur">Utilisateur</label>
           <select
             class="form-control"
@@ -116,17 +114,17 @@
               <option [ngValue]="userOption">{{ userOption.login }}</option>
             }
           </select>
+          @if (editForm.get(['utilisateur'])!.invalid && (editForm.get(['utilisateur'])!.dirty || editForm.get(['utilisateur'])!.touched)) {
+            <div>
+              @if (editForm.get(['utilisateur'])?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
         </div>
-        @if (editForm.get(['utilisateur'])!.invalid && (editForm.get(['utilisateur'])!.dirty || editForm.get(['utilisateur'])!.touched)) {
-          <div>
-            @if (editForm.get(['utilisateur'])?.errors?.required) {
-              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-            }
-          </div>
-        }
       </div>
 
-      <div>
+      <div class="jhi-form-actions">
         <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
           <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
         </button>
@@ -136,7 +134,7 @@
           id="save-entity"
           data-cy="entityCreateSaveButton"
           [disabled]="editForm.invalid || isSaving()"
-          class="btn btn-primary"
+          class="btn btn-accent"
         >
           <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
         </button>

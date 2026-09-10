@@ -651,6 +651,55 @@ Entity pages (list / form) design system
   color: var(--jhi-accent-dark);
 }
 
+.jhi-badge-statuttache-A_FAIRE {
+  background: var(--jhi-info-soft);
+  color: var(--jhi-info);
+}
+
+.jhi-badge-statuttache-EN_COURS,
+.jhi-badge-statuttache-EN_ATTENTE {
+  background: var(--jhi-warning-soft);
+  color: var(--jhi-warning);
+}
+
+.jhi-badge-statuttache-TERMINEE {
+  background: var(--jhi-accent-soft);
+  color: var(--jhi-accent-dark);
+}
+
+.jhi-badge-statuttache-ANNULEE {
+  background: var(--jhi-muted-soft);
+  color: var(--jhi-muted);
+}
+
+.jhi-badge-notiftype-NOUVELLE_TACHE,
+.jhi-badge-notiftype-NOUVELLE_DEMANDE,
+.jhi-badge-notiftype-DEMANDE_ASSIGNEE,
+.jhi-badge-notiftype-DEMANDE_MODIFIEE {
+  background: var(--jhi-info-soft);
+  color: var(--jhi-info);
+}
+
+.jhi-badge-notiftype-ECHEANCE_PROCHE {
+  background: var(--jhi-warning-soft);
+  color: var(--jhi-warning);
+}
+
+.jhi-badge-notiftype-DEMANDE_VALIDEE {
+  background: var(--jhi-accent-soft);
+  color: var(--jhi-accent-dark);
+}
+
+.jhi-badge-notiftype-DEMANDE_REJETEE {
+  background: var(--jhi-danger-soft);
+  color: var(--jhi-danger);
+}
+
+.jhi-badge-notiftype-INFORMATION {
+  background: var(--jhi-muted-soft);
+  color: var(--jhi-muted);
+}
+
 /* ---- Form ---- */
 
 .jhi-form-panel {

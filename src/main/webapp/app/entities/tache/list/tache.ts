@@ -1,3 +1,4 @@
+import { NgClass } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
 import { Component, effect, inject, signal, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -23,6 +24,7 @@ import { ITache } from '../tache.model';
   selector: 'jhi-tache',
   templateUrl: './tache.html',
   imports: [
+    NgClass,
     RouterLink,
     FontAwesomeModule,
     AlertError,

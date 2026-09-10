@@ -1,22 +1,23 @@
 <div class="d-flex justify-content-center">
-  <div class="col-8">
-    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+  <div class="col-12 col-xl-9">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm" class="jhi-form-panel">
       <h2 id="jhi-tache-heading" data-cy="TacheCreateUpdateHeading" jhiTranslate="peccnssApp.tache.home.createOrEditLabel">
         Create or edit a Tache
       </h2>
 
-      <div>
-        <jhi-alert-error />
+      <jhi-alert-error />
 
-        @if (editForm.controls.id.value !== null) {
-          <div class="mb-3">
-            <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
-            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
-          </div>
-        }
+      @if (editForm.controls.id.value !== null) {
+        <div class="jhi-field mb-3">
+          <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
+          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+        </div>
+      }
 
+      <h3 class="jhi-form-section">Tache</h3>
+      <div class="jhi-form-grid">
         @let titreRef = editForm.get('titre')!;
-        <div class="mb-3">
+        <div class="jhi-field">
           <label class="form-label" for="field_titre" jhiTranslate="peccnssApp.tache.titre">Titre</label>
           <input type="text" class="form-control" name="titre" id="field_titre" data-cy="titre" formControlName="titre" />
           @if (titreRef.invalid && (titreRef.dirty || titreRef.touched)) {
@@ -28,94 +29,49 @@
           }
         </div>
 
-        <div class="mb-3">
-          <label class="form-label" for="field_description" jhiTranslate="peccnssApp.tache.description">Description</label>
-          <input
-            type="text"
+        <div class="jhi-field">
+          <label class="form-label" for="field_demande" jhiTranslate="peccnssApp.tache.demande">Demande</label>
+          <select
             class="form-control"
-            name="description"
-            id="field_description"
-            data-cy="description"
-            formControlName="description"
-          />
-        </div>
-
-        @let dateCreationRef = editForm.get('dateCreation')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_dateCreation" jhiTranslate="peccnssApp.tache.dateCreation">Date Creation</label>
-          <div class="d-flex">
-            <input
-              id="field_dateCreation"
-              data-cy="dateCreation"
-              type="datetime-local"
-              class="form-control"
-              name="dateCreation"
-              formControlName="dateCreation"
-              placeholder="YYYY-MM-DD HH:mm"
-            />
-          </div>
-          @if (dateCreationRef.invalid && (dateCreationRef.dirty || dateCreationRef.touched)) {
+            id="field_demande"
+            data-cy="demande"
+            name="demande"
+            formControlName="demande"
+            [compareWith]="compareDemandePriseEnCharge"
+          >
+            @if (!editForm.get('demande')!.value) {
+              <option [ngValue]="null" selected></option>
+            }
+            @for (demandePriseEnChargeOption of demandePriseEnChargesSharedCollection(); track $index) {
+              <option [ngValue]="demandePriseEnChargeOption">{{ demandePriseEnChargeOption.reference }}</option>
+            }
+          </select>
+          @if (editForm.get(['demande'])!.invalid && (editForm.get(['demande'])!.dirty || editForm.get(['demande'])!.touched)) {
             <div>
-              @if (dateCreationRef.errors?.required) {
+              @if (editForm.get(['demande'])?.errors?.required) {
                 <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
               }
-              <small
-                class="form-text text-danger"
-                [hidden]="!dateCreationRef.errors?.datetimelocal"
-                jhiTranslate="entity.validation.datetimelocal"
-                >This field should be a date and time.</small
-              >
             </div>
           }
         </div>
 
-        <div class="mb-3">
-          <label class="form-label" for="field_dateAssignation" jhiTranslate="peccnssApp.tache.dateAssignation">Date Assignation</label>
-          <div class="d-flex">
-            <input
-              id="field_dateAssignation"
-              data-cy="dateAssignation"
-              type="datetime-local"
-              class="form-control"
-              name="dateAssignation"
-              formControlName="dateAssignation"
-              placeholder="YYYY-MM-DD HH:mm"
-            />
-          </div>
+        <div class="jhi-field jhi-field-full">
+          <label class="form-label" for="field_description" jhiTranslate="peccnssApp.tache.description">Description</label>
+          <textarea
+            class="form-control"
+            name="description"
+            id="field_description"
+            data-cy="description"
+            rows="2"
+            formControlName="description"
+          ></textarea>
         </div>
+      </div>
 
-        <div class="mb-3">
-          <label class="form-label" for="field_dateEcheance" jhiTranslate="peccnssApp.tache.dateEcheance">Date Echeance</label>
-          <div class="d-flex">
-            <input
-              id="field_dateEcheance"
-              data-cy="dateEcheance"
-              type="datetime-local"
-              class="form-control"
-              name="dateEcheance"
-              formControlName="dateEcheance"
-              placeholder="YYYY-MM-DD HH:mm"
-            />
-          </div>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_dateTerminaison" jhiTranslate="peccnssApp.tache.dateTerminaison">Date Terminaison</label>
-          <div class="d-flex">
-            <input
-              id="field_dateTerminaison"
-              data-cy="dateTerminaison"
-              type="datetime-local"
-              class="form-control"
-              name="dateTerminaison"
-              formControlName="dateTerminaison"
-              placeholder="YYYY-MM-DD HH:mm"
-            />
-          </div>
-        </div>
-
+      <h3 class="jhi-form-section">Suivi</h3>
+      <div class="jhi-form-grid">
         @let statutRef = editForm.get('statut')!;
-        <div class="mb-3">
+        <div class="jhi-field">
           <label class="form-label" for="field_statut" jhiTranslate="peccnssApp.tache.statut">Statut</label>
           <select class="form-control" name="statut" formControlName="statut" id="field_statut" data-cy="statut">
             <option [ngValue]="null">{{ 'peccnssApp.StatutTache.null' | translate }}</option>
@@ -133,7 +89,7 @@
         </div>
 
         @let prioriteRef = editForm.get('priorite')!;
-        <div class="mb-3">
+        <div class="jhi-field">
           <label class="form-label" for="field_priorite" jhiTranslate="peccnssApp.tache.priorite">Priorite</label>
           <select class="form-control" name="priorite" formControlName="priorite" id="field_priorite" data-cy="priorite">
             <option [ngValue]="null">{{ 'peccnssApp.PrioriteTache.null' | translate }}</option>
@@ -150,8 +106,74 @@
           }
         </div>
 
+        <div class="jhi-field">
+          <label class="form-label" for="field_dateCreation" jhiTranslate="peccnssApp.tache.dateCreation">Date Creation</label>
+          <input
+            id="field_dateCreation"
+            data-cy="dateCreation"
+            type="datetime-local"
+            class="form-control"
+            name="dateCreation"
+            formControlName="dateCreation"
+            placeholder="YYYY-MM-DD HH:mm"
+          />
+          @let dateCreationRef = editForm.get('dateCreation')!;
+          @if (dateCreationRef.invalid && (dateCreationRef.dirty || dateCreationRef.touched)) {
+            <div>
+              @if (dateCreationRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+              <small
+                class="form-text text-danger"
+                [hidden]="!dateCreationRef.errors?.datetimelocal"
+                jhiTranslate="entity.validation.datetimelocal"
+                >This field should be a date and time.</small
+              >
+            </div>
+          }
+        </div>
+
+        <div class="jhi-field">
+          <label class="form-label" for="field_dateAssignation" jhiTranslate="peccnssApp.tache.dateAssignation">Date Assignation</label>
+          <input
+            id="field_dateAssignation"
+            data-cy="dateAssignation"
+            type="datetime-local"
+            class="form-control"
+            name="dateAssignation"
+            formControlName="dateAssignation"
+            placeholder="YYYY-MM-DD HH:mm"
+          />
+        </div>
+
+        <div class="jhi-field">
+          <label class="form-label" for="field_dateEcheance" jhiTranslate="peccnssApp.tache.dateEcheance">Date Echeance</label>
+          <input
+            id="field_dateEcheance"
+            data-cy="dateEcheance"
+            type="datetime-local"
+            class="form-control"
+            name="dateEcheance"
+            formControlName="dateEcheance"
+            placeholder="YYYY-MM-DD HH:mm"
+          />
+        </div>
+
+        <div class="jhi-field">
+          <label class="form-label" for="field_dateTerminaison" jhiTranslate="peccnssApp.tache.dateTerminaison">Date Terminaison</label>
+          <input
+            id="field_dateTerminaison"
+            data-cy="dateTerminaison"
+            type="datetime-local"
+            class="form-control"
+            name="dateTerminaison"
+            formControlName="dateTerminaison"
+            placeholder="YYYY-MM-DD HH:mm"
+          />
+        </div>
+
         @let luRef = editForm.get('lu')!;
-        <div class="mb-3 form-check">
+        <div class="jhi-field form-check">
           <input type="checkbox" class="form-check-input" name="lu" id="field_lu" data-cy="lu" formControlName="lu" />
           <label class="form-check-label" for="field_lu" jhiTranslate="peccnssApp.tache.lu">Lu</label>
           @if (luRef.invalid && (luRef.dirty || luRef.touched)) {
@@ -163,45 +185,22 @@
           }
         </div>
 
-        <div class="mb-3">
+        <div class="jhi-field jhi-field-full">
           <label class="form-label" for="field_commentaire" jhiTranslate="peccnssApp.tache.commentaire">Commentaire</label>
-          <input
-            type="text"
+          <textarea
             class="form-control"
             name="commentaire"
             id="field_commentaire"
             data-cy="commentaire"
+            rows="2"
             formControlName="commentaire"
-          />
+          ></textarea>
         </div>
+      </div>
 
-        <div class="mb-3">
-          <label class="form-label" for="field_demande" jhiTranslate="peccnssApp.tache.demande">Demande</label>
-          <select
-            class="form-control"
-            id="field_demande"
-            data-cy="demande"
-            name="demande"
-            formControlName="demande"
-            [compareWith]="compareDemandePriseEnCharge"
-          >
-            @if (!editForm.get('demande')!.value) {
-              <option [ngValue]="null" selected></option>
-            }
-            @for (demandePriseEnChargeOption of demandePriseEnChargesSharedCollection(); track $index) {
-              <option [ngValue]="demandePriseEnChargeOption">{{ demandePriseEnChargeOption.reference }}</option>
-            }
-          </select>
-        </div>
-        @if (editForm.get(['demande'])!.invalid && (editForm.get(['demande'])!.dirty || editForm.get(['demande'])!.touched)) {
-          <div>
-            @if (editForm.get(['demande'])?.errors?.required) {
-              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-            }
-          </div>
-        }
-
-        <div class="mb-3">
+      <h3 class="jhi-form-section">Intervenants</h3>
+      <div class="jhi-form-grid">
+        <div class="jhi-field">
           <label class="form-label" for="field_utilisateur" jhiTranslate="peccnssApp.tache.utilisateur">Utilisateur</label>
           <select
             class="form-control"
@@ -218,16 +217,16 @@
               <option [ngValue]="userOption">{{ userOption.login }}</option>
             }
           </select>
+          @if (editForm.get(['utilisateur'])!.invalid && (editForm.get(['utilisateur'])!.dirty || editForm.get(['utilisateur'])!.touched)) {
+            <div>
+              @if (editForm.get(['utilisateur'])?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
         </div>
-        @if (editForm.get(['utilisateur'])!.invalid && (editForm.get(['utilisateur'])!.dirty || editForm.get(['utilisateur'])!.touched)) {
-          <div>
-            @if (editForm.get(['utilisateur'])?.errors?.required) {
-              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-            }
-          </div>
-        }
 
-        <div class="mb-3">
+        <div class="jhi-field">
           <label class="form-label" for="field_boiteReception" jhiTranslate="peccnssApp.tache.boiteReception">Boite Reception</label>
           <select
             class="form-control"
@@ -245,7 +244,7 @@
         </div>
       </div>
 
-      <div>
+      <div class="jhi-form-actions">
         <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
           <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
         </button>
@@ -255,7 +254,7 @@
           id="save-entity"
           data-cy="entityCreateSaveButton"
           [disabled]="editForm.invalid || isSaving()"
-          class="btn btn-primary"
+          class="btn btn-accent"
         >
           <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
         </button>

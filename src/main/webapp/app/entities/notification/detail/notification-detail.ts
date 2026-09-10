@@ -1,3 +1,4 @@
+import { NgClass } from '@angular/common';
 import { Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
@@ -11,7 +12,7 @@ import { INotification } from '../notification.model';
 @Component({
   selector: 'jhi-notification-detail',
   templateUrl: './notification-detail.html',
-  imports: [FontAwesomeModule, Alert, AlertError, TranslateDirective, RouterLink, FormatMediumDatetimePipe],
+  imports: [NgClass, FontAwesomeModule, Alert, AlertError, TranslateDirective, RouterLink, FormatMediumDatetimePipe],
 })
 export class NotificationDetail {
   readonly notification = input<INotification | null>(null);

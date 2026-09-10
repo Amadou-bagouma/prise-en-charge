@@ -1,3 +1,4 @@
+import { NgClass } from '@angular/common';
 import { Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
@@ -11,7 +12,7 @@ import { IBoiteReception } from '../boite-reception.model';
 @Component({
   selector: 'jhi-boite-reception-detail',
   templateUrl: './boite-reception-detail.html',
-  imports: [FontAwesomeModule, Alert, AlertError, TranslateDirective, RouterLink, FormatMediumDatetimePipe],
+  imports: [NgClass, FontAwesomeModule, Alert, AlertError, TranslateDirective, RouterLink, FormatMediumDatetimePipe],
 })
 export class BoiteReceptionDetail {
   readonly boiteReception = input<IBoiteReception | null>(null);

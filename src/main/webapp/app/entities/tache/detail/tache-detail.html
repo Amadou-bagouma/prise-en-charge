@@ -1,7 +1,7 @@
 <div class="d-flex justify-content-center">
   <div class="col-8">
     @if (tache(); as tacheRef) {
-      <div>
+      <div class="jhi-form-panel">
         <h2 data-cy="tacheDetailsHeading"><span jhiTranslate="peccnssApp.tache.detail.title">Tache</span></h2>
 
         <hr />
@@ -41,21 +41,31 @@
           </dd>
           <dt><span jhiTranslate="peccnssApp.tache.statut">Statut</span></dt>
           <dd>
-            <span [jhiTranslate]="'peccnssApp.StatutTache.' + (tacheRef.statut ?? 'null')">{{
-              { null: '', A_FAIRE: 'A_FAIRE', EN_COURS: 'EN_COURS', EN_ATTENTE: 'EN_ATTENTE', TERMINEE: 'TERMINEE', ANNULEE: 'ANNULEE' }[
-                tacheRef.statut ?? 'null'
-              ]
-            }}</span>
+            <span
+              class="jhi-badge"
+              [ngClass]="'jhi-badge-statuttache-' + tacheRef.statut"
+              [jhiTranslate]="'peccnssApp.StatutTache.' + (tacheRef.statut ?? 'null')"
+              >{{
+                { null: '', A_FAIRE: 'A_FAIRE', EN_COURS: 'EN_COURS', EN_ATTENTE: 'EN_ATTENTE', TERMINEE: 'TERMINEE', ANNULEE: 'ANNULEE' }[
+                  tacheRef.statut ?? 'null'
+                ]
+              }}</span
+            >
           </dd>
           <dt><span jhiTranslate="peccnssApp.tache.priorite">Priorite</span></dt>
           <dd>
-            <span [jhiTranslate]="'peccnssApp.PrioriteTache.' + (tacheRef.priorite ?? 'null')">{{
-              { null: '', NORMALE: 'NORMALE', IMPORTANTE: 'IMPORTANTE', URGENTE: 'URGENTE' }[tacheRef.priorite ?? 'null']
-            }}</span>
+            <span
+              class="jhi-badge"
+              [ngClass]="'jhi-badge-priorite-' + tacheRef.priorite"
+              [jhiTranslate]="'peccnssApp.PrioriteTache.' + (tacheRef.priorite ?? 'null')"
+              >{{ { null: '', NORMALE: 'NORMALE', IMPORTANTE: 'IMPORTANTE', URGENTE: 'URGENTE' }[tacheRef.priorite ?? 'null'] }}</span
+            >
           </dd>
           <dt><span jhiTranslate="peccnssApp.tache.lu">Lu</span></dt>
           <dd>
-            <span>{{ tacheRef.lu }}</span>
+            <span class="jhi-badge" [ngClass]="tacheRef.lu ? 'jhi-badge-actif-true' : 'jhi-badge-actif-false'">
+              {{ tacheRef.lu ? 'Lu' : 'Non lu' }}
+            </span>
           </dd>
           <dt><span jhiTranslate="peccnssApp.tache.commentaire">Commentaire</span></dt>
           <dd>
@@ -87,7 +97,7 @@
           <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
         </button>
 
-        <button type="button" [routerLink]="['/tache', tacheRef.id, 'edit']" class="btn btn-primary">
+        <button type="button" [routerLink]="['/tache', tacheRef.id, 'edit']" class="btn btn-accent">
           <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
         </button>
       </div>

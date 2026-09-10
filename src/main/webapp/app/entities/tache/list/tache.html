@@ -1,9 +1,11 @@
 <div>
-  <h2 id="page-heading" data-cy="TacheHeading">
-    <span jhiTranslate="peccnssApp.tache.home.title">Taches</span>
+  <div class="jhi-page-header">
+    <h2 id="page-heading" data-cy="TacheHeading">
+      <span jhiTranslate="peccnssApp.tache.home.title">Taches</span>
+    </h2>
 
-    <div class="d-flex justify-content-end">
-      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+    <div class="jhi-page-actions">
+      <button class="btn btn-outline-secondary" (click)="load()" [disabled]="isLoading()">
         <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
         <span jhiTranslate="peccnssApp.tache.home.refreshListLabel">Refresh list</span>
       </button>
@@ -11,14 +13,14 @@
       <button
         id="jh-create-entity"
         data-cy="entityCreateButton"
-        class="btn btn-primary jh-create-entity create-tache"
+        class="btn btn-accent jh-create-entity create-tache"
         [routerLink]="['/tache/new']"
       >
         <fa-icon icon="plus" />
         <span jhiTranslate="peccnssApp.tache.home.createLabel">Create a new Tache</span>
       </button>
     </div>
-  </h2>
+  </div>
 
   <jhi-alert-error />
 
@@ -31,49 +33,19 @@
       <span jhiTranslate="peccnssApp.tache.home.notFound">No Taches found</span>
     </div>
   } @else {
-    <div class="table-responsive table-entities" id="entities">
-      <table class="table table-striped" aria-describedby="page-heading">
+    <div class="jhi-table-panel table-responsive table-entities" id="entities">
+      <table class="table jhi-table" aria-describedby="page-heading">
         <thead>
           <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
-            <th scope="col" jhiSortBy="id">
-              <div class="d-flex">
-                <span jhiTranslate="global.field.id">ID</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
             <th scope="col" jhiSortBy="titre">
               <div class="d-flex">
                 <span jhiTranslate="peccnssApp.tache.titre">Titre</span>
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
-            <th scope="col" jhiSortBy="description">
+            <th scope="col" jhiSortBy="demande.reference">
               <div class="d-flex">
-                <span jhiTranslate="peccnssApp.tache.description">Description</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="dateCreation">
-              <div class="d-flex">
-                <span jhiTranslate="peccnssApp.tache.dateCreation">Date Creation</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="dateAssignation">
-              <div class="d-flex">
-                <span jhiTranslate="peccnssApp.tache.dateAssignation">Date Assignation</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="dateEcheance">
-              <div class="d-flex">
-                <span jhiTranslate="peccnssApp.tache.dateEcheance">Date Echeance</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="dateTerminaison">
-              <div class="d-flex">
-                <span jhiTranslate="peccnssApp.tache.dateTerminaison">Date Terminaison</span>
+                <span jhiTranslate="peccnssApp.tache.demande">Demande</span>
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
@@ -89,21 +61,9 @@
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
-            <th scope="col" jhiSortBy="lu">
+            <th scope="col" jhiSortBy="dateEcheance">
               <div class="d-flex">
-                <span jhiTranslate="peccnssApp.tache.lu">Lu</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="commentaire">
-              <div class="d-flex">
-                <span jhiTranslate="peccnssApp.tache.commentaire">Commentaire</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="demande.reference">
-              <div class="d-flex">
-                <span jhiTranslate="peccnssApp.tache.demande">Demande</span>
+                <span jhiTranslate="peccnssApp.tache.dateEcheance">Date Echeance</span>
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
@@ -113,9 +73,9 @@
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
-            <th scope="col" jhiSortBy="boiteReception.id">
+            <th scope="col" jhiSortBy="lu">
               <div class="d-flex">
-                <span jhiTranslate="peccnssApp.tache.boiteReception">Boite Reception</span>
+                <span jhiTranslate="peccnssApp.tache.lu">Lu</span>
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
@@ -126,47 +86,46 @@
           @for (tache of taches(); track trackId(tache)) {
             <tr data-cy="entityTable">
               <td>
-                <a [routerLink]="['/tache', tache.id, 'view']">{{ tache.id }}</a>
+                <a [routerLink]="['/tache', tache.id, 'view']">{{ tache.titre }}</a>
               </td>
-              <td>{{ tache.titre }}</td>
-              <td>{{ tache.description }}</td>
-              <td>{{ tache.dateCreation | formatMediumDatetime }}</td>
-              <td>{{ tache.dateAssignation | formatMediumDatetime }}</td>
-              <td>{{ tache.dateEcheance | formatMediumDatetime }}</td>
-              <td>{{ tache.dateTerminaison | formatMediumDatetime }}</td>
-              <td [jhiTranslate]="'peccnssApp.StatutTache.' + (tache.statut ?? 'null')">
-                {{
-                  {
-                    null: '',
-                    A_FAIRE: 'A_FAIRE',
-                    EN_COURS: 'EN_COURS',
-                    EN_ATTENTE: 'EN_ATTENTE',
-                    TERMINEE: 'TERMINEE',
-                    ANNULEE: 'ANNULEE',
-                  }[tache.statut ?? 'null']
-                }}
-              </td>
-              <td [jhiTranslate]="'peccnssApp.PrioriteTache.' + (tache.priorite ?? 'null')">
-                {{ { null: '', NORMALE: 'NORMALE', IMPORTANTE: 'IMPORTANTE', URGENTE: 'URGENTE' }[tache.priorite ?? 'null'] }}
-              </td>
-              <td>{{ tache.lu }}</td>
-              <td>{{ tache.commentaire }}</td>
               <td>
                 @if (tache.demande) {
-                  <div>
-                    <a [routerLink]="['/demande-prise-en-charge', tache.demande.id, 'view']">{{ tache.demande.reference }}</a>
-                  </div>
+                  <a [routerLink]="['/demande-prise-en-charge', tache.demande.id, 'view']">{{ tache.demande.reference }}</a>
                 }
               </td>
               <td>
-                {{ tache.utilisateur?.login }}
+                <span
+                  class="jhi-badge"
+                  [ngClass]="'jhi-badge-statuttache-' + tache.statut"
+                  [jhiTranslate]="'peccnssApp.StatutTache.' + (tache.statut ?? 'null')"
+                >
+                  {{
+                    {
+                      null: '',
+                      A_FAIRE: 'A_FAIRE',
+                      EN_COURS: 'EN_COURS',
+                      EN_ATTENTE: 'EN_ATTENTE',
+                      TERMINEE: 'TERMINEE',
+                      ANNULEE: 'ANNULEE',
+                    }[tache.statut ?? 'null']
+                  }}
+                </span>
               </td>
               <td>
-                @if (tache.boiteReception) {
-                  <div>
-                    <a [routerLink]="['/boite-reception', tache.boiteReception.id, 'view']">{{ tache.boiteReception.id }}</a>
-                  </div>
-                }
+                <span
+                  class="jhi-badge"
+                  [ngClass]="'jhi-badge-priorite-' + tache.priorite"
+                  [jhiTranslate]="'peccnssApp.PrioriteTache.' + (tache.priorite ?? 'null')"
+                >
+                  {{ { null: '', NORMALE: 'NORMALE', IMPORTANTE: 'IMPORTANTE', URGENTE: 'URGENTE' }[tache.priorite ?? 'null'] }}
+                </span>
+              </td>
+              <td>{{ tache.dateEcheance | formatMediumDatetime }}</td>
+              <td>{{ tache.utilisateur?.login }}</td>
+              <td>
+                <span class="jhi-badge" [ngClass]="tache.lu ? 'jhi-badge-actif-true' : 'jhi-badge-actif-false'">
+                  {{ tache.lu ? 'Lu' : 'Non lu' }}
+                </span>
               </td>
               <td class="text-end">
                 <div class="btn-group">

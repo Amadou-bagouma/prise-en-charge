@@ -1,3 +1,4 @@
+import { NgClass } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
 import { Component, effect, inject, signal, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -23,6 +24,7 @@ import { NotificationService } from '../service/notification.service';
   selector: 'jhi-notification',
   templateUrl: './notification.html',
   imports: [
+    NgClass,
     RouterLink,
     FontAwesomeModule,
     AlertError,

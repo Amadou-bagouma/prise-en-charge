@@ -1,3 +1,4 @@
+import { NgClass } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
 import { Component, effect, inject, signal, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -22,6 +23,7 @@ import { BoiteReceptionService } from '../service/boite-reception.service';
   selector: 'jhi-boite-reception',
   templateUrl: './boite-reception.html',
   imports: [
+    NgClass,
     RouterLink,
     FontAwesomeModule,
     AlertError,
