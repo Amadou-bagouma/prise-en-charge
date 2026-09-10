@@ -9,7 +9,7 @@ export interface IAyantDroit {
   prenom?: string | null;
   dateNaissance?: dayjs.Dayjs | null;
   lien?: keyof typeof LienParente | null;
-  agent?: Pick<IAgent, 'id'> | null;
+  agent?: Pick<IAgent, 'id' | 'matricule'> | null;
 }
 
 export type NewAyantDroit = Omit<IAyantDroit, 'id'> & { id: null };

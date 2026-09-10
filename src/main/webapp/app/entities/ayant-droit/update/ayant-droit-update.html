@@ -81,7 +81,7 @@
           <select class="form-control" id="field_agent" data-cy="agent" name="agent" formControlName="agent" [compareWith]="compareAgent">
             <option [ngValue]="null"></option>
             @for (agentOption of agentsSharedCollection(); track $index) {
-              <option [ngValue]="agentOption">{{ agentOption.id }}</option>
+              <option [ngValue]="agentOption">{{ agentOption.matricule }}</option>
             }
           </select>
         </div>

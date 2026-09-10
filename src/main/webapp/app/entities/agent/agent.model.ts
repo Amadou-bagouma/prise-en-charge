@@ -12,8 +12,8 @@ export interface IAgent {
   dateNaissance?: dayjs.Dayjs | null;
   telephone?: string | null;
   fonction?: string | null;
-  direction?: Pick<IDirection, 'id'> | null;
-  gestion?: Pick<IGestion, 'id'> | null;
+  direction?: Pick<IDirection, 'id' | 'nom'> | null;
+  gestion?: Pick<IGestion, 'id' | 'nom'> | null;
   user?: Pick<IUser, 'id' | 'login'> | null;
 }
 

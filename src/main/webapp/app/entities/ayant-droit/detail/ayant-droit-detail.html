@@ -37,7 +37,7 @@
           <dd>
             @if (ayantDroit()!.agent) {
               <div>
-                <a [routerLink]="['/agent', ayantDroit()!.agent?.id, 'view']">{{ ayantDroitRef.agent?.id }}</a>
+                <a [routerLink]="['/agent', ayantDroit()!.agent?.id, 'view']">{{ ayantDroitRef.agent?.matricule }}</a>
               </div>
             }
           </dd>

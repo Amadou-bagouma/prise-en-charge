@@ -258,11 +258,11 @@ relationship ManyToOne {
 
   Direction{region} to Region
 
-  Agent{direction} to Direction
+  Agent{direction(nom)} to Direction
 
-  Agent{gestion} to Gestion
+  Agent{gestion(nom)} to Gestion
 
-  AyantDroit{agent} to Agent
+  AyantDroit{agent(matricule)} to Agent
 
   Agent{user(login)} to User with builtInEntity
 }

@@ -15,20 +15,22 @@ import org.mapstruct.*;
  */
 @Mapper(componentModel = "spring")
 public interface AgentMapper extends EntityMapper<AgentDTO, Agent> {
-    @Mapping(target = "direction", source = "direction", qualifiedByName = "directionId")
-    @Mapping(target = "gestion", source = "gestion", qualifiedByName = "gestionId")
+    @Mapping(target = "direction", source = "direction", qualifiedByName = "directionNom")
+    @Mapping(target = "gestion", source = "gestion", qualifiedByName = "gestionNom")
     @Mapping(target = "user", source = "user", qualifiedByName = "userLogin")
     AgentDTO toDto(Agent s);
 
-    @Named("directionId")
+    @Named("directionNom")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
-    DirectionDTO toDtoDirectionId(Direction direction);
+    @Mapping(target = "nom", source = "nom")
+    DirectionDTO toDtoDirectionNom(Direction direction);
 
-    @Named("gestionId")
+    @Named("gestionNom")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
-    GestionDTO toDtoGestionId(Gestion gestion);
+    @Mapping(target = "nom", source = "nom")
+    GestionDTO toDtoGestionNom(Gestion gestion);
 
     @Named("userLogin")
     @BeanMapping(ignoreByDefault = true)

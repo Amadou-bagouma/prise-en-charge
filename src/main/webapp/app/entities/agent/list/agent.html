@@ -77,13 +77,13 @@
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
-            <th scope="col" jhiSortBy="direction.id">
+            <th scope="col" jhiSortBy="direction.nom">
               <div class="d-flex">
                 <span jhiTranslate="peccnssApp.agent.direction">Direction</span>
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
-            <th scope="col" jhiSortBy="gestion.id">
+            <th scope="col" jhiSortBy="gestion.nom">
               <div class="d-flex">
                 <span jhiTranslate="peccnssApp.agent.gestion">Gestion</span>
                 <fa-icon class="p-1" icon="sort" />
@@ -113,14 +113,14 @@
               <td>
                 @if (agent.direction) {
                   <div>
-                    <a [routerLink]="['/direction', agent.direction.id, 'view']">{{ agent.direction.id }}</a>
+                    <a [routerLink]="['/direction', agent.direction.id, 'view']">{{ agent.direction.nom }}</a>
                   </div>
                 }
               </td>
               <td>
                 @if (agent.gestion) {
                   <div>
-                    <a [routerLink]="['/gestion', agent.gestion.id, 'view']">{{ agent.gestion.id }}</a>
+                    <a [routerLink]="['/gestion', agent.gestion.id, 'view']">{{ agent.gestion.nom }}</a>
                   </div>
                 }
               </td>

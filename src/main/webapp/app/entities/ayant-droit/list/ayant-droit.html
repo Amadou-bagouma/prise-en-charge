@@ -65,7 +65,7 @@
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
-            <th scope="col" jhiSortBy="agent.id">
+            <th scope="col" jhiSortBy="agent.matricule">
               <div class="d-flex">
                 <span jhiTranslate="peccnssApp.ayantDroit.agent">Agent</span>
                 <fa-icon class="p-1" icon="sort" />
@@ -89,7 +89,7 @@
               <td>
                 @if (ayantDroit.agent) {
                   <div>
-                    <a [routerLink]="['/agent', ayantDroit.agent.id, 'view']">{{ ayantDroit.agent.id }}</a>
+                    <a [routerLink]="['/agent', ayantDroit.agent.id, 'view']">{{ ayantDroit.agent.matricule }}</a>
                   </div>
                 }
               </td>

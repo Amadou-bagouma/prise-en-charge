@@ -43,7 +43,7 @@
           <dd>
             @if (agent()!.direction) {
               <div>
-                <a [routerLink]="['/direction', agent()!.direction?.id, 'view']">{{ agentRef.direction?.id }}</a>
+                <a [routerLink]="['/direction', agent()!.direction?.id, 'view']">{{ agentRef.direction?.nom }}</a>
               </div>
             }
           </dd>
@@ -51,7 +51,7 @@
           <dd>
             @if (agent()!.gestion) {
               <div>
-                <a [routerLink]="['/gestion', agent()!.gestion?.id, 'view']">{{ agentRef.gestion?.id }}</a>
+                <a [routerLink]="['/gestion', agent()!.gestion?.id, 'view']">{{ agentRef.gestion?.nom }}</a>
               </div>
             }
           </dd>

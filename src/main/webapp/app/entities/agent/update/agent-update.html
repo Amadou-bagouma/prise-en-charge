@@ -93,7 +93,7 @@
           >
             <option [ngValue]="null"></option>
             @for (directionOption of directionsSharedCollection(); track $index) {
-              <option [ngValue]="directionOption">{{ directionOption.id }}</option>
+              <option [ngValue]="directionOption">{{ directionOption.nom }}</option>
             }
           </select>
         </div>
@@ -110,7 +110,7 @@
           >
             <option [ngValue]="null"></option>
             @for (gestionOption of gestionsSharedCollection(); track $index) {
-              <option [ngValue]="gestionOption">{{ gestionOption.id }}</option>
+              <option [ngValue]="gestionOption">{{ gestionOption.nom }}</option>
             }
           </select>
         </div>

@@ -8,6 +8,8 @@ import com.mycompany.myapp.service.mapper.AyantDroitMapper;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,11 +62,15 @@ public class AyantDroitServiceImpl implements AyantDroitService {
             .map(ayantDroitMapper::toDto);
     }
 
+    public Page<AyantDroitDTO> findAllWithEagerRelationships(Pageable pageable) {
+        return ayantDroitRepository.findAllWithEagerRelationships(pageable).map(ayantDroitMapper::toDto);
+    }
+
     @Override
     @Transactional(readOnly = true)
     public Optional<AyantDroitDTO> findOne(Long id) {
         LOG.debug("Request to get AyantDroit : {}", id);
-        return ayantDroitRepository.findById(id).map(ayantDroitMapper::toDto);
+        return ayantDroitRepository.findOneWithEagerRelationships(id).map(ayantDroitMapper::toDto);
     }
 
     @Override

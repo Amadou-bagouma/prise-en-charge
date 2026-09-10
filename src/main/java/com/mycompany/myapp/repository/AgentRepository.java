@@ -29,12 +29,17 @@ public interface AgentRepository extends JpaRepository<Agent, Long>, JpaSpecific
         return this.findAllWithToOneRelationships(pageable);
     }
 
-    @Query(value = "select agent from Agent agent left join fetch agent.user", countQuery = "select count(agent) from Agent agent")
+    @Query(
+        value = "select agent from Agent agent left join fetch agent.direction left join fetch agent.gestion left join fetch agent.user",
+        countQuery = "select count(agent) from Agent agent"
+    )
     Page<Agent> findAllWithToOneRelationships(Pageable pageable);
 
-    @Query("select agent from Agent agent left join fetch agent.user")
+    @Query("select agent from Agent agent left join fetch agent.direction left join fetch agent.gestion left join fetch agent.user")
     List<Agent> findAllWithToOneRelationships();
 
-    @Query("select agent from Agent agent left join fetch agent.user where agent.id =:id")
+    @Query(
+        "select agent from Agent agent left join fetch agent.direction left join fetch agent.gestion left join fetch agent.user where agent.id =:id"
+    )
     Optional<Agent> findOneWithToOneRelationships(@Param("id") Long id);
 }

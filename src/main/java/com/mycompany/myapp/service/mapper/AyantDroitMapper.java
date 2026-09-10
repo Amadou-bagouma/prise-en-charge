@@ -11,11 +11,12 @@ import org.mapstruct.*;
  */
 @Mapper(componentModel = "spring")
 public interface AyantDroitMapper extends EntityMapper<AyantDroitDTO, AyantDroit> {
-    @Mapping(target = "agent", source = "agent", qualifiedByName = "agentId")
+    @Mapping(target = "agent", source = "agent", qualifiedByName = "agentMatricule")
     AyantDroitDTO toDto(AyantDroit s);
 
-    @Named("agentId")
+    @Named("agentMatricule")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
-    AgentDTO toDtoAgentId(Agent agent);
+    @Mapping(target = "matricule", source = "matricule")
+    AgentDTO toDtoAgentMatricule(Agent agent);
 }
