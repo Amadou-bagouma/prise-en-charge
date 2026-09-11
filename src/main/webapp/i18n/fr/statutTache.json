@@ -1,0 +1,12 @@
+{
+  "peccnssApp": {
+    "StatutTache": {
+      "null": "",
+      "A_FAIRE": "À faire",
+      "EN_COURS": "En cours",
+      "EN_ATTENTE": "En attente",
+      "TERMINEE": "Terminée",
+      "ANNULEE": "Annulée"
+    }
+  }
+}

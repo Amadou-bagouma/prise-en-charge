@@ -1,0 +1,28 @@
+{
+  "peccnssApp": {
+    "etablissementSante": {
+      "home": {
+        "title": "EtablissementSantes",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Etablissement Sante",
+        "createOrEditLabel": "Créer ou éditer un Etablissement Sante",
+        "notFound": "Aucun Etablissement Sante trouvé"
+      },
+      "created": "Un nouveau Etablissement Sante a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Etablissement Sante avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Etablissement Sante avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Etablissement Sante {{ id }} ?"
+      },
+      "detail": {
+        "title": "Etablissement Sante"
+      },
+      "id": "ID",
+      "code": "Code",
+      "nom": "Nom",
+      "adresse": "Adresse",
+      "telephone": "Téléphone",
+      "actif": "Actif"
+    }
+  }
+}

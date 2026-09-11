@@ -1,0 +1,9 @@
+{
+  "peccnssApp": {
+    "TypeBeneficiaire": {
+      "null": "",
+      "AGENT": "Agent",
+      "AYANT_DROIT": "Ayant droit"
+    }
+  }
+}

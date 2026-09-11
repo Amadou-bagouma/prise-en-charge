@@ -1,0 +1,27 @@
+{
+  "peccnssApp": {
+    "pieceJustificative": {
+      "home": {
+        "title": "PieceJustificatives",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Piece Justificative",
+        "createOrEditLabel": "Créer ou éditer un Piece Justificative",
+        "notFound": "Aucun Piece Justificative trouvé"
+      },
+      "created": "Un nouveau Piece Justificative a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Piece Justificative avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Piece Justificative avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Piece Justificative {{ id }} ?"
+      },
+      "detail": {
+        "title": "Piece Justificative"
+      },
+      "id": "ID",
+      "nomFichier": "Nom du fichier",
+      "cheminFichier": "Chemin du fichier",
+      "dateAjout": "Date d'ajout",
+      "demande": "Demande"
+    }
+  }
+}

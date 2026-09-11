@@ -1,0 +1,51 @@
+{
+  "peccnssApp": {
+    "demandePriseEnCharge": {
+      "home": {
+        "title": "DemandePriseEnCharges",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Demande Prise En Charge",
+        "createOrEditLabel": "Créer ou éditer un Demande Prise En Charge",
+        "notFound": "Aucun Demande Prise En Charge trouvé"
+      },
+      "created": "Un nouveau Demande Prise En Charge a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Demande Prise En Charge avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Demande Prise En Charge avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Demande Prise En Charge {{ id }} ?"
+      },
+      "reject": {
+        "title": "Retourner la demande à l'auteur",
+        "question": "Êtes-vous certain de vouloir retourner la Demande Prise En Charge {{ id }} à son auteur pour correction ?",
+        "motifLabel": "Motif",
+        "confirm": "Retourner"
+      },
+      "workflow": {
+        "valider": "Valider",
+        "rejeter": "Retourner à l'auteur",
+        "resoumettre": "Resoumettre pour validation"
+      },
+      "detail": {
+        "title": "Demande Prise En Charge"
+      },
+      "id": "ID",
+      "reference": "Référence",
+      "dateCreation": "Date de création",
+      "dateModification": "Date de modification",
+      "typeBeneficiaire": "Type de bénéficiaire",
+      "description": "Description",
+      "statut": "Statut",
+      "priorite": "Priorité",
+      "dateAssignation": "Date d'assignation",
+      "dateEcheance": "Date d'échéance",
+      "motifRejet": "Motif de rejet",
+      "observation": "Observation",
+      "agent": "Agent",
+      "ayantDroit": "Ayant droit",
+      "typeSoin": "Type de soin",
+      "etablissementSante": "Établissement de santé",
+      "gestionnaireCreateur": "Gestionnaire créateur",
+      "assigneA": "Assigné à"
+    }
+  }
+}

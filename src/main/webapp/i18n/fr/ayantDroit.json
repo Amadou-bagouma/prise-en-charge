@@ -1,0 +1,28 @@
+{
+  "peccnssApp": {
+    "ayantDroit": {
+      "home": {
+        "title": "AyantDroits",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Ayant Droit",
+        "createOrEditLabel": "Créer ou éditer un Ayant Droit",
+        "notFound": "Aucun Ayant Droit trouvé"
+      },
+      "created": "Un nouveau Ayant Droit a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Ayant Droit avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Ayant Droit avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Ayant Droit {{ id }} ?"
+      },
+      "detail": {
+        "title": "Ayant Droit"
+      },
+      "id": "ID",
+      "nom": "Nom",
+      "prenom": "Prénom",
+      "dateNaissance": "Date de naissance",
+      "lien": "Lien de parenté",
+      "agent": "Agent"
+    }
+  }
+}

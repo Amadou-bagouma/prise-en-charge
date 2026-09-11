@@ -1,0 +1,28 @@
+{
+  "peccnssApp": {
+    "boiteReception": {
+      "home": {
+        "title": "BoiteReceptions",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Boite Reception",
+        "createOrEditLabel": "Créer ou éditer un Boite Reception",
+        "notFound": "Aucun Boite Reception trouvé"
+      },
+      "created": "Un nouveau Boite Reception a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Boite Reception avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Boite Reception avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Boite Reception {{ id }} ?"
+      },
+      "detail": {
+        "title": "Boite Reception"
+      },
+      "id": "ID",
+      "dateCreation": "Date de création",
+      "dateDerniereLecture": "Date de dernière lecture",
+      "nombreNonLus": "Nombre de messages non lus",
+      "actif": "Actif",
+      "utilisateur": "Utilisateur"
+    }
+  }
+}

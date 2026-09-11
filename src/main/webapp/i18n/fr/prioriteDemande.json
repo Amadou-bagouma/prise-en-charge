@@ -1,0 +1,10 @@
+{
+  "peccnssApp": {
+    "PrioriteDemande": {
+      "null": "",
+      "NORMALE": "NORMALE",
+      "IMPORTANTE": "IMPORTANTE",
+      "URGENTE": "URGENTE"
+    }
+  }
+}

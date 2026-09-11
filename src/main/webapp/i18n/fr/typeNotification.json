@@ -1,0 +1,15 @@
+{
+  "peccnssApp": {
+    "TypeNotification": {
+      "null": "",
+      "NOUVELLE_TACHE": "Nouvelle tâche",
+      "NOUVELLE_DEMANDE": "Nouvelle demande",
+      "DEMANDE_ASSIGNEE": "Demande assignée",
+      "DEMANDE_MODIFIEE": "Demande modifiée",
+      "ECHEANCE_PROCHE": "Échéance proche",
+      "DEMANDE_VALIDEE": "Demande validée",
+      "DEMANDE_REJETEE": "Demande rejetée",
+      "INFORMATION": "Information"
+    }
+  }
+}

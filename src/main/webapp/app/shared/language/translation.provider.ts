@@ -20,9 +20,9 @@ export function provideTranslation(): (Provider | EnvironmentProviders)[] {
     provideAppInitializer(() => {
       const translateService = inject(TranslateService);
       const stateStorageService = inject(StateStorageService);
-      translateService.setFallbackLang('en');
+      translateService.setFallbackLang('fr');
       // if the user has changed the language and navigates away from the application and back to it, then use the previously chosen language
-      const langKey = stateStorageService.getLocale() ?? 'en';
+      const langKey = stateStorageService.getLocale() ?? 'fr';
       translateService.use(langKey);
     }),
   ];

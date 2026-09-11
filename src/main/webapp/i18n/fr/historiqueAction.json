@@ -1,0 +1,28 @@
+{
+  "peccnssApp": {
+    "historiqueAction": {
+      "home": {
+        "title": "HistoriqueActions",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Historique Action",
+        "createOrEditLabel": "Créer ou éditer un Historique Action",
+        "notFound": "Aucun Historique Action trouvé"
+      },
+      "created": "Un nouveau Historique Action a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Historique Action avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Historique Action avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Historique Action {{ id }} ?"
+      },
+      "detail": {
+        "title": "Historique Action"
+      },
+      "id": "ID",
+      "action": "Action",
+      "description": "Description",
+      "dateAction": "Date de l'action",
+      "demande": "Demande",
+      "utilisateur": "Utilisateur"
+    }
+  }
+}

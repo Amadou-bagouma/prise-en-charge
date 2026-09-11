@@ -2,11 +2,13 @@
 // @ts-nocheck
 const angularLanguages = {
   en: async (): Promise<void> => import('@angular/common/locales/en'),
+  fr: async (): Promise<void> => import('@angular/common/locales/fr'),
   // jhipster-needle-i18n-language-angular-loader - JHipster will add languages in this object
 };
 
 const languagesData = {
   en: async (): Promise<any> => import('i18n/en.json').catch(),
+  fr: async (): Promise<any> => import('i18n/fr.json').catch(),
   // jhipster-needle-i18n-language-loader - JHipster will add languages in this object
 };
 

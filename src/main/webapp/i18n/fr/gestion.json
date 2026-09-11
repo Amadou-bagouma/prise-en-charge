@@ -1,0 +1,25 @@
+{
+  "peccnssApp": {
+    "gestion": {
+      "home": {
+        "title": "Gestions",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Gestion",
+        "createOrEditLabel": "Créer ou éditer un Gestion",
+        "notFound": "Aucun Gestion trouvé"
+      },
+      "created": "Un nouveau Gestion a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Gestion avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Gestion avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Gestion {{ id }} ?"
+      },
+      "detail": {
+        "title": "Gestion"
+      },
+      "id": "ID",
+      "nom": "Nom",
+      "type": "Type"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "peccnssApp": {
+    "LienParente": {
+      "null": "",
+      "CONJOINT": "CONJOINT",
+      "ENFANT": "ENFANT",
+      "AUTRE": "AUTRE"
+    }
+  }
+}
