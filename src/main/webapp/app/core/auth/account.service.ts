@@ -57,7 +57,12 @@ export class AccountService {
             this.translateService.use(account.langKey);
           }
 
-          this.navigateToStoredUrl();
+          if (account.mustChangePassword) {
+            this.stateStorageService.clearUrl();
+            this.router.navigateByUrl('/account/password');
+          } else {
+            this.navigateToStoredUrl();
+          }
         }),
         shareReplay(),
       );

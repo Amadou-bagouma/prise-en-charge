@@ -41,6 +41,7 @@ type UserManagementFormGroupContent = {
   lastName: FormControl<UserManagementFormRawValue['lastName']>;
   email: FormControl<UserManagementFormRawValue['email']>;
   activated: FormControl<UserManagementFormRawValue['activated']>;
+  password: FormControl<UserManagementFormRawValue['password']>;
   langKey: FormControl<UserManagementFormRawValue['langKey']>;
   imageUrl: FormControl<UserManagementFormRawValue['imageUrl']>;
   createdBy: FormControl<UserManagementFormRawValue['createdBy']>;
@@ -80,6 +81,9 @@ export class UserManagementFormService {
         validators: [Validators.required, Validators.email, Validators.minLength(5), Validators.maxLength(191)],
       }),
       activated: new FormControl(userManagementRawValue.activated),
+      password: new FormControl(userManagementRawValue.password, {
+        validators: [Validators.minLength(4), Validators.maxLength(100)],
+      }),
       langKey: new FormControl(userManagementRawValue.langKey, {
         validators: [Validators.maxLength(10)],
       }),

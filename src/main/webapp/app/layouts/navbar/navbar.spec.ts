@@ -27,6 +27,7 @@ describe('Navbar Component', () => {
     lastName: 'Doe',
     login: 'john.doe',
     imageUrl: '',
+    mustChangePassword: false,
   };
 
   beforeEach(() => {

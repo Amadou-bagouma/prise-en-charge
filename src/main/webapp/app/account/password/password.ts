@@ -18,7 +18,8 @@ export default class Password {
   readonly doNotMatch = signal(false);
   readonly error = signal(false);
   readonly success = signal(false);
-  readonly account = inject(AccountService).account;
+  private readonly accountService = inject(AccountService);
+  readonly account = this.accountService.account;
   passwordForm = new FormGroup({
     currentPassword: new FormControl('', { nonNullable: true, validators: Validators.required }),
     newPassword: new FormControl('', {
@@ -41,7 +42,11 @@ export default class Password {
     const { newPassword, confirmPassword, currentPassword } = this.passwordForm.getRawValue();
     if (newPassword === confirmPassword) {
       this.passwordService.save(newPassword, currentPassword).subscribe({
-        next: () => this.success.set(true),
+        next: () => {
+          this.success.set(true);
+          // Refresh the cached account so a mustChangePassword redirect (if any) clears immediately.
+          this.accountService.identity(true).subscribe();
+        },
         error: () => this.error.set(true),
       });
     } else {

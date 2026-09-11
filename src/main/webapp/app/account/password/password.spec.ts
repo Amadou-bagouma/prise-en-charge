@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { HttpResponse } from '@angular/common/http';
+import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { of, throwError } from 'rxjs';
@@ -21,6 +22,8 @@ describe('Password', () => {
           provide: AccountService,
           useValue: {
             isAuthenticated: vi.fn(),
+            account: signal(null),
+            identity: vi.fn(() => of(null)),
           },
         },
       ],

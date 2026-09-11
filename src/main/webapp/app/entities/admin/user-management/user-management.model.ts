@@ -9,6 +9,9 @@ export interface IUserManagement {
   lastName?: string | null;
   email?: string | null;
   activated?: boolean | null;
+  /** Initial password set by an admin on creation. Write-only: never returned by the API. */
+  password?: string | null;
+  mustChangePassword?: boolean | null;
   langKey?: (typeof LANGUAGES)[number] | null;
   imageUrl?: string | null;
   createdBy?: string | null;

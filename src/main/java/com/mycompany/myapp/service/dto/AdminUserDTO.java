@@ -40,6 +40,16 @@ public class AdminUserDTO implements Serializable {
 
     private boolean activated = false;
 
+    /**
+     * Initial password set by an admin when creating a user (instead of the default random
+     * password + email reset link). Write-only: never populated from a {@link User}, and ignored
+     * outside of user creation. Bounds mirror {@code ManagedUserVM.PASSWORD_MIN_LENGTH/MAX_LENGTH}.
+     */
+    @Size(min = 4, max = 100)
+    private String password;
+
+    private boolean mustChangePassword = false;
+
     @Size(min = 2, max = 10)
     private String langKey;
 
@@ -64,6 +74,7 @@ public class AdminUserDTO implements Serializable {
         this.lastName = user.getLastName();
         this.email = user.getEmail();
         this.activated = user.isActivated();
+        this.mustChangePassword = user.isMustChangePassword();
         this.imageUrl = user.getImageUrl();
         this.langKey = user.getLangKey();
         this.createdBy = user.getCreatedBy();
@@ -129,6 +140,22 @@ public class AdminUserDTO implements Serializable {
         this.activated = activated;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public boolean isMustChangePassword() {
+        return mustChangePassword;
+    }
+
+    public void setMustChangePassword(boolean mustChangePassword) {
+        this.mustChangePassword = mustChangePassword;
+    }
+
     public String getLangKey() {
         return langKey;
     }
@@ -187,6 +214,7 @@ public class AdminUserDTO implements Serializable {
             ", email='" + email + '\'' +
             ", imageUrl='" + imageUrl + '\'' +
             ", activated=" + activated +
+            ", mustChangePassword=" + mustChangePassword +
             ", langKey='" + langKey + '\'' +
             ", createdBy=" + createdBy +
             ", createdDate=" + createdDate +

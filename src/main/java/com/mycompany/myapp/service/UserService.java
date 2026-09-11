@@ -13,6 +13,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.CacheManager;
@@ -74,6 +75,7 @@ public class UserService {
                 user.setPassword(passwordEncoder.encode(newPassword));
                 user.setResetKey(null);
                 user.setResetDate(null);
+                user.setMustChangePassword(false);
                 this.clearUserCaches(user);
                 return user;
             });
@@ -153,10 +155,16 @@ public class UserService {
         } else {
             user.setLangKey(userDTO.getLangKey());
         }
-        String encryptedPassword = passwordEncoder.encode(RandomUtil.generatePassword());
-        user.setPassword(encryptedPassword);
-        user.setResetKey(RandomUtil.generateResetKey());
-        user.setResetDate(Instant.now());
+        if (StringUtils.isNotBlank(userDTO.getPassword())) {
+            // An admin set an initial password directly: skip the reset-key/email flow and require
+            // the user to change it on their first login.
+            user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+            user.setMustChangePassword(true);
+        } else {
+            user.setPassword(passwordEncoder.encode(RandomUtil.generatePassword()));
+            user.setResetKey(RandomUtil.generateResetKey());
+            user.setResetDate(Instant.now());
+        }
         user.setActivated(true);
         if (userDTO.getAuthorities() != null) {
             Set<Authority> authorities = userDTO
@@ -257,6 +265,7 @@ public class UserService {
                 }
                 String encryptedPassword = passwordEncoder.encode(newPassword);
                 user.setPassword(encryptedPassword);
+                user.setMustChangePassword(false);
                 this.clearUserCaches(user);
                 LOG.debug("Changed password for User: {}", user);
             });

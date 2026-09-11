@@ -19,6 +19,11 @@
             } @else {
               <span class="jhi-badge jhi-badge-actif-false" jhiTranslate="userManagement.deactivated">Deactivated</span>
             }
+            @if (userManagementRef.mustChangePassword) {
+              <span class="jhi-badge jhi-badge-statut-EN_ATTENTE_DECISION" jhiTranslate="userManagement.mustChangePassword"
+                >Must change password at next login</span
+              >
+            }
           </dd>
           <dt><span jhiTranslate="userManagement.firstName">First name</span></dt>
           <dd>

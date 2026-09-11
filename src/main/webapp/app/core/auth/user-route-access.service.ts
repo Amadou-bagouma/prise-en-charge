@@ -13,6 +13,11 @@ export const userRouteAccessService: CanActivateFn = (next: ActivatedRouteSnapsh
   return accountService.identity().pipe(
     map(account => {
       if (account) {
+        if (account.mustChangePassword && !state.url.startsWith('/account/password')) {
+          router.navigate(['/account/password']);
+          return false;
+        }
+
         const { authorities } = next.data;
 
         if (!authorities?.length || accountService.hasAnyAuthority(authorities)) {
