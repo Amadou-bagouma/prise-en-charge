@@ -108,4 +108,9 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-# application:
+application:
+  liquibase:
+    # Run migrations synchronously at startup: a failed/skipped migration then crashes startup
+    # loudly instead of leaving the app running against an out-of-date schema (see incident where
+    # the must_change_password migration silently never ran, breaking every login until noticed).
+    async-start: false
