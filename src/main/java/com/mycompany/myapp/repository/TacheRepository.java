@@ -1,6 +1,7 @@
 package com.mycompany.myapp.repository;
 
 import com.mycompany.myapp.domain.Tache;
+import com.mycompany.myapp.domain.enumeration.StatutTache;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Repository;
 public interface TacheRepository extends JpaRepository<Tache, Long>, JpaSpecificationExecutor<Tache> {
     @Query("select tache from Tache tache where tache.utilisateur.login = ?#{authentication.name}")
     List<Tache> findByUtilisateurIsCurrentUser();
+
+    List<Tache> findByDemandeIdAndStatutNotIn(Long demandeId, List<StatutTache> statuts);
 
     default Optional<Tache> findOneWithEagerRelationships(Long id) {
         return this.findOneWithToOneRelationships(id);

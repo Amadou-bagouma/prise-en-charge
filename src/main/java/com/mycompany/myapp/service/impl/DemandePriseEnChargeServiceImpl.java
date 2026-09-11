@@ -2,10 +2,14 @@ package com.mycompany.myapp.service.impl;
 
 import com.mycompany.myapp.domain.DemandePriseEnCharge;
 import com.mycompany.myapp.domain.HistoriqueAction;
+import com.mycompany.myapp.domain.Tache;
 import com.mycompany.myapp.domain.User;
+import com.mycompany.myapp.domain.enumeration.PrioriteTache;
 import com.mycompany.myapp.domain.enumeration.StatutDemande;
+import com.mycompany.myapp.domain.enumeration.StatutTache;
 import com.mycompany.myapp.repository.DemandePriseEnChargeRepository;
 import com.mycompany.myapp.repository.HistoriqueActionRepository;
+import com.mycompany.myapp.repository.TacheRepository;
 import com.mycompany.myapp.repository.UserRepository;
 import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.security.SecurityUtils;
@@ -14,6 +18,7 @@ import com.mycompany.myapp.service.dto.DemandePriseEnChargeDTO;
 import com.mycompany.myapp.service.mapper.DemandePriseEnChargeMapper;
 import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,16 +49,22 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
 
     private final HistoriqueActionRepository historiqueActionRepository;
 
+    private final TacheRepository tacheRepository;
+
+    private static final List<StatutTache> STATUTS_TACHE_CLOTURES = List.of(StatutTache.TERMINEE, StatutTache.ANNULEE);
+
     public DemandePriseEnChargeServiceImpl(
         DemandePriseEnChargeRepository demandePriseEnChargeRepository,
         DemandePriseEnChargeMapper demandePriseEnChargeMapper,
         UserRepository userRepository,
-        HistoriqueActionRepository historiqueActionRepository
+        HistoriqueActionRepository historiqueActionRepository,
+        TacheRepository tacheRepository
     ) {
         this.demandePriseEnChargeRepository = demandePriseEnChargeRepository;
         this.demandePriseEnChargeMapper = demandePriseEnChargeMapper;
         this.userRepository = userRepository;
         this.historiqueActionRepository = historiqueActionRepository;
+        this.tacheRepository = tacheRepository;
     }
 
     @Override
@@ -70,6 +81,7 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         demandePriseEnCharge.setStatut(StatutDemande.EN_ATTENTE_VALIDATION_DRH);
         demandePriseEnCharge = demandePriseEnChargeRepository.save(demandePriseEnCharge);
         logHistorique(demandePriseEnCharge, currentUser, "SOUMISSION", "Demande soumise pour validation DRH");
+        creerTachesValidation(demandePriseEnCharge, AuthoritiesConstants.VALIDATEUR_DRH, "Validation DRH");
         return demandePriseEnChargeMapper.toDto(demandePriseEnCharge);
     }
 
@@ -148,6 +160,10 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         demande.setDateModification(Instant.now());
         demande = demandePriseEnChargeRepository.save(demande);
         logHistorique(demande, currentUser, action, commentaire);
+        cloturerTachesValidation(demande.getId());
+        if (statutSuivant == StatutDemande.EN_ATTENTE_VALIDATION_INFIRMERIE) {
+            creerTachesValidation(demande, AuthoritiesConstants.VALIDATEUR_INFIRMERIE, "Validation infirmerie");
+        }
         return demandePriseEnChargeMapper.toDto(demande);
     }
 
@@ -173,6 +189,7 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         demande.setDateModification(Instant.now());
         demande = demandePriseEnChargeRepository.save(demande);
         logHistorique(demande, currentUser, "RETOUR", motif);
+        cloturerTachesValidation(demande.getId());
         return demandePriseEnChargeMapper.toDto(demande);
     }
 
@@ -196,6 +213,7 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         demande.setDateModification(Instant.now());
         demande = demandePriseEnChargeRepository.save(demande);
         logHistorique(demande, currentUser, "RESOUMISSION", "Demande corrigee et resoumise pour validation DRH");
+        creerTachesValidation(demande, AuthoritiesConstants.VALIDATEUR_DRH, "Validation DRH");
         return demandePriseEnChargeMapper.toDto(demande);
     }
 
@@ -215,6 +233,43 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         return SecurityUtils.getCurrentUserLogin()
             .flatMap(userRepository::findOneByLogin)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Current user could not be found"));
+    }
+
+    /**
+     * Creates a Tache for every user holding the given authority, so that the demande shows up in
+     * "Mes taches" for whoever is meant to validate it next.
+     */
+    private void creerTachesValidation(DemandePriseEnCharge demande, String authority, String titrePrefix) {
+        List<User> validateurs = userRepository.findAllByAuthoritiesNameAndActivatedIsTrue(authority);
+        Instant now = Instant.now();
+        for (User validateur : validateurs) {
+            Tache tache = new Tache();
+            tache.setTitre(titrePrefix + " - " + demande.getReference());
+            tache.setDescription("Demande de prise en charge en attente de votre validation.");
+            tache.setDateCreation(now);
+            tache.setDateAssignation(now);
+            tache.setDateEcheance(demande.getDateEcheance());
+            tache.setStatut(StatutTache.A_FAIRE);
+            tache.setPriorite(PrioriteTache.valueOf(demande.getPriorite().name()));
+            tache.setLu(false);
+            tache.setDemande(demande);
+            tache.setUtilisateur(validateur);
+            tacheRepository.save(tache);
+        }
+    }
+
+    /**
+     * Closes any still-open validation Tache for a demande (e.g. once one validator has acted on it,
+     * the same pending task on other validators' "Mes taches" no longer applies).
+     */
+    private void cloturerTachesValidation(Long demandeId) {
+        Instant now = Instant.now();
+        List<Tache> taches = tacheRepository.findByDemandeIdAndStatutNotIn(demandeId, STATUTS_TACHE_CLOTURES);
+        for (Tache tache : taches) {
+            tache.setStatut(StatutTache.TERMINEE);
+            tache.setDateTerminaison(now);
+        }
+        tacheRepository.saveAll(taches);
     }
 
     private void logHistorique(DemandePriseEnCharge demande, User utilisateur, String action, String description) {
