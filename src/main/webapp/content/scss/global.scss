@@ -608,7 +608,9 @@ Entity pages (list / form) design system
 .jhi-badge-statut-EN_ATTENTE_PIECES,
 .jhi-badge-statut-EN_COURS_TRAITEMENT,
 .jhi-badge-statut-EN_ATTENTE_AVIS_MEDICAL,
-.jhi-badge-statut-EN_ATTENTE_DECISION {
+.jhi-badge-statut-EN_ATTENTE_DECISION,
+.jhi-badge-statut-EN_ATTENTE_VALIDATION_DRH,
+.jhi-badge-statut-EN_ATTENTE_VALIDATION_INFIRMERIE {
   background: var(--jhi-warning-soft);
   color: var(--jhi-warning);
 }
@@ -618,7 +620,8 @@ Entity pages (list / form) design system
   color: var(--jhi-accent-dark);
 }
 
-.jhi-badge-statut-REJETEE {
+.jhi-badge-statut-REJETEE,
+.jhi-badge-statut-RETOURNEE {
   background: var(--jhi-danger-soft);
   color: var(--jhi-danger);
 }
