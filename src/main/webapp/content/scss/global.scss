@@ -584,6 +584,27 @@ Entity pages (list / form) design system
   td a {
     color: var(--jhi-accent-dark);
   }
+
+  /* Keep the Actions column reachable without scrolling all the way right on wide tables */
+  td:last-child,
+  th:last-child {
+    position: sticky;
+    right: 0;
+    z-index: 1;
+    box-shadow: -6px 0 6px -6px rgb(0 0 0 / 15%);
+  }
+
+  th:last-child {
+    background: var(--jhi-muted-soft);
+  }
+
+  td:last-child {
+    background: #fff;
+  }
+
+  tbody tr:hover td:last-child {
+    background: var(--jhi-accent-soft);
+  }
 }
 
 /* ---- Status / priority badges ---- */
