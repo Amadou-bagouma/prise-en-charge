@@ -111,7 +111,7 @@ export class UserManagementFormService {
     return {
       login: null,
       activated: true,
-      langKey: 'en',
+      langKey: 'fr',
       createdDate: currentTime,
       lastModifiedDate: currentTime,
       authorities: [],
