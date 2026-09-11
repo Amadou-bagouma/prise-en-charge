@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Adds the two authorities used by the DemandePriseEnCharge validation workflow:
+        - ROLE_VALIDATEUR_DRH: 1st validation step (direction DRH)
+        - ROLE_VALIDATEUR_INFIRMERIE: 2nd validation step (infirmerie du personnel)
+    -->
+    <changeSet id="20260911090000-1" author="jhipster">
+        <insert tableName="jhi_authority">
+            <column name="name" value="ROLE_VALIDATEUR_DRH"/>
+        </insert>
+        <insert tableName="jhi_authority">
+            <column name="name" value="ROLE_VALIDATEUR_INFIRMERIE"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

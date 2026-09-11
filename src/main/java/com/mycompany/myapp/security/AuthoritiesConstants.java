@@ -11,5 +11,11 @@ public final class AuthoritiesConstants {
 
     public static final String ANONYMOUS = "ROLE_ANONYMOUS";
 
+    /** Peut effectuer la 1ere validation (DRH) d'une DemandePriseEnCharge. */
+    public static final String VALIDATEUR_DRH = "ROLE_VALIDATEUR_DRH";
+
+    /** Peut effectuer la 2eme validation (Infirmerie du personnel) d'une DemandePriseEnCharge. */
+    public static final String VALIDATEUR_INFIRMERIE = "ROLE_VALIDATEUR_INFIRMERIE";
+
     private AuthoritiesConstants() {}
 }

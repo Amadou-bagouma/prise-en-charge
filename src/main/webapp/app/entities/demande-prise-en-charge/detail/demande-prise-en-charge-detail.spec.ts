@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
@@ -17,6 +18,7 @@ describe('DemandePriseEnCharge Management Detail Component', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
+        provideHttpClientTesting(),
         provideTranslateService(),
         provideRouter(
           [

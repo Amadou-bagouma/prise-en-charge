@@ -7,4 +7,6 @@ export const AUTHENTICATION_TOKEN_KEY = 'jhi-authenticationToken';
 export enum Authority {
   ADMIN = 'ROLE_ADMIN',
   USER = 'ROLE_USER',
+  VALIDATEUR_DRH = 'ROLE_VALIDATEUR_DRH',
+  VALIDATEUR_INFIRMERIE = 'ROLE_VALIDATEUR_INFIRMERIE',
 }

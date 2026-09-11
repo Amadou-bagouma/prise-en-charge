@@ -1077,7 +1077,8 @@ class DemandePriseEnChargeResourceIT {
             .dateModification(UPDATED_DATE_MODIFICATION)
             .typeBeneficiaire(UPDATED_TYPE_BENEFICIAIRE)
             .description(UPDATED_DESCRIPTION)
-            .statut(UPDATED_STATUT)
+            // statut is intentionally left as its already-fetched (persisted) value: the generic update
+            // endpoint never changes the workflow status, only valider/rejeter/resoumettre do.
             .priorite(UPDATED_PRIORITE)
             .dateAssignation(UPDATED_DATE_ASSIGNATION)
             .dateEcheance(UPDATED_DATE_ECHEANCE)
@@ -1214,7 +1215,9 @@ class DemandePriseEnChargeResourceIT {
             .dateModification(UPDATED_DATE_MODIFICATION)
             .typeBeneficiaire(UPDATED_TYPE_BENEFICIAIRE)
             .description(UPDATED_DESCRIPTION)
-            .statut(UPDATED_STATUT)
+            // statut is intentionally left as DEFAULT_STATUT (its persisted value): the generic patch
+            // endpoint never changes the workflow status, only valider/rejeter/resoumettre do.
+            .statut(DEFAULT_STATUT)
             .priorite(UPDATED_PRIORITE)
             .dateAssignation(UPDATED_DATE_ASSIGNATION)
             .dateEcheance(UPDATED_DATE_ECHEANCE)

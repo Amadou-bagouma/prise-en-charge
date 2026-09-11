@@ -106,6 +106,24 @@ export class DemandePriseEnChargeService extends DemandePriseEnChargesService {
     return this.http.delete<undefined>(`${this.resourceUrl}/${encodeURIComponent(id)}`);
   }
 
+  valider(id: number, commentaire?: string | null): Observable<IDemandePriseEnCharge> {
+    return this.http
+      .post<RestDemandePriseEnCharge>(`${this.resourceUrl}/${encodeURIComponent(id)}/valider`, { commentaire })
+      .pipe(map(res => this.convertResponseFromServer(res)));
+  }
+
+  rejeter(id: number, commentaire: string): Observable<IDemandePriseEnCharge> {
+    return this.http
+      .post<RestDemandePriseEnCharge>(`${this.resourceUrl}/${encodeURIComponent(id)}/rejeter`, { commentaire })
+      .pipe(map(res => this.convertResponseFromServer(res)));
+  }
+
+  resoumettre(id: number): Observable<IDemandePriseEnCharge> {
+    return this.http
+      .post<RestDemandePriseEnCharge>(`${this.resourceUrl}/${encodeURIComponent(id)}/resoumettre`, {})
+      .pipe(map(res => this.convertResponseFromServer(res)));
+  }
+
   getDemandePriseEnChargeIdentifier(demandePriseEnCharge: Pick<IDemandePriseEnCharge, 'id'>): number {
     return demandePriseEnCharge.id;
   }

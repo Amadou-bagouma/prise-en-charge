@@ -1,11 +1,13 @@
 package com.mycompany.myapp.web.rest;
 
 import com.mycompany.myapp.repository.DemandePriseEnChargeRepository;
+import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.service.DemandePriseEnChargeQueryService;
 import com.mycompany.myapp.service.DemandePriseEnChargeService;
 import com.mycompany.myapp.service.criteria.DemandePriseEnChargeCriteria;
 import com.mycompany.myapp.service.dto.DemandePriseEnChargeDTO;
 import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
+import com.mycompany.myapp.web.rest.vm.DemandeWorkflowActionVM;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.net.URI;
@@ -20,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -203,5 +206,64 @@ public class DemandePriseEnChargeResource {
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
+    }
+
+    /**
+     * {@code POST  /demande-prise-en-charges/:id/valider} : validates the current workflow step (DRH, then
+     * infirmerie du personnel) of the "id" demandePriseEnCharge.
+     *
+     * @param id the id of the demandePriseEnChargeDTO to validate.
+     * @param actionVM an optional comment to record in the history.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated demandePriseEnChargeDTO.
+     */
+    @PostMapping("/{id}/valider")
+    @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.VALIDATEUR_DRH + "', '" + AuthoritiesConstants.VALIDATEUR_INFIRMERIE + "')")
+    public ResponseEntity<DemandePriseEnChargeDTO> validerDemandePriseEnCharge(
+        @PathVariable("id") Long id,
+        @RequestBody(required = false) DemandeWorkflowActionVM actionVM
+    ) {
+        LOG.debug("REST request to valider DemandePriseEnCharge : {}", id);
+        String commentaire = actionVM != null ? actionVM.getCommentaire() : null;
+        DemandePriseEnChargeDTO result = demandePriseEnChargeService.valider(id, commentaire);
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, id.toString()))
+            .body(result);
+    }
+
+    /**
+     * {@code POST  /demande-prise-en-charges/:id/rejeter} : rejects the current workflow step of the "id"
+     * demandePriseEnCharge and returns it to its author for correction.
+     *
+     * @param id the id of the demandePriseEnChargeDTO to reject.
+     * @param actionVM the mandatory rejection reason (in {@code commentaire}).
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated demandePriseEnChargeDTO.
+     */
+    @PostMapping("/{id}/rejeter")
+    @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.VALIDATEUR_DRH + "', '" + AuthoritiesConstants.VALIDATEUR_INFIRMERIE + "')")
+    public ResponseEntity<DemandePriseEnChargeDTO> rejeterDemandePriseEnCharge(
+        @PathVariable("id") Long id,
+        @RequestBody DemandeWorkflowActionVM actionVM
+    ) {
+        LOG.debug("REST request to rejeter DemandePriseEnCharge : {}", id);
+        DemandePriseEnChargeDTO result = demandePriseEnChargeService.rejeter(id, actionVM.getCommentaire());
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, id.toString()))
+            .body(result);
+    }
+
+    /**
+     * {@code POST  /demande-prise-en-charges/:id/resoumettre} : resubmits a {@code RETOURNEE} demandePriseEnCharge,
+     * sending it back to the 1st validation step (DRH). Only the original author may do this.
+     *
+     * @param id the id of the demandePriseEnChargeDTO to resubmit.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated demandePriseEnChargeDTO.
+     */
+    @PostMapping("/{id}/resoumettre")
+    public ResponseEntity<DemandePriseEnChargeDTO> resoumettreDemandePriseEnCharge(@PathVariable("id") Long id) {
+        LOG.debug("REST request to resoumettre DemandePriseEnCharge : {}", id);
+        DemandePriseEnChargeDTO result = demandePriseEnChargeService.resoumettre(id);
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, id.toString()))
+            .body(result);
     }
 }

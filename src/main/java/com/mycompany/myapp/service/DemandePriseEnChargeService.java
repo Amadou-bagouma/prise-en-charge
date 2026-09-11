@@ -55,4 +55,32 @@ public interface DemandePriseEnChargeService {
      * @param id the id of the entity.
      */
     void delete(Long id);
+
+    /**
+     * Validates the current workflow step of a demandePriseEnCharge (DRH then infirmerie du personnel).
+     * Moves the demande to the next step, or to {@code VALIDEE} once both steps are done.
+     *
+     * @param id the id of the entity.
+     * @param commentaire an optional comment to record in the history.
+     * @return the persisted entity.
+     */
+    DemandePriseEnChargeDTO valider(Long id, String commentaire);
+
+    /**
+     * Rejects the current workflow step of a demandePriseEnCharge and returns it to its author for correction.
+     *
+     * @param id the id of the entity.
+     * @param motif the mandatory rejection reason.
+     * @return the persisted entity.
+     */
+    DemandePriseEnChargeDTO rejeter(Long id, String motif);
+
+    /**
+     * Resubmits a {@code RETOURNEE} demandePriseEnCharge, sending it back to the 1st validation step (DRH).
+     * Only the original author (gestionnaireCreateur) may do this.
+     *
+     * @param id the id of the entity.
+     * @return the persisted entity.
+     */
+    DemandePriseEnChargeDTO resoumettre(Long id);
 }

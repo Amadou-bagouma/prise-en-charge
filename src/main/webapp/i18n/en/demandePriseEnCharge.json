@@ -14,6 +14,17 @@
       "delete": {
         "question": "Are you sure you want to delete Demande Prise En Charge {{ id }}?"
       },
+      "reject": {
+        "title": "Return request to author",
+        "question": "Are you sure you want to return Demande Prise En Charge {{ id }} to its author for correction?",
+        "motifLabel": "Reason",
+        "confirm": "Return"
+      },
+      "workflow": {
+        "valider": "Validate",
+        "rejeter": "Return to author",
+        "resoumettre": "Resubmit for validation"
+      },
       "detail": {
         "title": "Demande Prise En Charge"
       },

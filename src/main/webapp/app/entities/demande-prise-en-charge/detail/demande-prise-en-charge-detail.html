@@ -1,6 +1,6 @@
 <div class="d-flex justify-content-center">
   <div class="col-8">
-    @if (demandePriseEnCharge(); as demandePriseEnChargeRef) {
+    @if (current(); as demandePriseEnChargeRef) {
       <div class="jhi-form-panel">
         <h2 data-cy="demandePriseEnChargeDetailsHeading">
           <span jhiTranslate="peccnssApp.demandePriseEnCharge.detail.title">Demande Prise En Charge</span>
@@ -54,6 +54,9 @@
                   EN_COURS_TRAITEMENT: 'EN_COURS_TRAITEMENT',
                   EN_ATTENTE_AVIS_MEDICAL: 'EN_ATTENTE_AVIS_MEDICAL',
                   EN_ATTENTE_DECISION: 'EN_ATTENTE_DECISION',
+                  EN_ATTENTE_VALIDATION_DRH: 'EN_ATTENTE_VALIDATION_DRH',
+                  EN_ATTENTE_VALIDATION_INFIRMERIE: 'EN_ATTENTE_VALIDATION_INFIRMERIE',
+                  RETOURNEE: 'RETOURNEE',
                   VALIDEE: 'VALIDEE',
                   REJETEE: 'REJETEE',
                   ANNULEE: 'ANNULEE',
@@ -136,6 +139,46 @@
             <span>{{ demandePriseEnChargeRef.assigneA?.login }}</span>
           </dd>
         </dl>
+
+        @if (canValiderOuRejeter()) {
+          <div class="jhi-form-panel" data-cy="demandePriseEnChargeWorkflowActions">
+            <button
+              type="button"
+              (click)="valider()"
+              [disabled]="isSaving()"
+              class="btn btn-success"
+              data-cy="demandePriseEnChargeValiderButton"
+            >
+              <fa-icon icon="check" />&nbsp;<span jhiTranslate="peccnssApp.demandePriseEnCharge.workflow.valider">Validate</span>
+            </button>
+
+            <button
+              type="button"
+              (click)="rejeter()"
+              [disabled]="isSaving()"
+              class="btn btn-danger"
+              data-cy="demandePriseEnChargeRejeterButton"
+            >
+              <fa-icon icon="times" />&nbsp;<span jhiTranslate="peccnssApp.demandePriseEnCharge.workflow.rejeter">Return to author</span>
+            </button>
+          </div>
+        }
+
+        @if (canResoumettre()) {
+          <div class="jhi-form-panel" data-cy="demandePriseEnChargeWorkflowActions">
+            <button
+              type="button"
+              (click)="resoumettre()"
+              [disabled]="isSaving()"
+              class="btn btn-primary"
+              data-cy="demandePriseEnChargeResoumettreButton"
+            >
+              <fa-icon icon="paper-plane" />&nbsp;<span jhiTranslate="peccnssApp.demandePriseEnCharge.workflow.resoumettre"
+                >Resubmit for validation</span
+              >
+            </button>
+          </div>
+        }
 
         <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
           <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
