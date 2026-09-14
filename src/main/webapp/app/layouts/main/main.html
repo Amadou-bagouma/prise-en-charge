@@ -1,15 +1,19 @@
 <jhi-page-ribbon />
 
-<div class="app-shell">
-  <router-outlet name="navbar" />
+@if (account()) {
+  <div class="app-shell">
+    <router-outlet name="navbar" />
 
-  <div class="app-content">
-    <div class="container-fluid">
-      <div class="card jh-card">
-        <router-outlet />
+    <div class="app-content">
+      <div class="container-fluid">
+        <div class="card jh-card">
+          <router-outlet />
+        </div>
+
+        <jhi-footer />
       </div>
-
-      <jhi-footer />
     </div>
   </div>
-</div>
+} @else {
+  <router-outlet />
+}

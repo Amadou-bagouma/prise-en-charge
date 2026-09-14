@@ -22,6 +22,7 @@ export default class Main implements OnInit {
   private readonly router = inject(Router);
   private readonly appPageTitleStrategy = inject(AppPageTitleStrategy);
   private readonly accountService = inject(AccountService);
+  public readonly account = this.accountService.account;
   private readonly document = inject(DOCUMENT);
   private readonly translateService = inject(TranslateService);
   private readonly rootRenderer = inject(RendererFactory2);

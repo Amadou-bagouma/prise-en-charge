@@ -10,6 +10,7 @@ const routes: Routes = [
     path: '',
     loadComponent: () => import('./home/home'),
     title: 'home.title',
+    canActivate: [userRouteAccessService],
   },
   {
     path: '',
