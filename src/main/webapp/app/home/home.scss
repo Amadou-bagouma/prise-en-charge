@@ -5,34 +5,31 @@ Home page - "prise en charge médicale" landing page
 .home-page {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 32px;
 
-  padding: 12px 4px 32px;
+  margin: -12px -4px -32px;
 }
 
-.home-hero {
-  width: 100%;
-  max-width: 640px;
+/* ---- Header band: icon + institution title ---- */
 
-  text-align: center;
+.home-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+
+  padding: 32px 16px 24px;
 
   background: #fff;
-  border-radius: var(--jhi-card-radius, 12px);
-  box-shadow: var(--jhi-card-shadow, 0 2px 10px rgba(0, 0, 0, 0.08));
-
-  padding: 40px 32px;
-  box-sizing: border-box;
+  border-bottom: 1px solid #e3e5e8;
 }
 
-.home-hero-icon {
+.home-header-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
   width: 64px;
   height: 64px;
-  margin-bottom: 16px;
 
   border-radius: 50%;
   background: var(--jhi-accent-soft, #e8f7ee);
@@ -40,46 +37,113 @@ Home page - "prise en charge médicale" landing page
   font-size: 26px;
 }
 
-.home-hero h1 {
+.home-header h1 {
   margin: 0;
 
   font-family: Georgia, 'Times New Roman', serif;
   font-weight: 700;
-  font-size: 1.9rem;
+  font-size: 1.5rem;
   color: #222;
+  text-align: center;
 }
 
-.home-hero h2 {
-  margin: 4px 0 0;
+/* ---- Hero row: welcome text (left) + side card (right) ---- */
 
-  font-weight: 400;
-  font-size: 0.9rem;
-  letter-spacing: 0.12em;
+.home-hero {
+  display: flex;
+  align-items: stretch;
+  gap: 32px;
+
+  padding: 40px 32px;
+}
+
+.home-welcome {
+  flex: 1 1 auto;
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.home-welcome h2 {
+  margin: 0;
+
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 700;
+  font-size: 2rem;
+  line-height: 1.25;
+  color: #222;
   text-transform: uppercase;
-  color: var(--jhi-muted, #6c757d);
 }
 
-.home-hero-text {
+.home-welcome-text {
   margin: 20px 0 0;
+  max-width: 46em;
 
   color: #555;
   line-height: 1.6;
 }
 
-.home-hero-welcome {
-  margin: 24px 0 0;
+.home-side {
+  flex: 0 0 340px;
 
-  font-weight: 600;
-  color: var(--jhi-accent-dark, #4a9a5f);
+  display: flex;
 }
+
+.home-side-card {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+
+  padding: 28px 24px;
+
+  background: #fff;
+  border-radius: var(--jhi-card-radius, 12px);
+  box-shadow: var(--jhi-card-shadow, 0 2px 10px rgba(0, 0, 0, 0.08));
+}
+
+.home-side-card-header {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--jhi-accent-dark, #4a9a5f);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+
+  padding-bottom: 14px;
+  margin-bottom: 18px;
+
+  border-bottom: 1px solid #eee;
+  width: 100%;
+}
+
+.home-side-welcome {
+  margin: 0 0 20px;
+
+  color: #555;
+  line-height: 1.5;
+}
+
+.home-connect-button {
+  width: 100%;
+}
+
+/* ---- Quick links grid ---- */
 
 .home-quick-links {
   width: 100%;
-  max-width: 920px;
+  max-width: 1080px;
+  margin: 0 auto;
 
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
+
+  padding: 0 32px 40px;
+  box-sizing: border-box;
 }
 
 @media (max-width: 900px) {
@@ -127,4 +191,41 @@ Home page - "prise en charge médicale" landing page
   color: var(--jhi-accent-dark, #4a9a5f);
   transform: translateY(-2px);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* ---- Footer band ---- */
+
+.home-footer {
+  margin-top: auto;
+
+  padding: 16px;
+
+  background: #e9ecef;
+  color: #6c757d;
+
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 900px) {
+  .home-hero {
+    flex-direction: column;
+    padding: 32px 20px;
+  }
+
+  .home-side {
+    flex-basis: auto;
+  }
+
+  .home-welcome h2 {
+    font-size: 1.6rem;
+    text-align: center;
+  }
+
+  .home-welcome-text {
+    max-width: none;
+    text-align: center;
+  }
 }

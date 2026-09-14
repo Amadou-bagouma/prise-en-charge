@@ -1,22 +1,40 @@
 <div class="home-page">
-  <div class="home-hero">
-    <div class="home-hero-icon">
+  <div class="home-header">
+    <div class="home-header-icon">
       <fa-icon icon="heart-pulse" />
     </div>
+    <h1>Caisse Nationale de Sécurité Sociale (CNSS)</h1>
+  </div>
 
-    <h1>Prise en charge médicale</h1>
-    <h2>CNSS</h2>
+  <div class="home-hero">
+    <div class="home-welcome">
+      <h2>Bienvenue sur la gestion de prise en charge médicale</h2>
 
-    <p class="home-hero-text">
-      Plateforme de gestion des demandes de prise en charge médicale&nbsp;: suivi des bénéficiaires, des agents et ayants droit, des pièces
-      justificatives et des tâches associées.
-    </p>
+      <p class="home-welcome-text">
+        Plateforme de gestion des demandes de prise en charge médicale&nbsp;: suivi des bénéficiaires, des agents et ayants droit, des
+        pièces justificatives et des tâches associées.
+      </p>
+    </div>
 
-    @if (account(); as acc) {
-      <p class="home-hero-welcome">Bienvenue, {{ acc.firstName || acc.login }}.</p>
-    } @else {
-      <button type="button" class="btn btn-accent btn-lg" (click)="login()"><fa-icon icon="sign-in-alt" />&nbsp;Se connecter</button>
-    }
+    <div class="home-side">
+      @if (account(); as acc) {
+        <div class="home-side-card">
+          <div class="home-side-card-header">Espace personnel</div>
+          <p class="home-side-welcome">Bienvenue, {{ acc.firstName || acc.login }}.</p>
+          <a class="btn btn-accent home-connect-button" routerLink="/demande-prise-en-charge/new">
+            <fa-icon icon="plus" />&nbsp;Nouvelle demande
+          </a>
+        </div>
+      } @else {
+        <div class="home-side-card">
+          <div class="home-side-card-header">Système d'Informations Métiers</div>
+          <p class="home-side-welcome">Accédez à votre espace pour gérer les demandes de prise en charge médicale.</p>
+          <button type="button" class="btn btn-accent home-connect-button" (click)="login()">
+            <fa-icon icon="sign-in-alt" />&nbsp;Se connecter
+          </button>
+        </div>
+      }
+    </div>
   </div>
 
   @if (account()) {
@@ -62,4 +80,6 @@
       </a>
     </div>
   }
+
+  <div class="home-footer">Copyright © CNSS — Gestion de la prise en charge médicale</div>
 </div>
