@@ -5,6 +5,22 @@
     </h2>
 
     <div class="jhi-page-actions">
+      <div class="jhi-search-bar">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Rechercher par nom..."
+          data-cy="searchInput"
+          [value]="searchTerm()"
+          (input)="searchTerm.set($any($event.target).value)"
+          (keyup.enter)="search()"
+        />
+        <button type="button" class="btn btn-outline-secondary" data-cy="searchButton" (click)="search()">
+          <fa-icon icon="search" />
+          <span>Rechercher</span>
+        </button>
+      </div>
+
       <button class="btn btn-outline-secondary" (click)="load()" [disabled]="isLoading()">
         <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
         <span jhiTranslate="peccnssApp.etablissementSante.home.refreshListLabel">Refresh list</span>

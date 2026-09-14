@@ -13,7 +13,7 @@ import { combineLatest, filter, map, tap } from 'rxjs';
 import { DEFAULT_SORT_DATA, ITEMS_PER_PAGE, ITEM_DELETED_EVENT, PAGE_HEADER, SORT, TOTAL_COUNT_RESPONSE_HEADER } from 'app/config';
 import { Alert, AlertError } from 'app/shared/alert';
 import { FormatMediumDatePipe } from 'app/shared/date';
-import { Filter, FilterOptions, IFilterOption, IFilterOptions } from 'app/shared/filter';
+import { Filter, FilterOption, FilterOptions, IFilterOption, IFilterOptions } from 'app/shared/filter';
 import { TranslateDirective } from 'app/shared/language';
 import { ItemCount } from 'app/shared/pagination';
 import { SortByDirective, SortDirective, SortService, type SortState, sortStateSignal } from 'app/shared/sort';
@@ -48,6 +48,8 @@ export class AyantDroit {
 
   sortState = sortStateSignal({});
   filters: IFilterOptions = new FilterOptions();
+  readonly searchTerm = signal('');
+  private readonly searchFilterName = 'nom.contains';
 
   readonly itemsPerPage = signal(ITEMS_PER_PAGE);
   readonly totalItems = signal(0);
@@ -124,11 +126,19 @@ export class AyantDroit {
     this.handleNavigation(page, this.sortState(), this.filters.filterOptions);
   }
 
+  search(): void {
+    const term = this.searchTerm().trim();
+    const otherFilters = this.filters.filterOptions.filter(option => option.name !== this.searchFilterName);
+    const filterOptions = term ? [...otherFilters, new FilterOption(this.searchFilterName, [term])] : otherFilters;
+    this.handleNavigation(1, this.sortState(), filterOptions);
+  }
+
   protected fillComponentAttributeFromRoute(params: ParamMap, data: Data): void {
     const page = params.get(PAGE_HEADER);
     this.page.set(+(page ?? 1));
     this.sortState.set(this.sortService.parseSortParam(params.get(SORT) ?? data[DEFAULT_SORT_DATA]));
     this.filters.initializeFromParams(params);
+    this.searchTerm.set(this.filters.filterOptions.find(option => option.name === this.searchFilterName)?.values[0] ?? '');
   }
 
   protected fillComponentAttributesFromResponseBody(data: IAyantDroit[]): IAyantDroit[] {

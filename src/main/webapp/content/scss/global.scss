@@ -547,6 +547,24 @@ Entity pages (list / form) design system
   overflow: hidden;
 }
 
+/* ---- Search bar (entity lists) ---- */
+
+.jhi-search-bar {
+  display: flex;
+  gap: 8px;
+
+  .form-control {
+    width: 220px;
+    border-radius: 6px;
+    border-color: #d5d8dc;
+
+    &:focus {
+      border-color: var(--jhi-accent);
+      box-shadow: 0 0 0 0.2rem var(--jhi-accent-soft);
+    }
+  }
+}
+
 /* ---- List / table ---- */
 
 .jhi-table-panel {
