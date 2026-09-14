@@ -9,6 +9,8 @@ export interface IAyantDroit {
   prenom?: string | null;
   dateNaissance?: dayjs.Dayjs | null;
   lien?: keyof typeof LienParente | null;
+  photo?: string | null;
+  photoContentType?: string | null;
   agent?: Pick<IAgent, 'id' | 'matricule'> | null;
 }
 

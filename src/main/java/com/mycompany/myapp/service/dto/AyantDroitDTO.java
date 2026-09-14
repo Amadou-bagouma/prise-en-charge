@@ -25,6 +25,10 @@ public class AyantDroitDTO implements Serializable {
     @NotNull
     private LienParente lien;
 
+    private byte[] photo;
+
+    private String photoContentType;
+
     private AgentDTO agent;
 
     public Long getId() {
@@ -65,6 +69,22 @@ public class AyantDroitDTO implements Serializable {
 
     public void setLien(LienParente lien) {
         this.lien = lien;
+    }
+
+    public byte[] getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(byte[] photo) {
+        this.photo = photo;
+    }
+
+    public String getPhotoContentType() {
+        return photoContentType;
+    }
+
+    public void setPhotoContentType(String photoContentType) {
+        this.photoContentType = photoContentType;
     }
 
     public AgentDTO getAgent() {

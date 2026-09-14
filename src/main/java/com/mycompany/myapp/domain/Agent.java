@@ -48,6 +48,13 @@ public class Agent implements Serializable {
     @Column(name = "fonction")
     private String fonction;
 
+    @Lob
+    @Column(name = "photo")
+    private byte[] photo;
+
+    @Column(name = "photo_content_type")
+    private String photoContentType;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "region" }, allowSetters = true)
     private Direction direction;
@@ -149,6 +156,32 @@ public class Agent implements Serializable {
 
     public void setFonction(String fonction) {
         this.fonction = fonction;
+    }
+
+    public byte[] getPhoto() {
+        return this.photo;
+    }
+
+    public Agent photo(byte[] photo) {
+        this.setPhoto(photo);
+        return this;
+    }
+
+    public void setPhoto(byte[] photo) {
+        this.photo = photo;
+    }
+
+    public String getPhotoContentType() {
+        return this.photoContentType;
+    }
+
+    public Agent photoContentType(String photoContentType) {
+        this.setPhotoContentType(photoContentType);
+        return this;
+    }
+
+    public void setPhotoContentType(String photoContentType) {
+        this.photoContentType = photoContentType;
     }
 
     public Direction getDirection() {

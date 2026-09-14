@@ -603,6 +603,13 @@ Entity pages (list / form) design system
     color: var(--jhi-accent-dark);
   }
 
+  .jhi-table-thumbnail {
+    width: 36px;
+    height: 36px;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+
   /* Keep the Actions column reachable without scrolling all the way right on wide tables */
   td:last-child,
   th:last-child {

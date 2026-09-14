@@ -39,6 +39,20 @@
           <dd>
             <span>{{ agentRef.fonction }}</span>
           </dd>
+          <dt><span jhiTranslate="peccnssApp.agent.photo">Photo</span></dt>
+          <dd>
+            @if (agentRef.photo) {
+              <div>
+                <img
+                  [src]="'data:' + agentRef.photoContentType + ';base64,' + agentRef.photo"
+                  style="max-height: 100px; cursor: pointer"
+                  alt="agent photo"
+                  (click)="openFile(agentRef.photo, agentRef.photoContentType)"
+                />
+                <span>{{ agentRef.photoContentType }}, {{ byteSize(agentRef.photo) }}</span>
+              </div>
+            }
+          </dd>
           <dt><span jhiTranslate="peccnssApp.agent.direction">Direction</span></dt>
           <dd>
             @if (agent()!.direction) {

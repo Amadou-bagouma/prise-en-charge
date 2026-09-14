@@ -1,5 +1,5 @@
 import { HttpResponse } from '@angular/common/http';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, inject, signal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
@@ -7,6 +7,8 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbInputDatepicker } from '@ng-bootstrap/ng-bootstrap/datepicker';
 import { Observable, finalize, map } from 'rxjs';
 
+import { DataUtils, FileLoadError } from 'app/core/util/data-util.service';
+import { AlertService } from 'app/core/util/alert.service';
 import { IDirection } from 'app/entities/direction/direction.model';
 import { DirectionService } from 'app/entities/direction/service/direction.service';
 import { IGestion } from 'app/entities/gestion/gestion.model';
@@ -33,12 +35,16 @@ export class AgentUpdate implements OnInit {
   gestionsSharedCollection = signal<IGestion[]>([]);
   usersSharedCollection = signal<IUser[]>([]);
 
+  protected dataUtils = inject(DataUtils);
+  protected alertService = inject(AlertService);
   protected agentService = inject(AgentService);
   protected agentFormService = inject(AgentFormService);
   protected directionService = inject(DirectionService);
   protected gestionService = inject(GestionService);
   protected userService = inject(UserService);
   protected activatedRoute = inject(ActivatedRoute);
+  protected elementRef = inject(ElementRef);
+  protected cdr = inject(ChangeDetectorRef);
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   editForm: AgentFormGroup = this.agentFormService.createAgentFormGroup();
@@ -62,6 +68,33 @@ export class AgentUpdate implements OnInit {
 
   previousState(): void {
     globalThis.history.back();
+  }
+
+  byteSize(base64String: string | null | undefined): string {
+    return base64String ? this.dataUtils.byteSize(base64String) : '';
+  }
+
+  setFileData(event: Event, field: string, isImage: boolean): void {
+    this.dataUtils.loadFileToForm(event, this.editForm, field, isImage).subscribe({
+      next: () => this.cdr.markForCheck(),
+      error: (err: FileLoadError) =>
+        this.alertService.addAlert({
+          type: 'danger',
+          translationKey: `error.file.${err.key}`,
+          translationParams: err.params,
+        }),
+    });
+  }
+
+  clearInputImage(field: string, fieldContentType: string, idInput: string): void {
+    this.editForm.patchValue({
+      [field]: null,
+      [fieldContentType]: null,
+    });
+    const inputElement = this.elementRef.nativeElement.querySelector(`#${idInput}`);
+    if (inputElement) {
+      inputElement.value = null;
+    }
   }
 
   save(): void {

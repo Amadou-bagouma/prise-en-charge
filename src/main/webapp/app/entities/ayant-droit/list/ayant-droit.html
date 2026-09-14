@@ -53,6 +53,7 @@
       <table class="table jhi-table" aria-describedby="page-heading">
         <thead>
           <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col"></th>
             <th scope="col" jhiSortBy="nom">
               <div class="d-flex">
                 <span jhiTranslate="peccnssApp.ayantDroit.nom">Nom</span>
@@ -89,6 +90,15 @@
         <tbody>
           @for (ayantDroit of ayantDroits(); track trackId(ayantDroit)) {
             <tr data-cy="entityTable">
+              <td>
+                @if (ayantDroit.photo) {
+                  <img
+                    [src]="'data:' + ayantDroit.photoContentType + ';base64,' + ayantDroit.photo"
+                    class="jhi-table-thumbnail"
+                    alt="ayant droit photo"
+                  />
+                }
+              </td>
               <td>
                 <a [routerLink]="['/ayant-droit', ayantDroit.id, 'view']">{{ ayantDroit.nom }}</a>
               </td>

@@ -44,6 +44,13 @@ public class AyantDroit implements Serializable {
     @Column(name = "lien", nullable = false)
     private LienParente lien;
 
+    @Lob
+    @Column(name = "photo")
+    private byte[] photo;
+
+    @Column(name = "photo_content_type")
+    private String photoContentType;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "direction", "gestion", "user" }, allowSetters = true)
     private Agent agent;
@@ -113,6 +120,32 @@ public class AyantDroit implements Serializable {
 
     public void setLien(LienParente lien) {
         this.lien = lien;
+    }
+
+    public byte[] getPhoto() {
+        return this.photo;
+    }
+
+    public AyantDroit photo(byte[] photo) {
+        this.setPhoto(photo);
+        return this;
+    }
+
+    public void setPhoto(byte[] photo) {
+        this.photo = photo;
+    }
+
+    public String getPhotoContentType() {
+        return this.photoContentType;
+    }
+
+    public AyantDroit photoContentType(String photoContentType) {
+        this.setPhotoContentType(photoContentType);
+        return this;
+    }
+
+    public void setPhotoContentType(String photoContentType) {
+        this.photoContentType = photoContentType;
     }
 
     public Agent getAgent() {

@@ -22,6 +22,7 @@
       "prenom": "Prenom",
       "dateNaissance": "Date Naissance",
       "lien": "Lien",
+      "photo": "Photo",
       "agent": "Agent"
     }
   }

@@ -53,6 +53,7 @@
       <table class="table jhi-table" aria-describedby="page-heading">
         <thead>
           <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col"></th>
             <th scope="col" jhiSortBy="matricule">
               <div class="d-flex">
                 <span jhiTranslate="peccnssApp.agent.matricule">Matricule</span>
@@ -107,6 +108,11 @@
         <tbody>
           @for (agent of agents(); track trackId(agent)) {
             <tr data-cy="entityTable">
+              <td>
+                @if (agent.photo) {
+                  <img [src]="'data:' + agent.photoContentType + ';base64,' + agent.photo" class="jhi-table-thumbnail" alt="agent photo" />
+                }
+              </td>
               <td>
                 <a [routerLink]="['/agent', agent.id, 'view']">{{ agent.matricule }}</a>
               </td>

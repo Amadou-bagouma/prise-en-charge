@@ -36,6 +36,20 @@
               >{{ { null: '', CONJOINT: 'CONJOINT', ENFANT: 'ENFANT', AUTRE: 'AUTRE' }[ayantDroitRef.lien ?? 'null'] }}</span
             >
           </dd>
+          <dt><span jhiTranslate="peccnssApp.ayantDroit.photo">Photo</span></dt>
+          <dd>
+            @if (ayantDroitRef.photo) {
+              <div>
+                <img
+                  [src]="'data:' + ayantDroitRef.photoContentType + ';base64,' + ayantDroitRef.photo"
+                  style="max-height: 100px; cursor: pointer"
+                  alt="ayant droit photo"
+                  (click)="openFile(ayantDroitRef.photo, ayantDroitRef.photoContentType)"
+                />
+                <span>{{ ayantDroitRef.photoContentType }}, {{ byteSize(ayantDroitRef.photo) }}</span>
+              </div>
+            }
+          </dd>
           <dt><span jhiTranslate="peccnssApp.ayantDroit.agent">Agent</span></dt>
           <dd>
             @if (ayantDroit()!.agent) {

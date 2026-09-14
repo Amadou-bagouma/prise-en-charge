@@ -77,6 +77,43 @@
         </div>
 
         <div class="jhi-field">
+          <label class="form-label" for="field_photo" jhiTranslate="peccnssApp.ayantDroit.photo">Photo</label>
+          @if (editForm.get('photo')!.value) {
+            <div>
+              <img
+                [src]="'data:' + editForm.get('photoContentType')!.value + ';base64,' + editForm.get('photo')!.value"
+                style="max-height: 100px"
+                alt="ayant droit photo"
+              />
+              <div>
+                {{ editForm.get('photoContentType')!.value }}, {{ byteSize(editForm.get('photo')!.value) }}
+                <button type="button" (click)="clearInputImage('photo', 'photoContentType', 'file_photo')" class="btn btn-secondary btn-sm">
+                  <fa-icon icon="times" />
+                </button>
+              </div>
+            </div>
+          }
+          <input type="file" (change)="setFileData($event, 'photo', true)" accept="image/*" id="file_photo" data-cy="photo" />
+          <input
+            type="hidden"
+            class="form-control"
+            name="photo"
+            id="field_photo"
+            data-cy="photo"
+            formControlName="photo"
+            [class.valid]="!editForm.get('photo')!.invalid"
+            [class.invalid]="editForm.get('photo')!.invalid"
+          />
+          <input
+            type="hidden"
+            class="form-control"
+            name="photoContentType"
+            id="field_photoContentType"
+            formControlName="photoContentType"
+          />
+        </div>
+
+        <div class="jhi-field">
           <label class="form-label" for="field_agent" jhiTranslate="peccnssApp.ayantDroit.agent">Agent</label>
           <select class="form-control" id="field_agent" data-cy="agent" name="agent" formControlName="agent" [compareWith]="compareAgent">
             <option [ngValue]="null"></option>

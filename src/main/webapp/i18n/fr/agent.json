@@ -24,6 +24,7 @@
       "dateNaissance": "Date de naissance",
       "telephone": "Téléphone",
       "fonction": "Fonction",
+      "photo": "Photo",
       "direction": "Direction",
       "gestion": "Gestion",
       "user": "Utilisateur"

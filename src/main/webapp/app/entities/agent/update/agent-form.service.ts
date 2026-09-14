@@ -24,6 +24,8 @@ type AgentFormGroupContent = {
   dateNaissance: FormControl<IAgent['dateNaissance']>;
   telephone: FormControl<IAgent['telephone']>;
   fonction: FormControl<IAgent['fonction']>;
+  photo: FormControl<IAgent['photo']>;
+  photoContentType: FormControl<IAgent['photoContentType']>;
   direction: FormControl<IAgent['direction']>;
   gestion: FormControl<IAgent['gestion']>;
   user: FormControl<IAgent['user']>;
@@ -59,6 +61,8 @@ export class AgentFormService {
       dateNaissance: new FormControl(agentRawValue.dateNaissance),
       telephone: new FormControl(agentRawValue.telephone),
       fonction: new FormControl(agentRawValue.fonction),
+      photo: new FormControl(agentRawValue.photo),
+      photoContentType: new FormControl(agentRawValue.photoContentType),
       direction: new FormControl(agentRawValue.direction),
       gestion: new FormControl(agentRawValue.gestion),
       user: new FormControl(agentRawValue.user),

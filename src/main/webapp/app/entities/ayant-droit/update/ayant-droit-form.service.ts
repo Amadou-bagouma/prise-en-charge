@@ -22,6 +22,8 @@ type AyantDroitFormGroupContent = {
   prenom: FormControl<IAyantDroit['prenom']>;
   dateNaissance: FormControl<IAyantDroit['dateNaissance']>;
   lien: FormControl<IAyantDroit['lien']>;
+  photo: FormControl<IAyantDroit['photo']>;
+  photoContentType: FormControl<IAyantDroit['photoContentType']>;
   agent: FormControl<IAyantDroit['agent']>;
 };
 
@@ -53,6 +55,8 @@ export class AyantDroitFormService {
       lien: new FormControl(ayantDroitRawValue.lien, {
         validators: [Validators.required],
       }),
+      photo: new FormControl(ayantDroitRawValue.photo),
+      photoContentType: new FormControl(ayantDroitRawValue.photoContentType),
       agent: new FormControl(ayantDroitRawValue.agent),
     });
   }

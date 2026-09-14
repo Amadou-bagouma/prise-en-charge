@@ -28,6 +28,10 @@ public class AgentDTO implements Serializable {
 
     private String fonction;
 
+    private byte[] photo;
+
+    private String photoContentType;
+
     private DirectionDTO direction;
 
     private GestionDTO gestion;
@@ -88,6 +92,22 @@ public class AgentDTO implements Serializable {
 
     public void setFonction(String fonction) {
         this.fonction = fonction;
+    }
+
+    public byte[] getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(byte[] photo) {
+        this.photo = photo;
+    }
+
+    public String getPhotoContentType() {
+        return photoContentType;
+    }
+
+    public void setPhotoContentType(String photoContentType) {
+        this.photoContentType = photoContentType;
     }
 
     public DirectionDTO getDirection() {
