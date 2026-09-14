@@ -1,6 +1,7 @@
 package com.mycompany.myapp.repository;
 
 import com.mycompany.myapp.domain.DemandePriseEnCharge;
+import com.mycompany.myapp.domain.enumeration.StatutDemande;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -25,6 +26,8 @@ public interface DemandePriseEnChargeRepository
         "select demandePriseEnCharge from DemandePriseEnCharge demandePriseEnCharge where demandePriseEnCharge.assigneA.login = ?#{authentication.name}"
     )
     List<DemandePriseEnCharge> findByAssigneAIsCurrentUser();
+
+    List<DemandePriseEnCharge> findByStatut(StatutDemande statut);
 
     default Optional<DemandePriseEnCharge> findOneWithEagerRelationships(Long id) {
         return this.findOneWithToOneRelationships(id);

@@ -1,5 +1,6 @@
 package com.mycompany.myapp.service;
 
+import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.service.dto.DemandePriseEnChargeDTO;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -83,4 +84,16 @@ public interface DemandePriseEnChargeService {
      * @return the persisted entity.
      */
     DemandePriseEnChargeDTO resoumettre(Long id);
+
+    /**
+     * Catches up a user who was just granted a validation authority (DRH or infirmerie): creates a
+     * validation Tache for every already-pending demande matching that step which doesn't already have
+     * an open task for them. Without this, a demande stuck in a validation step before the user held the
+     * role would never surface in their "Mes taches".
+     *
+     * @param validateur the user who was granted the authority.
+     * @param authority the granted authority (only {@code ROLE_VALIDATEUR_DRH} and
+     *     {@code ROLE_VALIDATEUR_INFIRMERIE} trigger a catch-up; anything else is a no-op).
+     */
+    void rattraperTachesValidationPourNouveauValidateur(User validateur, String authority);
 }

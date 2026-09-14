@@ -20,6 +20,8 @@ public interface TacheRepository extends JpaRepository<Tache, Long>, JpaSpecific
 
     List<Tache> findByDemandeIdAndStatutNotIn(Long demandeId, List<StatutTache> statuts);
 
+    boolean existsByDemandeIdAndUtilisateurIdAndStatutNotIn(Long demandeId, Long utilisateurId, List<StatutTache> statuts);
+
     default Optional<Tache> findOneWithEagerRelationships(Long id) {
         return this.findOneWithToOneRelationships(id);
     }

@@ -42,16 +42,20 @@ public class UserService {
 
     private final CacheManager cacheManager;
 
+    private final DemandePriseEnChargeService demandePriseEnChargeService;
+
     public UserService(
         UserRepository userRepository,
         PasswordEncoder passwordEncoder,
         AuthorityRepository authorityRepository,
-        CacheManager cacheManager
+        CacheManager cacheManager,
+        DemandePriseEnChargeService demandePriseEnChargeService
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authorityRepository = authorityRepository;
         this.cacheManager = cacheManager;
+        this.demandePriseEnChargeService = demandePriseEnChargeService;
     }
 
     public Optional<User> activateRegistration(String key) {
@@ -179,6 +183,11 @@ public class UserService {
         userRepository.save(user);
         this.clearUserCaches(user);
         LOG.debug("Created Information for User: {}", user);
+        rattraperTachesValidationSiNouvellesAutorites(
+            user,
+            Set.of(),
+            userDTO.getAuthorities() != null ? userDTO.getAuthorities() : Set.of()
+        );
         return user;
     }
 
@@ -204,6 +213,7 @@ public class UserService {
                 user.setActivated(userDTO.isActivated());
                 user.setLangKey(userDTO.getLangKey());
                 Set<Authority> managedAuthorities = user.getAuthorities();
+                Set<String> authoritesAvant = managedAuthorities.stream().map(Authority::getName).collect(Collectors.toSet());
                 managedAuthorities.clear();
                 userDTO
                     .getAuthorities()
@@ -215,9 +225,26 @@ public class UserService {
                 userRepository.save(user);
                 this.clearUserCaches(user);
                 LOG.debug("Changed Information for User: {}", user);
+                rattraperTachesValidationSiNouvellesAutorites(user, authoritesAvant, userDTO.getAuthorities());
                 return user;
             })
             .map(AdminUserDTO::new);
+    }
+
+    /**
+     * When an admin grants ROLE_VALIDATEUR_DRH or ROLE_VALIDATEUR_INFIRMERIE to a user who didn't
+     * already have it, catches them up on demandes that were already waiting for that validation step
+     * so they don't silently miss demandes submitted before they held the role.
+     */
+    private void rattraperTachesValidationSiNouvellesAutorites(User user, Set<String> authoritesAvant, Set<String> authoritesApres) {
+        for (String authority : authoritesApres) {
+            if (
+                !authoritesAvant.contains(authority) &&
+                (AuthoritiesConstants.VALIDATEUR_DRH.equals(authority) || AuthoritiesConstants.VALIDATEUR_INFIRMERIE.equals(authority))
+            ) {
+                demandePriseEnChargeService.rattraperTachesValidationPourNouveauValidateur(user, authority);
+            }
+        }
     }
 
     public void deleteUser(String login) {

@@ -241,20 +241,50 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
      */
     private void creerTachesValidation(DemandePriseEnCharge demande, String authority, String titrePrefix) {
         List<User> validateurs = userRepository.findAllByAuthoritiesNameAndActivatedIsTrue(authority);
-        Instant now = Instant.now();
         for (User validateur : validateurs) {
-            Tache tache = new Tache();
-            tache.setTitre(titrePrefix + " - " + demande.getReference());
-            tache.setDescription("Demande de prise en charge en attente de votre validation.");
-            tache.setDateCreation(now);
-            tache.setDateAssignation(now);
-            tache.setDateEcheance(demande.getDateEcheance());
-            tache.setStatut(StatutTache.A_FAIRE);
-            tache.setPriorite(PrioriteTache.valueOf(demande.getPriorite().name()));
-            tache.setLu(false);
-            tache.setDemande(demande);
-            tache.setUtilisateur(validateur);
-            tacheRepository.save(tache);
+            creerTacheValidation(demande, validateur, titrePrefix);
+        }
+    }
+
+    private void creerTacheValidation(DemandePriseEnCharge demande, User validateur, String titrePrefix) {
+        Instant now = Instant.now();
+        Tache tache = new Tache();
+        tache.setTitre(titrePrefix + " - " + demande.getReference());
+        tache.setDescription("Demande de prise en charge en attente de votre validation.");
+        tache.setDateCreation(now);
+        tache.setDateAssignation(now);
+        tache.setDateEcheance(demande.getDateEcheance());
+        tache.setStatut(StatutTache.A_FAIRE);
+        tache.setPriorite(PrioriteTache.valueOf(demande.getPriorite().name()));
+        tache.setLu(false);
+        tache.setDemande(demande);
+        tache.setUtilisateur(validateur);
+        tacheRepository.save(tache);
+    }
+
+    @Override
+    public void rattraperTachesValidationPourNouveauValidateur(User validateur, String authority) {
+        StatutDemande statutCorrespondant;
+        String titrePrefix;
+        if (AuthoritiesConstants.VALIDATEUR_DRH.equals(authority)) {
+            statutCorrespondant = StatutDemande.EN_ATTENTE_VALIDATION_DRH;
+            titrePrefix = "Validation DRH";
+        } else if (AuthoritiesConstants.VALIDATEUR_INFIRMERIE.equals(authority)) {
+            statutCorrespondant = StatutDemande.EN_ATTENTE_VALIDATION_INFIRMERIE;
+            titrePrefix = "Validation infirmerie";
+        } else {
+            return;
+        }
+        List<DemandePriseEnCharge> demandesEnAttente = demandePriseEnChargeRepository.findByStatut(statutCorrespondant);
+        for (DemandePriseEnCharge demande : demandesEnAttente) {
+            boolean aDejaUneTacheOuverte = tacheRepository.existsByDemandeIdAndUtilisateurIdAndStatutNotIn(
+                demande.getId(),
+                validateur.getId(),
+                STATUTS_TACHE_CLOTURES
+            );
+            if (!aDejaUneTacheOuverte) {
+                creerTacheValidation(demande, validateur, titrePrefix);
+            }
         }
     }
 
