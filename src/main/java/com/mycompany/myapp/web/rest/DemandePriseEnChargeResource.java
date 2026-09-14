@@ -4,6 +4,7 @@ import com.mycompany.myapp.repository.DemandePriseEnChargeRepository;
 import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.service.DemandePriseEnChargeQueryService;
 import com.mycompany.myapp.service.DemandePriseEnChargeService;
+import com.mycompany.myapp.service.RapportDemandeService;
 import com.mycompany.myapp.service.criteria.DemandePriseEnChargeCriteria;
 import com.mycompany.myapp.service.dto.DemandePriseEnChargeDTO;
 import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
@@ -20,7 +21,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -49,14 +52,18 @@ public class DemandePriseEnChargeResource {
 
     private final DemandePriseEnChargeQueryService demandePriseEnChargeQueryService;
 
+    private final RapportDemandeService rapportDemandeService;
+
     public DemandePriseEnChargeResource(
         DemandePriseEnChargeService demandePriseEnChargeService,
         DemandePriseEnChargeRepository demandePriseEnChargeRepository,
-        DemandePriseEnChargeQueryService demandePriseEnChargeQueryService
+        DemandePriseEnChargeQueryService demandePriseEnChargeQueryService,
+        RapportDemandeService rapportDemandeService
     ) {
         this.demandePriseEnChargeService = demandePriseEnChargeService;
         this.demandePriseEnChargeRepository = demandePriseEnChargeRepository;
         this.demandePriseEnChargeQueryService = demandePriseEnChargeQueryService;
+        this.rapportDemandeService = rapportDemandeService;
     }
 
     /**
@@ -265,5 +272,28 @@ public class DemandePriseEnChargeResource {
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .body(result);
+    }
+
+    /**
+     * {@code GET  /demande-prise-en-charges/:id/rapport} : downloads the PDF report for the "id" demandePriseEnCharge,
+     * which must be in the {@code VALIDEE} state.
+     *
+     * @param id the id of the demandePriseEnChargeDTO to report on.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the PDF file.
+     */
+    @GetMapping("/{id}/rapport")
+    public ResponseEntity<byte[]> getRapportDemandePriseEnCharge(@PathVariable("id") Long id) {
+        LOG.debug("REST request to get the PDF rapport for DemandePriseEnCharge : {}", id);
+        byte[] rapport = rapportDemandeService.genererRapport(id);
+        return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_PDF)
+            .header(
+                HttpHeaders.CONTENT_DISPOSITION,
+                ContentDisposition.attachment()
+                    .filename("rapport-" + id + ".pdf")
+                    .build()
+                    .toString()
+            )
+            .body(rapport);
     }
 }

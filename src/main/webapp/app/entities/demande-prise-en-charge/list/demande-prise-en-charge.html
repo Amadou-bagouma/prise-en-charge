@@ -195,6 +195,18 @@
                       <fa-icon icon="pencil-alt" class="me-1" />
                       <span jhiTranslate="entity.action.edit">Edit</span>
                     </a>
+                    @if (demandePriseEnCharge.statut === 'VALIDEE') {
+                      <button
+                        ngbDropdownItem
+                        type="button"
+                        (click)="telechargerRapport(demandePriseEnCharge)"
+                        [disabled]="downloadingRapportId() === demandePriseEnCharge.id"
+                        data-cy="entityRapportButton"
+                      >
+                        <fa-icon icon="file-pdf" class="me-1" />
+                        <span>Télécharger le rapport</span>
+                      </button>
+                    }
                     <button ngbDropdownItem type="button" (click)="delete(demandePriseEnCharge)" data-cy="entityDeleteButton">
                       <fa-icon icon="times" class="me-1" />
                       <span jhiTranslate="entity.action.delete">Delete</span>

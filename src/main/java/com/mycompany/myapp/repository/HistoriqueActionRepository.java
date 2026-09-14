@@ -19,6 +19,8 @@ public interface HistoriqueActionRepository extends JpaRepository<HistoriqueActi
     )
     List<HistoriqueAction> findByUtilisateurIsCurrentUser();
 
+    List<HistoriqueAction> findByDemandeIdOrderByDateActionAsc(Long demandeId);
+
     default Optional<HistoriqueAction> findOneWithEagerRelationships(Long id) {
         return this.findOneWithToOneRelationships(id);
     }

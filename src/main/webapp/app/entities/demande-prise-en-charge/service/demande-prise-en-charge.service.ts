@@ -124,6 +124,10 @@ export class DemandePriseEnChargeService extends DemandePriseEnChargesService {
       .pipe(map(res => this.convertResponseFromServer(res)));
   }
 
+  telechargerRapport(id: number): Observable<Blob> {
+    return this.http.get(`${this.resourceUrl}/${encodeURIComponent(id)}/rapport`, { responseType: 'blob' });
+  }
+
   getDemandePriseEnChargeIdentifier(demandePriseEnCharge: Pick<IDemandePriseEnCharge, 'id'>): number {
     return demandePriseEnCharge.id;
   }

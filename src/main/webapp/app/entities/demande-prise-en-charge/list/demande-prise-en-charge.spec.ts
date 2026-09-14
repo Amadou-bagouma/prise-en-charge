@@ -7,6 +7,7 @@ import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
 import {
   faEllipsisVertical,
   faEye,
+  faFilePdf,
   faPencilAlt,
   faPlus,
   faSearch,
@@ -73,7 +74,7 @@ describe('DemandePriseEnCharge Management Component', () => {
     routerNavigateSpy = vi.spyOn(comp.router, 'navigate');
 
     const library = TestBed.inject(FaIconLibrary);
-    library.addIcons(faEllipsisVertical, faEye, faPencilAlt, faPlus, faSearch, faSort, faSortDown, faSortUp, faSync, faTimes);
+    library.addIcons(faEllipsisVertical, faEye, faFilePdf, faPencilAlt, faPlus, faSearch, faSort, faSortDown, faSortUp, faSync, faTimes);
     httpMock = TestBed.inject(HttpTestingController);
   });
 

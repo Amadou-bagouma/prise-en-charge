@@ -54,6 +54,7 @@ export class DemandePriseEnCharge {
   readonly itemsPerPage = signal(ITEMS_PER_PAGE);
   readonly totalItems = signal(0);
   readonly page = signal(1);
+  readonly downloadingRapportId = signal<number | null>(null);
 
   readonly router = inject(Router);
   protected readonly demandePriseEnChargeService = inject(DemandePriseEnChargeService);
@@ -118,6 +119,22 @@ export class DemandePriseEnCharge {
 
   load(): void {
     this.queryBackend();
+  }
+
+  telechargerRapport(demandePriseEnCharge: IDemandePriseEnCharge): void {
+    this.downloadingRapportId.set(demandePriseEnCharge.id);
+    this.demandePriseEnChargeService.telechargerRapport(demandePriseEnCharge.id).subscribe({
+      next: blob => {
+        this.downloadingRapportId.set(null);
+        const objectUrl = URL.createObjectURL(blob);
+        const anchor = document.createElement('a');
+        anchor.href = objectUrl;
+        anchor.download = `rapport-${demandePriseEnCharge.reference ?? demandePriseEnCharge.id}.pdf`;
+        anchor.click();
+        URL.revokeObjectURL(objectUrl);
+      },
+      error: () => this.downloadingRapportId.set(null),
+    });
   }
 
   navigateToWithComponentValues(event: SortState): void {
