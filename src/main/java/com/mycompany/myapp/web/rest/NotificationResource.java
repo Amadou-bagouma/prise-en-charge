@@ -1,6 +1,10 @@
 package com.mycompany.myapp.web.rest;
 
+import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.repository.NotificationRepository;
+import com.mycompany.myapp.repository.UserRepository;
+import com.mycompany.myapp.security.AuthoritiesConstants;
+import com.mycompany.myapp.security.SecurityUtils;
 import com.mycompany.myapp.service.NotificationQueryService;
 import com.mycompany.myapp.service.NotificationService;
 import com.mycompany.myapp.service.criteria.NotificationCriteria;
@@ -19,9 +23,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import tech.jhipster.service.filter.LongFilter;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
@@ -46,14 +53,38 @@ public class NotificationResource {
 
     private final NotificationQueryService notificationQueryService;
 
+    private final UserRepository userRepository;
+
     public NotificationResource(
         NotificationService notificationService,
         NotificationRepository notificationRepository,
-        NotificationQueryService notificationQueryService
+        NotificationQueryService notificationQueryService,
+        UserRepository userRepository
     ) {
         this.notificationService = notificationService;
         this.notificationRepository = notificationRepository;
         this.notificationQueryService = notificationQueryService;
+        this.userRepository = userRepository;
+    }
+
+    /**
+     * Restricts the given criteria to the notifications addressed to the currently authenticated user,
+     * unless that user has the {@code ROLE_ADMIN} authority.
+     */
+    private NotificationCriteria restrictToCurrentUser(NotificationCriteria criteria) {
+        if (SecurityUtils.hasCurrentUserAnyOfAuthorities(AuthoritiesConstants.ADMIN)) {
+            return criteria;
+        }
+        Long currentUserId = SecurityUtils.getCurrentUserLogin()
+            .flatMap(userRepository::findOneByLogin)
+            .map(User::getId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Current user could not be found"));
+
+        NotificationCriteria restricted = criteria != null ? criteria.copy() : new NotificationCriteria();
+        LongFilter utilisateurIdFilter = new LongFilter();
+        utilisateurIdFilter.setEquals(currentUserId);
+        restricted.setUtilisateurId(utilisateurIdFilter);
+        return restricted;
     }
 
     /**
@@ -159,6 +190,7 @@ public class NotificationResource {
     ) {
         LOG.debug("REST request to get Notifications by criteria: {}", criteria);
 
+        criteria = restrictToCurrentUser(criteria);
         Page<NotificationDTO> page = notificationQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
@@ -173,6 +205,7 @@ public class NotificationResource {
     @GetMapping("/count")
     public ResponseEntity<Long> countNotifications(NotificationCriteria criteria) {
         LOG.debug("REST request to count Notifications by criteria: {}", criteria);
+        criteria = restrictToCurrentUser(criteria);
         return ResponseEntity.ok().body(notificationQueryService.countByCriteria(criteria));
     }
 
@@ -186,6 +219,15 @@ public class NotificationResource {
     public ResponseEntity<NotificationDTO> getNotification(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Notification : {}", id);
         Optional<NotificationDTO> notificationDTO = notificationService.findOne(id);
+        if (!SecurityUtils.hasCurrentUserAnyOfAuthorities(AuthoritiesConstants.ADMIN)) {
+            Long currentUserId = SecurityUtils.getCurrentUserLogin()
+                .flatMap(userRepository::findOneByLogin)
+                .map(User::getId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Current user could not be found"));
+            notificationDTO = notificationDTO.filter(
+                dto -> dto.getUtilisateur() != null && currentUserId.equals(dto.getUtilisateur().getId())
+            );
+        }
         return ResponseUtil.wrapOrNotFound(notificationDTO);
     }
 

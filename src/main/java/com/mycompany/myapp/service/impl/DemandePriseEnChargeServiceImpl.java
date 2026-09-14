@@ -2,13 +2,16 @@ package com.mycompany.myapp.service.impl;
 
 import com.mycompany.myapp.domain.DemandePriseEnCharge;
 import com.mycompany.myapp.domain.HistoriqueAction;
+import com.mycompany.myapp.domain.Notification;
 import com.mycompany.myapp.domain.Tache;
 import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.domain.enumeration.PrioriteTache;
 import com.mycompany.myapp.domain.enumeration.StatutDemande;
 import com.mycompany.myapp.domain.enumeration.StatutTache;
+import com.mycompany.myapp.domain.enumeration.TypeNotification;
 import com.mycompany.myapp.repository.DemandePriseEnChargeRepository;
 import com.mycompany.myapp.repository.HistoriqueActionRepository;
+import com.mycompany.myapp.repository.NotificationRepository;
 import com.mycompany.myapp.repository.TacheRepository;
 import com.mycompany.myapp.repository.UserRepository;
 import com.mycompany.myapp.security.AuthoritiesConstants;
@@ -51,6 +54,8 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
 
     private final TacheRepository tacheRepository;
 
+    private final NotificationRepository notificationRepository;
+
     private static final List<StatutTache> STATUTS_TACHE_CLOTURES = List.of(StatutTache.TERMINEE, StatutTache.ANNULEE);
 
     public DemandePriseEnChargeServiceImpl(
@@ -58,13 +63,15 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         DemandePriseEnChargeMapper demandePriseEnChargeMapper,
         UserRepository userRepository,
         HistoriqueActionRepository historiqueActionRepository,
-        TacheRepository tacheRepository
+        TacheRepository tacheRepository,
+        NotificationRepository notificationRepository
     ) {
         this.demandePriseEnChargeRepository = demandePriseEnChargeRepository;
         this.demandePriseEnChargeMapper = demandePriseEnChargeMapper;
         this.userRepository = userRepository;
         this.historiqueActionRepository = historiqueActionRepository;
         this.tacheRepository = tacheRepository;
+        this.notificationRepository = notificationRepository;
     }
 
     @Override
@@ -163,6 +170,15 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         cloturerTachesValidation(demande.getId());
         if (statutSuivant == StatutDemande.EN_ATTENTE_VALIDATION_INFIRMERIE) {
             creerTachesValidation(demande, AuthoritiesConstants.VALIDATEUR_INFIRMERIE, "Validation infirmerie");
+        } else if (statutSuivant == StatutDemande.VALIDEE && demande.getGestionnaireCreateur() != null) {
+            creerNotification(
+                demande.getGestionnaireCreateur(),
+                TypeNotification.DEMANDE_VALIDEE,
+                "Demande validée - " + demande.getReference(),
+                "Votre demande de prise en charge " + demande.getReference() + " a été validée.",
+                demande,
+                null
+            );
         }
         return demandePriseEnChargeMapper.toDto(demande);
     }
@@ -190,6 +206,16 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         demande = demandePriseEnChargeRepository.save(demande);
         logHistorique(demande, currentUser, "RETOUR", motif);
         cloturerTachesValidation(demande.getId());
+        if (demande.getGestionnaireCreateur() != null) {
+            creerNotification(
+                demande.getGestionnaireCreateur(),
+                TypeNotification.DEMANDE_REJETEE,
+                "Demande retournée - " + demande.getReference(),
+                "Votre demande de prise en charge " + demande.getReference() + " a été retournée pour correction : " + motif,
+                demande,
+                null
+            );
+        }
         return demandePriseEnChargeMapper.toDto(demande);
     }
 
@@ -259,7 +285,35 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         tache.setLu(false);
         tache.setDemande(demande);
         tache.setUtilisateur(validateur);
-        tacheRepository.save(tache);
+        tache = tacheRepository.save(tache);
+        creerNotification(
+            validateur,
+            TypeNotification.NOUVELLE_TACHE,
+            tache.getTitre(),
+            "Une demande de prise en charge (" + demande.getReference() + ") est en attente de votre validation.",
+            demande,
+            tache
+        );
+    }
+
+    private void creerNotification(
+        User destinataire,
+        TypeNotification type,
+        String titre,
+        String message,
+        DemandePriseEnCharge demande,
+        Tache tache
+    ) {
+        Notification notification = new Notification();
+        notification.setTitre(titre);
+        notification.setMessage(message);
+        notification.setDateCreation(Instant.now());
+        notification.setLu(false);
+        notification.setType(type);
+        notification.setUtilisateur(destinataire);
+        notification.setDemande(demande);
+        notification.setTache(tache);
+        notificationRepository.save(notification);
     }
 
     @Override
