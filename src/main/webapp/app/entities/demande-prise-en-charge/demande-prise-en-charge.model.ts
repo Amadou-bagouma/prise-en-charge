@@ -24,7 +24,7 @@ export interface IDemandePriseEnCharge {
   observation?: string | null;
   agent?: Pick<IAgent, 'id' | 'matricule'> | null;
   ayantDroit?: Pick<IAyantDroit, 'id' | 'nom'> | null;
-  typeSoin?: Pick<ITypeSoin, 'id' | 'libelle'> | null;
+  typeSoins?: Pick<ITypeSoin, 'id' | 'libelle'>[] | null;
   etablissementSante?: Pick<IEtablissementSante, 'id' | 'nom'> | null;
   gestionnaireCreateur?: Pick<IUser, 'id' | 'login'> | null;
   assigneA?: Pick<IUser, 'id' | 'login'> | null;

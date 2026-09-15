@@ -8,6 +8,8 @@ import static com.mycompany.myapp.domain.TypeSoinTestSamples.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.mycompany.myapp.web.rest.TestUtil;
+import java.util.HashSet;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 class DemandePriseEnChargeTest {
@@ -55,11 +57,17 @@ class DemandePriseEnChargeTest {
         DemandePriseEnCharge demandePriseEnCharge = getDemandePriseEnChargeRandomSampleGenerator();
         TypeSoin typeSoinBack = getTypeSoinRandomSampleGenerator();
 
-        demandePriseEnCharge.setTypeSoin(typeSoinBack);
-        assertThat(demandePriseEnCharge.getTypeSoin()).isEqualTo(typeSoinBack);
+        demandePriseEnCharge.addTypeSoin(typeSoinBack);
+        assertThat(demandePriseEnCharge.getTypeSoins()).containsOnly(typeSoinBack);
 
-        demandePriseEnCharge.typeSoin(null);
-        assertThat(demandePriseEnCharge.getTypeSoin()).isNull();
+        demandePriseEnCharge.removeTypeSoin(typeSoinBack);
+        assertThat(demandePriseEnCharge.getTypeSoins()).doesNotContain(typeSoinBack);
+
+        demandePriseEnCharge.typeSoins(new HashSet<>(Set.of(typeSoinBack)));
+        assertThat(demandePriseEnCharge.getTypeSoins()).containsOnly(typeSoinBack);
+
+        demandePriseEnCharge.setTypeSoins(new HashSet<>());
+        assertThat(demandePriseEnCharge.getTypeSoins()).doesNotContain(typeSoinBack);
     }
 
     @Test

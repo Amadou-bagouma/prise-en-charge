@@ -54,7 +54,7 @@ type DemandePriseEnChargeFormGroupContent = {
   observation: FormControl<DemandePriseEnChargeFormRawValue['observation']>;
   agent: FormControl<DemandePriseEnChargeFormRawValue['agent']>;
   ayantDroit: FormControl<DemandePriseEnChargeFormRawValue['ayantDroit']>;
-  typeSoin: FormControl<DemandePriseEnChargeFormRawValue['typeSoin']>;
+  typeSoins: FormControl<DemandePriseEnChargeFormRawValue['typeSoins']>;
   etablissementSante: FormControl<DemandePriseEnChargeFormRawValue['etablissementSante']>;
   gestionnaireCreateur: FormControl<DemandePriseEnChargeFormRawValue['gestionnaireCreateur']>;
   assigneA: FormControl<DemandePriseEnChargeFormRawValue['assigneA']>;
@@ -101,7 +101,7 @@ export class DemandePriseEnChargeFormService {
       observation: new FormControl(demandePriseEnChargeRawValue.observation),
       agent: new FormControl(demandePriseEnChargeRawValue.agent),
       ayantDroit: new FormControl(demandePriseEnChargeRawValue.ayantDroit),
-      typeSoin: new FormControl(demandePriseEnChargeRawValue.typeSoin),
+      typeSoins: new FormControl(demandePriseEnChargeRawValue.typeSoins ?? []),
       etablissementSante: new FormControl(demandePriseEnChargeRawValue.etablissementSante),
       gestionnaireCreateur: new FormControl(demandePriseEnChargeRawValue.gestionnaireCreateur, {
         validators: [Validators.required],

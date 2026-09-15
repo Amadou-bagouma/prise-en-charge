@@ -65,10 +65,9 @@
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
-            <th scope="col" jhiSortBy="typeSoin.libelle">
+            <th scope="col">
               <div class="d-flex">
-                <span jhiTranslate="peccnssApp.demandePriseEnCharge.typeSoin">Type Soin</span>
-                <fa-icon class="p-1" icon="sort" />
+                <span jhiTranslate="peccnssApp.demandePriseEnCharge.typeSoins">Types Soin</span>
               </div>
             </th>
             <th scope="col" jhiSortBy="etablissementSante.nom">
@@ -128,7 +127,7 @@
                   {{ { null: '', AGENT: 'Agent', AYANT_DROIT: 'Ayant droit' }[demandePriseEnCharge.typeBeneficiaire ?? 'null'] }}
                 </div>
               </td>
-              <td>{{ demandePriseEnCharge.typeSoin?.libelle }}</td>
+              <td>{{ demandePriseEnCharge.typeSoins?.map(t => t.libelle)?.join(', ') }}</td>
               <td>{{ demandePriseEnCharge.etablissementSante?.nom }}</td>
               <td>
                 <span

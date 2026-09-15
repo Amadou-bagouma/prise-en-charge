@@ -71,7 +71,7 @@ public class DemandePriseEnChargeAsserts {
             .as("Verify DemandePriseEnCharge relationships")
             .satisfies(a -> assertThat(a.getAgent()).as("check agent").isEqualTo(expected.getAgent()))
             .satisfies(a -> assertThat(a.getAyantDroit()).as("check ayantDroit").isEqualTo(expected.getAyantDroit()))
-            .satisfies(a -> assertThat(a.getTypeSoin()).as("check typeSoin").isEqualTo(expected.getTypeSoin()))
+            .satisfies(a -> assertThat(a.getTypeSoins()).as("check typeSoins").isEqualTo(expected.getTypeSoins()))
             .satisfies(a ->
                 assertThat(a.getEtablissementSante()).as("check etablissementSante").isEqualTo(expected.getEtablissementSante())
             );

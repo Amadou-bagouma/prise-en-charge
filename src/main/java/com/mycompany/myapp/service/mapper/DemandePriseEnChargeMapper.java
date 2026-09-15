@@ -12,6 +12,8 @@ import com.mycompany.myapp.service.dto.DemandePriseEnChargeDTO;
 import com.mycompany.myapp.service.dto.EtablissementSanteDTO;
 import com.mycompany.myapp.service.dto.TypeSoinDTO;
 import com.mycompany.myapp.service.dto.UserDTO;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.mapstruct.*;
 
 /**
@@ -21,7 +23,7 @@ import org.mapstruct.*;
 public interface DemandePriseEnChargeMapper extends EntityMapper<DemandePriseEnChargeDTO, DemandePriseEnCharge> {
     @Mapping(target = "agent", source = "agent", qualifiedByName = "agentMatricule")
     @Mapping(target = "ayantDroit", source = "ayantDroit", qualifiedByName = "ayantDroitNom")
-    @Mapping(target = "typeSoin", source = "typeSoin", qualifiedByName = "typeSoinLibelle")
+    @Mapping(target = "typeSoins", source = "typeSoins", qualifiedByName = "typeSoinLibelleSet")
     @Mapping(target = "etablissementSante", source = "etablissementSante", qualifiedByName = "etablissementSanteNom")
     @Mapping(target = "gestionnaireCreateur", source = "gestionnaireCreateur", qualifiedByName = "userLogin")
     @Mapping(target = "assigneA", source = "assigneA", qualifiedByName = "userLogin")
@@ -44,6 +46,11 @@ public interface DemandePriseEnChargeMapper extends EntityMapper<DemandePriseEnC
     @Mapping(target = "id", source = "id")
     @Mapping(target = "libelle", source = "libelle")
     TypeSoinDTO toDtoTypeSoinLibelle(TypeSoin typeSoin);
+
+    @Named("typeSoinLibelleSet")
+    default Set<TypeSoinDTO> toDtoTypeSoinLibelleSet(Set<TypeSoin> typeSoin) {
+        return typeSoin.stream().map(this::toDtoTypeSoinLibelle).collect(Collectors.toSet());
+    }
 
     @Named("etablissementSanteNom")
     @BeanMapping(ignoreByDefault = true)

@@ -921,7 +921,7 @@ class DemandePriseEnChargeResourceIT {
         }
         em.persist(typeSoin);
         em.flush();
-        demandePriseEnCharge.setTypeSoin(typeSoin);
+        demandePriseEnCharge.addTypeSoin(typeSoin);
         demandePriseEnChargeRepository.saveAndFlush(demandePriseEnCharge);
         Long typeSoinId = typeSoin.getId();
         // Get all the demandePriseEnChargeList where typeSoin equals to typeSoinId

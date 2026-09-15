@@ -123,7 +123,7 @@ export class DemandePriseEnChargeUpdate implements OnInit {
       this.ayantDroitService.addAyantDroitToCollectionIfMissing<IAyantDroit>(ayantDroits, demandePriseEnCharge.ayantDroit),
     );
     this.typeSoinsSharedCollection.update(typeSoins =>
-      this.typeSoinService.addTypeSoinToCollectionIfMissing<ITypeSoin>(typeSoins, demandePriseEnCharge.typeSoin),
+      this.typeSoinService.addTypeSoinToCollectionIfMissing<ITypeSoin>(typeSoins, ...(demandePriseEnCharge.typeSoins ?? [])),
     );
     this.etablissementSantesSharedCollection.update(etablissementSantes =>
       this.etablissementSanteService.addEtablissementSanteToCollectionIfMissing<IEtablissementSante>(
@@ -158,7 +158,7 @@ export class DemandePriseEnChargeUpdate implements OnInit {
       .pipe(map((res: HttpResponse<ITypeSoin[]>) => res.body ?? []))
       .pipe(
         map((typeSoins: ITypeSoin[]) =>
-          this.typeSoinService.addTypeSoinToCollectionIfMissing<ITypeSoin>(typeSoins, this.demandePriseEnCharge?.typeSoin),
+          this.typeSoinService.addTypeSoinToCollectionIfMissing<ITypeSoin>(typeSoins, ...(this.demandePriseEnCharge?.typeSoins ?? [])),
         ),
       )
       .subscribe((typeSoins: ITypeSoin[]) => this.typeSoinsSharedCollection.set(typeSoins));

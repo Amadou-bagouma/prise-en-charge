@@ -110,7 +110,7 @@ describe('DemandePriseEnCharge Management Update Component', () => {
     it('should call TypeSoin query and add missing value', () => {
       const demandePriseEnCharge: IDemandePriseEnCharge = { id: 19327 };
       const typeSoin: ITypeSoin = { id: 20111 };
-      demandePriseEnCharge.typeSoin = typeSoin;
+      demandePriseEnCharge.typeSoins = [typeSoin];
 
       const typeSoinCollection: ITypeSoin[] = [{ id: 20111 }];
       vi.spyOn(typeSoinService, 'query').mockReturnValue(of(new HttpResponse({ body: typeSoinCollection })));
@@ -182,7 +182,7 @@ describe('DemandePriseEnCharge Management Update Component', () => {
       const ayantDroit: IAyantDroit = { id: 17970 };
       demandePriseEnCharge.ayantDroit = ayantDroit;
       const typeSoin: ITypeSoin = { id: 20111 };
-      demandePriseEnCharge.typeSoin = typeSoin;
+      demandePriseEnCharge.typeSoins = [typeSoin];
       const etablissementSante: IEtablissementSante = { id: 2850 };
       demandePriseEnCharge.etablissementSante = etablissementSante;
       const gestionnaireCreateur: IUser = { id: 3944 };

@@ -2,6 +2,7 @@ package com.mycompany.myapp.service;
 
 import com.mycompany.myapp.domain.DemandePriseEnCharge;
 import com.mycompany.myapp.domain.HistoriqueAction;
+import com.mycompany.myapp.domain.TypeSoin;
 import com.mycompany.myapp.domain.enumeration.StatutDemande;
 import com.mycompany.myapp.repository.DemandePriseEnChargeRepository;
 import com.mycompany.myapp.repository.HistoriqueActionRepository;
@@ -11,6 +12,7 @@ import java.io.ByteArrayOutputStream;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.openpdf.text.Document;
 import org.openpdf.text.DocumentException;
 import org.openpdf.text.Element;
@@ -98,7 +100,13 @@ public class RapportDemandeService {
             PdfPTable idTable = infoTable();
             addRow(idTable, "Reference", demande.getReference(), labelFont, valueFont);
             addRow(idTable, "Beneficiaire", beneficiaire(demande), labelFont, valueFont);
-            addRow(idTable, "Type de soin", demande.getTypeSoin() != null ? demande.getTypeSoin().getLibelle() : "", labelFont, valueFont);
+            addRow(
+                idTable,
+                "Type de soin",
+                demande.getTypeSoins().stream().map(TypeSoin::getLibelle).collect(Collectors.joining(", ")),
+                labelFont,
+                valueFont
+            );
             addRow(
                 idTable,
                 "Etablissement de sante",

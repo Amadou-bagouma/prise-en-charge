@@ -76,7 +76,6 @@ public class DemandePriseEnChargeQueryService extends QueryService<DemandePriseE
             if (Long.class != query.getResultType()) {
                 root.fetch(DemandePriseEnCharge_.agent, JoinType.LEFT);
                 root.fetch(DemandePriseEnCharge_.ayantDroit, JoinType.LEFT);
-                root.fetch(DemandePriseEnCharge_.typeSoin, JoinType.LEFT);
                 root.fetch(DemandePriseEnCharge_.etablissementSante, JoinType.LEFT);
                 root.fetch(DemandePriseEnCharge_.gestionnaireCreateur, JoinType.LEFT);
                 root.fetch(DemandePriseEnCharge_.assigneA, JoinType.LEFT);
@@ -105,7 +104,7 @@ public class DemandePriseEnChargeQueryService extends QueryService<DemandePriseE
                         root.join(DemandePriseEnCharge_.ayantDroit, JoinType.LEFT).get(AyantDroit_.id)
                     ),
                     buildSpecification(criteria.getTypeSoinId(), root ->
-                        root.join(DemandePriseEnCharge_.typeSoin, JoinType.LEFT).get(TypeSoin_.id)
+                        root.join(DemandePriseEnCharge_.typeSoins, JoinType.LEFT).get(TypeSoin_.id)
                     ),
                     buildSpecification(criteria.getEtablissementSanteId(), root ->
                         root.join(DemandePriseEnCharge_.etablissementSante, JoinType.LEFT).get(EtablissementSante_.id)

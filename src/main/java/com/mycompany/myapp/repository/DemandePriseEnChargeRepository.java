@@ -42,18 +42,18 @@ public interface DemandePriseEnChargeRepository
     }
 
     @Query(
-        value = "select demandePriseEnCharge from DemandePriseEnCharge demandePriseEnCharge left join fetch demandePriseEnCharge.agent left join fetch demandePriseEnCharge.ayantDroit left join fetch demandePriseEnCharge.typeSoin left join fetch demandePriseEnCharge.etablissementSante left join fetch demandePriseEnCharge.gestionnaireCreateur left join fetch demandePriseEnCharge.assigneA",
+        value = "select demandePriseEnCharge from DemandePriseEnCharge demandePriseEnCharge left join fetch demandePriseEnCharge.agent left join fetch demandePriseEnCharge.ayantDroit left join fetch demandePriseEnCharge.etablissementSante left join fetch demandePriseEnCharge.gestionnaireCreateur left join fetch demandePriseEnCharge.assigneA",
         countQuery = "select count(demandePriseEnCharge) from DemandePriseEnCharge demandePriseEnCharge"
     )
     Page<DemandePriseEnCharge> findAllWithToOneRelationships(Pageable pageable);
 
     @Query(
-        "select demandePriseEnCharge from DemandePriseEnCharge demandePriseEnCharge left join fetch demandePriseEnCharge.agent left join fetch demandePriseEnCharge.ayantDroit left join fetch demandePriseEnCharge.typeSoin left join fetch demandePriseEnCharge.etablissementSante left join fetch demandePriseEnCharge.gestionnaireCreateur left join fetch demandePriseEnCharge.assigneA"
+        "select demandePriseEnCharge from DemandePriseEnCharge demandePriseEnCharge left join fetch demandePriseEnCharge.agent left join fetch demandePriseEnCharge.ayantDroit left join fetch demandePriseEnCharge.etablissementSante left join fetch demandePriseEnCharge.gestionnaireCreateur left join fetch demandePriseEnCharge.assigneA"
     )
     List<DemandePriseEnCharge> findAllWithToOneRelationships();
 
     @Query(
-        "select demandePriseEnCharge from DemandePriseEnCharge demandePriseEnCharge left join fetch demandePriseEnCharge.agent left join fetch demandePriseEnCharge.ayantDroit left join fetch demandePriseEnCharge.typeSoin left join fetch demandePriseEnCharge.etablissementSante left join fetch demandePriseEnCharge.gestionnaireCreateur left join fetch demandePriseEnCharge.assigneA where demandePriseEnCharge.id =:id"
+        "select demandePriseEnCharge from DemandePriseEnCharge demandePriseEnCharge left join fetch demandePriseEnCharge.agent left join fetch demandePriseEnCharge.ayantDroit left join fetch demandePriseEnCharge.typeSoins left join fetch demandePriseEnCharge.etablissementSante left join fetch demandePriseEnCharge.gestionnaireCreateur left join fetch demandePriseEnCharge.assigneA where demandePriseEnCharge.id =:id"
     )
     Optional<DemandePriseEnCharge> findOneWithToOneRelationships(@Param("id") Long id);
 }

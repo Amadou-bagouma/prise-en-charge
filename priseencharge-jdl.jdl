@@ -278,9 +278,12 @@ relationship ManyToOne {
 
   DemandePriseEnCharge{ayantDroit(nom)} to AyantDroit
 
-  DemandePriseEnCharge{typeSoin(libelle)} to TypeSoin
-
   DemandePriseEnCharge{etablissementSante(nom)} to EtablissementSante
+}
+
+relationship ManyToMany {
+
+  DemandePriseEnCharge{typeSoin(libelle)} to TypeSoin
 }
 
 

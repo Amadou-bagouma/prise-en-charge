@@ -81,7 +81,7 @@
       "otherEntityName": "typeSoin",
       "relationshipName": "typeSoin",
       "relationshipSide": "left",
-      "relationshipType": "many-to-one"
+      "relationshipType": "many-to-many"
     },
     {
       "otherEntityField": "nom",

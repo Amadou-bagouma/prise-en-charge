@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Converts DemandePriseEnCharge -> TypeSoin from ManyToOne to ManyToMany:
+        creates the join table, migrates existing single-valued data into it,
+        then drops the old FK and column.
+    -->
+    <changeSet id="20260915090000-1" author="manual">
+        <createTable tableName="rel_demande_prise_en_charge__type_soin">
+            <column name="demande_prise_en_charge_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type_soin_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="demande_prise_en_charge_id, type_soin_id"
+                        tableName="rel_demande_prise_en_charge__type_soin"/>
+
+        <addForeignKeyConstraint baseColumnNames="demande_prise_en_charge_id"
+                                 baseTableName="rel_demande_prise_en_charge__type_soin"
+                                 constraintName="fk_rel_demande_prise_en_charge__type_soin__demande_prise_en_charge_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="demande_prise_en_charge"/>
+
+        <addForeignKeyConstraint baseColumnNames="type_soin_id"
+                                 baseTableName="rel_demande_prise_en_charge__type_soin"
+                                 constraintName="fk_rel_demande_prise_en_charge__type_soin__type_soin_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="type_soin"/>
+    </changeSet>
+
+    <changeSet id="20260915090000-2" author="manual">
+        <sql>
+            INSERT INTO rel_demande_prise_en_charge__type_soin (demande_prise_en_charge_id, type_soin_id)
+            SELECT id, type_soin_id FROM demande_prise_en_charge WHERE type_soin_id IS NOT NULL
+        </sql>
+    </changeSet>
+
+    <changeSet id="20260915090000-3" author="manual">
+        <dropForeignKeyConstraint baseTableName="demande_prise_en_charge"
+                                   constraintName="fk_demande_prise_en_charge__type_soin_id"/>
+        <dropColumn tableName="demande_prise_en_charge" columnName="type_soin_id"/>
+    </changeSet>
+</databaseChangeLog>

@@ -110,13 +110,11 @@
               </div>
             }
           </dd>
-          <dt><span jhiTranslate="peccnssApp.demandePriseEnCharge.typeSoin">Type Soin</span></dt>
+          <dt><span jhiTranslate="peccnssApp.demandePriseEnCharge.typeSoins">Types Soin</span></dt>
           <dd>
-            @if (demandePriseEnCharge()!.typeSoin) {
+            @for (typeSoin of demandePriseEnCharge()!.typeSoins ?? []; track typeSoin.id) {
               <div>
-                <a [routerLink]="['/type-soin', demandePriseEnCharge()!.typeSoin?.id, 'view']">{{
-                  demandePriseEnChargeRef.typeSoin?.libelle
-                }}</a>
+                <a [routerLink]="['/type-soin', typeSoin.id, 'view']">{{ typeSoin.libelle }}</a>
               </div>
             }
           </dd>

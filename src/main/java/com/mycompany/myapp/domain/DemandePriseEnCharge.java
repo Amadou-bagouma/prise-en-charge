@@ -9,6 +9,9 @@ import jakarta.validation.constraints.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -79,8 +82,15 @@ public class DemandePriseEnCharge implements Serializable {
     @JsonIgnoreProperties(value = { "agent" }, allowSetters = true)
     private AyantDroit ayantDroit;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private TypeSoin typeSoin;
+    @ManyToMany
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @BatchSize(size = 20)
+    @JoinTable(
+        name = "rel_demande_prise_en_charge__type_soin",
+        joinColumns = @JoinColumn(name = "demande_prise_en_charge_id"),
+        inverseJoinColumns = @JoinColumn(name = "type_soin_id")
+    )
+    private Set<TypeSoin> typeSoins = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     private EtablissementSante etablissementSante;
@@ -276,16 +286,26 @@ public class DemandePriseEnCharge implements Serializable {
         return this;
     }
 
-    public TypeSoin getTypeSoin() {
-        return this.typeSoin;
+    public Set<TypeSoin> getTypeSoins() {
+        return this.typeSoins;
     }
 
-    public void setTypeSoin(TypeSoin typeSoin) {
-        this.typeSoin = typeSoin;
+    public void setTypeSoins(Set<TypeSoin> typeSoins) {
+        this.typeSoins = typeSoins;
     }
 
-    public DemandePriseEnCharge typeSoin(TypeSoin typeSoin) {
-        this.setTypeSoin(typeSoin);
+    public DemandePriseEnCharge typeSoins(Set<TypeSoin> typeSoins) {
+        this.setTypeSoins(typeSoins);
+        return this;
+    }
+
+    public DemandePriseEnCharge addTypeSoin(TypeSoin typeSoin) {
+        this.typeSoins.add(typeSoin);
+        return this;
+    }
+
+    public DemandePriseEnCharge removeTypeSoin(TypeSoin typeSoin) {
+        this.typeSoins.remove(typeSoin);
         return this;
     }
 

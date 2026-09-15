@@ -102,16 +102,16 @@
       <h3 class="jhi-form-section">Soin</h3>
       <div class="jhi-form-grid">
         <div class="jhi-field">
-          <label class="form-label" for="field_typeSoin" jhiTranslate="peccnssApp.demandePriseEnCharge.typeSoin">Type Soin</label>
+          <label class="form-label" for="field_typeSoin" jhiTranslate="peccnssApp.demandePriseEnCharge.typeSoins">Types Soin</label>
           <select
             class="form-control"
             id="field_typeSoin"
             data-cy="typeSoin"
             name="typeSoin"
-            formControlName="typeSoin"
+            multiple
+            formControlName="typeSoins"
             [compareWith]="compareTypeSoin"
           >
-            <option [ngValue]="null"></option>
             @for (typeSoinOption of typeSoinsSharedCollection(); track $index) {
               <option [ngValue]="typeSoinOption">{{ typeSoinOption.libelle }}</option>
             }

@@ -6,7 +6,9 @@ import com.mycompany.myapp.domain.enumeration.TypeBeneficiaire;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * A DTO for the {@link com.mycompany.myapp.domain.DemandePriseEnCharge} entity.
@@ -47,7 +49,7 @@ public class DemandePriseEnChargeDTO implements Serializable {
 
     private AyantDroitDTO ayantDroit;
 
-    private TypeSoinDTO typeSoin;
+    private Set<TypeSoinDTO> typeSoins = new HashSet<>();
 
     private EtablissementSanteDTO etablissementSante;
 
@@ -168,12 +170,12 @@ public class DemandePriseEnChargeDTO implements Serializable {
         this.ayantDroit = ayantDroit;
     }
 
-    public TypeSoinDTO getTypeSoin() {
-        return typeSoin;
+    public Set<TypeSoinDTO> getTypeSoins() {
+        return typeSoins;
     }
 
-    public void setTypeSoin(TypeSoinDTO typeSoin) {
-        this.typeSoin = typeSoin;
+    public void setTypeSoins(Set<TypeSoinDTO> typeSoins) {
+        this.typeSoins = typeSoins;
     }
 
     public EtablissementSanteDTO getEtablissementSante() {
@@ -239,7 +241,7 @@ public class DemandePriseEnChargeDTO implements Serializable {
             ", observation='" + getObservation() + "'" +
             ", agent=" + getAgent() +
             ", ayantDroit=" + getAyantDroit() +
-            ", typeSoin=" + getTypeSoin() +
+            ", typeSoins=" + getTypeSoins() +
             ", etablissementSante=" + getEtablissementSante() +
             ", gestionnaireCreateur=" + getGestionnaireCreateur() +
             ", assigneA=" + getAssigneA() +
