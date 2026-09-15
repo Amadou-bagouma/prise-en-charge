@@ -291,31 +291,15 @@
           <label class="form-label" for="field_gestionnaireCreateur" jhiTranslate="peccnssApp.demandePriseEnCharge.gestionnaireCreateur"
             >Gestionnaire Createur</label
           >
-          <select
+          <input
+            type="text"
             class="form-control"
+            name="gestionnaireCreateur"
             id="field_gestionnaireCreateur"
             data-cy="gestionnaireCreateur"
-            name="gestionnaireCreateur"
-            formControlName="gestionnaireCreateur"
-            [compareWith]="compareUser"
-          >
-            @if (!editForm.get('gestionnaireCreateur')!.value) {
-              <option [ngValue]="null" selected></option>
-            }
-            @for (userOption of usersSharedCollection(); track $index) {
-              <option [ngValue]="userOption">{{ userOption.login }}</option>
-            }
-          </select>
-          @if (
-            editForm.get(['gestionnaireCreateur'])!.invalid &&
-            (editForm.get(['gestionnaireCreateur'])!.dirty || editForm.get(['gestionnaireCreateur'])!.touched)
-          ) {
-            <div>
-              @if (editForm.get(['gestionnaireCreateur'])?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-            </div>
-          }
+            [value]="editForm.get('gestionnaireCreateur')!.value?.login ?? ''"
+            disabled
+          />
         </div>
 
         <div class="jhi-field">

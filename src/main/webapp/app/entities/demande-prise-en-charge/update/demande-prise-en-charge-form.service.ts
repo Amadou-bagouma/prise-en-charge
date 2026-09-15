@@ -103,9 +103,12 @@ export class DemandePriseEnChargeFormService {
         validators: [Validators.required],
       }),
       etablissementSante: new FormControl(demandePriseEnChargeRawValue.etablissementSante),
-      gestionnaireCreateur: new FormControl(demandePriseEnChargeRawValue.gestionnaireCreateur, {
-        validators: [Validators.required],
-      }),
+      gestionnaireCreateur: new FormControl(
+        { value: demandePriseEnChargeRawValue.gestionnaireCreateur, disabled: true },
+        {
+          validators: [Validators.required],
+        },
+      ),
       assigneA: new FormControl(demandePriseEnChargeRawValue.assigneA),
     });
   }
@@ -123,6 +126,7 @@ export class DemandePriseEnChargeFormService {
       ...demandePriseEnChargeRawValue,
       id: { value: demandePriseEnChargeRawValue.id, disabled: true },
       reference: { value: demandePriseEnChargeRawValue.reference, disabled: true },
+      gestionnaireCreateur: { value: demandePriseEnChargeRawValue.gestionnaireCreateur, disabled: true },
     });
   }
 

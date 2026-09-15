@@ -11,6 +11,7 @@ import { IAgent } from 'app/entities/agent/agent.model';
 import { AgentService } from 'app/entities/agent/service/agent.service';
 import { IAyantDroit } from 'app/entities/ayant-droit/ayant-droit.model';
 import { AyantDroitService } from 'app/entities/ayant-droit/service/ayant-droit.service';
+import { AccountService } from 'app/core/auth';
 import { PrioriteDemande } from 'app/entities/enumerations/priorite-demande.model';
 import { StatutDemande } from 'app/entities/enumerations/statut-demande.model';
 import { TypeBeneficiaire } from 'app/entities/enumerations/type-beneficiaire.model';
@@ -52,6 +53,7 @@ export class DemandePriseEnChargeUpdate implements OnInit {
   protected typeSoinService = inject(TypeSoinService);
   protected etablissementSanteService = inject(EtablissementSanteService);
   protected userService = inject(UserService);
+  protected accountService = inject(AccountService);
   protected activatedRoute = inject(ActivatedRoute);
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
@@ -120,7 +122,9 @@ export class DemandePriseEnChargeUpdate implements OnInit {
       this.agentService.addAgentToCollectionIfMissing<IAgent>(agents, demandePriseEnCharge.agent),
     );
     this.ayantDroitsSharedCollection.update(ayantDroits =>
-      this.ayantDroitService.addAyantDroitToCollectionIfMissing<IAyantDroit>(ayantDroits, demandePriseEnCharge.ayantDroit),
+      this.sortAyantDroitsDescending(
+        this.ayantDroitService.addAyantDroitToCollectionIfMissing<IAyantDroit>(ayantDroits, demandePriseEnCharge.ayantDroit),
+      ),
     );
     this.typeSoinsSharedCollection.update(typeSoins =>
       this.typeSoinService.addTypeSoinToCollectionIfMissing<ITypeSoin>(typeSoins, ...(demandePriseEnCharge.typeSoins ?? [])),
@@ -148,7 +152,9 @@ export class DemandePriseEnChargeUpdate implements OnInit {
       .pipe(map((res: HttpResponse<IAyantDroit[]>) => res.body ?? []))
       .pipe(
         map((ayantDroits: IAyantDroit[]) =>
-          this.ayantDroitService.addAyantDroitToCollectionIfMissing<IAyantDroit>(ayantDroits, this.demandePriseEnCharge?.ayantDroit),
+          this.sortAyantDroitsDescending(
+            this.ayantDroitService.addAyantDroitToCollectionIfMissing<IAyantDroit>(ayantDroits, this.demandePriseEnCharge?.ayantDroit),
+          ),
         ),
       )
       .subscribe((ayantDroits: IAyantDroit[]) => this.ayantDroitsSharedCollection.set(ayantDroits));
@@ -188,6 +194,24 @@ export class DemandePriseEnChargeUpdate implements OnInit {
           ),
         ),
       )
-      .subscribe((users: IUser[]) => this.usersSharedCollection.set(users));
+      .subscribe((users: IUser[]) => {
+        this.usersSharedCollection.set(users);
+        this.setGestionnaireCreateurFromCurrentUser(users);
+      });
+  }
+
+  protected setGestionnaireCreateurFromCurrentUser(users: IUser[]): void {
+    if (this.demandePriseEnCharge) {
+      return;
+    }
+    const currentLogin = this.accountService.account()?.login;
+    const currentUser = users.find(user => user.login === currentLogin);
+    if (currentUser) {
+      this.editForm.patchValue({ gestionnaireCreateur: currentUser });
+    }
+  }
+
+  protected sortAyantDroitsDescending(ayantDroits: IAyantDroit[]): IAyantDroit[] {
+    return [...ayantDroits].sort((a, b) => `${b.nom ?? ''} ${b.prenom ?? ''}`.localeCompare(`${a.nom ?? ''} ${a.prenom ?? ''}`));
   }
 }
