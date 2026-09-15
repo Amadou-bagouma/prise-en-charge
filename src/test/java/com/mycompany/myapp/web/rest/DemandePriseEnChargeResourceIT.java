@@ -144,6 +144,11 @@ class DemandePriseEnChargeResourceIT {
         em.persist(user);
         em.flush();
         demandePriseEnCharge.setGestionnaireCreateur(user);
+        // Add required entity
+        TypeSoin typeSoin = TypeSoinResourceIT.createEntity();
+        em.persist(typeSoin);
+        em.flush();
+        demandePriseEnCharge.addTypeSoin(typeSoin);
         return demandePriseEnCharge;
     }
 
@@ -171,6 +176,11 @@ class DemandePriseEnChargeResourceIT {
         em.persist(user);
         em.flush();
         updatedDemandePriseEnCharge.setGestionnaireCreateur(user);
+        // Add required entity
+        TypeSoin typeSoin = TypeSoinResourceIT.createEntity();
+        em.persist(typeSoin);
+        em.flush();
+        updatedDemandePriseEnCharge.addTypeSoin(typeSoin);
         return updatedDemandePriseEnCharge;
     }
 

@@ -101,7 +101,9 @@ export class DemandePriseEnChargeFormService {
       observation: new FormControl(demandePriseEnChargeRawValue.observation),
       agent: new FormControl(demandePriseEnChargeRawValue.agent),
       ayantDroit: new FormControl(demandePriseEnChargeRawValue.ayantDroit),
-      typeSoins: new FormControl(demandePriseEnChargeRawValue.typeSoins ?? []),
+      typeSoins: new FormControl(demandePriseEnChargeRawValue.typeSoins ?? [], {
+        validators: [Validators.required],
+      }),
       etablissementSante: new FormControl(demandePriseEnChargeRawValue.etablissementSante),
       gestionnaireCreateur: new FormControl(demandePriseEnChargeRawValue.gestionnaireCreateur, {
         validators: [Validators.required],

@@ -101,6 +101,7 @@
 
       <h3 class="jhi-form-section">Soin</h3>
       <div class="jhi-form-grid">
+        @let typeSoinsRef = editForm.get('typeSoins')!;
         <div class="jhi-field">
           <label class="form-label" for="field_typeSoin" jhiTranslate="peccnssApp.demandePriseEnCharge.typeSoins">Types Soin</label>
           <select
@@ -116,6 +117,13 @@
               <option [ngValue]="typeSoinOption">{{ typeSoinOption.libelle }}</option>
             }
           </select>
+          @if (typeSoinsRef.invalid && (typeSoinsRef.dirty || typeSoinsRef.touched)) {
+            <div>
+              @if (typeSoinsRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
         </div>
 
         <div class="jhi-field">

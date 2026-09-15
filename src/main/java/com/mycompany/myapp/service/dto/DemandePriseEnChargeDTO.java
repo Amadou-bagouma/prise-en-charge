@@ -49,6 +49,7 @@ public class DemandePriseEnChargeDTO implements Serializable {
 
     private AyantDroitDTO ayantDroit;
 
+    @NotEmpty
     private Set<TypeSoinDTO> typeSoins = new HashSet<>();
 
     private EtablissementSanteDTO etablissementSante;
