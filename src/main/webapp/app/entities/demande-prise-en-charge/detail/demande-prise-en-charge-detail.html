@@ -182,9 +182,11 @@
           <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
         </button>
 
-        <button type="button" [routerLink]="['/demande-prise-en-charge', demandePriseEnChargeRef.id, 'edit']" class="btn btn-accent">
-          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
-        </button>
+        @if (canSaisir()) {
+          <button type="button" [routerLink]="['/demande-prise-en-charge', demandePriseEnChargeRef.id, 'edit']" class="btn btn-accent">
+            <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+          </button>
+        }
       </div>
     }
   </div>

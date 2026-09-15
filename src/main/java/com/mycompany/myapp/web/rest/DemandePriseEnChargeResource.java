@@ -74,6 +74,7 @@ public class DemandePriseEnChargeResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
+    @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.USER + "', '" + AuthoritiesConstants.VALIDATEUR_DRH + "')")
     public ResponseEntity<DemandePriseEnChargeDTO> createDemandePriseEnCharge(
         @Valid @RequestBody DemandePriseEnChargeDTO demandePriseEnChargeDTO
     ) throws URISyntaxException {
@@ -98,6 +99,7 @@ public class DemandePriseEnChargeResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.USER + "', '" + AuthoritiesConstants.VALIDATEUR_DRH + "')")
     public ResponseEntity<DemandePriseEnChargeDTO> updateDemandePriseEnCharge(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody DemandePriseEnChargeDTO demandePriseEnChargeDTO
@@ -132,6 +134,7 @@ public class DemandePriseEnChargeResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.USER + "', '" + AuthoritiesConstants.VALIDATEUR_DRH + "')")
     public ResponseEntity<DemandePriseEnChargeDTO> partialUpdateDemandePriseEnCharge(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody DemandePriseEnChargeDTO demandePriseEnChargeDTO
@@ -207,6 +210,7 @@ public class DemandePriseEnChargeResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<Void> deleteDemandePriseEnCharge(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete DemandePriseEnCharge : {}", id);
         demandePriseEnChargeService.delete(id);
@@ -266,6 +270,7 @@ public class DemandePriseEnChargeResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated demandePriseEnChargeDTO.
      */
     @PostMapping("/{id}/resoumettre")
+    @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.USER + "', '" + AuthoritiesConstants.VALIDATEUR_DRH + "')")
     public ResponseEntity<DemandePriseEnChargeDTO> resoumettreDemandePriseEnCharge(@PathVariable("id") Long id) {
         LOG.debug("REST request to resoumettre DemandePriseEnCharge : {}", id);
         DemandePriseEnChargeDTO result = demandePriseEnChargeService.resoumettre(id);
@@ -282,6 +287,7 @@ public class DemandePriseEnChargeResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the PDF file.
      */
     @GetMapping("/{id}/rapport")
+    @PreAuthorize("hasAuthority('" + AuthoritiesConstants.USER + "')")
     public ResponseEntity<byte[]> getRapportDemandePriseEnCharge(@PathVariable("id") Long id) {
         LOG.debug("REST request to get the PDF rapport for DemandePriseEnCharge : {}", id);
         byte[] rapport = rapportDemandeService.genererRapport(id);

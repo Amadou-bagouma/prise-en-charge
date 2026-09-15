@@ -38,6 +38,7 @@ export class DemandePriseEnChargeDetail {
       this.current()?.statut === 'EN_ATTENTE_VALIDATION_INFIRMERIE' && this.accountService.hasAnyAuthority(Authority.VALIDATEUR_INFIRMERIE),
   );
   readonly canValiderOuRejeter = computed(() => this.canValiderDrh() || this.canValiderInfirmerie());
+  readonly canSaisir = computed(() => this.accountService.hasAnyAuthority([Authority.USER, Authority.VALIDATEUR_DRH]));
   readonly canResoumettre = computed(() => {
     const demande = this.current();
     const account = this.accountService.account();

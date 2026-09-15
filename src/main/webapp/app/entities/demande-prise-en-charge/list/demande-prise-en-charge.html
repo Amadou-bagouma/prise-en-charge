@@ -27,6 +27,7 @@
       </button>
 
       <button
+        *jhiHasAnyAuthority="[Authority.USER, Authority.VALIDATEUR_DRH]"
         id="jh-create-entity"
         data-cy="entityCreateButton"
         class="btn btn-accent jh-create-entity create-demande-prise-en-charge ms-auto"
@@ -187,6 +188,7 @@
                       <span jhiTranslate="entity.action.view">View</span>
                     </a>
                     <a
+                      *jhiHasAnyAuthority="[Authority.USER, Authority.VALIDATEUR_DRH]"
                       ngbDropdownItem
                       [routerLink]="['/demande-prise-en-charge', demandePriseEnCharge.id, 'edit']"
                       data-cy="entityEditButton"
@@ -196,6 +198,7 @@
                     </a>
                     @if (demandePriseEnCharge.statut === 'VALIDEE') {
                       <button
+                        *jhiHasAnyAuthority="Authority.USER"
                         ngbDropdownItem
                         type="button"
                         (click)="telechargerRapport(demandePriseEnCharge)"
@@ -206,7 +209,13 @@
                         <span>Télécharger le rapport</span>
                       </button>
                     }
-                    <button ngbDropdownItem type="button" (click)="delete(demandePriseEnCharge)" data-cy="entityDeleteButton">
+                    <button
+                      *jhiHasAnyAuthority="Authority.ADMIN"
+                      ngbDropdownItem
+                      type="button"
+                      (click)="delete(demandePriseEnCharge)"
+                      data-cy="entityDeleteButton"
+                    >
                       <fa-icon icon="times" class="me-1" />
                       <span jhiTranslate="entity.action.delete">Delete</span>
                     </button>

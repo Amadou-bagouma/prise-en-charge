@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 
 import { DESC } from 'app/config';
 import { userRouteAccessService } from 'app/core/auth';
+import { Authority } from 'app/shared/jhipster/constants';
 
 import DemandePriseEnChargeResolve from './route/demande-prise-en-charge-routing-resolve.service';
 
@@ -28,6 +29,9 @@ const demandePriseEnChargeRoute: Routes = [
     resolve: {
       demandePriseEnCharge: DemandePriseEnChargeResolve,
     },
+    data: {
+      authorities: [Authority.USER, Authority.VALIDATEUR_DRH],
+    },
     canActivate: [userRouteAccessService],
   },
   {
@@ -35,6 +39,9 @@ const demandePriseEnChargeRoute: Routes = [
     loadComponent: () => import('./update/demande-prise-en-charge-update').then(m => m.DemandePriseEnChargeUpdate),
     resolve: {
       demandePriseEnCharge: DemandePriseEnChargeResolve,
+    },
+    data: {
+      authorities: [Authority.USER, Authority.VALIDATEUR_DRH],
     },
     canActivate: [userRouteAccessService],
   },
