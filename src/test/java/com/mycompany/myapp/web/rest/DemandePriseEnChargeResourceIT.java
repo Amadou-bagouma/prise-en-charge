@@ -246,23 +246,6 @@ class DemandePriseEnChargeResourceIT {
 
     @Test
     @Transactional
-    void checkReferenceIsRequired() throws Exception {
-        long databaseSizeBeforeTest = getRepositoryCount();
-        // set the field null
-        demandePriseEnCharge.setReference(null);
-
-        // Create the DemandePriseEnCharge, which fails.
-        DemandePriseEnChargeDTO demandePriseEnChargeDTO = demandePriseEnChargeMapper.toDto(demandePriseEnCharge);
-
-        restDemandePriseEnChargeMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(demandePriseEnChargeDTO)))
-            .andExpect(status().isBadRequest());
-
-        assertSameRepositoryCount(databaseSizeBeforeTest);
-    }
-
-    @Test
-    @Transactional
     void checkDateCreationIsRequired() throws Exception {
         long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
@@ -1082,13 +1065,13 @@ class DemandePriseEnChargeResourceIT {
         // Disconnect from session so that the updates on updatedDemandePriseEnCharge are not directly saved in db
         em.detach(updatedDemandePriseEnCharge);
         updatedDemandePriseEnCharge
-            .reference(UPDATED_REFERENCE)
+            // reference and statut are intentionally left as their already-fetched (persisted) values:
+            // the generic update endpoint never changes either (reference is generated once at
+            // creation; the workflow status only ever changes through valider/rejeter/resoumettre).
             .dateCreation(UPDATED_DATE_CREATION)
             .dateModification(UPDATED_DATE_MODIFICATION)
             .typeBeneficiaire(UPDATED_TYPE_BENEFICIAIRE)
             .description(UPDATED_DESCRIPTION)
-            // statut is intentionally left as its already-fetched (persisted) value: the generic update
-            // endpoint never changes the workflow status, only valider/rejeter/resoumettre do.
             .priorite(UPDATED_PRIORITE)
             .dateAssignation(UPDATED_DATE_ASSIGNATION)
             .dateEcheance(UPDATED_DATE_ECHEANCE)
@@ -1184,7 +1167,8 @@ class DemandePriseEnChargeResourceIT {
         partialUpdatedDemandePriseEnCharge.setId(demandePriseEnCharge.getId());
 
         partialUpdatedDemandePriseEnCharge
-            .reference(UPDATED_REFERENCE)
+            // reference is intentionally left as its already-persisted value: it's generated once at
+            // creation and never editable afterwards, even through the merge-patch endpoint.
             .typeBeneficiaire(UPDATED_TYPE_BENEFICIAIRE)
             .description(UPDATED_DESCRIPTION)
             .dateAssignation(UPDATED_DATE_ASSIGNATION)
@@ -1220,7 +1204,9 @@ class DemandePriseEnChargeResourceIT {
         partialUpdatedDemandePriseEnCharge.setId(demandePriseEnCharge.getId());
 
         partialUpdatedDemandePriseEnCharge
-            .reference(UPDATED_REFERENCE)
+            // reference is intentionally left as DEFAULT_REFERENCE (its persisted value): it's generated
+            // once at creation and never editable afterwards, even through the merge-patch endpoint.
+            .reference(DEFAULT_REFERENCE)
             .dateCreation(UPDATED_DATE_CREATION)
             .dateModification(UPDATED_DATE_MODIFICATION)
             .typeBeneficiaire(UPDATED_TYPE_BENEFICIAIRE)

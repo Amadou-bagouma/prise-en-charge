@@ -29,6 +29,9 @@ public interface DemandePriseEnChargeRepository
 
     List<DemandePriseEnCharge> findByStatut(StatutDemande statut);
 
+    @Query(value = "select nextval('demande_prise_en_charge_reference_seq')", nativeQuery = true)
+    long nextReferenceSequenceValue();
+
     default Optional<DemandePriseEnCharge> findOneWithEagerRelationships(Long id) {
         return this.findOneWithToOneRelationships(id);
     }

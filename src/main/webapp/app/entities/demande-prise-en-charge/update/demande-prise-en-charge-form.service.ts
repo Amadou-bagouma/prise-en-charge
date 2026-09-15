@@ -78,9 +78,7 @@ export class DemandePriseEnChargeFormService {
           validators: [Validators.required],
         },
       ),
-      reference: new FormControl(demandePriseEnChargeRawValue.reference, {
-        validators: [Validators.required],
-      }),
+      reference: new FormControl({ value: demandePriseEnChargeRawValue.reference, disabled: true }),
       dateCreation: new FormControl(demandePriseEnChargeRawValue.dateCreation, {
         validators: [Validators.required],
       }),
@@ -124,6 +122,7 @@ export class DemandePriseEnChargeFormService {
     form.reset({
       ...demandePriseEnChargeRawValue,
       id: { value: demandePriseEnChargeRawValue.id, disabled: true },
+      reference: { value: demandePriseEnChargeRawValue.reference, disabled: true },
     });
   }
 

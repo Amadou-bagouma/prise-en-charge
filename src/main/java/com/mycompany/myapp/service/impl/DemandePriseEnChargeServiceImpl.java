@@ -21,6 +21,9 @@ import com.mycompany.myapp.service.dto.DemandePriseEnChargeDTO;
 import com.mycompany.myapp.service.mapper.DemandePriseEnChargeMapper;
 import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -58,6 +61,8 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
 
     private static final List<StatutTache> STATUTS_TACHE_CLOTURES = List.of(StatutTache.TERMINEE, StatutTache.ANNULEE);
 
+    private static final DateTimeFormatter REFERENCE_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyMMdd");
+
     public DemandePriseEnChargeServiceImpl(
         DemandePriseEnChargeRepository demandePriseEnChargeRepository,
         DemandePriseEnChargeMapper demandePriseEnChargeMapper,
@@ -82,6 +87,7 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         Instant now = Instant.now();
         // The workflow always starts with the current user as author and the 1st validation step (DRH),
         // regardless of what the client sent.
+        demandePriseEnCharge.setReference(genererReference());
         demandePriseEnCharge.setGestionnaireCreateur(currentUser);
         demandePriseEnCharge.setDateCreation(now);
         demandePriseEnCharge.setDateModification(now);
@@ -96,10 +102,12 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
     public DemandePriseEnChargeDTO update(DemandePriseEnChargeDTO demandePriseEnChargeDTO) {
         LOG.debug("Request to update DemandePriseEnCharge : {}", demandePriseEnChargeDTO);
         DemandePriseEnCharge demandePriseEnCharge = demandePriseEnChargeMapper.toEntity(demandePriseEnChargeDTO);
+        DemandePriseEnCharge existante = getDemandeOrThrow(demandePriseEnCharge.getId());
         // The workflow status is only ever changed through valider/rejeter/resoumettre, never through the
         // generic update endpoint, so callers cannot bypass the DRH / infirmerie validation steps.
-        StatutDemande statutPersiste = getDemandeOrThrow(demandePriseEnCharge.getId()).getStatut();
-        demandePriseEnCharge.setStatut(statutPersiste);
+        demandePriseEnCharge.setStatut(existante.getStatut());
+        // The reference is generated once at creation and never editable afterwards.
+        demandePriseEnCharge.setReference(existante.getReference());
         demandePriseEnCharge = demandePriseEnChargeRepository.save(demandePriseEnCharge);
         return demandePriseEnChargeMapper.toDto(demandePriseEnCharge);
     }
@@ -112,9 +120,12 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
             .findById(demandePriseEnChargeDTO.getId())
             .map(existingDemandePriseEnCharge -> {
                 StatutDemande statutPersiste = existingDemandePriseEnCharge.getStatut();
+                String referencePersistee = existingDemandePriseEnCharge.getReference();
                 demandePriseEnChargeMapper.partialUpdate(existingDemandePriseEnCharge, demandePriseEnChargeDTO);
-                // Same rule as update(): the workflow status cannot be changed through this endpoint.
+                // Same rule as update(): the workflow status cannot be changed through this endpoint,
+                // and the reference is generated once at creation and never editable afterwards.
                 existingDemandePriseEnCharge.setStatut(statutPersiste);
+                existingDemandePriseEnCharge.setReference(referencePersistee);
 
                 return existingDemandePriseEnCharge;
             })
@@ -241,6 +252,17 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         logHistorique(demande, currentUser, "RESOUMISSION", "Demande corrigee et resoumise pour validation DRH");
         creerTachesValidation(demande, AuthoritiesConstants.VALIDATEUR_DRH, "Validation DRH");
         return demandePriseEnChargeMapper.toDto(demande);
+    }
+
+    /**
+     * Builds a new, unique reference: today's date (yyMMdd) followed by a 7-digit sequence
+     * that never resets (a dedicated DB sequence, so it's gap-free and safe under concurrent
+     * creations), e.g. {@code 2609150000001} for the first demande ever created on 2026-09-15.
+     */
+    private String genererReference() {
+        String prefixeDate = REFERENCE_DATE_FORMATTER.format(LocalDate.now(ZoneId.systemDefault()));
+        long sequence = demandePriseEnChargeRepository.nextReferenceSequenceValue();
+        return prefixeDate + String.format("%07d", sequence);
     }
 
     private DemandePriseEnCharge getDemandeOrThrow(Long id) {

@@ -20,18 +20,20 @@
 
       <h3 class="jhi-form-section">Identification</h3>
       <div class="jhi-form-grid">
-        @let referenceRef = editForm.get('reference')!;
-        <div class="jhi-field">
-          <label class="form-label" for="field_reference" jhiTranslate="peccnssApp.demandePriseEnCharge.reference">Reference</label>
-          <input type="text" class="form-control" name="reference" id="field_reference" data-cy="reference" formControlName="reference" />
-          @if (referenceRef.invalid && (referenceRef.dirty || referenceRef.touched)) {
-            <div>
-              @if (referenceRef.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-            </div>
-          }
-        </div>
+        @if (editForm.controls.reference.value) {
+          <div class="jhi-field">
+            <label class="form-label" for="field_reference" jhiTranslate="peccnssApp.demandePriseEnCharge.reference">Reference</label>
+            <input
+              type="text"
+              class="form-control"
+              name="reference"
+              id="field_reference"
+              data-cy="reference"
+              formControlName="reference"
+              [readonly]="true"
+            />
+          </div>
+        }
 
         @let typeBeneficiaireRef = editForm.get('typeBeneficiaire')!;
         <div class="jhi-field">

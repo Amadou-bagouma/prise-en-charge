@@ -18,7 +18,7 @@ public class DemandePriseEnChargeDTO implements Serializable {
 
     private Long id;
 
-    @NotNull
+    // Generated server-side (see DemandePriseEnChargeServiceImpl); never required from the client.
     private String reference;
 
     @NotNull
