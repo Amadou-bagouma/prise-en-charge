@@ -4,6 +4,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import dayjs from 'dayjs/esm';
 
 import { DATE_TIME_FORMAT } from 'app/config';
+import { StatutDemande } from 'app/entities/enumerations/statut-demande.model';
 import { IDemandePriseEnCharge, NewDemandePriseEnCharge } from '../demande-prise-en-charge.model';
 
 /**
@@ -36,7 +37,7 @@ type NewDemandePriseEnChargeFormRawValue = FormValueOf<NewDemandePriseEnCharge>;
 
 type DemandePriseEnChargeFormDefaults = Pick<
   NewDemandePriseEnCharge,
-  'id' | 'dateCreation' | 'dateModification' | 'dateAssignation' | 'dateEcheance'
+  'id' | 'dateCreation' | 'dateModification' | 'dateAssignation' | 'dateEcheance' | 'statut'
 >;
 
 type DemandePriseEnChargeFormGroupContent = {
@@ -87,9 +88,12 @@ export class DemandePriseEnChargeFormService {
         validators: [Validators.required],
       }),
       description: new FormControl(demandePriseEnChargeRawValue.description),
-      statut: new FormControl(demandePriseEnChargeRawValue.statut, {
-        validators: [Validators.required],
-      }),
+      statut: new FormControl(
+        { value: demandePriseEnChargeRawValue.statut, disabled: true },
+        {
+          validators: [Validators.required],
+        },
+      ),
       priorite: new FormControl(demandePriseEnChargeRawValue.priorite, {
         validators: [Validators.required],
       }),
@@ -126,6 +130,7 @@ export class DemandePriseEnChargeFormService {
       ...demandePriseEnChargeRawValue,
       id: { value: demandePriseEnChargeRawValue.id, disabled: true },
       reference: { value: demandePriseEnChargeRawValue.reference, disabled: true },
+      statut: { value: demandePriseEnChargeRawValue.statut, disabled: true },
       gestionnaireCreateur: { value: demandePriseEnChargeRawValue.gestionnaireCreateur, disabled: true },
     });
   }
@@ -139,6 +144,7 @@ export class DemandePriseEnChargeFormService {
       dateModification: currentTime,
       dateAssignation: currentTime,
       dateEcheance: currentTime,
+      statut: StatutDemande.NOUVELLE,
     };
   }
 

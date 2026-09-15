@@ -13,7 +13,6 @@ import { IAyantDroit } from 'app/entities/ayant-droit/ayant-droit.model';
 import { AyantDroitService } from 'app/entities/ayant-droit/service/ayant-droit.service';
 import { AccountService } from 'app/core/auth';
 import { PrioriteDemande } from 'app/entities/enumerations/priorite-demande.model';
-import { StatutDemande } from 'app/entities/enumerations/statut-demande.model';
 import { TypeBeneficiaire } from 'app/entities/enumerations/type-beneficiaire.model';
 import { IEtablissementSante } from 'app/entities/etablissement-sante/etablissement-sante.model';
 import { TypeSoinService } from 'app/entities/type-soin/service/type-soin.service';
@@ -37,7 +36,6 @@ export class DemandePriseEnChargeUpdate implements OnInit {
   readonly isSaving = signal(false);
   demandePriseEnCharge: IDemandePriseEnCharge | null = null;
   typeBeneficiaireValues = Object.keys(TypeBeneficiaire);
-  statutDemandeValues = Object.keys(StatutDemande);
   prioriteDemandeValues = Object.keys(PrioriteDemande);
 
   agentsSharedCollection = signal<IAgent[]>([]);

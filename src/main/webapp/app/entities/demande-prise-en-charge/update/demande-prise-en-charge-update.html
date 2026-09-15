@@ -150,22 +150,21 @@
 
       <h3 class="jhi-form-section">Suivi</h3>
       <div class="jhi-form-grid">
-        @let statutRef = editForm.get('statut')!;
         <div class="jhi-field">
           <label class="form-label" for="field_statut" jhiTranslate="peccnssApp.demandePriseEnCharge.statut">Statut</label>
-          <select class="form-control" name="statut" formControlName="statut" id="field_statut" data-cy="statut">
-            <option [ngValue]="null">{{ 'peccnssApp.StatutDemande.null' | translate }}</option>
-            @for (statutDemande of statutDemandeValues; track $index) {
-              <option [value]="statutDemande">{{ 'peccnssApp.StatutDemande.' + statutDemande | translate }}</option>
-            }
-          </select>
-          @if (statutRef.invalid && (statutRef.dirty || statutRef.touched)) {
-            <div>
-              @if (statutRef.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-            </div>
-          }
+          <input
+            type="text"
+            class="form-control"
+            name="statut"
+            id="field_statut"
+            data-cy="statut"
+            [value]="
+              editForm.get('statut')!.value
+                ? ('peccnssApp.StatutDemande.' + editForm.get('statut')!.value | translate)
+                : ('peccnssApp.StatutDemande.null' | translate)
+            "
+            disabled
+          />
         </div>
 
         @let prioriteRef = editForm.get('priorite')!;
