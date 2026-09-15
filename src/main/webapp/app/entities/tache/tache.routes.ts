@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 
 import { DESC } from 'app/config';
 import { userRouteAccessService } from 'app/core/auth';
+import { Authority } from 'app/shared/jhipster/constants';
 
 import TacheResolve from './route/tache-routing-resolve.service';
 
@@ -27,6 +28,9 @@ const tacheRoute: Routes = [
     loadComponent: () => import('./update/tache-update').then(m => m.TacheUpdate),
     resolve: {
       tache: TacheResolve,
+    },
+    data: {
+      authorities: [Authority.ADMIN],
     },
     canActivate: [userRouteAccessService],
   },
