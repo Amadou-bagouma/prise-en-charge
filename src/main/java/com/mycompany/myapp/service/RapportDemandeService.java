@@ -83,6 +83,7 @@ public class RapportDemandeService {
             Font titleFont = new Font(Font.HELVETICA, 14, Font.BOLD | Font.UNDERLINE);
             Font headerFont = new Font(Font.HELVETICA, 10, Font.BOLD);
             Font bodyFont = new Font(Font.HELVETICA, 11, Font.NORMAL);
+            Font bodyBoldFont = new Font(Font.HELVETICA, 11, Font.BOLD);
             Font noteFont = new Font(Font.HELVETICA, 9, Font.ITALIC);
             Font underlineFont = new Font(Font.HELVETICA, 10, Font.BOLD | Font.UNDERLINE);
             Font footerFont = new Font(Font.HELVETICA, 7, Font.NORMAL, Color.DARK_GRAY);
@@ -99,7 +100,7 @@ public class RapportDemandeService {
             body.setFont(bodyFont);
             body.setAlignment(Element.ALIGN_JUSTIFIED);
             body.setLeading(18);
-            body.add(corpsAttestation(demande));
+            corpsAttestation(body, demande, bodyFont, bodyBoldFont);
             document.add(body);
 
             document.add(Chunk.NEWLINE);
@@ -166,34 +167,38 @@ public class RapportDemandeService {
         }
     }
 
-    private String corpsAttestation(DemandePriseEnCharge demande) {
+    private void corpsAttestation(Paragraph body, DemandePriseEnCharge demande, Font normal, Font bold) {
         Agent agent = demande.getAgent() != null ? demande.getAgent() : demande.getAyantDroit().getAgent();
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("Je Soussigne le Directeur des Ressources Humaines de la Caisse Nationale de Securite Sociale atteste que ")
-            .append(agent.getNom())
-            .append(' ')
-            .append(agent.getPrenom())
-            .append(" Mle ")
-            .append(agent.getMatricule())
-            .append(" est en service a la Caisse Nationale de Securite Sociale");
+        body.add(
+            new Chunk("Je Soussigne le Directeur des Ressources Humaines de la Caisse Nationale de Securite Sociale atteste que ", normal)
+        );
+        body.add(new Chunk(agent.getNom() + " " + agent.getPrenom(), bold));
+        body.add(new Chunk(" Mle ", normal));
+        body.add(new Chunk(agent.getMatricule(), bold));
+        body.add(new Chunk(" est en service a la Caisse Nationale de Securite Sociale", normal));
         if (agent.getFonction() != null && !agent.getFonction().isBlank()) {
-            sb.append(" en qualite de ").append(agent.getFonction());
+            body.add(new Chunk(" en qualite de ", normal));
+            body.add(new Chunk(agent.getFonction(), bold));
         }
-        sb.append(
-            ". Les soins medicaux occasionnes par lui ou sa famille sont pris en charge par la Caisse Nationale de Securite Sociale.\n\n"
+        body.add(
+            new Chunk(
+                ". Les soins medicaux occasionnes par lui ou sa famille sont pris en charge par la Caisse Nationale de Securite Sociale.\n\n",
+                normal
+            )
         );
 
-        sb.append("Cette prise en charge couvre les prestations medicales fournies par");
+        body.add(new Chunk("Cette prise en charge couvre les prestations medicales fournies par", normal));
         if (demande.getEtablissementSante() != null) {
-            sb.append(" (").append(demande.getEtablissementSante().getNom()).append(')');
+            body.add(new Chunk(" (", normal));
+            body.add(new Chunk(demande.getEtablissementSante().getNom(), bold));
+            body.add(new Chunk(")", normal));
         }
         if (demande.getAyantDroit() != null) {
-            sb.append(" au benefice de ").append(lienBeneficiaire(demande.getAyantDroit().getLien()));
-            sb.append(' ').append(demande.getAyantDroit().getNom()).append(' ').append(demande.getAyantDroit().getPrenom());
+            body.add(new Chunk(" au benefice de " + lienBeneficiaire(demande.getAyantDroit().getLien()) + " ", normal));
+            body.add(new Chunk(demande.getAyantDroit().getNom() + " " + demande.getAyantDroit().getPrenom(), bold));
         }
-        sb.append('.');
-        return sb.toString();
+        body.add(new Chunk(".", normal));
     }
 
     private String lienBeneficiaire(LienParente lien) {
