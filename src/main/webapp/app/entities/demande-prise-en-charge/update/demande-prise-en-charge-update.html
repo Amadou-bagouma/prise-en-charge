@@ -104,21 +104,25 @@
       <h3 class="jhi-form-section">Soin</h3>
       <div class="jhi-form-grid">
         @let typeSoinsRef = editForm.get('typeSoins')!;
-        <div class="jhi-field">
-          <label class="form-label" for="field_typeSoin" jhiTranslate="peccnssApp.demandePriseEnCharge.typeSoins">Types Soin</label>
-          <select
-            class="form-control"
-            id="field_typeSoin"
-            data-cy="typeSoin"
-            name="typeSoin"
-            multiple
-            formControlName="typeSoins"
-            [compareWith]="compareTypeSoin"
-          >
-            @for (typeSoinOption of typeSoinsSharedCollection(); track $index) {
-              <option [ngValue]="typeSoinOption">{{ typeSoinOption.libelle }}</option>
+        <div class="jhi-field jhi-field-full">
+          <label class="form-label" jhiTranslate="peccnssApp.demandePriseEnCharge.typeSoins">Types Soin</label>
+          <div class="d-flex flex-wrap gap-3">
+            @for (typeSoinOption of typeSoinValues; track typeSoinOption) {
+              <div class="form-check">
+                <input
+                  type="checkbox"
+                  class="form-check-input"
+                  [id]="'field_typeSoin_' + typeSoinOption"
+                  [attr.data-cy]="'typeSoin-' + typeSoinOption"
+                  [checked]="isTypeSoinChecked(typeSoinOption)"
+                  (change)="toggleTypeSoin(typeSoinOption, $any($event.target).checked)"
+                />
+                <label class="form-check-label" [for]="'field_typeSoin_' + typeSoinOption">{{
+                  'peccnssApp.TypeSoin.' + typeSoinOption | translate
+                }}</label>
+              </div>
             }
-          </select>
+          </div>
           @if (typeSoinsRef.invalid && (typeSoinsRef.dirty || typeSoinsRef.touched)) {
             <div>
               @if (typeSoinsRef.errors?.required) {

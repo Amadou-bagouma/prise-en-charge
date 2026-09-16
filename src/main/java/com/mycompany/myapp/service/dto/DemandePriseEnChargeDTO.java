@@ -3,6 +3,7 @@ package com.mycompany.myapp.service.dto;
 import com.mycompany.myapp.domain.enumeration.PrioriteDemande;
 import com.mycompany.myapp.domain.enumeration.StatutDemande;
 import com.mycompany.myapp.domain.enumeration.TypeBeneficiaire;
+import com.mycompany.myapp.domain.enumeration.TypeSoin;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.Instant;
@@ -50,7 +51,7 @@ public class DemandePriseEnChargeDTO implements Serializable {
     private AyantDroitDTO ayantDroit;
 
     @NotEmpty
-    private Set<TypeSoinDTO> typeSoins = new HashSet<>();
+    private Set<TypeSoin> typeSoins = new HashSet<>();
 
     private EtablissementSanteDTO etablissementSante;
 
@@ -171,11 +172,11 @@ public class DemandePriseEnChargeDTO implements Serializable {
         this.ayantDroit = ayantDroit;
     }
 
-    public Set<TypeSoinDTO> getTypeSoins() {
+    public Set<TypeSoin> getTypeSoins() {
         return typeSoins;
     }
 
-    public void setTypeSoins(Set<TypeSoinDTO> typeSoins) {
+    public void setTypeSoins(Set<TypeSoin> typeSoins) {
         this.typeSoins = typeSoins;
     }
 

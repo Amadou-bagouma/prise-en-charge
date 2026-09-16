@@ -168,17 +168,6 @@
                 <span jhiTranslate="global.menu.entities.ayantDroit">Ayant Droit</span>
               </a>
             </li>
-            <li
-              class="sidebar-nav-item"
-              *jhiHasAnyAuthority="'ROLE_ADMIN'"
-              routerLinkActive="active"
-              [routerLinkActiveOptions]="{ exact: true }"
-            >
-              <a class="sidebar-link" routerLink="/type-soin" (click)="collapseNavbar()">
-                <fa-icon icon="asterisk" [fixedWidth]="true" />
-                <span jhiTranslate="global.menu.entities.typeSoin">Type Soin</span>
-              </a>
-            </li>
             <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
               <a class="sidebar-link" routerLink="/etablissement-sante" (click)="collapseNavbar()">
                 <fa-icon icon="asterisk" [fixedWidth]="true" />

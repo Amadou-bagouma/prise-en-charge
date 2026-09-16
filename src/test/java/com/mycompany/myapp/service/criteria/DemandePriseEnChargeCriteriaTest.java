@@ -85,7 +85,6 @@ class DemandePriseEnChargeCriteriaTest {
         demandePriseEnChargeCriteria.observation();
         demandePriseEnChargeCriteria.agentId();
         demandePriseEnChargeCriteria.ayantDroitId();
-        demandePriseEnChargeCriteria.typeSoinId();
         demandePriseEnChargeCriteria.etablissementSanteId();
         demandePriseEnChargeCriteria.gestionnaireCreateurId();
         demandePriseEnChargeCriteria.assigneAId();
@@ -109,7 +108,6 @@ class DemandePriseEnChargeCriteriaTest {
                 condition.apply(criteria.getObservation()) &&
                 condition.apply(criteria.getAgentId()) &&
                 condition.apply(criteria.getAyantDroitId()) &&
-                condition.apply(criteria.getTypeSoinId()) &&
                 condition.apply(criteria.getEtablissementSanteId()) &&
                 condition.apply(criteria.getGestionnaireCreateurId()) &&
                 condition.apply(criteria.getAssigneAId()) &&
@@ -138,7 +136,6 @@ class DemandePriseEnChargeCriteriaTest {
                 condition.apply(criteria.getObservation(), copy.getObservation()) &&
                 condition.apply(criteria.getAgentId(), copy.getAgentId()) &&
                 condition.apply(criteria.getAyantDroitId(), copy.getAyantDroitId()) &&
-                condition.apply(criteria.getTypeSoinId(), copy.getTypeSoinId()) &&
                 condition.apply(criteria.getEtablissementSanteId(), copy.getEtablissementSanteId()) &&
                 condition.apply(criteria.getGestionnaireCreateurId(), copy.getGestionnaireCreateurId()) &&
                 condition.apply(criteria.getAssigneAId(), copy.getAssigneAId()) &&

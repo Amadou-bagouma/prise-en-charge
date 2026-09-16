@@ -14,12 +14,11 @@ import { AyantDroitService } from 'app/entities/ayant-droit/service/ayant-droit.
 import { AccountService } from 'app/core/auth';
 import { PrioriteDemande } from 'app/entities/enumerations/priorite-demande.model';
 import { TypeBeneficiaire } from 'app/entities/enumerations/type-beneficiaire.model';
+import { TypeSoin } from 'app/entities/enumerations/type-soin.model';
 import { IEtablissementSante } from 'app/entities/etablissement-sante/etablissement-sante.model';
-import { TypeSoinService } from 'app/entities/type-soin/service/type-soin.service';
 import { EtablissementSanteService } from 'app/entities/etablissement-sante/service/etablissement-sante.service';
 import { UserService } from 'app/entities/user/service/user.service';
 import { IUser } from 'app/entities/user/user.model';
-import { ITypeSoin } from 'app/entities/type-soin/type-soin.model';
 import { AlertError } from 'app/shared/alert';
 import { TranslateDirective } from 'app/shared/language';
 import { IDemandePriseEnCharge } from '../demande-prise-en-charge.model';
@@ -37,10 +36,10 @@ export class DemandePriseEnChargeUpdate implements OnInit {
   demandePriseEnCharge: IDemandePriseEnCharge | null = null;
   typeBeneficiaireValues = Object.keys(TypeBeneficiaire);
   prioriteDemandeValues = Object.keys(PrioriteDemande);
+  typeSoinValues = Object.keys(TypeSoin) as Array<keyof typeof TypeSoin>;
 
   agentsSharedCollection = signal<IAgent[]>([]);
   ayantDroitsSharedCollection = signal<IAyantDroit[]>([]);
-  typeSoinsSharedCollection = signal<ITypeSoin[]>([]);
   etablissementSantesSharedCollection = signal<IEtablissementSante[]>([]);
   usersSharedCollection = signal<IUser[]>([]);
 
@@ -48,7 +47,6 @@ export class DemandePriseEnChargeUpdate implements OnInit {
   protected demandePriseEnChargeFormService = inject(DemandePriseEnChargeFormService);
   protected agentService = inject(AgentService);
   protected ayantDroitService = inject(AyantDroitService);
-  protected typeSoinService = inject(TypeSoinService);
   protected etablissementSanteService = inject(EtablissementSanteService);
   protected userService = inject(UserService);
   protected accountService = inject(AccountService);
@@ -60,8 +58,6 @@ export class DemandePriseEnChargeUpdate implements OnInit {
   compareAgent = (o1: IAgent | null, o2: IAgent | null): boolean => this.agentService.compareAgent(o1, o2);
 
   compareAyantDroit = (o1: IAyantDroit | null, o2: IAyantDroit | null): boolean => this.ayantDroitService.compareAyantDroit(o1, o2);
-
-  compareTypeSoin = (o1: ITypeSoin | null, o2: ITypeSoin | null): boolean => this.typeSoinService.compareTypeSoin(o1, o2);
 
   compareEtablissementSante = (o1: IEtablissementSante | null, o2: IEtablissementSante | null): boolean =>
     this.etablissementSanteService.compareEtablissementSante(o1, o2);
@@ -124,9 +120,6 @@ export class DemandePriseEnChargeUpdate implements OnInit {
         this.ayantDroitService.addAyantDroitToCollectionIfMissing<IAyantDroit>(ayantDroits, demandePriseEnCharge.ayantDroit),
       ),
     );
-    this.typeSoinsSharedCollection.update(typeSoins =>
-      this.typeSoinService.addTypeSoinToCollectionIfMissing<ITypeSoin>(typeSoins, ...(demandePriseEnCharge.typeSoins ?? [])),
-    );
     this.etablissementSantesSharedCollection.update(etablissementSantes =>
       this.etablissementSanteService.addEtablissementSanteToCollectionIfMissing<IEtablissementSante>(
         etablissementSantes,
@@ -156,16 +149,6 @@ export class DemandePriseEnChargeUpdate implements OnInit {
         ),
       )
       .subscribe((ayantDroits: IAyantDroit[]) => this.ayantDroitsSharedCollection.set(ayantDroits));
-
-    this.typeSoinService
-      .query()
-      .pipe(map((res: HttpResponse<ITypeSoin[]>) => res.body ?? []))
-      .pipe(
-        map((typeSoins: ITypeSoin[]) =>
-          this.typeSoinService.addTypeSoinToCollectionIfMissing<ITypeSoin>(typeSoins, ...(this.demandePriseEnCharge?.typeSoins ?? [])),
-        ),
-      )
-      .subscribe((typeSoins: ITypeSoin[]) => this.typeSoinsSharedCollection.set(typeSoins));
 
     this.etablissementSanteService
       .query()
@@ -211,5 +194,16 @@ export class DemandePriseEnChargeUpdate implements OnInit {
 
   protected sortAyantDroitsDescending(ayantDroits: IAyantDroit[]): IAyantDroit[] {
     return [...ayantDroits].sort((a, b) => `${b.nom ?? ''} ${b.prenom ?? ''}`.localeCompare(`${a.nom ?? ''} ${a.prenom ?? ''}`));
+  }
+
+  isTypeSoinChecked(typeSoin: keyof typeof TypeSoin): boolean {
+    return (this.editForm.controls.typeSoins.value ?? []).includes(typeSoin);
+  }
+
+  toggleTypeSoin(typeSoin: keyof typeof TypeSoin, checked: boolean): void {
+    const current = this.editForm.controls.typeSoins.value ?? [];
+    const next = checked ? [...current, typeSoin] : current.filter(value => value !== typeSoin);
+    this.editForm.controls.typeSoins.setValue(next);
+    this.editForm.controls.typeSoins.markAsDirty();
   }
 }

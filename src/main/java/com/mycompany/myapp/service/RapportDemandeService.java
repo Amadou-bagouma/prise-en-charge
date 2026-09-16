@@ -1,59 +1,59 @@
 package com.mycompany.myapp.service;
 
+import com.mycompany.myapp.domain.Agent;
 import com.mycompany.myapp.domain.DemandePriseEnCharge;
-import com.mycompany.myapp.domain.HistoriqueAction;
-import com.mycompany.myapp.domain.TypeSoin;
+import com.mycompany.myapp.domain.enumeration.LienParente;
 import com.mycompany.myapp.domain.enumeration.StatutDemande;
+import com.mycompany.myapp.domain.enumeration.TypeSoin;
 import com.mycompany.myapp.repository.DemandePriseEnChargeRepository;
-import com.mycompany.myapp.repository.HistoriqueActionRepository;
 import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Set;
+import org.openpdf.text.BadElementException;
+import org.openpdf.text.Chunk;
 import org.openpdf.text.Document;
 import org.openpdf.text.DocumentException;
 import org.openpdf.text.Element;
 import org.openpdf.text.Font;
+import org.openpdf.text.Image;
 import org.openpdf.text.PageSize;
 import org.openpdf.text.Paragraph;
 import org.openpdf.text.Phrase;
-import org.openpdf.text.Rectangle;
 import org.openpdf.text.pdf.PdfPCell;
 import org.openpdf.text.pdf.PdfPTable;
 import org.openpdf.text.pdf.PdfWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Generates the PDF "etat" (report) for a fully validated {@link DemandePriseEnCharge}.
+ * Generates the PDF "Prise en charge des soins medicaux" for a fully validated
+ * {@link DemandePriseEnCharge}, reproducing the official CNSS paper form.
  */
 @Service
 @Transactional(readOnly = true)
 public class RapportDemandeService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(RapportDemandeService.class);
+
     private static final String ENTITY_NAME = "demandePriseEnCharge";
 
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm").withZone(
-        ZoneId.systemDefault()
-    );
-
-    private static final Color ACCENT_COLOR = new Color(74, 154, 95);
-
-    private static final Color ACCENT_SOFT_COLOR = new Color(232, 247, 238);
+    /**
+     * Optional CNSS logo, printed top-left of the report. Drop a PNG/JPG file at this
+     * classpath location (src/main/resources/static/content/images/logo-cnss.png) to
+     * have it appear automatically; the report renders fine without it.
+     */
+    private static final String LOGO_CLASSPATH = "static/content/images/logo-cnss.png";
 
     private final DemandePriseEnChargeRepository demandePriseEnChargeRepository;
 
-    private final HistoriqueActionRepository historiqueActionRepository;
-
-    public RapportDemandeService(
-        DemandePriseEnChargeRepository demandePriseEnChargeRepository,
-        HistoriqueActionRepository historiqueActionRepository
-    ) {
+    public RapportDemandeService(DemandePriseEnChargeRepository demandePriseEnChargeRepository) {
         this.demandePriseEnChargeRepository = demandePriseEnChargeRepository;
-        this.historiqueActionRepository = historiqueActionRepository;
     }
 
     /**
@@ -73,66 +73,54 @@ public class RapportDemandeService {
                 "rapport.notvalidated"
             );
         }
-        List<HistoriqueAction> historique = historiqueActionRepository.findByDemandeIdOrderByDateActionAsc(demandeId);
 
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
-            Document document = new Document(PageSize.A4, 40, 40, 60, 40);
+            Document document = new Document(PageSize.A4, 50, 50, 40, 40);
             PdfWriter.getInstance(document, out);
             document.open();
 
-            Font titleFont = new Font(Font.HELVETICA, 16, Font.BOLD);
-            Font subtitleFont = new Font(Font.HELVETICA, 10, Font.NORMAL, Color.DARK_GRAY);
-            Font sectionFont = new Font(Font.HELVETICA, 12, Font.BOLD, ACCENT_COLOR);
-            Font labelFont = new Font(Font.HELVETICA, 10, Font.BOLD);
-            Font valueFont = new Font(Font.HELVETICA, 10, Font.NORMAL);
+            Font titleFont = new Font(Font.HELVETICA, 14, Font.BOLD | Font.UNDERLINE);
+            Font headerFont = new Font(Font.HELVETICA, 10, Font.BOLD);
+            Font bodyFont = new Font(Font.HELVETICA, 11, Font.NORMAL);
+            Font noteFont = new Font(Font.HELVETICA, 9, Font.ITALIC);
+            Font underlineFont = new Font(Font.HELVETICA, 10, Font.BOLD | Font.UNDERLINE);
+            Font footerFont = new Font(Font.HELVETICA, 7, Font.NORMAL, Color.DARK_GRAY);
 
-            Paragraph title = new Paragraph("Etat de prise en charge medicale", titleFont);
+            document.add(header(demande, headerFont));
+
+            Paragraph title = new Paragraph("PRISE EN CHARGE DES SOINS MEDICAUX", titleFont);
             title.setAlignment(Element.ALIGN_CENTER);
+            title.setSpacingBefore(10);
+            title.setSpacingAfter(20);
             document.add(title);
 
-            Paragraph subtitle = new Paragraph("Caisse Nationale de Securite Sociale (CNSS)", subtitleFont);
-            subtitle.setAlignment(Element.ALIGN_CENTER);
-            subtitle.setSpacingAfter(20);
-            document.add(subtitle);
+            Paragraph body = new Paragraph();
+            body.setFont(bodyFont);
+            body.setAlignment(Element.ALIGN_JUSTIFIED);
+            body.setLeading(18);
+            body.add(corpsAttestation(demande));
+            document.add(body);
 
-            document.add(sectionTitle("Identification", sectionFont));
-            PdfPTable idTable = infoTable();
-            addRow(idTable, "Reference", demande.getReference(), labelFont, valueFont);
-            addRow(idTable, "Beneficiaire", beneficiaire(demande), labelFont, valueFont);
-            addRow(
-                idTable,
-                "Type de soin",
-                demande.getTypeSoins().stream().map(TypeSoin::getLibelle).collect(Collectors.joining(", ")),
-                labelFont,
-                valueFont
-            );
-            addRow(
-                idTable,
-                "Etablissement de sante",
-                demande.getEtablissementSante() != null ? demande.getEtablissementSante().getNom() : "",
-                labelFont,
-                valueFont
-            );
-            addRow(idTable, "Priorite", demande.getPriorite() != null ? demande.getPriorite().name() : "", labelFont, valueFont);
-            addRow(idTable, "Statut", "Validee", labelFont, valueFont);
-            document.add(idTable);
+            document.add(Chunk.NEWLINE);
+            document.add(casesTypeSoin(demande.getTypeSoins(), bodyFont));
 
-            document.add(sectionTitle("Historique de validation", sectionFont));
-            PdfPTable histTable = new PdfPTable(new float[] { 2, 2, 5 });
-            histTable.setWidthPercentage(100);
-            histTable.setSpacingBefore(6);
-            addHeaderCell(histTable, "Date", labelFont);
-            addHeaderCell(histTable, "Par", labelFont);
-            addHeaderCell(histTable, "Action", labelFont);
-            for (HistoriqueAction action : historique) {
-                histTable.addCell(
-                    new Phrase(action.getDateAction() != null ? DATE_FORMATTER.format(action.getDateAction()) : "", valueFont)
-                );
-                histTable.addCell(new Phrase(action.getUtilisateur() != null ? action.getUtilisateur().getLogin() : "", valueFont));
-                histTable.addCell(new Phrase(libelleAction(action), valueFont));
-            }
-            document.add(histTable);
+            Paragraph note = new Paragraph(
+                "N/B Cette prise en charge ne concerne en aucun cas l'achat d'appareillage ou autres protheses.",
+                noteFont
+            );
+            note.setSpacingBefore(20);
+            document.add(note);
+
+            Paragraph joindre = new Paragraph("Joindre l'original de prise en charge a la facture", underlineFont);
+            joindre.setAlignment(Element.ALIGN_CENTER);
+            joindre.setSpacingBefore(30);
+            joindre.setSpacingAfter(40);
+            document.add(joindre);
+
+            document.add(signatures(underlineFont));
+
+            document.add(pied(footerFont));
 
             document.close();
             return out.toByteArray();
@@ -141,52 +129,134 @@ public class RapportDemandeService {
         }
     }
 
-    private String beneficiaire(DemandePriseEnCharge demande) {
-        if (demande.getAgent() != null) {
-            return demande.getAgent().getNom() + " " + demande.getAgent().getPrenom() + " (" + demande.getAgent().getMatricule() + ")";
-        }
-        if (demande.getAyantDroit() != null) {
-            return demande.getAyantDroit().getNom() + " " + demande.getAyantDroit().getPrenom();
-        }
-        return "";
-    }
-
-    private String libelleAction(HistoriqueAction action) {
-        StringBuilder sb = new StringBuilder(action.getAction());
-        if (action.getDescription() != null && !action.getDescription().isBlank()) {
-            sb.append(" - ").append(action.getDescription());
-        }
-        return sb.toString();
-    }
-
-    private Paragraph sectionTitle(String text, Font font) {
-        Paragraph p = new Paragraph(text, font);
-        p.setSpacingBefore(14);
-        p.setSpacingAfter(6);
-        return p;
-    }
-
-    private PdfPTable infoTable() {
-        PdfPTable table = new PdfPTable(new float[] { 3, 7 });
+    private PdfPTable header(DemandePriseEnCharge demande, Font headerFont) {
+        PdfPTable table = new PdfPTable(new float[] { 1, 2, 1 });
         table.setWidthPercentage(100);
+
+        PdfPCell logoCell = new PdfPCell();
+        logoCell.setBorder(PdfPCell.NO_BORDER);
+        Image logo = logoImage();
+        if (logo != null) {
+            logo.scaleToFit(70, 70);
+            logoCell.addElement(logo);
+        }
+        table.addCell(logoCell);
+
+        PdfPCell titleCell = new PdfPCell(new Phrase("CAISSE NATIONALE DE SECURITE SOCIALE", headerFont));
+        titleCell.setBorder(PdfPCell.NO_BORDER);
+        titleCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        titleCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        table.addCell(titleCell);
+
+        PdfPCell refCell = new PdfPCell(new Phrase("N° " + demande.getReference() + " /", headerFont));
+        refCell.setBorder(PdfPCell.NO_BORDER);
+        refCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        refCell.setVerticalAlignment(Element.ALIGN_TOP);
+        table.addCell(refCell);
+
         return table;
     }
 
-    private void addRow(PdfPTable table, String label, String value, Font labelFont, Font valueFont) {
-        table.addCell(borderlessCell(new Phrase(label, labelFont)));
-        table.addCell(borderlessCell(new Phrase(value != null ? value : "", valueFont)));
+    private Image logoImage() {
+        try (InputStream in = new ClassPathResource(LOGO_CLASSPATH).getInputStream()) {
+            return Image.getInstance(in.readAllBytes());
+        } catch (IOException | BadElementException e) {
+            LOG.debug("No CNSS logo found at classpath:{} - printing the report without it", LOGO_CLASSPATH);
+            return null;
+        }
     }
 
-    private void addHeaderCell(PdfPTable table, String text, Font font) {
-        PdfPCell cell = new PdfPCell(new Phrase(text, font));
-        cell.setBackgroundColor(ACCENT_SOFT_COLOR);
+    private String corpsAttestation(DemandePriseEnCharge demande) {
+        Agent agent = demande.getAgent() != null ? demande.getAgent() : demande.getAyantDroit().getAgent();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Je Soussigne le Directeur des Ressources Humaines de la Caisse Nationale de Securite Sociale atteste que ")
+            .append(agent.getNom())
+            .append(' ')
+            .append(agent.getPrenom())
+            .append(" Mle ")
+            .append(agent.getMatricule())
+            .append(" est en service a la Caisse Nationale de Securite Sociale");
+        if (agent.getFonction() != null && !agent.getFonction().isBlank()) {
+            sb.append(" en qualite de ").append(agent.getFonction());
+        }
+        sb.append(
+            ". Les soins medicaux occasionnes par lui ou sa famille sont pris en charge par la Caisse Nationale de Securite Sociale.\n\n"
+        );
+
+        sb.append("Cette prise en charge couvre les prestations medicales fournies par");
+        if (demande.getEtablissementSante() != null) {
+            sb.append(" (").append(demande.getEtablissementSante().getNom()).append(')');
+        }
+        if (demande.getAyantDroit() != null) {
+            sb.append(" au benefice de ").append(lienBeneficiaire(demande.getAyantDroit().getLien()));
+            sb.append(' ').append(demande.getAyantDroit().getNom()).append(' ').append(demande.getAyantDroit().getPrenom());
+        }
+        sb.append('.');
+        return sb.toString();
+    }
+
+    private String lienBeneficiaire(LienParente lien) {
+        if (lien == null) {
+            return "son proche";
+        }
+        return switch (lien) {
+            case ENFANT -> "son enfant";
+            case CONJOINT -> "son (sa) conjoint(e)";
+            case AUTRE -> "son proche";
+        };
+    }
+
+    private PdfPTable casesTypeSoin(Set<TypeSoin> typeSoins, Font font) {
+        PdfPTable table = new PdfPTable(2);
+        table.setWidthPercentage(100);
+        table.setSpacingBefore(10);
+        table.getDefaultCell().setBorder(PdfPCell.NO_BORDER);
+        table.getDefaultCell().setPaddingBottom(12);
+
+        caseACocher(table, "CONSULTATIONS", typeSoins.contains(TypeSoin.CONSULTATIONS), font);
+        caseACocher(table, "EXAMENS MEDICAUX", typeSoins.contains(TypeSoin.EXAMENS_MEDICAUX), font);
+        caseACocher(table, "INTERVENTION CHIRURGICALE", typeSoins.contains(TypeSoin.INTERVENTION_CHIRURGICALE), font);
+        caseACocher(table, "HOSPITALISATION", typeSoins.contains(TypeSoin.HOSPITALISATION), font);
+
+        return table;
+    }
+
+    private void caseACocher(PdfPTable table, String libelle, boolean cochee, Font font) {
+        Phrase phrase = new Phrase();
+        phrase.add(new Chunk(cochee ? "[X] " : "[ ] ", new Font(Font.HELVETICA, 12, Font.BOLD)));
+        phrase.add(new Chunk(libelle, font));
+        PdfPCell cell = new PdfPCell(phrase);
+        cell.setBorder(PdfPCell.NO_BORDER);
+        cell.setPaddingBottom(12);
         table.addCell(cell);
     }
 
-    private PdfPCell borderlessCell(Phrase phrase) {
-        PdfPCell cell = new PdfPCell(phrase);
-        cell.setBorder(Rectangle.NO_BORDER);
-        cell.setPaddingBottom(4);
-        return cell;
+    private PdfPTable signatures(Font font) {
+        PdfPTable table = new PdfPTable(2);
+        table.setWidthPercentage(100);
+
+        PdfPCell medecin = new PdfPCell(new Phrase("VISA DU MEDECIN CNSS", font));
+        medecin.setBorder(PdfPCell.NO_BORDER);
+        medecin.setMinimumHeight(60);
+        table.addCell(medecin);
+
+        PdfPCell drh = new PdfPCell(new Phrase("LE DIRECTEUR DES RESSOURCES HUMAINES", font));
+        drh.setBorder(PdfPCell.NO_BORDER);
+        drh.setMinimumHeight(60);
+        table.addCell(drh);
+
+        return table;
+    }
+
+    private Paragraph pied(Font footerFont) {
+        Paragraph footer = new Paragraph();
+        footer.setFont(footerFont);
+        footer.setAlignment(Element.ALIGN_CENTER);
+        footer.setSpacingBefore(30);
+        footer.add("BP: 225 Niamey - Niger - tel : +227 20 73 35 17 / +227 20 73 35 18 - Fax : +227 20 73 42 44 - Email: cnss@intnet.ne\n");
+        footer.add("Comptes Bancaires - BCEAO : 002618200 / 00120001 - ECOBANK : 01000029043012\n");
+        footer.add("SONIBANK : 006401001 0251 4021 30 - BOA : 0115953002");
+        return footer;
     }
 }

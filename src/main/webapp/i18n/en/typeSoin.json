@@ -1,26 +1,11 @@
 {
   "peccnssApp": {
-    "typeSoin": {
-      "home": {
-        "title": "Type Soins",
-        "refreshListLabel": "Refresh list",
-        "createLabel": "Create a new Type Soin",
-        "createOrEditLabel": "Create or edit a Type Soin",
-        "notFound": "No Type Soins found"
-      },
-      "created": "A new Type Soin is created with identifier {{ param }}",
-      "updated": "A Type Soin is updated with identifier {{ param }}",
-      "deleted": "A Type Soin is deleted with identifier {{ param }}",
-      "delete": {
-        "question": "Are you sure you want to delete Type Soin {{ id }}?"
-      },
-      "detail": {
-        "title": "Type Soin"
-      },
-      "id": "ID",
-      "libelle": "Libelle",
-      "description": "Description",
-      "actif": "Actif"
+    "TypeSoin": {
+      "null": "",
+      "CONSULTATIONS": "Consultations",
+      "EXAMENS_MEDICAUX": "Medical examinations",
+      "INTERVENTION_CHIRURGICALE": "Surgical intervention",
+      "HOSPITALISATION": "Hospitalisation"
     }
   }
 }

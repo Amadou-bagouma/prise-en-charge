@@ -5,8 +5,8 @@ import { IAyantDroit } from 'app/entities/ayant-droit/ayant-droit.model';
 import { PrioriteDemande } from 'app/entities/enumerations/priorite-demande.model';
 import { StatutDemande } from 'app/entities/enumerations/statut-demande.model';
 import { TypeBeneficiaire } from 'app/entities/enumerations/type-beneficiaire.model';
+import { TypeSoin } from 'app/entities/enumerations/type-soin.model';
 import { IEtablissementSante } from 'app/entities/etablissement-sante/etablissement-sante.model';
-import { ITypeSoin } from 'app/entities/type-soin/type-soin.model';
 import { IUser } from 'app/entities/user/user.model';
 
 export interface IDemandePriseEnCharge {
@@ -24,7 +24,7 @@ export interface IDemandePriseEnCharge {
   observation?: string | null;
   agent?: Pick<IAgent, 'id' | 'matricule'> | null;
   ayantDroit?: Pick<IAyantDroit, 'id' | 'nom'> | null;
-  typeSoins?: Pick<ITypeSoin, 'id' | 'libelle'>[] | null;
+  typeSoins?: (keyof typeof TypeSoin)[] | null;
   etablissementSante?: Pick<IEtablissementSante, 'id' | 'nom'> | null;
   gestionnaireCreateur?: Pick<IUser, 'id' | 'login'> | null;
   assigneA?: Pick<IUser, 'id' | 'login'> | null;

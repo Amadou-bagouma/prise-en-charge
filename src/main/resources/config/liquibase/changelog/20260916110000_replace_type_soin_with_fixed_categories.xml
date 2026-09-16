@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Replaces the free-text, admin-managed TypeSoin reference entity with the 4 fixed
+        categories printed on the official CNSS "Prise en charge des soins medicaux" form
+        (Consultations, Examens medicaux, Intervention chirurgicale, Hospitalisation).
+
+        1. Creates the new element-collection table backing DemandePriseEnCharge.typeSoins
+           (now a Set<TypeSoin> enum instead of a Set<TypeSoin> entity).
+        2. Best-effort migrates existing assignments whose old libelle matches one of the
+           3 categories that already existed (Consultation, Examens, Hospitalisation).
+           There is no prior data for "Intervention chirurgicale", which did not exist before.
+        3. Drops the old join table and the type_soin reference table.
+    -->
+    <changeSet id="20260916110000-1" author="manual">
+        <createTable tableName="demande_prise_en_charge_type_soin">
+            <column name="demande_prise_en_charge_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type_soin" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="demande_prise_en_charge_id, type_soin"
+                        tableName="demande_prise_en_charge_type_soin"/>
+
+        <addForeignKeyConstraint baseColumnNames="demande_prise_en_charge_id"
+                                 baseTableName="demande_prise_en_charge_type_soin"
+                                 constraintName="fk_demande_prise_en_charge_type_soin__demande_prise_en_charge_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="demande_prise_en_charge"/>
+    </changeSet>
+
+    <changeSet id="20260916110000-2" author="manual">
+        <sql>
+            INSERT INTO demande_prise_en_charge_type_soin (demande_prise_en_charge_id, type_soin)
+            SELECT DISTINCT r.demande_prise_en_charge_id, 'CONSULTATIONS'
+            FROM rel_demande_prise_en_charge__type_soin r
+            JOIN type_soin t ON t.id = r.type_soin_id
+            WHERE UPPER(t.libelle) LIKE '%CONSULTATION%'
+
+            UNION
+
+            SELECT DISTINCT r.demande_prise_en_charge_id, 'EXAMENS_MEDICAUX'
+            FROM rel_demande_prise_en_charge__type_soin r
+            JOIN type_soin t ON t.id = r.type_soin_id
+            WHERE UPPER(t.libelle) LIKE '%EXAMEN%'
+
+            UNION
+
+            SELECT DISTINCT r.demande_prise_en_charge_id, 'HOSPITALISATION'
+            FROM rel_demande_prise_en_charge__type_soin r
+            JOIN type_soin t ON t.id = r.type_soin_id
+            WHERE UPPER(t.libelle) LIKE '%HOSPITALISATION%'
+        </sql>
+    </changeSet>
+
+    <changeSet id="20260916110000-3" author="manual">
+        <dropTable tableName="rel_demande_prise_en_charge__type_soin"/>
+        <dropTable tableName="type_soin"/>
+    </changeSet>
+</databaseChangeLog>

@@ -14,7 +14,6 @@
         "direction": "Direction",
         "agent": "Agent",
         "ayantDroit": "Ayant Droit",
-        "typeSoin": "Type Soin",
         "etablissementSante": "Etablissement Sante",
         "demandePriseEnCharge": "Demande Prise En Charge",
         "pieceJustificative": "Piece Justificative",

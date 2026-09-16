@@ -66,36 +66,32 @@ public class SecurityConfiguration {
                     .requestMatchers("/api/account/reset-password/init").permitAll()
                     .requestMatchers("/api/account/reset-password/finish").permitAll()
                     .requestMatchers("/api/admin/**").hasAuthority(AuthoritiesConstants.ADMIN)
-                    // Gestion, Region, Direction and TypeSoin are reference/master data: any authenticated
+                    // Gestion, Region and Direction are reference/master data: any authenticated
                     // user may read them (e.g. to populate pickers on Agent/DemandePriseEnCharge forms),
                     // but only admins may create, update or delete them.
                     .requestMatchers(
                         HttpMethod.POST,
                         "/api/gestions/**",
                         "/api/regions/**",
-                        "/api/directions/**",
-                        "/api/type-soins/**"
+                        "/api/directions/**"
                     ).hasAuthority(AuthoritiesConstants.ADMIN)
                     .requestMatchers(
                         HttpMethod.PUT,
                         "/api/gestions/**",
                         "/api/regions/**",
-                        "/api/directions/**",
-                        "/api/type-soins/**"
+                        "/api/directions/**"
                     ).hasAuthority(AuthoritiesConstants.ADMIN)
                     .requestMatchers(
                         HttpMethod.PATCH,
                         "/api/gestions/**",
                         "/api/regions/**",
-                        "/api/directions/**",
-                        "/api/type-soins/**"
+                        "/api/directions/**"
                     ).hasAuthority(AuthoritiesConstants.ADMIN)
                     .requestMatchers(
                         HttpMethod.DELETE,
                         "/api/gestions/**",
                         "/api/regions/**",
-                        "/api/directions/**",
-                        "/api/type-soins/**"
+                        "/api/directions/**"
                     ).hasAuthority(AuthoritiesConstants.ADMIN)
                     .requestMatchers("/api/**").authenticated()
                     .requestMatchers("/v3/api-docs/**").hasAuthority(AuthoritiesConstants.ADMIN)

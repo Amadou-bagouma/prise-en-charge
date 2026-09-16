@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.mycompany.myapp.domain.enumeration.PrioriteDemande;
 import com.mycompany.myapp.domain.enumeration.StatutDemande;
 import com.mycompany.myapp.domain.enumeration.TypeBeneficiaire;
+import com.mycompany.myapp.domain.enumeration.TypeSoin;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serial;
@@ -82,14 +83,11 @@ public class DemandePriseEnCharge implements Serializable {
     @JsonIgnoreProperties(value = { "agent" }, allowSetters = true)
     private AyantDroit ayantDroit;
 
-    @ManyToMany
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "demande_prise_en_charge_type_soin", joinColumns = @JoinColumn(name = "demande_prise_en_charge_id"))
+    @Column(name = "type_soin")
+    @Enumerated(EnumType.STRING)
     @BatchSize(size = 20)
-    @JoinTable(
-        name = "rel_demande_prise_en_charge__type_soin",
-        joinColumns = @JoinColumn(name = "demande_prise_en_charge_id"),
-        inverseJoinColumns = @JoinColumn(name = "type_soin_id")
-    )
     private Set<TypeSoin> typeSoins = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)

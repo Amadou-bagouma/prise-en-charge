@@ -106,8 +106,6 @@ public class DemandePriseEnChargeCriteria implements Serializable, Criteria {
 
     private LongFilter ayantDroitId;
 
-    private LongFilter typeSoinId;
-
     private LongFilter etablissementSanteId;
 
     private LongFilter gestionnaireCreateurId;
@@ -133,7 +131,6 @@ public class DemandePriseEnChargeCriteria implements Serializable, Criteria {
         this.observation = other.optionalObservation().map(StringFilter::copy).orElse(null);
         this.agentId = other.optionalAgentId().map(LongFilter::copy).orElse(null);
         this.ayantDroitId = other.optionalAyantDroitId().map(LongFilter::copy).orElse(null);
-        this.typeSoinId = other.optionalTypeSoinId().map(LongFilter::copy).orElse(null);
         this.etablissementSanteId = other.optionalEtablissementSanteId().map(LongFilter::copy).orElse(null);
         this.gestionnaireCreateurId = other.optionalGestionnaireCreateurId().map(LongFilter::copy).orElse(null);
         this.assigneAId = other.optionalAssigneAId().map(LongFilter::copy).orElse(null);
@@ -411,25 +408,6 @@ public class DemandePriseEnChargeCriteria implements Serializable, Criteria {
         this.ayantDroitId = ayantDroitId;
     }
 
-    public LongFilter getTypeSoinId() {
-        return typeSoinId;
-    }
-
-    public Optional<LongFilter> optionalTypeSoinId() {
-        return Optional.ofNullable(typeSoinId);
-    }
-
-    public LongFilter typeSoinId() {
-        if (typeSoinId == null) {
-            setTypeSoinId(new LongFilter());
-        }
-        return typeSoinId;
-    }
-
-    public void setTypeSoinId(LongFilter typeSoinId) {
-        this.typeSoinId = typeSoinId;
-    }
-
     public LongFilter getEtablissementSanteId() {
         return etablissementSanteId;
     }
@@ -530,7 +508,6 @@ public class DemandePriseEnChargeCriteria implements Serializable, Criteria {
             Objects.equals(observation, that.observation) &&
             Objects.equals(agentId, that.agentId) &&
             Objects.equals(ayantDroitId, that.ayantDroitId) &&
-            Objects.equals(typeSoinId, that.typeSoinId) &&
             Objects.equals(etablissementSanteId, that.etablissementSanteId) &&
             Objects.equals(gestionnaireCreateurId, that.gestionnaireCreateurId) &&
             Objects.equals(assigneAId, that.assigneAId) &&
@@ -555,7 +532,6 @@ public class DemandePriseEnChargeCriteria implements Serializable, Criteria {
             observation,
             agentId,
             ayantDroitId,
-            typeSoinId,
             etablissementSanteId,
             gestionnaireCreateurId,
             assigneAId,
@@ -581,7 +557,6 @@ public class DemandePriseEnChargeCriteria implements Serializable, Criteria {
             optionalObservation().map(f -> "observation=" + f + ", ").orElse("") +
             optionalAgentId().map(f -> "agentId=" + f + ", ").orElse("") +
             optionalAyantDroitId().map(f -> "ayantDroitId=" + f + ", ").orElse("") +
-            optionalTypeSoinId().map(f -> "typeSoinId=" + f + ", ").orElse("") +
             optionalEtablissementSanteId().map(f -> "etablissementSanteId=" + f + ", ").orElse("") +
             optionalGestionnaireCreateurId().map(f -> "gestionnaireCreateurId=" + f + ", ").orElse("") +
             optionalAssigneAId().map(f -> "assigneAId=" + f + ", ").orElse("") +

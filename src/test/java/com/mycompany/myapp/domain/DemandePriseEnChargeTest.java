@@ -4,9 +4,9 @@ import static com.mycompany.myapp.domain.AgentTestSamples.*;
 import static com.mycompany.myapp.domain.AyantDroitTestSamples.*;
 import static com.mycompany.myapp.domain.DemandePriseEnChargeTestSamples.*;
 import static com.mycompany.myapp.domain.EtablissementSanteTestSamples.*;
-import static com.mycompany.myapp.domain.TypeSoinTestSamples.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.mycompany.myapp.domain.enumeration.TypeSoin;
 import com.mycompany.myapp.web.rest.TestUtil;
 import java.util.HashSet;
 import java.util.Set;
@@ -55,7 +55,7 @@ class DemandePriseEnChargeTest {
     @Test
     void typeSoinTest() {
         DemandePriseEnCharge demandePriseEnCharge = getDemandePriseEnChargeRandomSampleGenerator();
-        TypeSoin typeSoinBack = getTypeSoinRandomSampleGenerator();
+        TypeSoin typeSoinBack = TypeSoin.CONSULTATIONS;
 
         demandePriseEnCharge.addTypeSoin(typeSoinBack);
         assertThat(demandePriseEnCharge.getTypeSoins()).containsOnly(typeSoinBack);

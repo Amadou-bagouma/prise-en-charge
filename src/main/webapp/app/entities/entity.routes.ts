@@ -37,11 +37,6 @@ const routes: Routes = [
     loadChildren: () => import('./ayant-droit/ayant-droit.routes'),
   },
   {
-    path: 'type-soin',
-    title: 'peccnssApp.typeSoin.home.title',
-    loadChildren: () => import('./type-soin/type-soin.routes'),
-  },
-  {
     path: 'etablissement-sante',
     title: 'peccnssApp.etablissementSante.home.title',
     loadChildren: () => import('./etablissement-sante/etablissement-sante.routes'),

@@ -103,9 +103,6 @@ public class DemandePriseEnChargeQueryService extends QueryService<DemandePriseE
                     buildSpecification(criteria.getAyantDroitId(), root ->
                         root.join(DemandePriseEnCharge_.ayantDroit, JoinType.LEFT).get(AyantDroit_.id)
                     ),
-                    buildSpecification(criteria.getTypeSoinId(), root ->
-                        root.join(DemandePriseEnCharge_.typeSoins, JoinType.LEFT).get(TypeSoin_.id)
-                    ),
                     buildSpecification(criteria.getEtablissementSanteId(), root ->
                         root.join(DemandePriseEnCharge_.etablissementSante, JoinType.LEFT).get(EtablissementSante_.id)
                     ),

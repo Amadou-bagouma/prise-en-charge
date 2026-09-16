@@ -13,8 +13,6 @@ import { IAyantDroit } from 'app/entities/ayant-droit/ayant-droit.model';
 import { AyantDroitService } from 'app/entities/ayant-droit/service/ayant-droit.service';
 import { IEtablissementSante } from 'app/entities/etablissement-sante/etablissement-sante.model';
 import { EtablissementSanteService } from 'app/entities/etablissement-sante/service/etablissement-sante.service';
-import { TypeSoinService } from 'app/entities/type-soin/service/type-soin.service';
-import { ITypeSoin } from 'app/entities/type-soin/type-soin.model';
 import { UserService } from 'app/entities/user/service/user.service';
 import { IUser } from 'app/entities/user/user.model';
 import { IDemandePriseEnCharge } from '../demande-prise-en-charge.model';
@@ -31,7 +29,6 @@ describe('DemandePriseEnCharge Management Update Component', () => {
   let demandePriseEnChargeService: DemandePriseEnChargeService;
   let agentService: AgentService;
   let ayantDroitService: AyantDroitService;
-  let typeSoinService: TypeSoinService;
   let etablissementSanteService: EtablissementSanteService;
   let userService: UserService;
 
@@ -56,7 +53,6 @@ describe('DemandePriseEnCharge Management Update Component', () => {
     demandePriseEnChargeService = TestBed.inject(DemandePriseEnChargeService);
     agentService = TestBed.inject(AgentService);
     ayantDroitService = TestBed.inject(AyantDroitService);
-    typeSoinService = TestBed.inject(TypeSoinService);
     etablissementSanteService = TestBed.inject(EtablissementSanteService);
     userService = TestBed.inject(UserService);
 
@@ -106,28 +102,6 @@ describe('DemandePriseEnCharge Management Update Component', () => {
         ...additionalAyantDroits.map(i => expect.objectContaining(i) as typeof i),
       );
       expect(comp.ayantDroitsSharedCollection()).toEqual(expectedCollection);
-    });
-
-    it('should call TypeSoin query and add missing value', () => {
-      const demandePriseEnCharge: IDemandePriseEnCharge = { id: 19327 };
-      const typeSoin: ITypeSoin = { id: 20111 };
-      demandePriseEnCharge.typeSoins = [typeSoin];
-
-      const typeSoinCollection: ITypeSoin[] = [{ id: 20111 }];
-      vi.spyOn(typeSoinService, 'query').mockReturnValue(of(new HttpResponse({ body: typeSoinCollection })));
-      const additionalTypeSoins = [typeSoin];
-      const expectedCollection: ITypeSoin[] = [...additionalTypeSoins, ...typeSoinCollection];
-      vi.spyOn(typeSoinService, 'addTypeSoinToCollectionIfMissing').mockReturnValue(expectedCollection);
-
-      activatedRoute.data = of({ demandePriseEnCharge });
-      comp.ngOnInit();
-
-      expect(typeSoinService.query).toHaveBeenCalled();
-      expect(typeSoinService.addTypeSoinToCollectionIfMissing).toHaveBeenCalledWith(
-        typeSoinCollection,
-        ...additionalTypeSoins.map(i => expect.objectContaining(i) as typeof i),
-      );
-      expect(comp.typeSoinsSharedCollection()).toEqual(expectedCollection);
     });
 
     it('should call EtablissementSante query and add missing value', () => {
@@ -182,8 +156,7 @@ describe('DemandePriseEnCharge Management Update Component', () => {
       demandePriseEnCharge.agent = agent;
       const ayantDroit: IAyantDroit = { id: 17970 };
       demandePriseEnCharge.ayantDroit = ayantDroit;
-      const typeSoin: ITypeSoin = { id: 20111 };
-      demandePriseEnCharge.typeSoins = [typeSoin];
+      demandePriseEnCharge.typeSoins = ['CONSULTATIONS'];
       const etablissementSante: IEtablissementSante = { id: 2850 };
       demandePriseEnCharge.etablissementSante = etablissementSante;
       const gestionnaireCreateur: IUser = { id: 3944 };
@@ -196,7 +169,6 @@ describe('DemandePriseEnCharge Management Update Component', () => {
 
       expect(comp.agentsSharedCollection()).toContainEqual(agent);
       expect(comp.ayantDroitsSharedCollection()).toContainEqual(ayantDroit);
-      expect(comp.typeSoinsSharedCollection()).toContainEqual(typeSoin);
       expect(comp.etablissementSantesSharedCollection()).toContainEqual(etablissementSante);
       expect(comp.usersSharedCollection()).toContainEqual(gestionnaireCreateur);
       expect(comp.usersSharedCollection()).toContainEqual(assigneA);
@@ -290,16 +262,6 @@ describe('DemandePriseEnCharge Management Update Component', () => {
         vi.spyOn(ayantDroitService, 'compareAyantDroit');
         comp.compareAyantDroit(entity, entity2);
         expect(ayantDroitService.compareAyantDroit).toHaveBeenCalledWith(entity, entity2);
-      });
-    });
-
-    describe('compareTypeSoin', () => {
-      it('should forward to typeSoinService', () => {
-        const entity = { id: 20111 };
-        const entity2 = { id: 12086 };
-        vi.spyOn(typeSoinService, 'compareTypeSoin');
-        comp.compareTypeSoin(entity, entity2);
-        expect(typeSoinService.compareTypeSoin).toHaveBeenCalledWith(entity, entity2);
       });
     });
 

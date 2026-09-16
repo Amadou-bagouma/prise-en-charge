@@ -76,17 +76,6 @@ enum LienParente {
 
 
 // =========================================================
-// TYPES DE SOINS
-// =========================================================
-
-entity TypeSoin {
-  libelle String required unique
-  description String
-  actif Boolean required
-}
-
-
-// =========================================================
 // ETABLISSEMENT DE SANTE
 // =========================================================
 
@@ -115,12 +104,23 @@ entity DemandePriseEnCharge {
   dateEcheance Instant
   motifRejet String
   observation String
+  typeSoins TypeSoin[] required
 }
 
 
 enum TypeBeneficiaire {
   AGENT
   AYANT_DROIT
+}
+
+
+// The 4 fixed categories printed as checkboxes on the official CNSS
+// "Prise en charge des soins medicaux" form.
+enum TypeSoin {
+  CONSULTATIONS
+  EXAMENS_MEDICAUX
+  INTERVENTION_CHIRURGICALE
+  HOSPITALISATION
 }
 
 
@@ -281,12 +281,6 @@ relationship ManyToOne {
   DemandePriseEnCharge{etablissementSante(nom)} to EtablissementSante
 }
 
-relationship ManyToMany {
-
-  DemandePriseEnCharge{typeSoin(libelle)} to TypeSoin
-}
-
-
 // =========================================================
 // CREATEUR ET RESPONSABLE DE LA DEMANDE
 // =========================================================
@@ -363,21 +357,21 @@ relationship ManyToOne {
 // PAGINATION
 // =========================================================
 
-paginate Region, Direction, Gestion, Agent, AyantDroit, TypeSoin, EtablissementSante, DemandePriseEnCharge, PieceJustificative, Tache, BoiteReception, Notification, HistoriqueAction with pagination
+paginate Region, Direction, Gestion, Agent, AyantDroit, EtablissementSante, DemandePriseEnCharge, PieceJustificative, Tache, BoiteReception, Notification, HistoriqueAction with pagination
 
 
 // =========================================================
 // SERVICES
 // =========================================================
 
-service Region, Direction, Gestion, Agent, AyantDroit, TypeSoin, EtablissementSante, DemandePriseEnCharge, PieceJustificative, Tache, BoiteReception, Notification, HistoriqueAction with serviceImpl
+service Region, Direction, Gestion, Agent, AyantDroit, EtablissementSante, DemandePriseEnCharge, PieceJustificative, Tache, BoiteReception, Notification, HistoriqueAction with serviceImpl
 
 
 // =========================================================
 // DTO MAPSTRUCT
 // =========================================================
 
-dto Region, Direction, Gestion, Agent, AyantDroit, TypeSoin, EtablissementSante, DemandePriseEnCharge, PieceJustificative, Tache, BoiteReception, Notification, HistoriqueAction with mapstruct
+dto Region, Direction, Gestion, Agent, AyantDroit, EtablissementSante, DemandePriseEnCharge, PieceJustificative, Tache, BoiteReception, Notification, HistoriqueAction with mapstruct
 
 
 // =========================================================

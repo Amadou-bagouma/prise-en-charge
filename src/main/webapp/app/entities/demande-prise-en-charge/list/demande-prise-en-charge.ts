@@ -8,6 +8,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbDropdown, NgbDropdownItem, NgbDropdownMenu, NgbDropdownToggle } from '@ng-bootstrap/ng-bootstrap/dropdown';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap/modal';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap/pagination';
+import { TranslateService } from '@ngx-translate/core';
 import { combineLatest, filter, map, tap } from 'rxjs';
 
 import { DEFAULT_SORT_DATA, ITEMS_PER_PAGE, ITEM_DELETED_EVENT, PAGE_HEADER, SORT, TOTAL_COUNT_RESPONSE_HEADER } from 'app/config';
@@ -75,6 +76,7 @@ export class DemandePriseEnCharge {
   protected readonly sortService = inject(SortService);
   protected readonly filterOptions = toSignal(this.filters.filterChanges);
   protected modalService = inject(NgbModal);
+  protected readonly translateService = inject(TranslateService);
 
   constructor() {
     effect(() => {
@@ -124,6 +126,12 @@ export class DemandePriseEnCharge {
 
   load(): void {
     this.queryBackend();
+  }
+
+  typeSoinsLabel(demandePriseEnCharge: IDemandePriseEnCharge): string {
+    return (demandePriseEnCharge.typeSoins ?? [])
+      .map(typeSoin => this.translateService.instant(`peccnssApp.TypeSoin.${typeSoin}`))
+      .join(', ');
   }
 
   telechargerRapport(demandePriseEnCharge: IDemandePriseEnCharge): void {

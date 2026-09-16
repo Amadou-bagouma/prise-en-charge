@@ -13,11 +13,11 @@ import com.mycompany.myapp.domain.Agent;
 import com.mycompany.myapp.domain.AyantDroit;
 import com.mycompany.myapp.domain.DemandePriseEnCharge;
 import com.mycompany.myapp.domain.EtablissementSante;
-import com.mycompany.myapp.domain.TypeSoin;
 import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.domain.enumeration.PrioriteDemande;
 import com.mycompany.myapp.domain.enumeration.StatutDemande;
 import com.mycompany.myapp.domain.enumeration.TypeBeneficiaire;
+import com.mycompany.myapp.domain.enumeration.TypeSoin;
 import com.mycompany.myapp.repository.DemandePriseEnChargeRepository;
 import com.mycompany.myapp.repository.UserRepository;
 import com.mycompany.myapp.service.DemandePriseEnChargeService;
@@ -144,11 +144,7 @@ class DemandePriseEnChargeResourceIT {
         em.persist(user);
         em.flush();
         demandePriseEnCharge.setGestionnaireCreateur(user);
-        // Add required entity
-        TypeSoin typeSoin = TypeSoinResourceIT.createEntity();
-        em.persist(typeSoin);
-        em.flush();
-        demandePriseEnCharge.addTypeSoin(typeSoin);
+        demandePriseEnCharge.addTypeSoin(TypeSoin.CONSULTATIONS);
         return demandePriseEnCharge;
     }
 
@@ -176,11 +172,7 @@ class DemandePriseEnChargeResourceIT {
         em.persist(user);
         em.flush();
         updatedDemandePriseEnCharge.setGestionnaireCreateur(user);
-        // Add required entity
-        TypeSoin typeSoin = TypeSoinResourceIT.createEntity();
-        em.persist(typeSoin);
-        em.flush();
-        updatedDemandePriseEnCharge.addTypeSoin(typeSoin);
+        updatedDemandePriseEnCharge.addTypeSoin(TypeSoin.EXAMENS_MEDICAUX);
         return updatedDemandePriseEnCharge;
     }
 
@@ -900,28 +892,6 @@ class DemandePriseEnChargeResourceIT {
 
         // Get all the demandePriseEnChargeList where ayantDroit equals to (ayantDroitId + 1)
         defaultDemandePriseEnChargeShouldNotBeFound("ayantDroitId.equals=" + (ayantDroitId + 1));
-    }
-
-    @Test
-    @Transactional
-    void getAllDemandePriseEnChargesByTypeSoinIsEqualToSomething() throws Exception {
-        TypeSoin typeSoin;
-        if (TestUtil.findAll(em, TypeSoin.class).isEmpty()) {
-            demandePriseEnChargeRepository.saveAndFlush(demandePriseEnCharge);
-            typeSoin = TypeSoinResourceIT.createEntity();
-        } else {
-            typeSoin = TestUtil.findAll(em, TypeSoin.class).get(0);
-        }
-        em.persist(typeSoin);
-        em.flush();
-        demandePriseEnCharge.addTypeSoin(typeSoin);
-        demandePriseEnChargeRepository.saveAndFlush(demandePriseEnCharge);
-        Long typeSoinId = typeSoin.getId();
-        // Get all the demandePriseEnChargeList where typeSoin equals to typeSoinId
-        defaultDemandePriseEnChargeShouldBeFound("typeSoinId.equals=" + typeSoinId);
-
-        // Get all the demandePriseEnChargeList where typeSoin equals to (typeSoinId + 1)
-        defaultDemandePriseEnChargeShouldNotBeFound("typeSoinId.equals=" + (typeSoinId + 1));
     }
 
     @Test

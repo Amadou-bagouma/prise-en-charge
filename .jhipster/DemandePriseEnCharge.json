@@ -56,6 +56,12 @@
     {
       "fieldName": "observation",
       "fieldType": "String"
+    },
+    {
+      "fieldName": "typeSoins",
+      "fieldType": "TypeSoin",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "CONSULTATIONS,EXAMENS_MEDICAUX,INTERVENTION_CHIRURGICALE,HOSPITALISATION"
     }
   ],
   "jpaMetamodelFiltering": true,
@@ -75,13 +81,6 @@
       "relationshipName": "ayantDroit",
       "relationshipSide": "left",
       "relationshipType": "many-to-one"
-    },
-    {
-      "otherEntityField": "libelle",
-      "otherEntityName": "typeSoin",
-      "relationshipName": "typeSoin",
-      "relationshipSide": "left",
-      "relationshipType": "many-to-many"
     },
     {
       "otherEntityField": "nom",

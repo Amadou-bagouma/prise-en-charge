@@ -128,7 +128,7 @@
                   {{ { null: '', AGENT: 'Agent', AYANT_DROIT: 'Ayant droit' }[demandePriseEnCharge.typeBeneficiaire ?? 'null'] }}
                 </div>
               </td>
-              <td>{{ demandePriseEnCharge.typeSoins?.map(t => t.libelle)?.join(', ') }}</td>
+              <td>{{ typeSoinsLabel(demandePriseEnCharge) }}</td>
               <td>{{ demandePriseEnCharge.etablissementSante?.nom }}</td>
               <td>
                 <span

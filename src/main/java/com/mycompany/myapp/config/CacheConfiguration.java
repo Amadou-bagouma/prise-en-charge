@@ -49,7 +49,6 @@ public class CacheConfiguration {
             createCache(cm, com.mycompany.myapp.domain.Direction.class.getName());
             createCache(cm, com.mycompany.myapp.domain.Agent.class.getName());
             createCache(cm, com.mycompany.myapp.domain.AyantDroit.class.getName());
-            createCache(cm, com.mycompany.myapp.domain.TypeSoin.class.getName());
             createCache(cm, com.mycompany.myapp.domain.EtablissementSante.class.getName());
             createCache(cm, com.mycompany.myapp.domain.DemandePriseEnCharge.class.getName());
             createCache(cm, com.mycompany.myapp.domain.PieceJustificative.class.getName());
