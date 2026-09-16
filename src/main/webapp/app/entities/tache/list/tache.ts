@@ -1,6 +1,6 @@
 import { NgClass } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
-import { Component, effect, inject, signal, untracked } from '@angular/core';
+import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Data, ParamMap, Router, RouterLink } from '@angular/router';
 
@@ -12,6 +12,7 @@ import { combineLatest, filter, map, tap } from 'rxjs';
 
 import { DEFAULT_SORT_DATA, ITEMS_PER_PAGE, ITEM_DELETED_EVENT, PAGE_HEADER, SORT, TOTAL_COUNT_RESPONSE_HEADER } from 'app/config';
 import { Alert, AlertError } from 'app/shared/alert';
+import { AccountService } from 'app/core/auth';
 import { HasAnyAuthorityDirective } from 'app/shared/auth';
 import { FormatMediumDatetimePipe } from 'app/shared/date';
 import { Filter, FilterOptions, IFilterOption, IFilterOptions } from 'app/shared/filter';
@@ -48,6 +49,11 @@ import { ITache } from '../tache.model';
 })
 export class Tache {
   protected readonly Authority = Authority;
+  protected readonly accountService = inject(AccountService);
+
+  readonly canManageTaches = computed(
+    () => !this.accountService.hasAnyAuthority([Authority.VALIDATEUR_DRH, Authority.VALIDATEUR_INFIRMERIE]),
+  );
 
   readonly taches = signal<ITache[]>([]);
 

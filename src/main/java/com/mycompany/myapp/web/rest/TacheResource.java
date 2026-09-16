@@ -119,6 +119,7 @@ public class TacheResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
+    @PreAuthorize("!hasAnyAuthority('" + AuthoritiesConstants.VALIDATEUR_DRH + "', '" + AuthoritiesConstants.VALIDATEUR_INFIRMERIE + "')")
     public ResponseEntity<TacheDTO> updateTache(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody TacheDTO tacheDTO
@@ -153,6 +154,7 @@ public class TacheResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PreAuthorize("!hasAnyAuthority('" + AuthoritiesConstants.VALIDATEUR_DRH + "', '" + AuthoritiesConstants.VALIDATEUR_INFIRMERIE + "')")
     public ResponseEntity<TacheDTO> partialUpdateTache(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody TacheDTO tacheDTO
@@ -237,6 +239,7 @@ public class TacheResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("!hasAnyAuthority('" + AuthoritiesConstants.VALIDATEUR_DRH + "', '" + AuthoritiesConstants.VALIDATEUR_INFIRMERIE + "')")
     public ResponseEntity<Void> deleteTache(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete Tache : {}", id);
         tacheService.delete(id);

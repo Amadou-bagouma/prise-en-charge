@@ -129,26 +129,28 @@
                 </span>
               </td>
               <td class="text-end">
-                <div ngbDropdown class="d-inline-block" container="body">
-                  <button type="button" class="btn btn-secondary btn-sm" ngbDropdownToggle data-cy="entityActionsButton">
-                    <fa-icon icon="ellipsis-vertical" />
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.actions">Actions</span>
-                  </button>
-                  <div ngbDropdownMenu>
-                    <a ngbDropdownItem [routerLink]="['/tache', tache.id, 'view']" data-cy="entityDetailsButton">
-                      <fa-icon icon="eye" class="me-1" />
-                      <span jhiTranslate="entity.action.view">View</span>
-                    </a>
-                    <a ngbDropdownItem [routerLink]="['/tache', tache.id, 'edit']" data-cy="entityEditButton">
-                      <fa-icon icon="pencil-alt" class="me-1" />
-                      <span jhiTranslate="entity.action.edit">Edit</span>
-                    </a>
-                    <button ngbDropdownItem type="button" (click)="delete(tache)" data-cy="entityDeleteButton">
-                      <fa-icon icon="times" class="me-1" />
-                      <span jhiTranslate="entity.action.delete">Delete</span>
+                @if (canManageTaches()) {
+                  <div ngbDropdown class="d-inline-block" container="body">
+                    <button type="button" class="btn btn-secondary btn-sm" ngbDropdownToggle data-cy="entityActionsButton">
+                      <fa-icon icon="ellipsis-vertical" />
+                      <span class="d-none d-md-inline" jhiTranslate="entity.action.actions">Actions</span>
                     </button>
+                    <div ngbDropdownMenu>
+                      <a ngbDropdownItem [routerLink]="['/tache', tache.id, 'view']" data-cy="entityDetailsButton">
+                        <fa-icon icon="eye" class="me-1" />
+                        <span jhiTranslate="entity.action.view">View</span>
+                      </a>
+                      <a ngbDropdownItem [routerLink]="['/tache', tache.id, 'edit']" data-cy="entityEditButton">
+                        <fa-icon icon="pencil-alt" class="me-1" />
+                        <span jhiTranslate="entity.action.edit">Edit</span>
+                      </a>
+                      <button ngbDropdownItem type="button" (click)="delete(tache)" data-cy="entityDeleteButton">
+                        <fa-icon icon="times" class="me-1" />
+                        <span jhiTranslate="entity.action.delete">Delete</span>
+                      </button>
+                    </div>
                   </div>
-                </div>
+                }
               </td>
             </tr>
           }
