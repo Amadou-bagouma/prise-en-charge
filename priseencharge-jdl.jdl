@@ -51,6 +51,7 @@ entity Agent {
   nom String required
   prenom String required
   dateNaissance LocalDate
+  dateEmbauche LocalDate
   telephone String
   fonction String
 }

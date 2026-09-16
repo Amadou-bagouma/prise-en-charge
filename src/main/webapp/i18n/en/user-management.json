@@ -25,6 +25,8 @@
     "passwordHelp": "Leave blank to send an activation email instead (requires a working mail server).",
     "mustChangePassword": "Must change password at next login",
     "imageUrl": "Image",
+    "signature": "Signature",
+    "signatureHelp": "Printed on the demande PDF report, for DRH/infirmerie validators only.",
     "activated": "Activated",
     "deactivated": "Deactivated",
     "profiles": "Profiles",

@@ -42,6 +42,9 @@ public class Agent implements Serializable {
     @Column(name = "date_naissance")
     private LocalDate dateNaissance;
 
+    @Column(name = "date_embauche")
+    private LocalDate dateEmbauche;
+
     @Column(name = "telephone")
     private String telephone;
 
@@ -130,6 +133,19 @@ public class Agent implements Serializable {
 
     public void setDateNaissance(LocalDate dateNaissance) {
         this.dateNaissance = dateNaissance;
+    }
+
+    public LocalDate getDateEmbauche() {
+        return this.dateEmbauche;
+    }
+
+    public Agent dateEmbauche(LocalDate dateEmbauche) {
+        this.setDateEmbauche(dateEmbauche);
+        return this;
+    }
+
+    public void setDateEmbauche(LocalDate dateEmbauche) {
+        this.dateEmbauche = dateEmbauche;
     }
 
     public String getTelephone() {
@@ -251,6 +267,7 @@ public class Agent implements Serializable {
             ", nom='" + getNom() + "'" +
             ", prenom='" + getPrenom() + "'" +
             ", dateNaissance='" + getDateNaissance() + "'" +
+            ", dateEmbauche='" + getDateEmbauche() + "'" +
             ", telephone='" + getTelephone() + "'" +
             ", fonction='" + getFonction() + "'" +
             "}";

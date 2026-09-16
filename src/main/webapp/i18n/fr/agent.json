@@ -22,6 +22,7 @@
       "nom": "Nom",
       "prenom": "Prénom",
       "dateNaissance": "Date de naissance",
+      "dateEmbauche": "Date d'embauche",
       "telephone": "Téléphone",
       "fonction": "Fonction",
       "photo": "Photo",

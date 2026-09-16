@@ -24,6 +24,8 @@ public class AgentDTO implements Serializable {
 
     private LocalDate dateNaissance;
 
+    private LocalDate dateEmbauche;
+
     private String telephone;
 
     private String fonction;
@@ -76,6 +78,14 @@ public class AgentDTO implements Serializable {
 
     public void setDateNaissance(LocalDate dateNaissance) {
         this.dateNaissance = dateNaissance;
+    }
+
+    public LocalDate getDateEmbauche() {
+        return dateEmbauche;
+    }
+
+    public void setDateEmbauche(LocalDate dateEmbauche) {
+        this.dateEmbauche = dateEmbauche;
     }
 
     public String getTelephone() {
@@ -164,6 +174,7 @@ public class AgentDTO implements Serializable {
             ", nom='" + getNom() + "'" +
             ", prenom='" + getPrenom() + "'" +
             ", dateNaissance='" + getDateNaissance() + "'" +
+            ", dateEmbauche='" + getDateEmbauche() + "'" +
             ", telephone='" + getTelephone() + "'" +
             ", fonction='" + getFonction() + "'" +
             ", direction=" + getDirection() +

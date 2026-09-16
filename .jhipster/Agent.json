@@ -25,6 +25,10 @@
       "fieldType": "LocalDate"
     },
     {
+      "fieldName": "dateEmbauche",
+      "fieldType": "LocalDate"
+    },
+    {
       "fieldName": "telephone",
       "fieldType": "String"
     },

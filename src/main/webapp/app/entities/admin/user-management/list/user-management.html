@@ -41,12 +41,6 @@
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
-            <th scope="col" jhiSortBy="email">
-              <div class="d-flex">
-                <span jhiTranslate="userManagement.email">Email</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
             <th scope="col"></th>
             <th scope="col" jhiSortBy="langKey">
               <div class="d-flex">
@@ -74,7 +68,6 @@
               <td>
                 <a [routerLink]="['/user-management', userManagement.login, 'view']">{{ userManagement.login }}</a>
               </td>
-              <td>{{ userManagement.email }}</td>
               <td>
                 @if (!userManagement.activated) {
                   <button class="btn btn-danger btn-sm" (click)="setActive(userManagement, true)" jhiTranslate="userManagement.deactivated">

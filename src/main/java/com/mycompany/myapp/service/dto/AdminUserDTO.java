@@ -38,6 +38,13 @@ public class AdminUserDTO implements Serializable {
     @Size(max = 256)
     private String imageUrl;
 
+    /**
+     * Signature image of a DRH/infirmerie validator, printed on the demande's PDF report.
+     */
+    private byte[] signature;
+
+    private String signatureContentType;
+
     private boolean activated = false;
 
     /**
@@ -76,6 +83,8 @@ public class AdminUserDTO implements Serializable {
         this.activated = user.isActivated();
         this.mustChangePassword = user.isMustChangePassword();
         this.imageUrl = user.getImageUrl();
+        this.signature = user.getSignature();
+        this.signatureContentType = user.getSignatureContentType();
         this.langKey = user.getLangKey();
         this.createdBy = user.getCreatedBy();
         this.createdDate = user.getCreatedDate();
@@ -130,6 +139,22 @@ public class AdminUserDTO implements Serializable {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public byte[] getSignature() {
+        return signature;
+    }
+
+    public void setSignature(byte[] signature) {
+        this.signature = signature;
+    }
+
+    public String getSignatureContentType() {
+        return signatureContentType;
+    }
+
+    public void setSignatureContentType(String signatureContentType) {
+        this.signatureContentType = signatureContentType;
     }
 
     public boolean isActivated() {

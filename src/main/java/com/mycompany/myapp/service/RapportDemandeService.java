@@ -2,15 +2,19 @@ package com.mycompany.myapp.service;
 
 import com.mycompany.myapp.domain.Agent;
 import com.mycompany.myapp.domain.DemandePriseEnCharge;
+import com.mycompany.myapp.domain.HistoriqueAction;
+import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.domain.enumeration.LienParente;
 import com.mycompany.myapp.domain.enumeration.StatutDemande;
 import com.mycompany.myapp.domain.enumeration.TypeSoin;
 import com.mycompany.myapp.repository.DemandePriseEnChargeRepository;
+import com.mycompany.myapp.repository.HistoriqueActionRepository;
 import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Set;
 import org.openpdf.text.BadElementException;
 import org.openpdf.text.Chunk;
@@ -52,8 +56,14 @@ public class RapportDemandeService {
 
     private final DemandePriseEnChargeRepository demandePriseEnChargeRepository;
 
-    public RapportDemandeService(DemandePriseEnChargeRepository demandePriseEnChargeRepository) {
+    private final HistoriqueActionRepository historiqueActionRepository;
+
+    public RapportDemandeService(
+        DemandePriseEnChargeRepository demandePriseEnChargeRepository,
+        HistoriqueActionRepository historiqueActionRepository
+    ) {
         this.demandePriseEnChargeRepository = demandePriseEnChargeRepository;
+        this.historiqueActionRepository = historiqueActionRepository;
     }
 
     /**
@@ -119,7 +129,10 @@ public class RapportDemandeService {
             joindre.setSpacingAfter(40);
             document.add(joindre);
 
-            document.add(signatures(underlineFont));
+            List<HistoriqueAction> historique = historiqueActionRepository.findByDemandeIdOrderByDateActionAsc(demandeId);
+            User validateurDrh = dernierValidateur(historique, "VALIDATION_DRH");
+            User validateurInfirmerie = dernierValidateur(historique, "VALIDATION_INFIRMERIE");
+            document.add(signatures(underlineFont, validateurInfirmerie, validateurDrh));
 
             document.add(pied(footerFont));
 
@@ -163,6 +176,33 @@ public class RapportDemandeService {
             return Image.getInstance(in.readAllBytes());
         } catch (IOException | BadElementException e) {
             LOG.debug("No CNSS logo found at classpath:{} - printing the report without it", LOGO_CLASSPATH);
+            return null;
+        }
+    }
+
+    /**
+     * The user who most recently performed the given workflow action (e.g. {@code VALIDATION_DRH})
+     * on this demande, or {@code null} if it hasn't reached that step (or was resoumise before
+     * anyone validated it again).
+     */
+    private User dernierValidateur(List<HistoriqueAction> historique, String action) {
+        for (int i = historique.size() - 1; i >= 0; i--) {
+            HistoriqueAction entry = historique.get(i);
+            if (action.equals(entry.getAction())) {
+                return entry.getUtilisateur();
+            }
+        }
+        return null;
+    }
+
+    private Image signatureImage(User validateur) {
+        if (validateur == null || validateur.getSignature() == null) {
+            return null;
+        }
+        try {
+            return Image.getInstance(validateur.getSignature());
+        } catch (IOException | BadElementException e) {
+            LOG.warn("Could not render the signature of user {} on the rapport", validateur.getLogin(), e);
             return null;
         }
     }
@@ -237,21 +277,28 @@ public class RapportDemandeService {
         table.addCell(cell);
     }
 
-    private PdfPTable signatures(Font font) {
+    private PdfPTable signatures(Font font, User validateurInfirmerie, User validateurDrh) {
         PdfPTable table = new PdfPTable(2);
         table.setWidthPercentage(100);
 
-        PdfPCell medecin = new PdfPCell(new Phrase("VISA DU MEDECIN CNSS", font));
-        medecin.setBorder(PdfPCell.NO_BORDER);
-        medecin.setMinimumHeight(60);
-        table.addCell(medecin);
-
-        PdfPCell drh = new PdfPCell(new Phrase("LE DIRECTEUR DES RESSOURCES HUMAINES", font));
-        drh.setBorder(PdfPCell.NO_BORDER);
-        drh.setMinimumHeight(60);
-        table.addCell(drh);
+        table.addCell(signatureCell("VISA DU MEDECIN CNSS", validateurInfirmerie, font));
+        table.addCell(signatureCell("LE DIRECTEUR DES RESSOURCES HUMAINES", validateurDrh, font));
 
         return table;
+    }
+
+    private PdfPCell signatureCell(String libelle, User validateur, Font font) {
+        PdfPCell cell = new PdfPCell();
+        cell.setBorder(PdfPCell.NO_BORDER);
+        cell.setMinimumHeight(70);
+        cell.addElement(new Phrase(libelle, font));
+        Image signature = signatureImage(validateur);
+        if (signature != null) {
+            signature.scaleToFit(120, 50);
+            signature.setSpacingBefore(4);
+            cell.addElement(signature);
+        }
+        return cell;
     }
 
     private Paragraph pied(Font footerFont) {

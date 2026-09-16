@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Mistaken "fix": Agent.photo and AyantDroit.photo are annotated @Lob (unlike
+        User.signature), so Hibernate writes them through Postgres' oid/large-object
+        protocol, which needs the oid column type that ${blobType} already produced.
+        This changeset wrongly converted them to bytea, which broke saving a photo the
+        other way ("column is of type bytea but expression is of type bigint"). Reverted
+        by 20260916150100-2 below.
+    -->
+    <changeSet id="20260916150100-1" author="manual">
+        <dropColumn tableName="agent" columnName="photo"/>
+        <addColumn tableName="agent">
+            <column name="photo" type="bytea"/>
+        </addColumn>
+        <dropColumn tableName="ayant_droit" columnName="photo"/>
+        <addColumn tableName="ayant_droit">
+            <column name="photo" type="bytea"/>
+        </addColumn>
+    </changeSet>
+
+    <!--
+        Revert 20260916150100-1: Agent.photo/AyantDroit.photo are @Lob, so they need the
+        oid column type ${blobType} originally gave them, not bytea.
+    -->
+    <changeSet id="20260916150100-2" author="manual">
+        <dropColumn tableName="agent" columnName="photo"/>
+        <addColumn tableName="agent">
+            <column name="photo" type="${blobType}"/>
+        </addColumn>
+        <dropColumn tableName="ayant_droit" columnName="photo"/>
+        <addColumn tableName="ayant_droit">
+            <column name="photo" type="${blobType}"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

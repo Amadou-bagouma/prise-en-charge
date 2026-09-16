@@ -10,6 +10,7 @@ export interface IAgent {
   nom?: string | null;
   prenom?: string | null;
   dateNaissance?: dayjs.Dayjs | null;
+  dateEmbauche?: dayjs.Dayjs | null;
   telephone?: string | null;
   fonction?: string | null;
   photo?: string | null;

@@ -31,32 +31,6 @@
           }
         </div>
 
-        @let emailRef = editForm.get('email')!;
-        <div class="jhi-field">
-          <label class="form-label" for="field_email" jhiTranslate="userManagement.email">Email</label>
-          <input type="text" class="form-control" name="email" id="field_email" data-cy="email" formControlName="email" />
-          @if (emailRef.invalid && (emailRef.dirty || emailRef.touched)) {
-            <div>
-              @if (emailRef.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-              @if (emailRef.errors?.minlength) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.minlength" [translateValues]="{ min: '5' }"
-                  >This field is required to be at least 5 characters.</small
-                >
-              }
-              @if (emailRef.errors?.maxlength) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '191' }"
-                  >This field cannot be longer than 191 characters.</small
-                >
-              }
-              @if (emailRef.errors?.email) {
-                <small class="form-text text-danger" jhiTranslate="global.messages.validate.email.invalid">Your email is invalid.</small>
-              }
-            </div>
-          }
-        </div>
-
         @if (!userManagement) {
           @let passwordRef = editForm.get('password')!;
           <div class="jhi-field">
@@ -138,6 +112,41 @@
               }
             </div>
           }
+        </div>
+
+        <div class="jhi-field">
+          <label class="form-label" for="field_signature" jhiTranslate="userManagement.signature">Signature</label>
+          @if (editForm.get('signature')!.value) {
+            <div>
+              <img
+                [src]="'data:' + editForm.get('signatureContentType')!.value + ';base64,' + editForm.get('signature')!.value"
+                style="max-height: 80px"
+                alt="signature"
+              />
+              <div>
+                {{ editForm.get('signatureContentType')!.value }}, {{ byteSize(editForm.get('signature')!.value) }}
+                <button
+                  type="button"
+                  (click)="clearInputImage('signature', 'signatureContentType', 'file_signature')"
+                  class="btn btn-secondary btn-sm"
+                >
+                  <fa-icon icon="times" />
+                </button>
+              </div>
+            </div>
+          }
+          <input type="file" (change)="setFileData($event, 'signature', true)" accept="image/*" id="file_signature" data-cy="signature" />
+          <input type="hidden" class="form-control" name="signature" id="field_signature" data-cy="signature" formControlName="signature" />
+          <input
+            type="hidden"
+            class="form-control"
+            name="signatureContentType"
+            id="field_signatureContentType"
+            formControlName="signatureContentType"
+          />
+          <small class="form-text text-muted" jhiTranslate="userManagement.signatureHelp"
+            >Printed on the demande PDF report for DRH/infirmerie validators only.</small
+          >
         </div>
 
         @if (editForm.controls.activated.value !== null) {

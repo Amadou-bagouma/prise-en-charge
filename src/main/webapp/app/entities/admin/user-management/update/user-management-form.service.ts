@@ -39,11 +39,12 @@ type UserManagementFormGroupContent = {
   login: FormControl<UserManagementFormRawValue['login'] | NewUserManagement['login']>;
   firstName: FormControl<UserManagementFormRawValue['firstName']>;
   lastName: FormControl<UserManagementFormRawValue['lastName']>;
-  email: FormControl<UserManagementFormRawValue['email']>;
   activated: FormControl<UserManagementFormRawValue['activated']>;
   password: FormControl<UserManagementFormRawValue['password']>;
   langKey: FormControl<UserManagementFormRawValue['langKey']>;
   imageUrl: FormControl<UserManagementFormRawValue['imageUrl']>;
+  signature: FormControl<UserManagementFormRawValue['signature']>;
+  signatureContentType: FormControl<UserManagementFormRawValue['signatureContentType']>;
   createdBy: FormControl<UserManagementFormRawValue['createdBy']>;
   createdDate: FormControl<UserManagementFormRawValue['createdDate']>;
   lastModifiedBy: FormControl<UserManagementFormRawValue['lastModifiedBy']>;
@@ -77,9 +78,6 @@ export class UserManagementFormService {
       lastName: new FormControl(userManagementRawValue.lastName, {
         validators: [Validators.maxLength(50)],
       }),
-      email: new FormControl(userManagementRawValue.email, {
-        validators: [Validators.required, Validators.email, Validators.minLength(5), Validators.maxLength(191)],
-      }),
       activated: new FormControl(userManagementRawValue.activated),
       password: new FormControl(userManagementRawValue.password, {
         validators: [Validators.minLength(4), Validators.maxLength(100)],
@@ -90,6 +88,8 @@ export class UserManagementFormService {
       imageUrl: new FormControl(userManagementRawValue.imageUrl, {
         validators: [Validators.maxLength(256)],
       }),
+      signature: new FormControl(userManagementRawValue.signature),
+      signatureContentType: new FormControl(userManagementRawValue.signatureContentType),
       createdBy: new FormControl(userManagementRawValue.createdBy),
       createdDate: new FormControl(userManagementRawValue.createdDate),
       lastModifiedBy: new FormControl(userManagementRawValue.lastModifiedBy),

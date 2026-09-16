@@ -14,6 +14,9 @@ export interface IUserManagement {
   mustChangePassword?: boolean | null;
   langKey?: (typeof LANGUAGES)[number] | null;
   imageUrl?: string | null;
+  /** Signature image of a DRH/infirmerie validator, printed on the demande's PDF report. */
+  signature?: string | null;
+  signatureContentType?: string | null;
   createdBy?: string | null;
   createdDate?: dayjs.Dayjs | null;
   lastModifiedBy?: string | null;

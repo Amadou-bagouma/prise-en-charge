@@ -4,7 +4,6 @@ import { IUserManagement, NewUserManagement } from './user-management.model';
 
 export const sampleWithRequiredData: IUserManagement = {
   login: 'Randall.Sauer',
-  email: 'Lucienne5@hotmail.com',
 };
 
 export const sampleWithPartialData: IUserManagement = {
@@ -12,7 +11,6 @@ export const sampleWithPartialData: IUserManagement = {
   login: 'Sasha.McCullough4',
   firstName: 'Parker',
   lastName: 'Dietrich',
-  email: 'Janessa44@hotmail.com',
   activated: false,
   langKey: 'en',
   lastModifiedBy: 'schematise hm',
@@ -24,7 +22,6 @@ export const sampleWithFullData: IUserManagement = {
   login: 'Brisa72',
   firstName: 'Lorena',
   lastName: 'Bode',
-  email: 'Rylan_Altenwerth65@hotmail.com',
   activated: false,
   langKey: 'en',
   imageUrl: 'as vastly than',
@@ -35,7 +32,6 @@ export const sampleWithFullData: IUserManagement = {
 };
 
 export const sampleWithNewData: NewUserManagement = {
-  email: 'Jasen82@yahoo.com',
   login: null,
 };
 

@@ -28,6 +28,8 @@
     "deactivated": "Désactivé",
     "profiles": "Droits",
     "imageUrl": "Image",
+    "signature": "Signature",
+    "signatureHelp": "Imprimée sur le rapport PDF de la demande, pour les validateurs DRH/infirmerie uniquement.",
     "langKey": "Langue",
     "createdBy": "Créé par",
     "createdDate": "Créé le",

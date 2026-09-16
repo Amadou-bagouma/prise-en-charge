@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, computed, inject, signal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
@@ -8,6 +8,8 @@ import { Observable, finalize } from 'rxjs';
 import { LANGUAGES } from 'app/config';
 import { AuthorityService } from 'app/entities/admin/authority/service/authority.service';
 import { AlertError } from 'app/shared/alert';
+import { AlertService } from 'app/core/util/alert.service';
+import { DataUtils, FileLoadError } from 'app/core/util/data-util.service';
 import { FindLanguageFromKeyPipe, TranslateDirective } from 'app/shared/language';
 import { UserManagementService } from '../service/user-management.service';
 import { IUserManagement, NewUserManagement } from '../user-management.model';
@@ -28,6 +30,10 @@ export class UserManagementUpdate implements OnInit {
   protected userManagementFormService = inject(UserManagementFormService);
   protected activatedRoute = inject(ActivatedRoute);
   protected readonly authorityService = inject(AuthorityService);
+  protected dataUtils = inject(DataUtils);
+  protected alertService = inject(AlertService);
+  protected elementRef = inject(ElementRef);
+  protected cdr = inject(ChangeDetectorRef);
   // eslint-disable-next-line @typescript-eslint/member-ordering
   readonly authorities = computed(() => this.authorityService.authorities().map(authority => authority.name));
 
@@ -47,6 +53,33 @@ export class UserManagementUpdate implements OnInit {
 
   previousState(): void {
     globalThis.history.back();
+  }
+
+  byteSize(base64String: string | null | undefined): string {
+    return base64String ? this.dataUtils.byteSize(base64String) : '';
+  }
+
+  setFileData(event: Event, field: string, isImage: boolean): void {
+    this.dataUtils.loadFileToForm(event, this.editForm, field, isImage).subscribe({
+      next: () => this.cdr.markForCheck(),
+      error: (err: FileLoadError) =>
+        this.alertService.addAlert({
+          type: 'danger',
+          translationKey: `error.file.${err.key}`,
+          translationParams: err.params,
+        }),
+    });
+  }
+
+  clearInputImage(field: string, fieldContentType: string, idInput: string): void {
+    this.editForm.patchValue({
+      [field]: null,
+      [fieldContentType]: null,
+    });
+    const inputElement = this.elementRef.nativeElement.querySelector(`#${idInput}`);
+    if (inputElement) {
+      inputElement.value = null;
+    }
   }
 
   save(): void {

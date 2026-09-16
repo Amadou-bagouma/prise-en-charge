@@ -72,6 +72,16 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @Column(name = "image_url", length = 256)
     private String imageUrl;
 
+    /**
+     * Signature image of a DRH/infirmerie validator, printed on the validated demande's PDF
+     * report next to their role. Set by an admin from the user management screen.
+     */
+    @Column(name = "signature")
+    private byte[] signature;
+
+    @Column(name = "signature_content_type")
+    private String signatureContentType;
+
     @Size(max = 20)
     @Column(name = "activation_key", length = 20)
     @JsonIgnore
@@ -155,6 +165,22 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public byte[] getSignature() {
+        return signature;
+    }
+
+    public void setSignature(byte[] signature) {
+        this.signature = signature;
+    }
+
+    public String getSignatureContentType() {
+        return signatureContentType;
+    }
+
+    public void setSignatureContentType(String signatureContentType) {
+        this.signatureContentType = signatureContentType;
     }
 
     public boolean isActivated() {

@@ -31,6 +31,9 @@
     <include file="config/liquibase/changelog/20260915090000_add_demande_prise_en_charge_type_soin_many_to_many.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260915140000_add_demande_prise_en_charge_reference_sequence.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260916110000_replace_type_soin_with_fixed_categories.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260916150000_add_user_signature.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260916150100_fix_agent_ayant_droit_photo_type.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260916160000_add_agent_date_embauche.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <include file="config/liquibase/changelog/20231225055847_added_entity_constraints_Direction.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20231225055947_added_entity_constraints_Agent.xml" relativeToChangelogFile="false"/>

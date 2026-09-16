@@ -45,6 +45,23 @@
           </div>
         </div>
 
+        <div class="jhi-field">
+          <label class="form-label" for="field_dateEmbauche" jhiTranslate="peccnssApp.agent.dateEmbauche">Date Embauche</label>
+          <div class="input-group">
+            <input
+              id="field_dateEmbauche"
+              data-cy="dateEmbauche"
+              type="text"
+              class="form-control"
+              name="dateEmbauche"
+              ngbDatepicker
+              #dateEmbaucheDp="ngbDatepicker"
+              formControlName="dateEmbauche"
+            />
+            <button type="button" class="btn btn-secondary" (click)="dateEmbaucheDp.toggle()"><fa-icon icon="calendar-alt" /></button>
+          </div>
+        </div>
+
         @let nomRef = editForm.get('nom')!;
         <div class="jhi-field">
           <label class="form-label" for="field_nom" jhiTranslate="peccnssApp.agent.nom">Nom</label>
