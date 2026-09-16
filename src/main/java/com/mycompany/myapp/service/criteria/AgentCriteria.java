@@ -42,8 +42,6 @@ public class AgentCriteria implements Serializable, Criteria {
 
     private LongFilter gestionId;
 
-    private LongFilter userId;
-
     private Boolean distinct;
 
     public AgentCriteria() {}
@@ -58,7 +56,6 @@ public class AgentCriteria implements Serializable, Criteria {
         this.fonction = other.optionalFonction().map(StringFilter::copy).orElse(null);
         this.directionId = other.optionalDirectionId().map(LongFilter::copy).orElse(null);
         this.gestionId = other.optionalGestionId().map(LongFilter::copy).orElse(null);
-        this.userId = other.optionalUserId().map(LongFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
@@ -238,25 +235,6 @@ public class AgentCriteria implements Serializable, Criteria {
         this.gestionId = gestionId;
     }
 
-    public LongFilter getUserId() {
-        return userId;
-    }
-
-    public Optional<LongFilter> optionalUserId() {
-        return Optional.ofNullable(userId);
-    }
-
-    public LongFilter userId() {
-        if (userId == null) {
-            setUserId(new LongFilter());
-        }
-        return userId;
-    }
-
-    public void setUserId(LongFilter userId) {
-        this.userId = userId;
-    }
-
     public Boolean getDistinct() {
         return distinct;
     }
@@ -295,14 +273,13 @@ public class AgentCriteria implements Serializable, Criteria {
             Objects.equals(fonction, that.fonction) &&
             Objects.equals(directionId, that.directionId) &&
             Objects.equals(gestionId, that.gestionId) &&
-            Objects.equals(userId, that.userId) &&
             Objects.equals(distinct, that.distinct)
         );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, matricule, nom, prenom, dateNaissance, telephone, fonction, directionId, gestionId, userId, distinct);
+        return Objects.hash(id, matricule, nom, prenom, dateNaissance, telephone, fonction, directionId, gestionId, distinct);
     }
 
     // prettier-ignore
@@ -318,7 +295,6 @@ public class AgentCriteria implements Serializable, Criteria {
             optionalFonction().map(f -> "fonction=" + f + ", ").orElse("") +
             optionalDirectionId().map(f -> "directionId=" + f + ", ").orElse("") +
             optionalGestionId().map(f -> "gestionId=" + f + ", ").orElse("") +
-            optionalUserId().map(f -> "userId=" + f + ", ").orElse("") +
             optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
         "}";
     }

@@ -12,9 +12,7 @@ import com.mycompany.myapp.IntegrationTest;
 import com.mycompany.myapp.domain.Agent;
 import com.mycompany.myapp.domain.Direction;
 import com.mycompany.myapp.domain.Gestion;
-import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.repository.AgentRepository;
-import com.mycompany.myapp.repository.UserRepository;
 import com.mycompany.myapp.service.AgentService;
 import com.mycompany.myapp.service.dto.AgentDTO;
 import com.mycompany.myapp.service.mapper.AgentMapper;
@@ -78,9 +76,6 @@ class AgentResourceIT {
 
     @Autowired
     private AgentRepository agentRepository;
-
-    @Autowired
-    private UserRepository userRepository;
 
     @Mock
     private AgentRepository agentRepositoryMock;
@@ -682,28 +677,6 @@ class AgentResourceIT {
 
         // Get all the agentList where gestion equals to (gestionId + 1)
         defaultAgentShouldNotBeFound("gestionId.equals=" + (gestionId + 1));
-    }
-
-    @Test
-    @Transactional
-    void getAllAgentsByUserIsEqualToSomething() throws Exception {
-        User user;
-        if (TestUtil.findAll(em, User.class).isEmpty()) {
-            agentRepository.saveAndFlush(agent);
-            user = UserResourceIT.createEntity();
-        } else {
-            user = TestUtil.findAll(em, User.class).get(0);
-        }
-        em.persist(user);
-        em.flush();
-        agent.setUser(user);
-        agentRepository.saveAndFlush(agent);
-        Long userId = user.getId();
-        // Get all the agentList where user equals to userId
-        defaultAgentShouldBeFound("userId.equals=" + userId);
-
-        // Get all the agentList where user equals to (userId + 1)
-        defaultAgentShouldNotBeFound("userId.equals=" + (userId + 1));
     }
 
     private void defaultAgentFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {

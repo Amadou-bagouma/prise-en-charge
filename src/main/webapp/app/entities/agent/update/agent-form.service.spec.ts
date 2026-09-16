@@ -28,7 +28,6 @@ describe('Agent Form Service', () => {
             fonction: expect.any(Object),
             direction: expect.any(Object),
             gestion: expect.any(Object),
-            user: expect.any(Object),
           }),
         );
       });
@@ -47,7 +46,6 @@ describe('Agent Form Service', () => {
             fonction: expect.any(Object),
             direction: expect.any(Object),
             gestion: expect.any(Object),
-            user: expect.any(Object),
           }),
         );
       });

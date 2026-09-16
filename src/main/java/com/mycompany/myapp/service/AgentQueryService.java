@@ -73,7 +73,6 @@ public class AgentQueryService extends QueryService<Agent> {
             if (Long.class != query.getResultType()) {
                 root.fetch(Agent_.direction, JoinType.LEFT);
                 root.fetch(Agent_.gestion, JoinType.LEFT);
-                root.fetch(Agent_.user, JoinType.LEFT);
             }
             return null;
         });
@@ -90,8 +89,7 @@ public class AgentQueryService extends QueryService<Agent> {
                     buildStringSpecification(criteria.getTelephone(), Agent_.telephone),
                     buildStringSpecification(criteria.getFonction(), Agent_.fonction),
                     buildSpecification(criteria.getDirectionId(), root -> root.join(Agent_.direction, JoinType.LEFT).get(Direction_.id)),
-                    buildSpecification(criteria.getGestionId(), root -> root.join(Agent_.gestion, JoinType.LEFT).get(Gestion_.id)),
-                    buildSpecification(criteria.getUserId(), root -> root.join(Agent_.user, JoinType.LEFT).get(User_.id))
+                    buildSpecification(criteria.getGestionId(), root -> root.join(Agent_.gestion, JoinType.LEFT).get(Gestion_.id))
                 )
             );
         }

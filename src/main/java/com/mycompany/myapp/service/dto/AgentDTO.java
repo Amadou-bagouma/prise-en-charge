@@ -38,8 +38,6 @@ public class AgentDTO implements Serializable {
 
     private GestionDTO gestion;
 
-    private UserDTO user;
-
     public Long getId() {
         return id;
     }
@@ -136,14 +134,6 @@ public class AgentDTO implements Serializable {
         this.gestion = gestion;
     }
 
-    public UserDTO getUser() {
-        return user;
-    }
-
-    public void setUser(UserDTO user) {
-        this.user = user;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -179,7 +169,6 @@ public class AgentDTO implements Serializable {
             ", fonction='" + getFonction() + "'" +
             ", direction=" + getDirection() +
             ", gestion=" + getGestion() +
-            ", user=" + getUser() +
             "}";
     }
 }

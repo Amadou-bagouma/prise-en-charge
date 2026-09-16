@@ -11,8 +11,6 @@ import { IDirection } from 'app/entities/direction/direction.model';
 import { DirectionService } from 'app/entities/direction/service/direction.service';
 import { IGestion } from 'app/entities/gestion/gestion.model';
 import { GestionService } from 'app/entities/gestion/service/gestion.service';
-import { UserService } from 'app/entities/user/service/user.service';
-import { IUser } from 'app/entities/user/user.model';
 import { IAgent } from '../agent.model';
 import { AgentService } from '../service/agent.service';
 
@@ -27,7 +25,6 @@ describe('Agent Management Update Component', () => {
   let agentService: AgentService;
   let directionService: DirectionService;
   let gestionService: GestionService;
-  let userService: UserService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -49,7 +46,6 @@ describe('Agent Management Update Component', () => {
     agentService = TestBed.inject(AgentService);
     directionService = TestBed.inject(DirectionService);
     gestionService = TestBed.inject(GestionService);
-    userService = TestBed.inject(UserService);
 
     comp = fixture.componentInstance;
   });
@@ -99,43 +95,18 @@ describe('Agent Management Update Component', () => {
       expect(comp.gestionsSharedCollection()).toEqual(expectedCollection);
     });
 
-    it('should call User query and add missing value', () => {
-      const agent: IAgent = { id: 18913 };
-      const user: IUser = { id: 3944 };
-      agent.user = user;
-
-      const userCollection: IUser[] = [{ id: 3944 }];
-      vi.spyOn(userService, 'query').mockReturnValue(of(new HttpResponse({ body: userCollection })));
-      const additionalUsers = [user];
-      const expectedCollection: IUser[] = [...additionalUsers, ...userCollection];
-      vi.spyOn(userService, 'addUserToCollectionIfMissing').mockReturnValue(expectedCollection);
-
-      activatedRoute.data = of({ agent });
-      comp.ngOnInit();
-
-      expect(userService.query).toHaveBeenCalled();
-      expect(userService.addUserToCollectionIfMissing).toHaveBeenCalledWith(
-        userCollection,
-        ...additionalUsers.map(i => expect.objectContaining(i) as typeof i),
-      );
-      expect(comp.usersSharedCollection()).toEqual(expectedCollection);
-    });
-
     it('should update editForm', () => {
       const agent: IAgent = { id: 18913 };
       const direction: IDirection = { id: 3524 };
       agent.direction = direction;
       const gestion: IGestion = { id: 26677 };
       agent.gestion = gestion;
-      const user: IUser = { id: 3944 };
-      agent.user = user;
 
       activatedRoute.data = of({ agent });
       comp.ngOnInit();
 
       expect(comp.directionsSharedCollection()).toContainEqual(direction);
       expect(comp.gestionsSharedCollection()).toContainEqual(gestion);
-      expect(comp.usersSharedCollection()).toContainEqual(user);
       expect(comp.agent).toEqual(agent);
     });
   });
@@ -226,16 +197,6 @@ describe('Agent Management Update Component', () => {
         vi.spyOn(gestionService, 'compareGestion');
         comp.compareGestion(entity, entity2);
         expect(gestionService.compareGestion).toHaveBeenCalledWith(entity, entity2);
-      });
-    });
-
-    describe('compareUser', () => {
-      it('should forward to userService', () => {
-        const entity = { id: 3944 };
-        const entity2 = { id: 6275 };
-        vi.spyOn(userService, 'compareUser');
-        comp.compareUser(entity, entity2);
-        expect(userService.compareUser).toHaveBeenCalledWith(entity, entity2);
       });
     });
   });

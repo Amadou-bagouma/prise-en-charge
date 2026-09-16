@@ -29,7 +29,6 @@ type AgentFormGroupContent = {
   photoContentType: FormControl<IAgent['photoContentType']>;
   direction: FormControl<IAgent['direction']>;
   gestion: FormControl<IAgent['gestion']>;
-  user: FormControl<IAgent['user']>;
 };
 
 export type AgentFormGroup = FormGroup<AgentFormGroupContent>;
@@ -67,7 +66,6 @@ export class AgentFormService {
       photoContentType: new FormControl(agentRawValue.photoContentType),
       direction: new FormControl(agentRawValue.direction),
       gestion: new FormControl(agentRawValue.gestion),
-      user: new FormControl(agentRawValue.user),
     });
   }
 

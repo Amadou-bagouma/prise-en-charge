@@ -14,9 +14,6 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface AgentRepository extends JpaRepository<Agent, Long>, JpaSpecificationExecutor<Agent> {
-    @Query("select agent from Agent agent where agent.user.login = ?#{authentication.name}")
-    List<Agent> findByUserIsCurrentUser();
-
     default Optional<Agent> findOneWithEagerRelationships(Long id) {
         return this.findOneWithToOneRelationships(id);
     }
@@ -30,16 +27,14 @@ public interface AgentRepository extends JpaRepository<Agent, Long>, JpaSpecific
     }
 
     @Query(
-        value = "select agent from Agent agent left join fetch agent.direction left join fetch agent.gestion left join fetch agent.user",
+        value = "select agent from Agent agent left join fetch agent.direction left join fetch agent.gestion",
         countQuery = "select count(agent) from Agent agent"
     )
     Page<Agent> findAllWithToOneRelationships(Pageable pageable);
 
-    @Query("select agent from Agent agent left join fetch agent.direction left join fetch agent.gestion left join fetch agent.user")
+    @Query("select agent from Agent agent left join fetch agent.direction left join fetch agent.gestion")
     List<Agent> findAllWithToOneRelationships();
 
-    @Query(
-        "select agent from Agent agent left join fetch agent.direction left join fetch agent.gestion left join fetch agent.user where agent.id =:id"
-    )
+    @Query("select agent from Agent agent left join fetch agent.direction left join fetch agent.gestion where agent.id =:id")
     Optional<Agent> findOneWithToOneRelationships(@Param("id") Long id);
 }

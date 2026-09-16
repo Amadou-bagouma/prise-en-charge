@@ -80,7 +80,6 @@ class AgentCriteriaTest {
         agentCriteria.fonction();
         agentCriteria.directionId();
         agentCriteria.gestionId();
-        agentCriteria.userId();
         agentCriteria.distinct();
     }
 
@@ -96,7 +95,6 @@ class AgentCriteriaTest {
                 condition.apply(criteria.getFonction()) &&
                 condition.apply(criteria.getDirectionId()) &&
                 condition.apply(criteria.getGestionId()) &&
-                condition.apply(criteria.getUserId()) &&
                 condition.apply(criteria.getDistinct()),
             "every filter matches"
         );
@@ -114,7 +112,6 @@ class AgentCriteriaTest {
                 condition.apply(criteria.getFonction(), copy.getFonction()) &&
                 condition.apply(criteria.getDirectionId(), copy.getDirectionId()) &&
                 condition.apply(criteria.getGestionId(), copy.getGestionId()) &&
-                condition.apply(criteria.getUserId(), copy.getUserId()) &&
                 condition.apply(criteria.getDistinct(), copy.getDistinct()),
             "every filter matches"
         );

@@ -264,8 +264,6 @@ relationship ManyToOne {
   Agent{gestion(nom)} to Gestion
 
   AyantDroit{agent(matricule)} to Agent
-
-  Agent{user(login)} to User with builtInEntity
 }
 
 

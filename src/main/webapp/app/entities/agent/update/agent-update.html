@@ -168,16 +168,6 @@
             }
           </select>
         </div>
-
-        <div class="jhi-field">
-          <label class="form-label" for="field_user" jhiTranslate="peccnssApp.agent.user">User</label>
-          <select class="form-control" id="field_user" data-cy="user" name="user" formControlName="user" [compareWith]="compareUser">
-            <option [ngValue]="null"></option>
-            @for (userOption of usersSharedCollection(); track $index) {
-              <option [ngValue]="userOption">{{ userOption.login }}</option>
-            }
-          </select>
-        </div>
       </div>
 
       <div class="jhi-form-actions">

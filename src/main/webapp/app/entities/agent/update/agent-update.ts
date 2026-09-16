@@ -13,8 +13,6 @@ import { IDirection } from 'app/entities/direction/direction.model';
 import { DirectionService } from 'app/entities/direction/service/direction.service';
 import { IGestion } from 'app/entities/gestion/gestion.model';
 import { GestionService } from 'app/entities/gestion/service/gestion.service';
-import { UserService } from 'app/entities/user/service/user.service';
-import { IUser } from 'app/entities/user/user.model';
 import { AlertError } from 'app/shared/alert';
 import { TranslateDirective } from 'app/shared/language';
 import { IAgent } from '../agent.model';
@@ -33,7 +31,6 @@ export class AgentUpdate implements OnInit {
 
   directionsSharedCollection = signal<IDirection[]>([]);
   gestionsSharedCollection = signal<IGestion[]>([]);
-  usersSharedCollection = signal<IUser[]>([]);
 
   protected dataUtils = inject(DataUtils);
   protected alertService = inject(AlertService);
@@ -41,7 +38,6 @@ export class AgentUpdate implements OnInit {
   protected agentFormService = inject(AgentFormService);
   protected directionService = inject(DirectionService);
   protected gestionService = inject(GestionService);
-  protected userService = inject(UserService);
   protected activatedRoute = inject(ActivatedRoute);
   protected elementRef = inject(ElementRef);
   protected cdr = inject(ChangeDetectorRef);
@@ -52,8 +48,6 @@ export class AgentUpdate implements OnInit {
   compareDirection = (o1: IDirection | null, o2: IDirection | null): boolean => this.directionService.compareDirection(o1, o2);
 
   compareGestion = (o1: IGestion | null, o2: IGestion | null): boolean => this.gestionService.compareGestion(o1, o2);
-
-  compareUser = (o1: IUser | null, o2: IUser | null): boolean => this.userService.compareUser(o1, o2);
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ agent }) => {
@@ -136,7 +130,6 @@ export class AgentUpdate implements OnInit {
     this.gestionsSharedCollection.update(gestions =>
       this.gestionService.addGestionToCollectionIfMissing<IGestion>(gestions, agent.gestion),
     );
-    this.usersSharedCollection.update(users => this.userService.addUserToCollectionIfMissing<IUser>(users, agent.user));
   }
 
   protected loadRelationshipsOptions(): void {
@@ -155,11 +148,5 @@ export class AgentUpdate implements OnInit {
       .pipe(map((res: HttpResponse<IGestion[]>) => res.body ?? []))
       .pipe(map((gestions: IGestion[]) => this.gestionService.addGestionToCollectionIfMissing<IGestion>(gestions, this.agent?.gestion)))
       .subscribe((gestions: IGestion[]) => this.gestionsSharedCollection.set(gestions));
-
-    this.userService
-      .query()
-      .pipe(map((res: HttpResponse<IUser[]>) => res.body ?? []))
-      .pipe(map((users: IUser[]) => this.userService.addUserToCollectionIfMissing<IUser>(users, this.agent?.user)))
-      .subscribe((users: IUser[]) => this.usersSharedCollection.set(users));
   }
 }

@@ -34,6 +34,7 @@
     <include file="config/liquibase/changelog/20260916150000_add_user_signature.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260916150100_fix_agent_ayant_droit_photo_type.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260916160000_add_agent_date_embauche.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260916170000_drop_agent_user.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <include file="config/liquibase/changelog/20231225055847_added_entity_constraints_Direction.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20231225055947_added_entity_constraints_Agent.xml" relativeToChangelogFile="false"/>
