@@ -128,11 +128,19 @@
                   {{ { null: '', AGENT: 'Agent', AYANT_DROIT: 'Ayant droit' }[demandePriseEnCharge.typeBeneficiaire ?? 'null'] }}
                 </div>
               </td>
-              <td>{{ typeSoinsLabel(demandePriseEnCharge) }}</td>
-              <td>{{ demandePriseEnCharge.etablissementSante?.nom }}</td>
+              <td>
+                <span class="jhi-table-cell-truncate" [title]="typeSoinsLabel(demandePriseEnCharge)">{{
+                  typeSoinsLabel(demandePriseEnCharge)
+                }}</span>
+              </td>
+              <td>
+                <span class="jhi-table-cell-truncate" [title]="demandePriseEnCharge.etablissementSante?.nom">{{
+                  demandePriseEnCharge.etablissementSante?.nom
+                }}</span>
+              </td>
               <td>
                 <span
-                  class="jhi-badge"
+                  class="jhi-badge jhi-badge-wrap"
                   [ngClass]="'jhi-badge-statut-' + demandePriseEnCharge.statut"
                   [jhiTranslate]="'peccnssApp.StatutDemande.' + (demandePriseEnCharge.statut ?? 'null')"
                 >
@@ -158,7 +166,7 @@
               </td>
               <td>
                 <span
-                  class="jhi-badge"
+                  class="jhi-badge jhi-badge-wrap"
                   [ngClass]="'jhi-badge-priorite-' + demandePriseEnCharge.priorite"
                   [jhiTranslate]="'peccnssApp.PrioriteDemande.' + (demandePriseEnCharge.priorite ?? 'null')"
                 >
@@ -170,7 +178,9 @@
               <td>{{ demandePriseEnCharge.dateCreation | formatMediumDatetime }}</td>
               <td>{{ demandePriseEnCharge.dateEcheance | formatMediumDatetime }}</td>
               <td>
-                {{ demandePriseEnCharge.assigneA?.login }}
+                <span class="jhi-table-cell-truncate" [title]="demandePriseEnCharge.assigneA?.login">{{
+                  demandePriseEnCharge.assigneA?.login
+                }}</span>
               </td>
               <td class="text-end">
                 <div ngbDropdown class="d-inline-block" container="body">
