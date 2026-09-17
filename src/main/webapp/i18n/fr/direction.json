@@ -5,7 +5,7 @@
         "title": "Directions",
         "refreshListLabel": "Actualiser la liste",
         "createLabel": "Créer un nouveau Direction",
-        "createOrEditLabel": "Créer ou éditer un Direction",
+        "createOrEditLabel": "Créer un Direction",
         "notFound": "Aucun Direction trouvé"
       },
       "created": "Un nouveau Direction a été créé avec l'identifiant {{ param }}",

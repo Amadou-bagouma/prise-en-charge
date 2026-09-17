@@ -5,7 +5,7 @@
         "title": "Agents",
         "refreshListLabel": "Actualiser la liste",
         "createLabel": "Créer un nouveau Agent",
-        "createOrEditLabel": "Créer ou éditer un Agent",
+        "createOrEditLabel": "Créer un Agent",
         "notFound": "Aucun Agent trouvé"
       },
       "created": "Un nouveau Agent a été créé avec l'identifiant {{ param }}",

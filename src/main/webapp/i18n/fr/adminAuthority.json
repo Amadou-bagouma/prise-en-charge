@@ -5,7 +5,7 @@
         "title": "Authorities",
         "refreshListLabel": "Actualiser la liste",
         "createLabel": "Créer un nouveau Authority",
-        "createOrEditLabel": "Créer ou éditer un Authority",
+        "createOrEditLabel": "Créer un Authority",
         "notFound": "Aucun Authority trouvé"
       },
       "created": "Un nouveau Authority a été créé avec l'identifiant {{ param }}",

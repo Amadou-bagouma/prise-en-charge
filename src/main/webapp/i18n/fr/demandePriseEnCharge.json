@@ -5,7 +5,7 @@
         "title": "DemandePriseEnCharges",
         "refreshListLabel": "Actualiser la liste",
         "createLabel": "Créer un nouveau Demande Prise En Charge",
-        "createOrEditLabel": "Créer ou éditer un Demande Prise En Charge",
+        "createOrEditLabel": "Créer un Demande Prise En Charge",
         "notFound": "Aucun Demande Prise En Charge trouvé"
       },
       "created": "Un nouveau Demande Prise En Charge a été créé avec l'identifiant {{ param }}",

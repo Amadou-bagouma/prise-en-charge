@@ -5,7 +5,7 @@
         "title": "EtablissementSantes",
         "refreshListLabel": "Actualiser la liste",
         "createLabel": "Créer un nouveau Etablissement Sante",
-        "createOrEditLabel": "Créer ou éditer un Etablissement Sante",
+        "createOrEditLabel": "Créer un Etablissement Sante",
         "notFound": "Aucun Etablissement Sante trouvé"
       },
       "created": "Un nouveau Etablissement Sante a été créé avec l'identifiant {{ param }}",

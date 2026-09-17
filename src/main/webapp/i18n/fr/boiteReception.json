@@ -5,7 +5,7 @@
         "title": "BoiteReceptions",
         "refreshListLabel": "Actualiser la liste",
         "createLabel": "Créer un nouveau Boite Reception",
-        "createOrEditLabel": "Créer ou éditer un Boite Reception",
+        "createOrEditLabel": "Créer un Boite Reception",
         "notFound": "Aucun Boite Reception trouvé"
       },
       "created": "Un nouveau Boite Reception a été créé avec l'identifiant {{ param }}",
