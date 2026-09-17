@@ -603,6 +603,19 @@ Entity pages (list / form) design system
     color: var(--jhi-accent-dark);
   }
 
+  /* Tighter padding for tables with many columns (e.g. Demande Prise En Charge),
+     so more columns fit before the table needs to scroll horizontally. Header
+     labels are also allowed to wrap so a long one (e.g. "Établissement de santé")
+     doesn't force its whole column wider than the content actually needs. */
+  &.jhi-table-compact td,
+  &.jhi-table-compact th {
+    padding: 0.5rem 0.5rem;
+  }
+
+  &.jhi-table-compact thead th {
+    white-space: normal;
+  }
+
   .jhi-table-thumbnail {
     width: 36px;
     height: 36px;
@@ -645,20 +658,21 @@ Entity pages (list / form) design system
   color: var(--jhi-muted);
 }
 
-/* Modifier for badges whose translated text can be long (e.g. Statut, Priorite):
-   wrap onto multiple lines instead of forcing the table column to stretch. */
-.jhi-badge-wrap {
-  white-space: normal;
-  max-width: 160px;
-  text-align: center;
-  line-height: 1.3;
+/* Modifier for badges whose translated text can be long (e.g. Statut: "En attente
+   de validation infirmerie"): truncate with an ellipsis instead of wrapping, which
+   blew up the row height far beyond every other row's. */
+.jhi-badge-truncate {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
 }
 
 /* Truncate long free-text table cells (etablissement, types de soin, login…)
    with an ellipsis instead of letting them push the table wider than the viewport. */
 .jhi-table-cell-truncate {
   display: inline-block;
-  max-width: 200px;
+  max-width: 150px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

@@ -51,7 +51,7 @@
     </div>
   } @else {
     <div class="jhi-table-panel table-responsive table-entities" id="entities">
-      <table class="table jhi-table" aria-describedby="page-heading">
+      <table class="table jhi-table jhi-table-compact" aria-describedby="page-heading">
         <thead>
           <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
             <th scope="col" jhiSortBy="reference">
@@ -118,11 +118,19 @@
               </td>
               <td>
                 @if (demandePriseEnCharge.typeBeneficiaire === 'AGENT' && demandePriseEnCharge.agent) {
-                  <a [routerLink]="['/agent', demandePriseEnCharge.agent.id, 'view']">{{ demandePriseEnCharge.agent.matricule }}</a>
+                  <a
+                    class="jhi-table-cell-truncate"
+                    [title]="demandePriseEnCharge.agent.matricule"
+                    [routerLink]="['/agent', demandePriseEnCharge.agent.id, 'view']"
+                    >{{ demandePriseEnCharge.agent.matricule }}</a
+                  >
                 } @else if (demandePriseEnCharge.typeBeneficiaire === 'AYANT_DROIT' && demandePriseEnCharge.ayantDroit) {
-                  <a [routerLink]="['/ayant-droit', demandePriseEnCharge.ayantDroit.id, 'view']">{{
-                    demandePriseEnCharge.ayantDroit.nom
-                  }}</a>
+                  <a
+                    class="jhi-table-cell-truncate"
+                    [title]="demandePriseEnCharge.ayantDroit.nom"
+                    [routerLink]="['/ayant-droit', demandePriseEnCharge.ayantDroit.id, 'view']"
+                    >{{ demandePriseEnCharge.ayantDroit.nom }}</a
+                  >
                 }
                 <div class="jhi-badge" [jhiTranslate]="'peccnssApp.TypeBeneficiaire.' + (demandePriseEnCharge.typeBeneficiaire ?? 'null')">
                   {{ { null: '', AGENT: 'Agent', AYANT_DROIT: 'Ayant droit' }[demandePriseEnCharge.typeBeneficiaire ?? 'null'] }}
@@ -140,9 +148,10 @@
               </td>
               <td>
                 <span
-                  class="jhi-badge jhi-badge-wrap"
+                  class="jhi-badge jhi-badge-truncate"
                   [ngClass]="'jhi-badge-statut-' + demandePriseEnCharge.statut"
                   [jhiTranslate]="'peccnssApp.StatutDemande.' + (demandePriseEnCharge.statut ?? 'null')"
+                  [title]="'peccnssApp.StatutDemande.' + (demandePriseEnCharge.statut ?? 'null') | translate"
                 >
                   {{
                     {
@@ -166,7 +175,7 @@
               </td>
               <td>
                 <span
-                  class="jhi-badge jhi-badge-wrap"
+                  class="jhi-badge"
                   [ngClass]="'jhi-badge-priorite-' + demandePriseEnCharge.priorite"
                   [jhiTranslate]="'peccnssApp.PrioriteDemande.' + (demandePriseEnCharge.priorite ?? 'null')"
                 >
@@ -175,8 +184,8 @@
                   }}
                 </span>
               </td>
-              <td>{{ demandePriseEnCharge.dateCreation | formatMediumDatetime }}</td>
-              <td>{{ demandePriseEnCharge.dateEcheance | formatMediumDatetime }}</td>
+              <td>{{ demandePriseEnCharge.dateCreation | formatMediumDate }}</td>
+              <td>{{ demandePriseEnCharge.dateEcheance | formatMediumDate }}</td>
               <td>
                 <span class="jhi-table-cell-truncate" [title]="demandePriseEnCharge.assigneA?.login">{{
                   demandePriseEnCharge.assigneA?.login
