@@ -5,7 +5,7 @@
         "title": "Gestions",
         "refreshListLabel": "Actualiser la liste",
         "createLabel": "Créer un nouveau Gestion",
-        "createOrEditLabel": "Créer ou éditer un Gestion",
+        "createOrEditLabel": "Créer un Gestion",
         "notFound": "Aucun Gestion trouvé"
       },
       "created": "Un nouveau Gestion a été créé avec l'identifiant {{ param }}",

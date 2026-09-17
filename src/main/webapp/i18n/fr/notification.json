@@ -5,7 +5,7 @@
         "title": "Notifications",
         "refreshListLabel": "Actualiser la liste",
         "createLabel": "Créer un nouveau Notification",
-        "createOrEditLabel": "Créer ou éditer un Notification",
+        "createOrEditLabel": "Créer un Notification",
         "notFound": "Aucun Notification trouvé"
       },
       "created": "Un nouveau Notification a été créé avec l'identifiant {{ param }}",

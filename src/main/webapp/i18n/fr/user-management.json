@@ -4,7 +4,7 @@
       "title": "Utilisateurs",
       "refreshListLabel": "Actualiser la liste",
       "createLabel": "Créer un nouvel utilisateur",
-      "createOrEditLabel": "Créer ou éditer un utilisateur",
+      "createOrEditLabel": "Créer un utilisateur",
       "notFound": "Aucun utilisateur trouvé"
     },
     "created": "L'utilisateur {{ param }} a été créé.",

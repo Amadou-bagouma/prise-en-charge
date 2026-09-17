@@ -5,7 +5,7 @@
         "title": "HistoriqueActions",
         "refreshListLabel": "Actualiser la liste",
         "createLabel": "Créer un nouveau Historique Action",
-        "createOrEditLabel": "Créer ou éditer un Historique Action",
+        "createOrEditLabel": "Créer un Historique Action",
         "notFound": "Aucun Historique Action trouvé"
       },
       "created": "Un nouveau Historique Action a été créé avec l'identifiant {{ param }}",

@@ -5,7 +5,7 @@
         "title": "AyantDroits",
         "refreshListLabel": "Actualiser la liste",
         "createLabel": "Créer un nouveau Ayant Droit",
-        "createOrEditLabel": "Créer ou éditer un Ayant Droit",
+        "createOrEditLabel": "Créer un Ayant Droit",
         "notFound": "Aucun Ayant Droit trouvé"
       },
       "created": "Un nouveau Ayant Droit a été créé avec l'identifiant {{ param }}",
