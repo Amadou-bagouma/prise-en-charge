@@ -523,6 +523,7 @@ Entity pages (list / form) design system
 
 .jhi-page-actions {
   display: flex;
+  flex: 1 1 auto;
   flex-wrap: wrap;
   gap: 8px;
 }
