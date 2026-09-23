@@ -1,0 +1,56 @@
+{
+  "annotations": {
+    "changelogDate": "20260923132049"
+  },
+  "applications": ["peccnss"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "numeroCarte",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "unique"]
+    },
+    {
+      "fieldName": "typeBeneficiaire",
+      "fieldType": "TypeBeneficiaire",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "AGENT,AYANT_DROIT"
+    },
+    {
+      "fieldName": "dateDebutValidite",
+      "fieldType": "LocalDate",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "dateFinValidite",
+      "fieldType": "LocalDate",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "dateEmission",
+      "fieldType": "LocalDate",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "CarteBeneficiaire",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityField": "matricule",
+      "otherEntityName": "agent",
+      "relationshipName": "agent",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityField": "nom",
+      "otherEntityName": "ayantDroit",
+      "relationshipName": "ayantDroit",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

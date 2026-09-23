@@ -1,0 +1,76 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (carteBeneficiaire(); as carteBeneficiaireRef) {
+      <div>
+        <h2 data-cy="carteBeneficiaireDetailsHeading">
+          <span jhiTranslate="peccnssApp.carteBeneficiaire.detail.title">Carte Beneficiaire</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ carteBeneficiaireRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.carteBeneficiaire.numeroCarte">Numero Carte</span></dt>
+          <dd>
+            <span>{{ carteBeneficiaireRef.numeroCarte }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.carteBeneficiaire.typeBeneficiaire">Type Beneficiaire</span></dt>
+          <dd>
+            <span [jhiTranslate]="'peccnssApp.TypeBeneficiaire.' + (carteBeneficiaireRef.typeBeneficiaire ?? 'null')">{{
+              { null: '', AGENT: 'AGENT', AYANT_DROIT: 'AYANT_DROIT' }[carteBeneficiaireRef.typeBeneficiaire ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.carteBeneficiaire.dateDebutValidite">Date Debut Validite</span></dt>
+          <dd>
+            <span>{{ carteBeneficiaireRef.dateDebutValidite | formatMediumDate }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.carteBeneficiaire.dateFinValidite">Date Fin Validite</span></dt>
+          <dd>
+            <span>{{ carteBeneficiaireRef.dateFinValidite | formatMediumDate }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.carteBeneficiaire.dateEmission">Date Emission</span></dt>
+          <dd>
+            <span>{{ carteBeneficiaireRef.dateEmission | formatMediumDate }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.carteBeneficiaire.agent">Agent</span></dt>
+          <dd>
+            @if (carteBeneficiaire()!.agent) {
+              <div>
+                <a [routerLink]="['/agent', carteBeneficiaire()!.agent?.id, 'view']">{{ carteBeneficiaireRef.agent?.matricule }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.carteBeneficiaire.ayantDroit">Ayant Droit</span></dt>
+          <dd>
+            @if (carteBeneficiaire()!.ayantDroit) {
+              <div>
+                <a [routerLink]="['/ayant-droit', carteBeneficiaire()!.ayantDroit?.id, 'view']">{{
+                  carteBeneficiaireRef.ayantDroit?.nom
+                }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Retour</span>
+        </button>
+
+        <button type="button" [routerLink]="['/carte-beneficiaire', carteBeneficiaireRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Editer</span>
+        </button>
+
+        <button type="button" [routerLink]="['/carte-beneficiaire', carteBeneficiaireRef.id, 'print']" class="btn btn-secondary">
+          <fa-icon icon="print" />&nbsp;<span jhiTranslate="peccnssApp.carteBeneficiaire.print">Imprimer</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

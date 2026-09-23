@@ -85,16 +85,16 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         DemandePriseEnCharge demandePriseEnCharge = demandePriseEnChargeMapper.toEntity(demandePriseEnChargeDTO);
         User currentUser = getCurrentUser();
         Instant now = Instant.now();
-        // The workflow always starts with the current user as author and the 1st validation step (DRH),
+        // The workflow always starts with the current user as author and the 1st validation step (infirmerie),
         // regardless of what the client sent.
         demandePriseEnCharge.setReference(genererReference());
         demandePriseEnCharge.setGestionnaireCreateur(currentUser);
         demandePriseEnCharge.setDateCreation(now);
         demandePriseEnCharge.setDateModification(now);
-        demandePriseEnCharge.setStatut(StatutDemande.EN_ATTENTE_VALIDATION_DRH);
+        demandePriseEnCharge.setStatut(StatutDemande.EN_ATTENTE_VALIDATION_INFIRMERIE);
         demandePriseEnCharge = demandePriseEnChargeRepository.save(demandePriseEnCharge);
-        logHistorique(demandePriseEnCharge, currentUser, "SOUMISSION", "Demande soumise pour validation DRH");
-        creerTachesValidation(demandePriseEnCharge, AuthoritiesConstants.VALIDATEUR_DRH, "Validation DRH");
+        logHistorique(demandePriseEnCharge, currentUser, "SOUMISSION", "Demande soumise pour validation infirmerie");
+        creerTachesValidation(demandePriseEnCharge, AuthoritiesConstants.VALIDATEUR_INFIRMERIE, "Validation infirmerie");
         return demandePriseEnChargeMapper.toDto(demandePriseEnCharge);
     }
 
@@ -158,15 +158,15 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         StatutDemande statutSuivant;
         String action;
         switch (demande.getStatut()) {
-            case EN_ATTENTE_VALIDATION_DRH -> {
-                requireAuthority(AuthoritiesConstants.VALIDATEUR_DRH);
-                statutSuivant = StatutDemande.EN_ATTENTE_VALIDATION_INFIRMERIE;
-                action = "VALIDATION_DRH";
-            }
             case EN_ATTENTE_VALIDATION_INFIRMERIE -> {
                 requireAuthority(AuthoritiesConstants.VALIDATEUR_INFIRMERIE);
-                statutSuivant = StatutDemande.VALIDEE;
+                statutSuivant = StatutDemande.EN_ATTENTE_VALIDATION_DRH;
                 action = "VALIDATION_INFIRMERIE";
+            }
+            case EN_ATTENTE_VALIDATION_DRH -> {
+                requireAuthority(AuthoritiesConstants.VALIDATEUR_DRH);
+                statutSuivant = StatutDemande.VALIDEE;
+                action = "VALIDATION_DRH";
             }
             default -> throw new BadRequestAlertException(
                 "Cette demande n'est pas en attente de validation",
@@ -179,8 +179,8 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         demande = demandePriseEnChargeRepository.save(demande);
         logHistorique(demande, currentUser, action, commentaire);
         cloturerTachesValidation(demande.getId());
-        if (statutSuivant == StatutDemande.EN_ATTENTE_VALIDATION_INFIRMERIE) {
-            creerTachesValidation(demande, AuthoritiesConstants.VALIDATEUR_INFIRMERIE, "Validation infirmerie");
+        if (statutSuivant == StatutDemande.EN_ATTENTE_VALIDATION_DRH) {
+            creerTachesValidation(demande, AuthoritiesConstants.VALIDATEUR_DRH, "Validation DRH");
         } else if (statutSuivant == StatutDemande.VALIDEE && demande.getGestionnaireCreateur() != null) {
             creerNotification(
                 demande.getGestionnaireCreateur(),
@@ -245,12 +245,12 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         if (demande.getGestionnaireCreateur() == null || !currentUser.getId().equals(demande.getGestionnaireCreateur().getId())) {
             throw new AccessDeniedException("Seul l'auteur de la demande peut la resoumettre");
         }
-        demande.setStatut(StatutDemande.EN_ATTENTE_VALIDATION_DRH);
+        demande.setStatut(StatutDemande.EN_ATTENTE_VALIDATION_INFIRMERIE);
         demande.setMotifRejet(null);
         demande.setDateModification(Instant.now());
         demande = demandePriseEnChargeRepository.save(demande);
-        logHistorique(demande, currentUser, "RESOUMISSION", "Demande corrigee et resoumise pour validation DRH");
-        creerTachesValidation(demande, AuthoritiesConstants.VALIDATEUR_DRH, "Validation DRH");
+        logHistorique(demande, currentUser, "RESOUMISSION", "Demande corrigee et resoumise pour validation infirmerie");
+        creerTachesValidation(demande, AuthoritiesConstants.VALIDATEUR_INFIRMERIE, "Validation infirmerie");
         return demandePriseEnChargeMapper.toDto(demande);
     }
 

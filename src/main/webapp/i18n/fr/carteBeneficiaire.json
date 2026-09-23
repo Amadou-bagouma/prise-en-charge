@@ -1,0 +1,41 @@
+{
+  "peccnssApp": {
+    "carteBeneficiaire": {
+      "home": {
+        "title": "CarteBeneficiaires",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Carte Beneficiaire",
+        "createOrEditLabel": "Créer ou éditer un Carte Beneficiaire",
+        "notFound": "Aucun Carte Beneficiaire trouvé"
+      },
+      "created": "Un nouveau Carte Beneficiaire a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Carte Beneficiaire avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Carte Beneficiaire avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Carte Beneficiaire {{ id }} ?"
+      },
+      "detail": {
+        "title": "Carte Beneficiaire"
+      },
+      "id": "ID",
+      "numeroCarte": "Numero Carte",
+      "typeBeneficiaire": "Type Beneficiaire",
+      "dateDebutValidite": "Date Debut Validite",
+      "dateFinValidite": "Date Fin Validite",
+      "dateEmission": "Date Emission",
+      "agent": "Agent",
+      "ayantDroit": "Ayant Droit",
+      "print": "Imprimer",
+      "printView": {
+        "title": "Carte de bénéficiaire",
+        "organism": "Caisse Nationale de Sécurité Sociale",
+        "numero": "N° de carte",
+        "matricule": "Matricule",
+        "lien": "Lien de parenté",
+        "validFrom": "Valable du",
+        "validTo": "au",
+        "issuedOn": "Émise le"
+      }
+    }
+  }
+}

@@ -77,6 +77,22 @@ enum LienParente {
 
 
 // =========================================================
+// CARTE BENEFICIAIRE (carte imprimable Agent ou Ayant Droit)
+// =========================================================
+// Réutilise la photo déjà stockée sur l'Agent ou l'Ayant Droit
+// concerné plutôt que d'en dupliquer une nouvelle.
+// =========================================================
+
+entity CarteBeneficiaire {
+  numeroCarte String required unique
+  typeBeneficiaire TypeBeneficiaire required
+  dateDebutValidite LocalDate required
+  dateFinValidite LocalDate required
+  dateEmission LocalDate required
+}
+
+
+// =========================================================
 // ETABLISSEMENT DE SANTE
 // =========================================================
 
@@ -268,6 +284,18 @@ relationship ManyToOne {
 
 
 // =========================================================
+// RELATIONS CARTE BENEFICIAIRE
+// =========================================================
+
+relationship ManyToOne {
+
+  CarteBeneficiaire{agent(matricule)} to Agent
+
+  CarteBeneficiaire{ayantDroit(nom)} to AyantDroit
+}
+
+
+// =========================================================
 // RELATIONS DEMANDE
 // =========================================================
 
@@ -356,26 +384,26 @@ relationship ManyToOne {
 // PAGINATION
 // =========================================================
 
-paginate Region, Direction, Gestion, Agent, AyantDroit, EtablissementSante, DemandePriseEnCharge, PieceJustificative, Tache, BoiteReception, Notification, HistoriqueAction with pagination
+paginate Region, Direction, Gestion, Agent, AyantDroit, EtablissementSante, DemandePriseEnCharge, PieceJustificative, Tache, BoiteReception, Notification, HistoriqueAction, CarteBeneficiaire with pagination
 
 
 // =========================================================
 // SERVICES
 // =========================================================
 
-service Region, Direction, Gestion, Agent, AyantDroit, EtablissementSante, DemandePriseEnCharge, PieceJustificative, Tache, BoiteReception, Notification, HistoriqueAction with serviceImpl
+service Region, Direction, Gestion, Agent, AyantDroit, EtablissementSante, DemandePriseEnCharge, PieceJustificative, Tache, BoiteReception, Notification, HistoriqueAction, CarteBeneficiaire with serviceImpl
 
 
 // =========================================================
 // DTO MAPSTRUCT
 // =========================================================
 
-dto Region, Direction, Gestion, Agent, AyantDroit, EtablissementSante, DemandePriseEnCharge, PieceJustificative, Tache, BoiteReception, Notification, HistoriqueAction with mapstruct
+dto Region, Direction, Gestion, Agent, AyantDroit, EtablissementSante, DemandePriseEnCharge, PieceJustificative, Tache, BoiteReception, Notification, HistoriqueAction, CarteBeneficiaire with mapstruct
 
 
 // =========================================================
 // FILTRES
 // =========================================================
 
-filter Region, Direction, Agent, AyantDroit, EtablissementSante, DemandePriseEnCharge, Tache, Notification, HistoriqueAction
+filter Region, Direction, Agent, AyantDroit, EtablissementSante, DemandePriseEnCharge, Tache, Notification, HistoriqueAction, CarteBeneficiaire
 

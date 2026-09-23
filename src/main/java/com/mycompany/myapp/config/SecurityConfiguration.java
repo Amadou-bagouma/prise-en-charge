@@ -66,6 +66,8 @@ public class SecurityConfiguration {
                     .requestMatchers("/api/account/reset-password/init").permitAll()
                     .requestMatchers("/api/account/reset-password/finish").permitAll()
                     .requestMatchers("/api/admin/**").hasAuthority(AuthoritiesConstants.ADMIN)
+                    // Carte Beneficiaire (printable Agent/AyantDroit ID cards): admin-only, for every method.
+                    .requestMatchers("/api/carte-beneficiaires/**").hasAuthority(AuthoritiesConstants.ADMIN)
                     // Gestion, Region and Direction are reference/master data: any authenticated
                     // user may read them (e.g. to populate pickers on Agent/DemandePriseEnCharge forms),
                     // but only admins may create, update or delete them.

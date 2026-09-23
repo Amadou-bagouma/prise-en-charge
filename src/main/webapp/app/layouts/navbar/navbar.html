@@ -210,6 +210,17 @@
                 <span jhiTranslate="global.menu.entities.historiqueAction">Historique Action</span>
               </a>
             </li>
+            <li
+              class="sidebar-nav-item"
+              *jhiHasAnyAuthority="'ROLE_ADMIN'"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+            >
+              <a class="sidebar-link" routerLink="/carte-beneficiaire" (click)="collapseNavbar()">
+                <fa-icon icon="asterisk" [fixedWidth]="true" />
+                <span jhiTranslate="global.menu.entities.carteBeneficiaire">Carte Beneficiaire</span>
+              </a>
+            </li>
             <!-- jhipster-needle-add-entity-to-menu - JHipster will add entities to the menu here -->
           </ul>
         </li>

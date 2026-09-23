@@ -71,6 +71,11 @@ const routes: Routes = [
     title: 'peccnssApp.historiqueAction.home.title',
     loadChildren: () => import('./historique-action/historique-action.routes'),
   },
+  {
+    path: 'carte-beneficiaire',
+    title: 'peccnssApp.carteBeneficiaire.home.title',
+    loadChildren: () => import('./carte-beneficiaire/carte-beneficiaire.routes'),
+  },
   // jhipster-needle-add-entity-route - JHipster will add entity modules routes here
 ];
 

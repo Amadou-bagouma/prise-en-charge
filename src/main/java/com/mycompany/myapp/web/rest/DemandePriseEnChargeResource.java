@@ -220,8 +220,8 @@ public class DemandePriseEnChargeResource {
     }
 
     /**
-     * {@code POST  /demande-prise-en-charges/:id/valider} : validates the current workflow step (DRH, then
-     * infirmerie du personnel) of the "id" demandePriseEnCharge.
+     * {@code POST  /demande-prise-en-charges/:id/valider} : validates the current workflow step (infirmerie
+     * du personnel, then DRH) of the "id" demandePriseEnCharge.
      *
      * @param id the id of the demandePriseEnChargeDTO to validate.
      * @param actionVM an optional comment to record in the history.
@@ -264,7 +264,7 @@ public class DemandePriseEnChargeResource {
 
     /**
      * {@code POST  /demande-prise-en-charges/:id/resoumettre} : resubmits a {@code RETOURNEE} demandePriseEnCharge,
-     * sending it back to the 1st validation step (DRH). Only the original author may do this.
+     * sending it back to the 1st validation step (infirmerie). Only the original author may do this.
      *
      * @param id the id of the demandePriseEnChargeDTO to resubmit.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated demandePriseEnChargeDTO.

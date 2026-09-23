@@ -1,6 +1,7 @@
 package com.mycompany.myapp.web.rest;
 
 import com.mycompany.myapp.domain.User;
+import com.mycompany.myapp.domain.enumeration.StatutTache;
 import com.mycompany.myapp.repository.TacheRepository;
 import com.mycompany.myapp.repository.UserRepository;
 import com.mycompany.myapp.security.AuthoritiesConstants;
@@ -45,6 +46,8 @@ public class TacheResource {
 
     private static final String ENTITY_NAME = "tache";
 
+    private static final List<StatutTache> STATUTS_TACHE_CLOTURES = List.of(StatutTache.TERMINEE, StatutTache.ANNULEE);
+
     @Value("${jhipster.clientApp.name:peccnss}")
     private String applicationName;
 
@@ -70,7 +73,9 @@ public class TacheResource {
 
     /**
      * Restricts the given criteria to the tasks assigned to the currently authenticated user,
-     * unless that user has the {@code ROLE_ADMIN} authority.
+     * unless that user has the {@code ROLE_ADMIN} authority. Also hides closed tasks (TERMINEE,
+     * ANNULEE) from "Mes taches" by default, so a task disappears from a validator's list once
+     * they've acted on it, unless the caller explicitly filters on {@code statut}.
      */
     private TacheCriteria restrictToCurrentUser(TacheCriteria criteria) {
         if (SecurityUtils.hasCurrentUserAnyOfAuthorities(AuthoritiesConstants.ADMIN)) {
@@ -85,6 +90,11 @@ public class TacheResource {
         LongFilter utilisateurIdFilter = new LongFilter();
         utilisateurIdFilter.setEquals(currentUserId);
         restricted.setUtilisateurId(utilisateurIdFilter);
+        if (restricted.getStatut() == null) {
+            TacheCriteria.StatutTacheFilter statutFilter = new TacheCriteria.StatutTacheFilter();
+            statutFilter.setNotIn(STATUTS_TACHE_CLOTURES);
+            restricted.setStatut(statutFilter);
+        }
         return restricted;
     }
 
