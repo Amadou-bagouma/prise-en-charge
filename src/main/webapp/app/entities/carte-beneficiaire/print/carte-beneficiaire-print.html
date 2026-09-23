@@ -1,0 +1,56 @@
+@if (carteBeneficiaire(); as carte) {
+  <div class="print-toolbar no-print">
+    <button type="button" (click)="previousState()" class="btn btn-info">
+      <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Retour</span>
+    </button>
+
+    <button type="button" (click)="print()" class="btn btn-primary">
+      <fa-icon icon="print" />&nbsp;<span jhiTranslate="peccnssApp.carteBeneficiaire.print">Imprimer</span>
+    </button>
+  </div>
+
+  <div class="carte-card">
+    <div class="carte-card__header">
+      <span jhiTranslate="peccnssApp.carteBeneficiaire.printView.organism">Caisse Nationale de Sécurité Sociale</span>
+      <span class="carte-card__title" jhiTranslate="peccnssApp.carteBeneficiaire.printView.title">Carte de bénéficiaire</span>
+    </div>
+
+    <div class="carte-card__body">
+      <div class="carte-card__photo">
+        @if (photo(); as photoValue) {
+          <img [src]="'data:' + photoContentType() + ';base64,' + photoValue" alt="photo" />
+        } @else {
+          <div class="carte-card__photo-placeholder"></div>
+        }
+      </div>
+
+      <div class="carte-card__identity">
+        <div class="carte-card__name">{{ titulairePrenom() }} {{ titulaireNom() }}</div>
+
+        @if (carte.typeBeneficiaire === 'AGENT') {
+          <div><span jhiTranslate="peccnssApp.carteBeneficiaire.printView.matricule">Matricule</span> : {{ matricule() }}</div>
+        } @else {
+          <div>
+            <span jhiTranslate="peccnssApp.carteBeneficiaire.printView.lien">Lien de parenté</span> :
+            <span [jhiTranslate]="'peccnssApp.LienParente.' + (ayantDroit()?.lien ?? 'null')">{{ ayantDroit()?.lien }}</span>
+          </div>
+          <div><span jhiTranslate="peccnssApp.carteBeneficiaire.printView.matricule">Matricule</span> : {{ matricule() }}</div>
+        }
+
+        <div><span jhiTranslate="peccnssApp.carteBeneficiaire.printView.numero">N° de carte</span> : {{ carte.numeroCarte }}</div>
+
+        <div>
+          <span jhiTranslate="peccnssApp.carteBeneficiaire.printView.validFrom">Valable du</span>
+          {{ carte.dateDebutValidite | formatMediumDate }}
+          <span jhiTranslate="peccnssApp.carteBeneficiaire.printView.validTo">au</span>
+          {{ carte.dateFinValidite | formatMediumDate }}
+        </div>
+
+        <div>
+          <span jhiTranslate="peccnssApp.carteBeneficiaire.printView.issuedOn">Émise le</span>
+          {{ carte.dateEmission | formatMediumDate }}
+        </div>
+      </div>
+    </div>
+  </div>
+}

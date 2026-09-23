@@ -20,7 +20,8 @@
         "tache": "Tache",
         "boiteReception": "Boite Reception",
         "notification": "Notification",
-        "historiqueAction": "Historique Action"
+        "historiqueAction": "Historique Action",
+        "carteBeneficiaire": "Carte Beneficiaire"
       },
       "account": {
         "main": "Compte",

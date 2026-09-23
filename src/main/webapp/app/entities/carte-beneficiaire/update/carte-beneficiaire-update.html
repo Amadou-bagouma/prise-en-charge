@@ -1,0 +1,192 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2
+        id="jhi-carte-beneficiaire-heading"
+        data-cy="CarteBeneficiaireCreateUpdateHeading"
+        jhiTranslate="peccnssApp.carteBeneficiaire.home.createOrEditLabel"
+      >
+        Créer ou éditer un Carte Beneficiaire
+      </h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let numeroCarteRef = editForm.get('numeroCarte')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_numeroCarte" jhiTranslate="peccnssApp.carteBeneficiaire.numeroCarte">Numero Carte</label>
+          <input
+            type="text"
+            class="form-control"
+            name="numeroCarte"
+            id="field_numeroCarte"
+            data-cy="numeroCarte"
+            formControlName="numeroCarte"
+          />
+          @if (numeroCarteRef.invalid && (numeroCarteRef.dirty || numeroCarteRef.touched)) {
+            <div>
+              @if (numeroCarteRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let typeBeneficiaireRef = editForm.get('typeBeneficiaire')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_typeBeneficiaire" jhiTranslate="peccnssApp.carteBeneficiaire.typeBeneficiaire"
+            >Type Beneficiaire</label
+          >
+          <select
+            class="form-control"
+            name="typeBeneficiaire"
+            formControlName="typeBeneficiaire"
+            id="field_typeBeneficiaire"
+            data-cy="typeBeneficiaire"
+          >
+            <option [ngValue]="null">{{ 'peccnssApp.TypeBeneficiaire.null' | translate }}</option>
+            @for (typeBeneficiaire of typeBeneficiaireValues; track $index) {
+              <option [value]="typeBeneficiaire">{{ 'peccnssApp.TypeBeneficiaire.' + typeBeneficiaire | translate }}</option>
+            }
+          </select>
+          @if (typeBeneficiaireRef.invalid && (typeBeneficiaireRef.dirty || typeBeneficiaireRef.touched)) {
+            <div>
+              @if (typeBeneficiaireRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let dateDebutValiditeRef = editForm.get('dateDebutValidite')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_dateDebutValidite" jhiTranslate="peccnssApp.carteBeneficiaire.dateDebutValidite"
+            >Date Debut Validite</label
+          >
+          <div class="input-group">
+            <input
+              id="field_dateDebutValidite"
+              data-cy="dateDebutValidite"
+              type="text"
+              class="form-control"
+              name="dateDebutValidite"
+              ngbDatepicker
+              #dateDebutValiditeDp="ngbDatepicker"
+              formControlName="dateDebutValidite"
+            />
+            <button type="button" class="btn btn-secondary" (click)="dateDebutValiditeDp.toggle()"><fa-icon icon="calendar-alt" /></button>
+          </div>
+          @if (dateDebutValiditeRef.invalid && (dateDebutValiditeRef.dirty || dateDebutValiditeRef.touched)) {
+            <div>
+              @if (dateDebutValiditeRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let dateFinValiditeRef = editForm.get('dateFinValidite')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_dateFinValidite" jhiTranslate="peccnssApp.carteBeneficiaire.dateFinValidite"
+            >Date Fin Validite</label
+          >
+          <div class="input-group">
+            <input
+              id="field_dateFinValidite"
+              data-cy="dateFinValidite"
+              type="text"
+              class="form-control"
+              name="dateFinValidite"
+              ngbDatepicker
+              #dateFinValiditeDp="ngbDatepicker"
+              formControlName="dateFinValidite"
+            />
+            <button type="button" class="btn btn-secondary" (click)="dateFinValiditeDp.toggle()"><fa-icon icon="calendar-alt" /></button>
+          </div>
+          @if (dateFinValiditeRef.invalid && (dateFinValiditeRef.dirty || dateFinValiditeRef.touched)) {
+            <div>
+              @if (dateFinValiditeRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let dateEmissionRef = editForm.get('dateEmission')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_dateEmission" jhiTranslate="peccnssApp.carteBeneficiaire.dateEmission">Date Emission</label>
+          <div class="input-group">
+            <input
+              id="field_dateEmission"
+              data-cy="dateEmission"
+              type="text"
+              class="form-control"
+              name="dateEmission"
+              ngbDatepicker
+              #dateEmissionDp="ngbDatepicker"
+              formControlName="dateEmission"
+            />
+            <button type="button" class="btn btn-secondary" (click)="dateEmissionDp.toggle()"><fa-icon icon="calendar-alt" /></button>
+          </div>
+          @if (dateEmissionRef.invalid && (dateEmissionRef.dirty || dateEmissionRef.touched)) {
+            <div>
+              @if (dateEmissionRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_agent" jhiTranslate="peccnssApp.carteBeneficiaire.agent">Agent</label>
+          <select class="form-control" id="field_agent" data-cy="agent" name="agent" formControlName="agent" [compareWith]="compareAgent">
+            <option [ngValue]="null"></option>
+            @for (agentOption of agentsSharedCollection(); track $index) {
+              <option [ngValue]="agentOption">{{ agentOption.matricule }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_ayantDroit" jhiTranslate="peccnssApp.carteBeneficiaire.ayantDroit">Ayant Droit</label>
+          <select
+            class="form-control"
+            id="field_ayantDroit"
+            data-cy="ayantDroit"
+            name="ayantDroit"
+            formControlName="ayantDroit"
+            [compareWith]="compareAyantDroit"
+          >
+            <option [ngValue]="null"></option>
+            @for (ayantDroitOption of ayantDroitsSharedCollection(); track $index) {
+              <option [ngValue]="ayantDroitOption">{{ ayantDroitOption.nom }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Annuler</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Sauvegarder</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

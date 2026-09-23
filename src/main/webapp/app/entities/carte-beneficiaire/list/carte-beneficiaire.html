@@ -1,0 +1,176 @@
+<div>
+  <h2 id="page-heading" data-cy="CarteBeneficiaireHeading">
+    <span jhiTranslate="peccnssApp.carteBeneficiaire.home.title">CarteBeneficiaires</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span jhiTranslate="peccnssApp.carteBeneficiaire.home.refreshListLabel">Actualiser la liste</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-carte-beneficiaire"
+        [routerLink]="['/carte-beneficiaire/new']"
+      >
+        <fa-icon icon="plus" />
+        <span jhiTranslate="peccnssApp.carteBeneficiaire.home.createLabel">Créer un nouveau Carte Beneficiaire</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  <jhi-filter [filters]="filters" />
+
+  @if (carteBeneficiaires().length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span jhiTranslate="peccnssApp.carteBeneficiaire.home.notFound">Aucun Carte Beneficiaire trouvé</span>
+    </div>
+  } @else {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span jhiTranslate="global.field.id">ID</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="numeroCarte">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.carteBeneficiaire.numeroCarte">Numero Carte</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="typeBeneficiaire">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.carteBeneficiaire.typeBeneficiaire">Type Beneficiaire</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="dateDebutValidite">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.carteBeneficiaire.dateDebutValidite">Date Debut Validite</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="dateFinValidite">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.carteBeneficiaire.dateFinValidite">Date Fin Validite</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="dateEmission">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.carteBeneficiaire.dateEmission">Date Emission</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="agent.matricule">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.carteBeneficiaire.agent">Agent</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="ayantDroit.nom">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.carteBeneficiaire.ayantDroit">Ayant Droit</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (carteBeneficiaire of carteBeneficiaires(); track trackId(carteBeneficiaire)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/carte-beneficiaire', carteBeneficiaire.id, 'view']">{{ carteBeneficiaire.id }}</a>
+              </td>
+              <td>{{ carteBeneficiaire.numeroCarte }}</td>
+              <td [jhiTranslate]="'peccnssApp.TypeBeneficiaire.' + (carteBeneficiaire.typeBeneficiaire ?? 'null')">
+                {{ { null: '', AGENT: 'AGENT', AYANT_DROIT: 'AYANT_DROIT' }[carteBeneficiaire.typeBeneficiaire ?? 'null'] }}
+              </td>
+              <td>{{ carteBeneficiaire.dateDebutValidite | formatMediumDate }}</td>
+              <td>{{ carteBeneficiaire.dateFinValidite | formatMediumDate }}</td>
+              <td>{{ carteBeneficiaire.dateEmission | formatMediumDate }}</td>
+              <td>
+                @if (carteBeneficiaire.agent) {
+                  <div>
+                    <a [routerLink]="['/agent', carteBeneficiaire.agent.id, 'view']">{{ carteBeneficiaire.agent.matricule }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (carteBeneficiaire.ayantDroit) {
+                  <div>
+                    <a [routerLink]="['/ayant-droit', carteBeneficiaire.ayantDroit.id, 'view']">{{ carteBeneficiaire.ayantDroit.nom }}</a>
+                  </div>
+                }
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a
+                    [routerLink]="['/carte-beneficiaire', carteBeneficiaire.id, 'view']"
+                    class="btn btn-info btn-sm"
+                    data-cy="entityDetailsButton"
+                  >
+                    <fa-icon icon="eye" />
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.view">Voir</span>
+                  </a>
+
+                  <a
+                    [routerLink]="['/carte-beneficiaire', carteBeneficiaire.id, 'edit']"
+                    class="btn btn-primary btn-sm"
+                    data-cy="entityEditButton"
+                  >
+                    <fa-icon icon="pencil-alt" />
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Editer</span>
+                  </a>
+
+                  <a
+                    [routerLink]="['/carte-beneficiaire', carteBeneficiaire.id, 'print']"
+                    class="btn btn-secondary btn-sm"
+                    data-cy="entityPrintButton"
+                  >
+                    <fa-icon icon="print" />
+                    <span class="d-none d-md-inline" jhiTranslate="peccnssApp.carteBeneficiaire.print">Imprimer</span>
+                  </a>
+
+                  <button type="submit" (click)="delete(carteBeneficiaire)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times" />
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Supprimer</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+  @if (carteBeneficiaires().length > 0) {
+    <div>
+      <div class="d-flex justify-content-center">
+        <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+      </div>
+
+      <div class="d-flex justify-content-center">
+        <ngb-pagination
+          [collectionSize]="totalItems()"
+          [page]="page()"
+          [pageSize]="itemsPerPage()"
+          [maxSize]="5"
+          [rotate]="true"
+          [boundaryLinks]="true"
+          (pageChange)="navigateToPage($event)"
+        />
+      </div>
+    </div>
+  }
+</div>
