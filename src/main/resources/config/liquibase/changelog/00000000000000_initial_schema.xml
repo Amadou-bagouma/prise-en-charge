@@ -99,10 +99,6 @@
         through the admin UI.
     -->
     <changeSet id="00000000000001-demo-users" author="jhipster" context="faker,test">
-        <!-- Databases created before this changeset was split out already contain these users. -->
-        <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="0">SELECT COUNT(*) FROM jhi_user WHERE id IN (1, 2)</sqlCheck>
-        </preConditions>
         <loadData
                   file="config/liquibase/data/user.csv"
                   separator=";"

@@ -7,8 +7,8 @@ import { ActivatedRoute } from '@angular/router';
 import { provideTranslateService } from '@ngx-translate/core';
 import { Subject, from, of } from 'rxjs';
 
-import { IDemandePriseEnCharge } from 'app/fonctionnalites/demande-prise-en-charge/demande-prise-en-charge.model';
-import { DemandePriseEnChargeService } from 'app/fonctionnalites/demande-prise-en-charge/service/demande-prise-en-charge.service';
+import { IDemandePriseEnCharge } from 'app/entities/demande-prise-en-charge/demande-prise-en-charge.model';
+import { DemandePriseEnChargeService } from 'app/entities/demande-prise-en-charge/service/demande-prise-en-charge.service';
 import { ConfirmService } from 'app/shared/confirm';
 
 import { IPieceJustificative } from '../piece-justificative.model';

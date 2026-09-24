@@ -4,7 +4,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import dayjs from 'dayjs/esm';
 
 import { DATE_TIME_FORMAT } from 'app/config';
-import { StatutDemande } from 'app/fonctionnalites/enumerations/statut-demande.model';
+import { StatutDemande } from 'app/entities/enumerations/statut-demande.model';
 import { IDemandePriseEnCharge, NewDemandePriseEnCharge } from '../demande-prise-en-charge.model';
 
 /**
@@ -58,6 +58,7 @@ type DemandePriseEnChargeFormGroupContent = {
   typeSoins: FormControl<DemandePriseEnChargeFormRawValue['typeSoins']>;
   etablissementSante: FormControl<DemandePriseEnChargeFormRawValue['etablissementSante']>;
   gestionnaireCreateur: FormControl<DemandePriseEnChargeFormRawValue['gestionnaireCreateur']>;
+  assigneA: FormControl<DemandePriseEnChargeFormRawValue['assigneA']>;
 };
 
 export type DemandePriseEnChargeFormGroup = FormGroup<DemandePriseEnChargeFormGroupContent>;
@@ -112,6 +113,7 @@ export class DemandePriseEnChargeFormService {
           validators: [Validators.required],
         },
       ),
+      assigneA: new FormControl(demandePriseEnChargeRawValue.assigneA),
     });
   }
 
@@ -142,9 +144,9 @@ export class DemandePriseEnChargeFormService {
       dateModification: currentTime,
       dateAssignation: currentTime,
       dateEcheance: currentTime,
-      // A newly created demande always starts at the 1st workflow step (infirmerie validation);
+      // A newly created demande always starts at the 1st workflow step (DRH validation);
       // the backend enforces this regardless of what is submitted (see DemandePriseEnChargeServiceImpl.save).
-      statut: StatutDemande.EN_ATTENTE_VALIDATION_INFIRMERIE,
+      statut: StatutDemande.EN_ATTENTE_VALIDATION_DRH,
     };
   }
 

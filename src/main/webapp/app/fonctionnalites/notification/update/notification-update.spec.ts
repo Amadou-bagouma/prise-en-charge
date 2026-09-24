@@ -7,12 +7,12 @@ import { ActivatedRoute } from '@angular/router';
 import { provideTranslateService } from '@ngx-translate/core';
 import { Subject, from, of } from 'rxjs';
 
-import { IDemandePriseEnCharge } from 'app/fonctionnalites/demande-prise-en-charge/demande-prise-en-charge.model';
-import { DemandePriseEnChargeService } from 'app/fonctionnalites/demande-prise-en-charge/service/demande-prise-en-charge.service';
-import { TacheService } from 'app/fonctionnalites/tache/service/tache.service';
-import { ITache } from 'app/fonctionnalites/tache/tache.model';
-import { UserService } from 'app/fonctionnalites/user/service/user.service';
-import { IUser } from 'app/fonctionnalites/user/user.model';
+import { IDemandePriseEnCharge } from 'app/entities/demande-prise-en-charge/demande-prise-en-charge.model';
+import { DemandePriseEnChargeService } from 'app/entities/demande-prise-en-charge/service/demande-prise-en-charge.service';
+import { TacheService } from 'app/entities/tache/service/tache.service';
+import { ITache } from 'app/entities/tache/tache.model';
+import { UserService } from 'app/entities/user/service/user.service';
+import { IUser } from 'app/entities/user/user.model';
 import { ConfirmService } from 'app/shared/confirm';
 
 import { INotification } from '../notification.model';

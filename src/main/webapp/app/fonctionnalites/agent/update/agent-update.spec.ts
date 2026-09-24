@@ -7,10 +7,10 @@ import { ActivatedRoute } from '@angular/router';
 import { provideTranslateService } from '@ngx-translate/core';
 import { Subject, from, of } from 'rxjs';
 
-import { IDirection } from 'app/fonctionnalites/direction/direction.model';
-import { DirectionService } from 'app/fonctionnalites/direction/service/direction.service';
-import { IGestion } from 'app/fonctionnalites/gestion/gestion.model';
-import { GestionService } from 'app/fonctionnalites/gestion/service/gestion.service';
+import { IDirection } from 'app/entities/direction/direction.model';
+import { DirectionService } from 'app/entities/direction/service/direction.service';
+import { IGestion } from 'app/entities/gestion/gestion.model';
+import { GestionService } from 'app/entities/gestion/service/gestion.service';
 import { ConfirmService } from 'app/shared/confirm';
 
 import { IAgent } from '../agent.model';

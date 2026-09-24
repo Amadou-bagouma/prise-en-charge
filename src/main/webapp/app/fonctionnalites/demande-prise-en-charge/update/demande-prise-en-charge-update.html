@@ -288,6 +288,41 @@
         </div>
       </div>
 
+      <h3 class="jhi-form-section">Intervenants</h3>
+      <div class="jhi-form-grid">
+        <div class="jhi-field">
+          <label class="form-label" for="field_gestionnaireCreateur" jhiTranslate="peccnssApp.demandePriseEnCharge.gestionnaireCreateur"
+            >Gestionnaire Createur</label
+          >
+          <input
+            type="text"
+            class="form-control"
+            name="gestionnaireCreateur"
+            id="field_gestionnaireCreateur"
+            data-cy="gestionnaireCreateur"
+            [value]="editForm.get('gestionnaireCreateur')!.value?.login ?? ''"
+            disabled
+          />
+        </div>
+
+        <div class="jhi-field">
+          <label class="form-label" for="field_assigneA" jhiTranslate="peccnssApp.demandePriseEnCharge.assigneA">Assigne A</label>
+          <select
+            class="form-control"
+            id="field_assigneA"
+            data-cy="assigneA"
+            name="assigneA"
+            formControlName="assigneA"
+            [compareWith]="compareUser"
+          >
+            <option [ngValue]="null"></option>
+            @for (userOption of usersSharedCollection(); track $index) {
+              <option [ngValue]="userOption">{{ userOption.login }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
       <div class="jhi-form-actions">
         <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
           <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>

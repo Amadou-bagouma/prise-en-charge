@@ -1,7 +1,7 @@
 import dayjs from 'dayjs/esm';
 
-import { IDemandePriseEnCharge } from 'app/fonctionnalites/demande-prise-en-charge/demande-prise-en-charge.model';
-import { IUser } from 'app/fonctionnalites/user/user.model';
+import { IDemandePriseEnCharge } from 'app/entities/demande-prise-en-charge/demande-prise-en-charge.model';
+import { IUser } from 'app/entities/user/user.model';
 
 export interface IHistoriqueAction {
   id: number;

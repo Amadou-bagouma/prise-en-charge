@@ -297,6 +297,8 @@
             <dl class="pec-defs">
               <dt jhiTranslate="peccnssApp.demandePriseEnCharge.gestionnaireCreateur">Gestionnaire Createur</dt>
               <dd>{{ demande.gestionnaireCreateur?.login || '—' }}</dd>
+              <dt jhiTranslate="peccnssApp.demandePriseEnCharge.assigneA">Assigne A</dt>
+              <dd>{{ demande.assigneA?.login || '—' }}</dd>
               <dt jhiTranslate="peccnssApp.demandePriseEnCharge.dateCreation">Date Creation</dt>
               <dd class="pec-defs--mono">{{ (demande.dateCreation | formatMediumDatetime) || '—' }}</dd>
               <dt jhiTranslate="peccnssApp.demandePriseEnCharge.dateModification">Date Modification</dt>

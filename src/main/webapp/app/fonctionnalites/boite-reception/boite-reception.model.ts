@@ -1,6 +1,6 @@
 import dayjs from 'dayjs/esm';
 
-import { IUser } from 'app/fonctionnalites/user/user.model';
+import { IUser } from 'app/entities/user/user.model';
 
 export interface IBoiteReception {
   id: number;

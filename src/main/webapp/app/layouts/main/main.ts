@@ -6,6 +6,7 @@ import dayjs from 'dayjs/esm';
 
 import { AppPageTitleStrategy } from 'app/app-page-title-strategy';
 import { AccountService } from 'app/core/auth';
+import Footer from '../footer/footer';
 import { LayoutService } from '../layout.service';
 import PageRibbon from '../profiles/page-ribbon';
 

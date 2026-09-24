@@ -7,12 +7,12 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Observable, finalize, map } from 'rxjs';
 
-import { IBoiteReception } from 'app/fonctionnalites/boite-reception/boite-reception.model';
-import { BoiteReceptionService } from 'app/fonctionnalites/boite-reception/service/boite-reception.service';
-import { IDemandePriseEnCharge } from 'app/fonctionnalites/demande-prise-en-charge/demande-prise-en-charge.model';
-import { DemandePriseEnChargeService } from 'app/fonctionnalites/demande-prise-en-charge/service/demande-prise-en-charge.service';
-import { UserService } from 'app/fonctionnalites/user/service/user.service';
-import { IUser } from 'app/fonctionnalites/user/user.model';
+import { IBoiteReception } from 'app/entities/boite-reception/boite-reception.model';
+import { BoiteReceptionService } from 'app/entities/boite-reception/service/boite-reception.service';
+import { IDemandePriseEnCharge } from 'app/entities/demande-prise-en-charge/demande-prise-en-charge.model';
+import { DemandePriseEnChargeService } from 'app/entities/demande-prise-en-charge/service/demande-prise-en-charge.service';
+import { UserService } from 'app/entities/user/service/user.service';
+import { IUser } from 'app/entities/user/user.model';
 import { AlertError } from 'app/shared/alert';
 import { ConfirmService } from 'app/shared/confirm';
 import { TranslateDirective } from 'app/shared/language';
@@ -21,8 +21,8 @@ import { TacheService } from '../service/tache.service';
 import { ITache } from '../tache.model';
 
 import { TacheFormGroup, TacheFormService } from './tache-form.service';
-import { StatutTache } from 'app/fonctionnalites/enumerations/statut-tache.model';
-import { PrioriteTache } from 'app/fonctionnalites/enumerations/priorite-tache.model';
+import { StatutTache } from 'app/entities/enumerations/statut-tache.model';
+import { PrioriteTache } from 'app/entities/enumerations/priorite-tache.model';
 
 @Component({
   selector: 'jhi-tache-update',

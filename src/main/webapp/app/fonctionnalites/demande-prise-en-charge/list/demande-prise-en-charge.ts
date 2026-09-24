@@ -56,8 +56,8 @@ export class DemandePriseEnCharge {
    */
   readonly puces: { cle: string; libelle: string; statuts: string[] }[] = [
     { cle: 'toutes', libelle: 'Toutes', statuts: [] },
-    { cle: 'infirmerie', libelle: 'À valider infirmerie', statuts: ['EN_ATTENTE_VALIDATION_INFIRMERIE'] },
     { cle: 'drh', libelle: 'À valider DRH', statuts: ['EN_ATTENTE_VALIDATION_DRH'] },
+    { cle: 'infirmerie', libelle: 'À valider infirmerie', statuts: ['EN_ATTENTE_VALIDATION_INFIRMERIE'] },
     { cle: 'retournees', libelle: 'Retournées', statuts: ['RETOURNEE'] },
   ];
   /** Effectif par puce ; indéfini tant que le compte n'est pas revenu du serveur. */

@@ -6,7 +6,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Observable, finalize } from 'rxjs';
 
-import { TypeGestion } from 'app/fonctionnalites/enumerations/type-gestion.model';
+import { TypeGestion } from 'app/entities/enumerations/type-gestion.model';
 import { AlertError } from 'app/shared/alert';
 import { ConfirmService } from 'app/shared/confirm';
 import { TranslateDirective } from 'app/shared/language';

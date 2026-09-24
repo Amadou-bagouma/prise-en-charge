@@ -1,7 +1,7 @@
 import dayjs from 'dayjs/esm';
 
-import { IDirection } from 'app/fonctionnalites/direction/direction.model';
-import { IGestion } from 'app/fonctionnalites/gestion/gestion.model';
+import { IDirection } from 'app/entities/direction/direction.model';
+import { IGestion } from 'app/entities/gestion/gestion.model';
 
 export interface IAgent {
   id: number;

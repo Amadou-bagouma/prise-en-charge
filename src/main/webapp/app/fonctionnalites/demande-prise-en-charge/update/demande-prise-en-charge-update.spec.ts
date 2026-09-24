@@ -7,14 +7,14 @@ import { ActivatedRoute, provideRouter } from '@angular/router';
 import { provideTranslateService } from '@ngx-translate/core';
 import { Subject, from, of } from 'rxjs';
 
-import { IAgent } from 'app/fonctionnalites/agent/agent.model';
-import { AgentService } from 'app/fonctionnalites/agent/service/agent.service';
-import { IAyantDroit } from 'app/fonctionnalites/ayant-droit/ayant-droit.model';
-import { AyantDroitService } from 'app/fonctionnalites/ayant-droit/service/ayant-droit.service';
-import { IEtablissementSante } from 'app/fonctionnalites/etablissement-sante/etablissement-sante.model';
-import { EtablissementSanteService } from 'app/fonctionnalites/etablissement-sante/service/etablissement-sante.service';
-import { UserService } from 'app/fonctionnalites/user/service/user.service';
-import { IUser } from 'app/fonctionnalites/user/user.model';
+import { IAgent } from 'app/entities/agent/agent.model';
+import { AgentService } from 'app/entities/agent/service/agent.service';
+import { IAyantDroit } from 'app/entities/ayant-droit/ayant-droit.model';
+import { AyantDroitService } from 'app/entities/ayant-droit/service/ayant-droit.service';
+import { IEtablissementSante } from 'app/entities/etablissement-sante/etablissement-sante.model';
+import { EtablissementSanteService } from 'app/entities/etablissement-sante/service/etablissement-sante.service';
+import { UserService } from 'app/entities/user/service/user.service';
+import { IUser } from 'app/entities/user/user.model';
 import { ConfirmService } from 'app/shared/confirm';
 
 import { IDemandePriseEnCharge } from '../demande-prise-en-charge.model';
@@ -135,10 +135,12 @@ describe('DemandePriseEnCharge Management Update Component', () => {
       const demandePriseEnCharge: IDemandePriseEnCharge = { id: 19327 };
       const gestionnaireCreateur: IUser = { id: 3944 };
       demandePriseEnCharge.gestionnaireCreateur = gestionnaireCreateur;
+      const assigneA: IUser = { id: 3944 };
+      demandePriseEnCharge.assigneA = assigneA;
 
       const userCollection: IUser[] = [{ id: 3944 }];
       vi.spyOn(userService, 'query').mockReturnValue(of(new HttpResponse({ body: userCollection })));
-      const additionalUsers = [gestionnaireCreateur];
+      const additionalUsers = [gestionnaireCreateur, assigneA];
       const expectedCollection: IUser[] = [...additionalUsers, ...userCollection];
       vi.spyOn(userService, 'addUserToCollectionIfMissing').mockReturnValue(expectedCollection);
 
@@ -165,6 +167,8 @@ describe('DemandePriseEnCharge Management Update Component', () => {
       demandePriseEnCharge.etablissementSante = etablissementSante;
       const gestionnaireCreateur: IUser = { id: 3944 };
       demandePriseEnCharge.gestionnaireCreateur = gestionnaireCreateur;
+      const assigneA: IUser = { id: 3944 };
+      demandePriseEnCharge.assigneA = assigneA;
 
       activatedRoute.data = of({ demandePriseEnCharge });
       comp.ngOnInit();
@@ -173,6 +177,7 @@ describe('DemandePriseEnCharge Management Update Component', () => {
       expect(comp.ayantDroitsSharedCollection()).toContainEqual(ayantDroit);
       expect(comp.etablissementSantesSharedCollection()).toContainEqual(etablissementSante);
       expect(comp.usersSharedCollection()).toContainEqual(gestionnaireCreateur);
+      expect(comp.usersSharedCollection()).toContainEqual(assigneA);
       expect(comp.demandePriseEnCharge).toEqual(demandePriseEnCharge);
     });
   });

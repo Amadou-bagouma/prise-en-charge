@@ -7,8 +7,8 @@ import { ActivatedRoute } from '@angular/router';
 import { provideTranslateService } from '@ngx-translate/core';
 import { Subject, from, of } from 'rxjs';
 
-import { IAgent } from 'app/fonctionnalites/agent/agent.model';
-import { AgentService } from 'app/fonctionnalites/agent/service/agent.service';
+import { IAgent } from 'app/entities/agent/agent.model';
+import { AgentService } from 'app/entities/agent/service/agent.service';
 import { ConfirmService } from 'app/shared/confirm';
 
 import { IAyantDroit } from '../ayant-droit.model';

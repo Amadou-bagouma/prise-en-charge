@@ -122,15 +122,13 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         requireAuteurOuAdmin(existante, getCurrentUser());
         // The workflow status is only ever changed through valider/rejeter/resoumettre, never through the
         // generic update endpoint, so callers cannot bypass the DRH / infirmerie validation steps. The
-        // reference, author, creation date, rejection reason and assignee are likewise fixed by the workflow and
+        // reference, author, creation date and rejection reason are likewise fixed by the workflow and
         // never editable through this endpoint, and the modification date is always set by the server.
         demandePriseEnCharge.setStatut(existante.getStatut());
         demandePriseEnCharge.setReference(existante.getReference());
         demandePriseEnCharge.setGestionnaireCreateur(existante.getGestionnaireCreateur());
         demandePriseEnCharge.setDateCreation(existante.getDateCreation());
         demandePriseEnCharge.setMotifRejet(existante.getMotifRejet());
-        demandePriseEnCharge.setAssigneA(existante.getAssigneA());
-        demandePriseEnCharge.setDateAssignation(existante.getDateAssignation());
         demandePriseEnCharge.setDateModification(Instant.now());
         demandePriseEnCharge = demandePriseEnChargeRepository.save(demandePriseEnCharge);
         return demandePriseEnChargeMapper.toDto(demandePriseEnCharge);
@@ -150,8 +148,6 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
                 User auteurPersiste = existingDemandePriseEnCharge.getGestionnaireCreateur();
                 Instant dateCreationPersistee = existingDemandePriseEnCharge.getDateCreation();
                 String motifRejetPersiste = existingDemandePriseEnCharge.getMotifRejet();
-                User assigneAPersiste = existingDemandePriseEnCharge.getAssigneA();
-                Instant dateAssignationPersistee = existingDemandePriseEnCharge.getDateAssignation();
                 demandePriseEnChargeMapper.partialUpdate(existingDemandePriseEnCharge, demandePriseEnChargeDTO);
                 if (demandePriseEnChargeDTO.getTypeSoins() != null && !demandePriseEnChargeDTO.getTypeSoins().isEmpty()) {
                     existingDemandePriseEnCharge.setTypeSoins(resoudreTypeSoins(demandePriseEnChargeDTO));
@@ -163,8 +159,6 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
                 existingDemandePriseEnCharge.setGestionnaireCreateur(auteurPersiste);
                 existingDemandePriseEnCharge.setDateCreation(dateCreationPersistee);
                 existingDemandePriseEnCharge.setMotifRejet(motifRejetPersiste);
-                existingDemandePriseEnCharge.setAssigneA(assigneAPersiste);
-                existingDemandePriseEnCharge.setDateAssignation(dateAssignationPersistee);
                 existingDemandePriseEnCharge.setDateModification(Instant.now());
 
                 return existingDemandePriseEnCharge;

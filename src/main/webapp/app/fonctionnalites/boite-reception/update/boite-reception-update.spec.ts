@@ -7,8 +7,8 @@ import { ActivatedRoute } from '@angular/router';
 import { provideTranslateService } from '@ngx-translate/core';
 import { Subject, from, of } from 'rxjs';
 
-import { UserService } from 'app/fonctionnalites/user/service/user.service';
-import { IUser } from 'app/fonctionnalites/user/user.model';
+import { UserService } from 'app/entities/user/service/user.service';
+import { IUser } from 'app/entities/user/user.model';
 import { ConfirmService } from 'app/shared/confirm';
 
 import { IBoiteReception } from '../boite-reception.model';

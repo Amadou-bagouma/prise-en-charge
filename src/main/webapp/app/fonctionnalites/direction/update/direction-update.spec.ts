@@ -7,8 +7,8 @@ import { ActivatedRoute } from '@angular/router';
 import { provideTranslateService } from '@ngx-translate/core';
 import { Subject, from, of } from 'rxjs';
 
-import { IRegion } from 'app/fonctionnalites/region/region.model';
-import { RegionService } from 'app/fonctionnalites/region/service/region.service';
+import { IRegion } from 'app/entities/region/region.model';
+import { RegionService } from 'app/entities/region/service/region.service';
 import { ConfirmService } from 'app/shared/confirm';
 
 import { IDirection } from '../direction.model';

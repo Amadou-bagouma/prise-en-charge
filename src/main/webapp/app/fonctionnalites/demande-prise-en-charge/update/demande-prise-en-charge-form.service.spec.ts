@@ -36,6 +36,7 @@ describe('DemandePriseEnCharge Form Service', () => {
             typeSoins: expect.any(Object),
             etablissementSante: expect.any(Object),
             gestionnaireCreateur: expect.any(Object),
+            assigneA: expect.any(Object),
           }),
         );
       });
@@ -62,6 +63,7 @@ describe('DemandePriseEnCharge Form Service', () => {
             typeSoins: expect.any(Object),
             etablissementSante: expect.any(Object),
             gestionnaireCreateur: expect.any(Object),
+            assigneA: expect.any(Object),
           }),
         );
       });

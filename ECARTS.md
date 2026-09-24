@@ -11,7 +11,7 @@ complète) plutôt que tranchées seul.
 `piece-manquante`, `accordee`, `rejetee`, `cloturee` — et rien d'autre.
 
 **Écart** : le workflow réel de l'application (`StatutDemande`, backend) est une double validation
-hiérarchique — `EN_ATTENTE_VALIDATION_INFIRMERIE` → `EN_ATTENTE_VALIDATION_DRH` → `VALIDEE`, ou
+hiérarchique — `EN_ATTENTE_VALIDATION_DRH` → `EN_ATTENTE_VALIDATION_INFIRMERIE` → `VALIDEE`, ou
 `RETOURNEE` en cas de rejet — sans notion de « pièce manquante » bloquante ni d'état de fin de vie
 « clôturée » après validation.
 
@@ -24,8 +24,8 @@ retenu, à appliquer à l'étape 3 :
 
 | Statut métier                      | Ton      |
 | ---------------------------------- | -------- |
-| `EN_ATTENTE_VALIDATION_INFIRMERIE` | `warn`   |
 | `EN_ATTENTE_VALIDATION_DRH`        | `warn`   |
+| `EN_ATTENTE_VALIDATION_INFIRMERIE` | `warn`   |
 | `VALIDEE`                          | `ok`     |
 | `RETOURNEE`                        | `danger` |
 

@@ -6,10 +6,10 @@ import { ActivatedRoute } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { Observable, finalize, map } from 'rxjs';
 
-import { IDemandePriseEnCharge } from 'app/fonctionnalites/demande-prise-en-charge/demande-prise-en-charge.model';
-import { DemandePriseEnChargeService } from 'app/fonctionnalites/demande-prise-en-charge/service/demande-prise-en-charge.service';
-import { UserService } from 'app/fonctionnalites/user/service/user.service';
-import { IUser } from 'app/fonctionnalites/user/user.model';
+import { IDemandePriseEnCharge } from 'app/entities/demande-prise-en-charge/demande-prise-en-charge.model';
+import { DemandePriseEnChargeService } from 'app/entities/demande-prise-en-charge/service/demande-prise-en-charge.service';
+import { UserService } from 'app/entities/user/service/user.service';
+import { IUser } from 'app/entities/user/user.model';
 import { AlertError } from 'app/shared/alert';
 import { ConfirmService } from 'app/shared/confirm';
 import { TranslateDirective } from 'app/shared/language';

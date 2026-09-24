@@ -1,4 +1,4 @@
-import { TypeGestion } from 'app/fonctionnalites/enumerations/type-gestion.model';
+import { TypeGestion } from 'app/entities/enumerations/type-gestion.model';
 
 export interface IGestion {
   id: number;

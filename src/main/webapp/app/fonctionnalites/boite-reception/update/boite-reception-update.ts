@@ -6,8 +6,8 @@ import { ActivatedRoute } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { Observable, finalize, map } from 'rxjs';
 
-import { UserService } from 'app/fonctionnalites/user/service/user.service';
-import { IUser } from 'app/fonctionnalites/user/user.model';
+import { UserService } from 'app/entities/user/service/user.service';
+import { IUser } from 'app/entities/user/user.model';
 import { AlertError } from 'app/shared/alert';
 import { ConfirmService } from 'app/shared/confirm';
 import { TranslateDirective } from 'app/shared/language';

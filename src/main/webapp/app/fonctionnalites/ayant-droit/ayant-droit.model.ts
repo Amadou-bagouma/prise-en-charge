@@ -1,7 +1,7 @@
 import dayjs from 'dayjs/esm';
 
-import { IAgent } from 'app/fonctionnalites/agent/agent.model';
-import { LienParente } from 'app/fonctionnalites/enumerations/lien-parente.model';
+import { IAgent } from 'app/entities/agent/agent.model';
+import { LienParente } from 'app/entities/enumerations/lien-parente.model';
 
 export interface IAyantDroit {
   id: number;

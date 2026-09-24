@@ -7,19 +7,19 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Observable, finalize, map } from 'rxjs';
 
-import { IAgent } from 'app/fonctionnalites/agent/agent.model';
-import { AgentService } from 'app/fonctionnalites/agent/service/agent.service';
-import { IAyantDroit } from 'app/fonctionnalites/ayant-droit/ayant-droit.model';
-import { AyantDroitService } from 'app/fonctionnalites/ayant-droit/service/ayant-droit.service';
+import { IAgent } from 'app/entities/agent/agent.model';
+import { AgentService } from 'app/entities/agent/service/agent.service';
+import { IAyantDroit } from 'app/entities/ayant-droit/ayant-droit.model';
+import { AyantDroitService } from 'app/entities/ayant-droit/service/ayant-droit.service';
 import { AccountService } from 'app/core/auth';
-import { PrioriteDemande } from 'app/fonctionnalites/enumerations/priorite-demande.model';
-import { TypeBeneficiaire } from 'app/fonctionnalites/enumerations/type-beneficiaire.model';
+import { PrioriteDemande } from 'app/entities/enumerations/priorite-demande.model';
+import { TypeBeneficiaire } from 'app/entities/enumerations/type-beneficiaire.model';
 import { ITypeSoin } from 'app/fonctionnalites/type-soin/type-soin.model';
 import { TypeSoinService } from 'app/fonctionnalites/type-soin/service/type-soin.service';
-import { IEtablissementSante } from 'app/fonctionnalites/etablissement-sante/etablissement-sante.model';
-import { EtablissementSanteService } from 'app/fonctionnalites/etablissement-sante/service/etablissement-sante.service';
-import { UserService } from 'app/fonctionnalites/user/service/user.service';
-import { IUser } from 'app/fonctionnalites/user/user.model';
+import { IEtablissementSante } from 'app/entities/etablissement-sante/etablissement-sante.model';
+import { EtablissementSanteService } from 'app/entities/etablissement-sante/service/etablissement-sante.service';
+import { UserService } from 'app/entities/user/service/user.service';
+import { IUser } from 'app/entities/user/user.model';
 import { AlertError } from 'app/shared/alert';
 import { ConfirmService } from 'app/shared/confirm';
 import { TranslateDirective } from 'app/shared/language';
@@ -142,7 +142,7 @@ export class DemandePriseEnChargeUpdate implements OnInit {
       ),
     );
     this.usersSharedCollection.update(users =>
-      this.userService.addUserToCollectionIfMissing<IUser>(users, demandePriseEnCharge.gestionnaireCreateur),
+      this.userService.addUserToCollectionIfMissing<IUser>(users, demandePriseEnCharge.gestionnaireCreateur, demandePriseEnCharge.assigneA),
     );
   }
 
@@ -191,7 +191,11 @@ export class DemandePriseEnChargeUpdate implements OnInit {
       .pipe(map((res: HttpResponse<IUser[]>) => res.body ?? []))
       .pipe(
         map((users: IUser[]) =>
-          this.userService.addUserToCollectionIfMissing<IUser>(users, this.demandePriseEnCharge?.gestionnaireCreateur),
+          this.userService.addUserToCollectionIfMissing<IUser>(
+            users,
+            this.demandePriseEnCharge?.gestionnaireCreateur,
+            this.demandePriseEnCharge?.assigneA,
+          ),
         ),
       )
       .subscribe((users: IUser[]) => {
