@@ -1,0 +1,106 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (tache(); as tacheRef) {
+      <div class="jhi-form-panel">
+        <h2 data-cy="tacheDetailsHeading"><span jhiTranslate="peccnssApp.tache.detail.title">Tache</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ tacheRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.tache.titre">Titre</span></dt>
+          <dd>
+            <span>{{ tacheRef.titre }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.tache.description">Description</span></dt>
+          <dd>
+            <span>{{ tacheRef.description }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.tache.dateCreation">Date Creation</span></dt>
+          <dd>
+            <span>{{ tacheRef.dateCreation | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.tache.dateAssignation">Date Assignation</span></dt>
+          <dd>
+            <span>{{ tacheRef.dateAssignation | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.tache.dateEcheance">Date Echeance</span></dt>
+          <dd>
+            <span>{{ tacheRef.dateEcheance | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.tache.dateTerminaison">Date Terminaison</span></dt>
+          <dd>
+            <span>{{ tacheRef.dateTerminaison | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.tache.statut">Statut</span></dt>
+          <dd>
+            <span
+              class="jhi-badge"
+              [ngClass]="'jhi-badge-statuttache-' + tacheRef.statut"
+              [jhiTranslate]="'peccnssApp.StatutTache.' + (tacheRef.statut ?? 'null')"
+              >{{
+                { null: '', A_FAIRE: 'A_FAIRE', EN_COURS: 'EN_COURS', EN_ATTENTE: 'EN_ATTENTE', TERMINEE: 'TERMINEE', ANNULEE: 'ANNULEE' }[
+                  tacheRef.statut ?? 'null'
+                ]
+              }}</span
+            >
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.tache.priorite">Priorite</span></dt>
+          <dd>
+            <span
+              class="jhi-badge"
+              [ngClass]="'jhi-badge-priorite-' + tacheRef.priorite"
+              [jhiTranslate]="'peccnssApp.PrioriteTache.' + (tacheRef.priorite ?? 'null')"
+              >{{ { null: '', NORMALE: 'NORMALE', IMPORTANTE: 'IMPORTANTE', URGENTE: 'URGENTE' }[tacheRef.priorite ?? 'null'] }}</span
+            >
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.tache.lu">Lu</span></dt>
+          <dd>
+            <span class="jhi-badge" [ngClass]="tacheRef.lu ? 'jhi-badge-actif-true' : 'jhi-badge-actif-false'">
+              {{ tacheRef.lu ? 'Lu' : 'Non lu' }}
+            </span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.tache.commentaire">Commentaire</span></dt>
+          <dd>
+            <span>{{ tacheRef.commentaire }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.tache.demande">Demande</span></dt>
+          <dd>
+            @if (tache()!.demande) {
+              <div>
+                <a [routerLink]="['/demande-prise-en-charge', tache()!.demande?.id, 'view']">{{ tacheRef.demande?.reference }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.tache.utilisateur">Utilisateur</span></dt>
+          <dd>
+            <span>{{ tacheRef.utilisateur?.login }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.tache.boiteReception">Boite Reception</span></dt>
+          <dd>
+            @if (tache()!.boiteReception) {
+              <div>
+                <a [routerLink]="['/boite-reception', tache()!.boiteReception?.id, 'view']">{{ tacheRef.boiteReception?.id }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/tache', tacheRef.id, 'edit']" class="btn btn-accent">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

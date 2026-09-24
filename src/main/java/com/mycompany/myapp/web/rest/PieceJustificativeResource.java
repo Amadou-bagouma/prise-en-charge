@@ -149,11 +149,16 @@ public class PieceJustificativeResource {
     @GetMapping("")
     public ResponseEntity<List<PieceJustificativeDTO>> getAllPieceJustificatives(
         @org.springdoc.core.annotations.ParameterObject Pageable pageable,
-        @RequestParam(name = "eagerload", required = false, defaultValue = "true") boolean eagerload
+        @RequestParam(name = "eagerload", required = false, defaultValue = "true") boolean eagerload,
+        @RequestParam(name = "demandeId", required = false) Long demandeId
     ) {
         LOG.debug("REST request to get a page of PieceJustificatives");
         Page<PieceJustificativeDTO> page;
-        if (eagerload) {
+        // L'ecran de detail d'une demande n'a besoin que des pieces de ce dossier : le filtre
+        // evite de rapatrier toute la table pour en garder trois lignes.
+        if (demandeId != null) {
+            page = pieceJustificativeService.findAllByDemande(demandeId, pageable);
+        } else if (eagerload) {
             page = pieceJustificativeService.findAllWithEagerRelationships(pageable);
         } else {
             page = pieceJustificativeService.findAll(pageable);

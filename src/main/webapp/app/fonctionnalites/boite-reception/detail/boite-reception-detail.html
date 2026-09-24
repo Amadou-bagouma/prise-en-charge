@@ -1,0 +1,52 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (boiteReception(); as boiteReceptionRef) {
+      <div class="jhi-form-panel">
+        <h2 data-cy="boiteReceptionDetailsHeading"><span jhiTranslate="peccnssApp.boiteReception.detail.title">Boite Reception</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ boiteReceptionRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.boiteReception.dateCreation">Date Creation</span></dt>
+          <dd>
+            <span>{{ boiteReceptionRef.dateCreation | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.boiteReception.dateDerniereLecture">Date Derniere Lecture</span></dt>
+          <dd>
+            <span>{{ boiteReceptionRef.dateDerniereLecture | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.boiteReception.nombreNonLus">Nombre Non Lus</span></dt>
+          <dd>
+            <span>{{ boiteReceptionRef.nombreNonLus }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.boiteReception.actif">Actif</span></dt>
+          <dd>
+            <span class="jhi-badge" [ngClass]="boiteReceptionRef.actif ? 'jhi-badge-actif-true' : 'jhi-badge-actif-false'">
+              {{ boiteReceptionRef.actif ? 'Actif' : 'Inactif' }}
+            </span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.boiteReception.utilisateur">Utilisateur</span></dt>
+          <dd>
+            <span>{{ boiteReceptionRef.utilisateur?.login }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/boite-reception', boiteReceptionRef.id, 'edit']" class="btn btn-accent">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

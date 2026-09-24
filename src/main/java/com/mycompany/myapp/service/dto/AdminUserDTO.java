@@ -2,6 +2,7 @@ package com.mycompany.myapp.service.dto;
 
 import com.mycompany.myapp.config.Constants;
 import com.mycompany.myapp.domain.Authority;
+import com.mycompany.myapp.domain.Profil;
 import com.mycompany.myapp.domain.User;
 import jakarta.validation.constraints.*;
 import java.io.Serial;
@@ -52,8 +53,15 @@ public class AdminUserDTO implements Serializable {
      * password + email reset link). Write-only: never populated from a {@link User}, and ignored
      * outside of user creation. Bounds mirror {@code ManagedUserVM.PASSWORD_MIN_LENGTH/MAX_LENGTH}.
      */
-    @Size(min = 4, max = 100)
+    @Size(min = 8, max = 100)
     private String password;
+
+    /**
+     * The profil (bundle of authorities) to assign this user. Mandatory when an admin creates or
+     * updates a user (see {@code UserService}); ignored - and always overridden server-side - on
+     * public self-registration, where a caller must never be able to pick their own authorities.
+     */
+    private ProfilDTO profil;
 
     private boolean mustChangePassword = false;
 
@@ -91,6 +99,19 @@ public class AdminUserDTO implements Serializable {
         this.lastModifiedBy = user.getLastModifiedBy();
         this.lastModifiedDate = user.getLastModifiedDate();
         this.authorities = user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet());
+        this.profil = toProfilDTO(user.getProfil());
+    }
+
+    private static ProfilDTO toProfilDTO(Profil profil) {
+        if (profil == null) {
+            return null;
+        }
+        ProfilDTO dto = new ProfilDTO();
+        dto.setId(profil.getId());
+        dto.setNom(profil.getNom());
+        dto.setDescription(profil.getDescription());
+        dto.setAuthorities(profil.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet()));
+        return dto;
     }
 
     public Long getId() {
@@ -229,6 +250,14 @@ public class AdminUserDTO implements Serializable {
         this.authorities = authorities;
     }
 
+    public ProfilDTO getProfil() {
+        return profil;
+    }
+
+    public void setProfil(ProfilDTO profil) {
+        this.profil = profil;
+    }
+
     // prettier-ignore
     @Override
     public String toString() {
@@ -246,6 +275,7 @@ public class AdminUserDTO implements Serializable {
             ", lastModifiedBy='" + lastModifiedBy + '\'' +
             ", lastModifiedDate=" + lastModifiedDate +
             ", authorities=" + authorities +
+            ", profil=" + (profil == null ? null : profil.getNom()) +
             "}";
     }
 }

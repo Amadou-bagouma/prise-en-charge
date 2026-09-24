@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import com.mycompany.myapp.IntegrationTest;
+import com.mycompany.myapp.domain.Profil;
 import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.repository.UserRepository;
 import java.time.Instant;
@@ -75,6 +76,11 @@ class UserServiceIT {
         user.setLastName(DEFAULT_LASTNAME);
         user.setImageUrl(DEFAULT_IMAGEURL);
         user.setLangKey(DEFAULT_LANGKEY);
+        // A profil is mandatory. This throwaway one is never persisted independently - it rides
+        // along (cascade = PERSIST, see User#profil) whenever this user is saved.
+        Profil profil = new Profil();
+        profil.setNom("test-profil-service-" + RandomStringUtils.insecure().nextAlphanumeric(10));
+        user.setProfil(profil);
 
         when(dateTimeProvider.getNow()).thenReturn(Optional.of(LocalDateTime.now()));
         auditingHandler.setDateTimeProvider(dateTimeProvider);

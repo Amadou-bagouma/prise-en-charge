@@ -27,7 +27,14 @@
       "fonction": "Fonction",
       "photo": "Photo",
       "direction": "Direction",
-      "gestion": "Gestion"
+      "gestion": "Gestion",
+      "rattachement": "Organisational unit",
+      "ayantsDroit": {
+        "titre": "Dependants",
+        "ajouter": "Add a dependant",
+        "aucun": "No dependant attached to this agent.",
+        "chargement": "Loading…"
+      }
     }
   }
 }

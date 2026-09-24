@@ -1,6 +1,7 @@
 package com.mycompany.myapp.repository;
 
 import com.mycompany.myapp.domain.Notification;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -44,4 +45,16 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
         "select notification from Notification notification left join fetch notification.utilisateur left join fetch notification.demande left join fetch notification.tache where notification.id =:id"
     )
     Optional<Notification> findOneWithToOneRelationships(@Param("id") Long id);
+
+    /**
+     * Marque lues toutes les notifications encore non lues d'un agent.
+     *
+     * <p>En une requete plutot qu'en chargeant chaque ligne : « tout marquer comme lu » sur une
+     * boite qui en compte des centaines ne doit pas se payer en centaines d'allers-retours.
+     */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query(
+        "update Notification n set n.lu = true, n.dateLecture = :dateLecture where n.utilisateur.id = :utilisateurId and (n.lu = false or n.lu is null)"
+    )
+    int marquerToutLu(@Param("utilisateurId") Long utilisateurId, @Param("dateLecture") Instant dateLecture);
 }

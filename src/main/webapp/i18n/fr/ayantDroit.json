@@ -23,7 +23,8 @@
       "dateNaissance": "Date de naissance",
       "lien": "Lien de parenté",
       "photo": "Photo",
-      "agent": "Agent"
+      "agent": "Agent",
+      "codeAyantDroit": "Code"
     }
   }
 }

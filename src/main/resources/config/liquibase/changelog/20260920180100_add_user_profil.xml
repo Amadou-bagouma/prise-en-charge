@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Makes profil mandatory on jhi_user. The column is added nullable first, existing users (if
+        any - a fresh database has none yet at this point in the changelog) are backfilled from
+        their current authorities, then NOT NULL and the FK are added. This order lets the migration
+        run cleanly both on a brand-new database and on an existing installation being upgraded.
+    -->
+    <changeSet id="20260920180100-1" author="manual">
+        <addColumn tableName="jhi_user">
+            <column name="profil_id" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20260920180100-2" author="manual">
+        <sql>
+            UPDATE jhi_user SET profil_id = (SELECT id FROM profil WHERE nom = 'Administrateur')
+            WHERE profil_id IS NULL
+              AND EXISTS (SELECT 1 FROM jhi_user_authority ua WHERE ua.user_id = jhi_user.id AND ua.authority_name = 'ROLE_ADMIN');
+
+            UPDATE jhi_user SET profil_id = (SELECT id FROM profil WHERE nom = 'Validateur DRH')
+            WHERE profil_id IS NULL
+              AND EXISTS (SELECT 1 FROM jhi_user_authority ua WHERE ua.user_id = jhi_user.id AND ua.authority_name = 'ROLE_VALIDATEUR_DRH');
+
+            UPDATE jhi_user SET profil_id = (SELECT id FROM profil WHERE nom = 'Validateur infirmerie')
+            WHERE profil_id IS NULL
+              AND EXISTS (SELECT 1 FROM jhi_user_authority ua WHERE ua.user_id = jhi_user.id AND ua.authority_name = 'ROLE_VALIDATEUR_INFIRMERIE');
+
+            UPDATE jhi_user SET profil_id = (SELECT id FROM profil WHERE nom = 'Gestionnaire')
+            WHERE profil_id IS NULL;
+        </sql>
+    </changeSet>
+
+    <changeSet id="20260920180100-3" author="manual">
+        <addNotNullConstraint tableName="jhi_user" columnName="profil_id" columnDataType="bigint"/>
+    </changeSet>
+
+    <changeSet id="20260920180100-4" author="manual">
+        <addForeignKeyConstraint baseColumnNames="profil_id"
+                                 baseTableName="jhi_user"
+                                 constraintName="fk_user__profil_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="profil"/>
+    </changeSet>
+
+    <!--
+        A database default (the "Gestionnaire" profil, id 2) backs the NOT NULL constraint above.
+        Application code (UserService#createUser/registerUser) always resolves and sets an explicit
+        profil, so this default is never relied upon there - it exists purely so that code which
+        builds a User without one (chiefly test fixtures, see User#@DynamicInsert) still satisfies
+        the constraint instead of failing to insert.
+    -->
+    <changeSet id="20260920180100-5" author="manual">
+        <addDefaultValue tableName="jhi_user" columnName="profil_id" columnDataType="bigint" defaultValueNumeric="2"/>
+    </changeSet>
+</databaseChangeLog>

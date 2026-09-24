@@ -1,0 +1,134 @@
+<div class="pec-ecran">
+  <div class="pec-titre-ecran">
+    <h1 id="page-heading" data-cy="NotificationHeading" jhiTranslate="peccnssApp.notification.home.title">Notifications</h1>
+    <span class="pec-muted">{{ totalItems() }} notification{{ totalItems() > 1 ? 's' : '' }}</span>
+  </div>
+
+  <jhi-alert-error />
+  <jhi-alert />
+
+  <!--
+    Deux vues seulement : ce qui reste à voir, et tout. Pas de menu de filtres : une boîte de
+    réception se consulte, elle ne s'interroge pas.
+  -->
+  <div class="pec-filtres">
+    @for (puce of puces; track puce.cle) {
+      <button
+        type="button"
+        class="pec-puce"
+        [class.pec-puce--active]="puceActive() === puce.cle"
+        (click)="choisirPuce(puce.cle)"
+        [attr.data-cy]="'puce-' + puce.cle"
+      >
+        {{ puce.libelle }}
+        @if (effectifs()[puce.cle] !== undefined) {
+          <span class="pec-puce__n">{{ effectifs()[puce.cle] }}</span>
+        }
+      </button>
+    }
+
+    <div class="pec-filtres__actions">
+      <button type="button" class="pec-btn pec-btn--discret pec-btn--sm" (click)="load()" [disabled]="isLoading()">
+        <fa-icon class="pec-btn__ico" icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span jhiTranslate="peccnssApp.notification.home.refreshListLabel">Actualiser la liste</span>
+      </button>
+
+      <button
+        type="button"
+        class="pec-btn pec-btn--secondaire pec-btn--sm"
+        (click)="marquerToutLu()"
+        [disabled]="isSoldant() || !effectifs().nonLues"
+        data-cy="marquerToutLu"
+      >
+        <fa-icon class="pec-btn__ico" icon="check" />
+        <span>Tout marquer comme lu</span>
+      </button>
+    </div>
+  </div>
+
+  @if (notifications().length === 0) {
+    <section class="pec-panneau">
+      <div class="pec-panneau__corps">
+        <span class="pec-muted">
+          @if (puceActive() === 'nonLues') {
+            Aucune notification non lue. Votre boîte est à jour.
+          } @else {
+            <span jhiTranslate="peccnssApp.notification.home.notFound">Aucune notification</span>
+          }
+        </span>
+      </div>
+    </section>
+  } @else {
+    <ul class="pec-boite">
+      @for (notification of notifications(); track trackId(notification)) {
+        <!-- Une notification non lue se distingue au premier coup d'œil, sans avoir à lire. -->
+        <li class="pec-boite__item" [class.pec-boite__item--non-lue]="!notification.lu" data-cy="entityTable">
+          <div class="pec-boite__tete">
+            <span class="pec-boite__titre">{{ notification.titre }}</span>
+            <span class="pec-badge" [ngClass]="'pec-badge--' + typeTon(notification.type)">
+              <span class="pec-badge__pt"></span>
+              <span [jhiTranslate]="'peccnssApp.TypeNotification.' + (notification.type ?? 'null')">{{ notification.type }}</span>
+            </span>
+            <span class="pec-boite__date">{{ notification.dateCreation | formatMediumDatetime }}</span>
+          </div>
+
+          @if (notification.message) {
+            <p class="pec-boite__message">{{ notification.message }}</p>
+          }
+
+          <div class="pec-boite__actions">
+            @if (lienCible(notification); as cible) {
+              <a [routerLink]="cible" class="pec-btn pec-btn--discret pec-btn--sm" data-cy="ouvrirCible">
+                <fa-icon class="pec-btn__ico" icon="eye" />
+                <span>
+                  @if (notification.demande) {
+                    Ouvrir le dossier {{ notification.demande.reference }}
+                  } @else {
+                    Ouvrir la tâche
+                  }
+                </span>
+              </a>
+            }
+
+            @if (!notification.lu) {
+              <button type="button" class="pec-btn pec-btn--discret pec-btn--sm" (click)="marquerLue(notification)" data-cy="marquerLue">
+                <fa-icon class="pec-btn__ico" icon="check" />
+                <span>Marquer comme lue</span>
+              </button>
+            } @else {
+              <span class="pec-muted pec-boite__lue">Lue le {{ notification.dateLecture | formatMediumDatetime }}</span>
+            }
+
+            <button
+              type="button"
+              class="pec-btn pec-btn--discret pec-btn--sm pec-boite__fin"
+              (click)="delete(notification)"
+              data-cy="entityDeleteButton"
+            >
+              <fa-icon class="pec-btn__ico" icon="times" />
+              <span jhiTranslate="entity.action.delete">Supprimer</span>
+            </button>
+          </div>
+        </li>
+      }
+    </ul>
+
+    <div>
+      <div class="d-flex justify-content-center">
+        <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+      </div>
+
+      <div class="d-flex justify-content-center">
+        <ngb-pagination
+          [collectionSize]="totalItems()"
+          [page]="page()"
+          [pageSize]="itemsPerPage()"
+          [maxSize]="5"
+          [rotate]="true"
+          [boundaryLinks]="true"
+          (pageChange)="navigateToPage($event)"
+        />
+      </div>
+    </div>
+  }
+</div>

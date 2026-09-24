@@ -39,4 +39,16 @@ public interface PieceJustificativeRepository extends JpaRepository<PieceJustifi
         "select pieceJustificative from PieceJustificative pieceJustificative left join fetch pieceJustificative.demande where pieceJustificative.id =:id"
     )
     Optional<PieceJustificative> findOneWithToOneRelationships(@Param("id") Long id);
+
+    /**
+     * Les pieces d'un dossier, de la plus recente a la plus ancienne.
+     *
+     * <p>Une piece justificative ne se consulte jamais seule : elle appartient a une demande,
+     * et c'est depuis la demande qu'on verifie ce qui a ete joint.
+     */
+    @Query(
+        value = "select pieceJustificative from PieceJustificative pieceJustificative left join fetch pieceJustificative.demande where pieceJustificative.demande.id = :demandeId",
+        countQuery = "select count(pieceJustificative) from PieceJustificative pieceJustificative where pieceJustificative.demande.id = :demandeId"
+    )
+    Page<PieceJustificative> findAllByDemandeId(@Param("demandeId") Long demandeId, Pageable pageable);
 }

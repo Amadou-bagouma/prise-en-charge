@@ -13,19 +13,25 @@ import com.mycompany.myapp.repository.DemandePriseEnChargeRepository;
 import com.mycompany.myapp.repository.HistoriqueActionRepository;
 import com.mycompany.myapp.repository.NotificationRepository;
 import com.mycompany.myapp.repository.TacheRepository;
+import com.mycompany.myapp.repository.TypeSoinRepository;
 import com.mycompany.myapp.repository.UserRepository;
 import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.security.SecurityUtils;
 import com.mycompany.myapp.service.DemandePriseEnChargeService;
 import com.mycompany.myapp.service.dto.DemandePriseEnChargeDTO;
+import com.mycompany.myapp.service.dto.TypeSoinDTO;
 import com.mycompany.myapp.service.mapper.DemandePriseEnChargeMapper;
 import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -59,6 +65,8 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
 
     private final NotificationRepository notificationRepository;
 
+    private final TypeSoinRepository typeSoinRepository;
+
     private static final List<StatutTache> STATUTS_TACHE_CLOTURES = List.of(StatutTache.TERMINEE, StatutTache.ANNULEE);
 
     private static final DateTimeFormatter REFERENCE_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyMMdd");
@@ -69,7 +77,8 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         UserRepository userRepository,
         HistoriqueActionRepository historiqueActionRepository,
         TacheRepository tacheRepository,
-        NotificationRepository notificationRepository
+        NotificationRepository notificationRepository,
+        TypeSoinRepository typeSoinRepository
     ) {
         this.demandePriseEnChargeRepository = demandePriseEnChargeRepository;
         this.demandePriseEnChargeMapper = demandePriseEnChargeMapper;
@@ -77,12 +86,14 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         this.historiqueActionRepository = historiqueActionRepository;
         this.tacheRepository = tacheRepository;
         this.notificationRepository = notificationRepository;
+        this.typeSoinRepository = typeSoinRepository;
     }
 
     @Override
     public DemandePriseEnChargeDTO save(DemandePriseEnChargeDTO demandePriseEnChargeDTO) {
         LOG.debug("Request to save DemandePriseEnCharge : {}", demandePriseEnChargeDTO);
         DemandePriseEnCharge demandePriseEnCharge = demandePriseEnChargeMapper.toEntity(demandePriseEnChargeDTO);
+        demandePriseEnCharge.setTypeSoins(resoudreTypeSoins(demandePriseEnChargeDTO));
         User currentUser = getCurrentUser();
         Instant now = Instant.now();
         // The workflow always starts with the current user as author and the 1st validation step (DRH),
@@ -102,12 +113,19 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
     public DemandePriseEnChargeDTO update(DemandePriseEnChargeDTO demandePriseEnChargeDTO) {
         LOG.debug("Request to update DemandePriseEnCharge : {}", demandePriseEnChargeDTO);
         DemandePriseEnCharge demandePriseEnCharge = demandePriseEnChargeMapper.toEntity(demandePriseEnChargeDTO);
+        demandePriseEnCharge.setTypeSoins(resoudreTypeSoins(demandePriseEnChargeDTO));
         DemandePriseEnCharge existante = getDemandeOrThrow(demandePriseEnCharge.getId());
+        requireAuteurOuAdmin(existante, getCurrentUser());
         // The workflow status is only ever changed through valider/rejeter/resoumettre, never through the
-        // generic update endpoint, so callers cannot bypass the DRH / infirmerie validation steps.
+        // generic update endpoint, so callers cannot bypass the DRH / infirmerie validation steps. The
+        // reference, author, creation date and rejection reason are likewise fixed by the workflow and
+        // never editable through this endpoint, and the modification date is always set by the server.
         demandePriseEnCharge.setStatut(existante.getStatut());
-        // The reference is generated once at creation and never editable afterwards.
         demandePriseEnCharge.setReference(existante.getReference());
+        demandePriseEnCharge.setGestionnaireCreateur(existante.getGestionnaireCreateur());
+        demandePriseEnCharge.setDateCreation(existante.getDateCreation());
+        demandePriseEnCharge.setMotifRejet(existante.getMotifRejet());
+        demandePriseEnCharge.setDateModification(Instant.now());
         demandePriseEnCharge = demandePriseEnChargeRepository.save(demandePriseEnCharge);
         return demandePriseEnChargeMapper.toDto(demandePriseEnCharge);
     }
@@ -115,22 +133,57 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
     @Override
     public Optional<DemandePriseEnChargeDTO> partialUpdate(DemandePriseEnChargeDTO demandePriseEnChargeDTO) {
         LOG.debug("Request to partially update DemandePriseEnCharge : {}", demandePriseEnChargeDTO);
+        User currentUser = getCurrentUser();
 
         return demandePriseEnChargeRepository
             .findById(demandePriseEnChargeDTO.getId())
             .map(existingDemandePriseEnCharge -> {
+                requireAuteurOuAdmin(existingDemandePriseEnCharge, currentUser);
                 StatutDemande statutPersiste = existingDemandePriseEnCharge.getStatut();
                 String referencePersistee = existingDemandePriseEnCharge.getReference();
+                User auteurPersiste = existingDemandePriseEnCharge.getGestionnaireCreateur();
+                Instant dateCreationPersistee = existingDemandePriseEnCharge.getDateCreation();
+                String motifRejetPersiste = existingDemandePriseEnCharge.getMotifRejet();
                 demandePriseEnChargeMapper.partialUpdate(existingDemandePriseEnCharge, demandePriseEnChargeDTO);
-                // Same rule as update(): the workflow status cannot be changed through this endpoint,
-                // and the reference is generated once at creation and never editable afterwards.
+                if (demandePriseEnChargeDTO.getTypeSoins() != null && !demandePriseEnChargeDTO.getTypeSoins().isEmpty()) {
+                    existingDemandePriseEnCharge.setTypeSoins(resoudreTypeSoins(demandePriseEnChargeDTO));
+                }
+                // Same rule as update(): none of these fields can be changed through this endpoint,
+                // and the modification date is always set by the server.
                 existingDemandePriseEnCharge.setStatut(statutPersiste);
                 existingDemandePriseEnCharge.setReference(referencePersistee);
+                existingDemandePriseEnCharge.setGestionnaireCreateur(auteurPersiste);
+                existingDemandePriseEnCharge.setDateCreation(dateCreationPersistee);
+                existingDemandePriseEnCharge.setMotifRejet(motifRejetPersiste);
+                existingDemandePriseEnCharge.setDateModification(Instant.now());
 
                 return existingDemandePriseEnCharge;
             })
             .map(demandePriseEnChargeRepository::save)
             .map(demandePriseEnChargeMapper::toDto);
+    }
+
+    /**
+     * Relit les types de soin dans le referentiel, plutot que de faire confiance a ce que le
+     * client a envoye.
+     *
+     * <p>Le mapper reconstruit des objets a partir du JSON : leur libelle et leur code viennent
+     * du navigateur. Les relire ici garantit qu'un identifiant inconnu est refuse avec un
+     * message clair, et qu'un client ne peut pas renommer une categorie au passage.
+     */
+    private Set<com.mycompany.myapp.domain.TypeSoin> resoudreTypeSoins(DemandePriseEnChargeDTO dto) {
+        if (dto.getTypeSoins() == null || dto.getTypeSoins().isEmpty()) {
+            return new HashSet<>();
+        }
+        Set<Long> ids = dto.getTypeSoins().stream().map(TypeSoinDTO::getId).filter(Objects::nonNull).collect(Collectors.toSet());
+        if (ids.size() != dto.getTypeSoins().size()) {
+            throw new BadRequestAlertException("Un type de soin est sans identifiant", ENTITY_NAME, "typesoin.invalide");
+        }
+        List<com.mycompany.myapp.domain.TypeSoin> trouves = typeSoinRepository.findAllByIdIn(ids);
+        if (trouves.size() != ids.size()) {
+            throw new BadRequestAlertException("Un type de soin demande n'existe pas", ENTITY_NAME, "typesoin.introuvable");
+        }
+        return new HashSet<>(trouves);
     }
 
     public Page<DemandePriseEnChargeDTO> findAllWithEagerRelationships(Pageable pageable) {
@@ -155,6 +208,7 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         LOG.debug("Request to valider DemandePriseEnCharge : {}", id);
         DemandePriseEnCharge demande = getDemandeOrThrow(id);
         User currentUser = getCurrentUser();
+        requireNotAuteur(demande, currentUser);
         StatutDemande statutSuivant;
         String action;
         switch (demande.getStatut()) {
@@ -202,6 +256,7 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         }
         DemandePriseEnCharge demande = getDemandeOrThrow(id);
         User currentUser = getCurrentUser();
+        requireNotAuteur(demande, currentUser);
         switch (demande.getStatut()) {
             case EN_ATTENTE_VALIDATION_DRH -> requireAuthority(AuthoritiesConstants.VALIDATEUR_DRH);
             case EN_ATTENTE_VALIDATION_INFIRMERIE -> requireAuthority(AuthoritiesConstants.VALIDATEUR_INFIRMERIE);
@@ -277,10 +332,34 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         }
     }
 
+    /**
+     * A validator who also happens to hold ROLE_USER (and so can create demandes) must not be able to
+     * validate or reject their own submission - that would let a single person clear a workflow step
+     * meant to be an independent check.
+     */
+    private void requireNotAuteur(DemandePriseEnCharge demande, User currentUser) {
+        if (demande.getGestionnaireCreateur() != null && currentUser.getId().equals(demande.getGestionnaireCreateur().getId())) {
+            throw new AccessDeniedException("Un validateur ne peut pas valider ou rejeter sa propre demande");
+        }
+    }
+
     private User getCurrentUser() {
         return SecurityUtils.getCurrentUserLogin()
             .flatMap(userRepository::findOneByLogin)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Current user could not be found"));
+    }
+
+    /**
+     * Only the demande's own author (gestionnaireCreateur) or an admin may go through the generic
+     * update/partialUpdate endpoints - anyone else, including a validator who happens to also hold
+     * ROLE_USER, must go through valider/rejeter instead.
+     */
+    private void requireAuteurOuAdmin(DemandePriseEnCharge demande, User currentUser) {
+        boolean estAuteur =
+            demande.getGestionnaireCreateur() != null && currentUser.getId().equals(demande.getGestionnaireCreateur().getId());
+        if (!estAuteur && !SecurityUtils.hasCurrentUserAnyOfAuthorities(AuthoritiesConstants.ADMIN)) {
+            throw new AccessDeniedException("Seul l'auteur de cette demande (ou un administrateur) peut la modifier");
+        }
     }
 
     /**

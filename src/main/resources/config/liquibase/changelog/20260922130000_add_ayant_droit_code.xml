@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Ajoute la colonne code_ayant_droit.
+
+        Le champ existait dans l'entite AyantDroit sans colonne en base : toute lecture d'un
+        ayant droit, et donc de toute demande qui en porte un, echouait au redemarrage.
+
+        La colonne est unique et NOT NULL, ce qui interdit de l'ajouter d'un bloc a une table
+        deja peuplee. On procede donc en trois temps : colonne nullable, attribution d'un code
+        a chaque ligne existante, puis pose des contraintes.
+
+        Les ayants droit anterieurs recoivent « AD-<id> ». Ce n'est pas un code metier, c'est
+        un code de reprise : il est unique par construction, et sa forme dit qu'il a ete
+        attribue automatiquement plutot que saisi.
+    -->
+    <changeSet id="20260922130000-1" author="manual">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="ayant_droit" columnName="code_ayant_droit"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="ayant_droit">
+            <column name="code_ayant_droit" type="varchar(50)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20260922130000-2" author="manual">
+        <sql>
+            UPDATE ayant_droit SET code_ayant_droit = 'AD-' || id WHERE code_ayant_droit IS NULL
+        </sql>
+    </changeSet>
+
+    <changeSet id="20260922130000-3" author="manual">
+        <addNotNullConstraint tableName="ayant_droit" columnName="code_ayant_droit" columnDataType="varchar(50)"/>
+        <addUniqueConstraint tableName="ayant_droit" columnNames="code_ayant_droit" constraintName="ux_ayant_droit__code_ayant_droit"/>
+    </changeSet>
+</databaseChangeLog>

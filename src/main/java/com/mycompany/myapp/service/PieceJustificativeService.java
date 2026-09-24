@@ -50,6 +50,15 @@ public interface PieceJustificativeService {
     Page<PieceJustificativeDTO> findAllWithEagerRelationships(Pageable pageable);
 
     /**
+     * Les pieces jointes a une demande.
+     *
+     * @param demandeId le dossier concerne.
+     * @param pageable la pagination.
+     * @return les pieces de ce dossier.
+     */
+    Page<PieceJustificativeDTO> findAllByDemande(Long demandeId, Pageable pageable);
+
+    /**
      * Get the "id" pieceJustificative.
      *
      * @param id the id of the entity.

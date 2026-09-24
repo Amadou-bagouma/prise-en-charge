@@ -80,7 +80,7 @@ export class UserManagementFormService {
       }),
       activated: new FormControl(userManagementRawValue.activated),
       password: new FormControl(userManagementRawValue.password, {
-        validators: [Validators.minLength(4), Validators.maxLength(100)],
+        validators: [Validators.minLength(8), Validators.maxLength(100)],
       }),
       langKey: new FormControl(userManagementRawValue.langKey, {
         validators: [Validators.maxLength(10)],

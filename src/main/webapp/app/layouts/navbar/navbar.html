@@ -10,6 +10,26 @@
     <fa-icon icon="bars" />
   </button>
 
+  <!-- Réduit la navigation à ses icônes sans la masquer. -->
+  <button
+    type="button"
+    class="topbar-rail-toggle d-none d-md-inline-flex"
+    (click)="basculerRail()"
+    [attr.aria-pressed]="layoutService.rail()"
+    [attr.aria-label]="layoutService.rail() ? 'Déployer la navigation' : 'Réduire la navigation'"
+    [title]="layoutService.rail() ? 'Déployer la navigation' : 'Réduire la navigation'"
+    data-cy="railToggle"
+  >
+    <fa-icon [icon]="layoutService.rail() ? 'chevron-right' : 'chevron-left'" />
+  </button>
+
+  <!-- Fil d'Ariane : il se termine par ce qu'on regarde. -->
+  <nav class="topbar-fil" aria-label="Fil d'Ariane">
+    <span jhiTranslate="global.title">Peccnss</span>
+    <fa-icon icon="chevron-right" class="topbar-fil__sep" />
+    <b [jhiTranslate]="filCleTraduction()">Accueil</b>
+  </nav>
+
   <div class="topbar-spacer"></div>
 
   <div class="topbar-right">
@@ -37,13 +57,22 @@
 
     <div ngbDropdown class="topbar-dropdown" display="static" placement="bottom-end" data-cy="accountMenu">
       @let accountRef = account();
-      <button type="button" class="topbar-link" ngbDropdownToggle id="account-menu">
-        @if (!accountRef?.imageUrl) {
-          <fa-icon icon="user" [fixedWidth]="true" />
-          <span jhiTranslate="global.menu.account.main">Account</span>
+      <button type="button" class="topbar-link topbar-agent" ngbDropdownToggle id="account-menu">
+        @if (accountRef) {
+          @if (accountRef.imageUrl) {
+            <img [src]="accountRef.imageUrl" class="profile-image" alt="" />
+          } @else {
+            <span class="topbar-agent__pastille" aria-hidden="true">{{ initiales() }}</span>
+          }
+          <span class="topbar-agent__ident">
+            <span class="topbar-agent__nom">{{ accountRef.firstName || accountRef.login }} {{ accountRef.lastName }}</span>
+            @if (accountRef.profil?.nom) {
+              <span class="topbar-agent__role">{{ accountRef.profil.nom }}</span>
+            }
+          </span>
         } @else {
-          <img [src]="accountRef.imageUrl" class="profile-image rounded-circle" alt="Avatar" />
-          <span>{{ accountRef.login }}</span>
+          <fa-icon icon="user" [fixedWidth]="true" />
+          <span jhiTranslate="global.menu.account.main">Compte</span>
         }
       </button>
       <ul class="dropdown-menu dropdown-menu-end" ngbDropdownMenu aria-labelledby="account-menu">
@@ -101,36 +130,101 @@
   <div class="sidebar-scroll">
     <ul class="sidebar-nav">
       <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-        <a class="sidebar-link" routerLink="/" (click)="collapseNavbar()">
+        <a class="sidebar-link" [title]="'global.menu.home' | translate" routerLink="/" (click)="collapseNavbar()">
           <fa-icon icon="home" [fixedWidth]="true" />
           <span jhiTranslate="global.menu.home">Home</span>
         </a>
       </li>
 
       @if (account() !== null) {
+        <!--
+          Le référentiel — ce qui décrit l'institution et les personnes — est regroupé : on
+          l'alimente rarement, alors que les écrans d'instruction servent tous les jours. Le
+          groupe s'ouvre tout seul quand on travaille dedans.
+        -->
         <li class="sidebar-nav-item">
           <button
             type="button"
             class="sidebar-link sidebar-link-toggle"
-            (click)="toggleEntities()"
-            [attr.aria-expanded]="!entitiesCollapsed()"
-            aria-controls="entitiesSubmenu"
-            data-cy="entity"
+            (click)="toggleReferentiel()"
+            [attr.aria-expanded]="!referentielCollapsed()"
+            aria-controls="referentielSubmenu"
+            data-cy="referentielMenu"
           >
-            <fa-icon icon="th-list" [fixedWidth]="true" />
-            <span class="sidebar-link-text" jhiTranslate="global.menu.entities.main">Entities</span>
-            <fa-icon class="sidebar-link-caret" icon="chevron-down" [class.sidebar-link-caret--open]="!entitiesCollapsed()" />
+            <fa-icon icon="folder-open" [fixedWidth]="true" />
+            <span class="sidebar-link-text" jhiTranslate="global.menu.referentiel.main">Référentiel</span>
+            <fa-icon class="sidebar-link-caret" icon="chevron-down" [class.sidebar-link-caret--open]="!referentielCollapsed()" />
           </button>
 
-          <ul id="entitiesSubmenu" class="sidebar-submenu" [ngbCollapse]="entitiesCollapsed()">
+          <ul id="referentielSubmenu" class="sidebar-submenu" [ngbCollapse]="referentielCollapsed()">
+            <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+              <a class="sidebar-link" [title]="'global.menu.entities.agent' | translate" routerLink="/agent" (click)="collapseNavbar()">
+                <fa-icon icon="id-card" [fixedWidth]="true" />
+                <span jhiTranslate="global.menu.entities.agent">Agent</span>
+              </a>
+            </li>
+            <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+              <a
+                class="sidebar-link"
+                [title]="'global.menu.entities.ayantDroit' | translate"
+                routerLink="/ayant-droit"
+                (click)="collapseNavbar()"
+              >
+                <fa-icon icon="users" [fixedWidth]="true" />
+                <span jhiTranslate="global.menu.entities.ayantDroit">Ayant Droit</span>
+              </a>
+            </li>
+            <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+              <a
+                class="sidebar-link"
+                [title]="'global.menu.entities.etablissementSante' | translate"
+                routerLink="/etablissement-sante"
+                (click)="collapseNavbar()"
+              >
+                <fa-icon icon="hospital" [fixedWidth]="true" />
+                <span jhiTranslate="global.menu.entities.etablissementSante">Etablissement Sante</span>
+              </a>
+            </li>
             <li
               class="sidebar-nav-item"
               *jhiHasAnyAuthority="'ROLE_ADMIN'"
               routerLinkActive="active"
               [routerLinkActiveOptions]="{ exact: true }"
             >
-              <a class="sidebar-link" routerLink="/gestion" (click)="collapseNavbar()">
-                <fa-icon icon="asterisk" [fixedWidth]="true" />
+              <a
+                class="sidebar-link"
+                [title]="'global.menu.entities.typeSoin' | translate"
+                routerLink="/type-soin"
+                (click)="collapseNavbar()"
+              >
+                <fa-icon icon="notes-medical" [fixedWidth]="true" />
+                <span jhiTranslate="global.menu.entities.typeSoin">Type de soin</span>
+              </a>
+            </li>
+            <li
+              class="sidebar-nav-item"
+              *jhiHasAnyAuthority="'ROLE_ADMIN'"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+            >
+              <a
+                class="sidebar-link"
+                [title]="'global.menu.entities.direction' | translate"
+                routerLink="/direction"
+                (click)="collapseNavbar()"
+              >
+                <fa-icon icon="building" [fixedWidth]="true" />
+                <span jhiTranslate="global.menu.entities.direction">Direction</span>
+              </a>
+            </li>
+            <li
+              class="sidebar-nav-item"
+              *jhiHasAnyAuthority="'ROLE_ADMIN'"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+            >
+              <a class="sidebar-link" [title]="'global.menu.entities.gestion' | translate" routerLink="/gestion" (click)="collapseNavbar()">
+                <fa-icon icon="sitemap" [fixedWidth]="true" />
                 <span jhiTranslate="global.menu.entities.gestion">Gestion</span>
               </a>
             </li>
@@ -140,8 +234,8 @@
               routerLinkActive="active"
               [routerLinkActiveOptions]="{ exact: true }"
             >
-              <a class="sidebar-link" routerLink="/region" (click)="collapseNavbar()">
-                <fa-icon icon="asterisk" [fixedWidth]="true" />
+              <a class="sidebar-link" [title]="'global.menu.entities.region' | translate" routerLink="/region" (click)="collapseNavbar()">
+                <fa-icon icon="location-dot" [fixedWidth]="true" />
                 <span jhiTranslate="global.menu.entities.region">Region</span>
               </a>
             </li>
@@ -151,67 +245,83 @@
               routerLinkActive="active"
               [routerLinkActiveOptions]="{ exact: true }"
             >
-              <a class="sidebar-link" routerLink="/direction" (click)="collapseNavbar()">
-                <fa-icon icon="asterisk" [fixedWidth]="true" />
-                <span jhiTranslate="global.menu.entities.direction">Direction</span>
+              <a class="sidebar-link" [title]="'global.menu.entities.profil' | translate" routerLink="/profil" (click)="collapseNavbar()">
+                <fa-icon icon="users-cog" [fixedWidth]="true" />
+                <span jhiTranslate="global.menu.entities.profil">Profil</span>
               </a>
             </li>
-            <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-              <a class="sidebar-link" routerLink="/agent" (click)="collapseNavbar()">
-                <fa-icon icon="asterisk" [fixedWidth]="true" />
-                <span jhiTranslate="global.menu.entities.agent">Agent</span>
-              </a>
-            </li>
-            <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-              <a class="sidebar-link" routerLink="/ayant-droit" (click)="collapseNavbar()">
-                <fa-icon icon="asterisk" [fixedWidth]="true" />
-                <span jhiTranslate="global.menu.entities.ayantDroit">Ayant Droit</span>
-              </a>
-            </li>
-            <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-              <a class="sidebar-link" routerLink="/etablissement-sante" (click)="collapseNavbar()">
-                <fa-icon icon="asterisk" [fixedWidth]="true" />
-                <span jhiTranslate="global.menu.entities.etablissementSante">Etablissement Sante</span>
-              </a>
-            </li>
-            <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-              <a class="sidebar-link" routerLink="/demande-prise-en-charge" (click)="collapseNavbar()">
-                <fa-icon icon="asterisk" [fixedWidth]="true" />
-                <span jhiTranslate="global.menu.entities.demandePriseEnCharge">Demande Prise En Charge</span>
-              </a>
-            </li>
-            <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-              <a class="sidebar-link" routerLink="/piece-justificative" (click)="collapseNavbar()">
-                <fa-icon icon="asterisk" [fixedWidth]="true" />
-                <span jhiTranslate="global.menu.entities.pieceJustificative">Piece Justificative</span>
-              </a>
-            </li>
-            <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-              <a class="sidebar-link" routerLink="/tache" (click)="collapseNavbar()">
-                <fa-icon icon="asterisk" [fixedWidth]="true" />
-                <span jhiTranslate="global.menu.entities.tache">Tache</span>
-              </a>
-            </li>
-            <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-              <a class="sidebar-link" routerLink="/boite-reception" (click)="collapseNavbar()">
-                <fa-icon icon="asterisk" [fixedWidth]="true" />
-                <span jhiTranslate="global.menu.entities.boiteReception">Boite Reception</span>
-              </a>
-            </li>
-            <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-              <a class="sidebar-link" routerLink="/notification" (click)="collapseNavbar()">
-                <fa-icon icon="asterisk" [fixedWidth]="true" />
-                <span jhiTranslate="global.menu.entities.notification">Notification</span>
-              </a>
-            </li>
-            <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-              <a class="sidebar-link" routerLink="/historique-action" (click)="collapseNavbar()">
-                <fa-icon icon="asterisk" [fixedWidth]="true" />
-                <span jhiTranslate="global.menu.entities.historiqueAction">Historique Action</span>
-              </a>
-            </li>
-            <!-- jhipster-needle-add-entity-to-menu - JHipster will add entities to the menu here -->
           </ul>
+        </li>
+
+        <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+          <a
+            class="sidebar-link"
+            [title]="'global.menu.entities.demandePriseEnCharge' | translate"
+            routerLink="/demande-prise-en-charge"
+            (click)="collapseNavbar()"
+          >
+            <fa-icon icon="file-medical" [fixedWidth]="true" />
+            <span jhiTranslate="global.menu.entities.demandePriseEnCharge">Demande Prise En Charge</span>
+            @if (chargeTravail.demandes(); as nombre) {
+              <span class="sidebar-link-count">{{ nombre }}</span>
+            }
+          </a>
+        </li>
+        <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+          <a
+            class="sidebar-link"
+            [title]="'global.menu.entities.pieceJustificative' | translate"
+            routerLink="/piece-justificative"
+            (click)="collapseNavbar()"
+          >
+            <fa-icon icon="paperclip" [fixedWidth]="true" />
+            <span jhiTranslate="global.menu.entities.pieceJustificative">Piece Justificative</span>
+          </a>
+        </li>
+        <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+          <a class="sidebar-link" [title]="'global.menu.entities.tache' | translate" routerLink="/tache" (click)="collapseNavbar()">
+            <fa-icon icon="tasks" [fixedWidth]="true" />
+            <span jhiTranslate="global.menu.entities.tache">Tache</span>
+            @if (chargeTravail.taches(); as nombre) {
+              <span class="sidebar-link-count">{{ nombre }}</span>
+            }
+          </a>
+        </li>
+        <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+          <a
+            class="sidebar-link"
+            [title]="'global.menu.entities.boiteReception' | translate"
+            routerLink="/boite-reception"
+            (click)="collapseNavbar()"
+          >
+            <fa-icon icon="inbox" [fixedWidth]="true" />
+            <span jhiTranslate="global.menu.entities.boiteReception">Boite Reception</span>
+          </a>
+        </li>
+        <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+          <a
+            class="sidebar-link"
+            [title]="'global.menu.entities.notification' | translate"
+            routerLink="/notification"
+            (click)="collapseNavbar()"
+          >
+            <fa-icon icon="bell" [fixedWidth]="true" />
+            <span jhiTranslate="global.menu.entities.notification">Notification</span>
+            @if (chargeTravail.notifications(); as nombre) {
+              <span class="sidebar-link-count">{{ nombre }}</span>
+            }
+          </a>
+        </li>
+        <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+          <a
+            class="sidebar-link"
+            [title]="'global.menu.entities.historiqueAction' | translate"
+            routerLink="/historique-action"
+            (click)="collapseNavbar()"
+          >
+            <fa-icon icon="clock-rotate-left" [fixedWidth]="true" />
+            <span jhiTranslate="global.menu.entities.historiqueAction">Historique Action</span>
+          </a>
         </li>
       }
 
@@ -231,45 +341,65 @@
 
         <ul id="adminSubmenu" class="sidebar-submenu" [ngbCollapse]="adminCollapsed()">
           <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-            <a class="sidebar-link" routerLink="/user-management" (click)="collapseNavbar()">
-              <fa-icon icon="asterisk" [fixedWidth]="true" />
+            <a
+              class="sidebar-link"
+              [title]="'userManagement.home.title' | translate"
+              routerLink="/user-management"
+              (click)="collapseNavbar()"
+            >
+              <fa-icon icon="users" [fixedWidth]="true" />
               <span jhiTranslate="userManagement.home.title">User Management</span>
             </a>
           </li>
           <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-            <a class="sidebar-link" routerLink="/authority" (click)="collapseNavbar()">
-              <fa-icon icon="asterisk" [fixedWidth]="true" />
+            <a
+              class="sidebar-link"
+              [title]="'global.menu.entities.adminAuthority' | translate"
+              routerLink="/authority"
+              (click)="collapseNavbar()"
+            >
+              <fa-icon icon="key" [fixedWidth]="true" />
               <span jhiTranslate="global.menu.entities.adminAuthority">Authority</span>
             </a>
           </li>
           <!-- jhipster-needle-add-element-to-admin-menu - JHipster will add entities to the admin menu here -->
           <li class="sidebar-nav-item" routerLinkActive="active">
-            <a class="sidebar-link" routerLink="/admin/metrics" (click)="collapseNavbar()">
+            <a
+              class="sidebar-link"
+              [title]="'global.menu.admin.metrics' | translate"
+              routerLink="/admin/metrics"
+              (click)="collapseNavbar()"
+            >
               <fa-icon icon="tachometer-alt" [fixedWidth]="true" />
               <span jhiTranslate="global.menu.admin.metrics">Metrics</span>
             </a>
           </li>
           <li class="sidebar-nav-item" routerLinkActive="active">
-            <a class="sidebar-link" routerLink="/admin/health" (click)="collapseNavbar()">
+            <a class="sidebar-link" [title]="'global.menu.admin.health' | translate" routerLink="/admin/health" (click)="collapseNavbar()">
               <fa-icon icon="heart" [fixedWidth]="true" />
               <span jhiTranslate="global.menu.admin.health">Health</span>
             </a>
           </li>
           <li class="sidebar-nav-item" routerLinkActive="active">
-            <a class="sidebar-link" routerLink="/admin/configuration" (click)="collapseNavbar()">
+            <a
+              class="sidebar-link"
+              [title]="'global.menu.admin.configuration' | translate"
+              routerLink="/admin/configuration"
+              (click)="collapseNavbar()"
+            >
               <fa-icon icon="cogs" [fixedWidth]="true" />
               <span jhiTranslate="global.menu.admin.configuration">Configuration</span>
             </a>
           </li>
           <li class="sidebar-nav-item" routerLinkActive="active">
-            <a class="sidebar-link" routerLink="/admin/logs" (click)="collapseNavbar()">
+            <a class="sidebar-link" [title]="'global.menu.admin.logs' | translate" routerLink="/admin/logs" (click)="collapseNavbar()">
               <fa-icon icon="tasks" [fixedWidth]="true" />
               <span jhiTranslate="global.menu.admin.logs">Logs</span>
             </a>
           </li>
           @if (openAPIEnabled()) {
             <li class="sidebar-nav-item" routerLinkActive="active">
-              <a class="sidebar-link" routerLink="/admin/docs" (click)="collapseNavbar()">
+              <a class="sidebar-link" [title]="'global.menu.admin.apidocs' | translate" routerLink="/admin/docs" (click)="collapseNavbar()">
                 <fa-icon icon="book" [fixedWidth]="true" />
                 <span jhiTranslate="global.menu.admin.apidocs">API</span>
               </a>

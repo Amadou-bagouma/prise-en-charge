@@ -17,7 +17,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Table(name = "ayant_droit")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @SuppressWarnings("common-java:DuplicatedBlocks")
-public class AyantDroit implements Serializable {
+public class AyantDroit extends AbstractAuditingEntity<Long> implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -44,6 +44,12 @@ public class AyantDroit implements Serializable {
     @Column(name = "lien", nullable = false)
     private LienParente lien;
 
+    /** Identifiant de l'ayant droit, unique dans le referentiel. */
+    @NotNull
+    @Size(max = 50)
+    @Column(name = "code_ayant_droit", length = 50, unique = true, nullable = false)
+    private String codeAyantDroit;
+
     @Lob
     @Column(name = "photo")
     private byte[] photo;
@@ -68,6 +74,19 @@ public class AyantDroit implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getCodeAyantDroit() {
+        return this.codeAyantDroit;
+    }
+
+    public AyantDroit codeAyantDroit(String codeAyantDroit) {
+        this.setCodeAyantDroit(codeAyantDroit);
+        return this;
+    }
+
+    public void setCodeAyantDroit(String codeAyantDroit) {
+        this.codeAyantDroit = codeAyantDroit;
     }
 
     public String getNom() {

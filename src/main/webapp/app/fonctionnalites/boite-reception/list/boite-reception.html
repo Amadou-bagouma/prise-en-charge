@@ -1,0 +1,125 @@
+<div>
+  <div class="jhi-page-header">
+    <h2 id="page-heading" data-cy="BoiteReceptionHeading">
+      <span jhiTranslate="peccnssApp.boiteReception.home.title">Boite Receptions</span>
+    </h2>
+
+    <div class="jhi-page-actions">
+      <button class="btn btn-outline-secondary" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span jhiTranslate="peccnssApp.boiteReception.home.refreshListLabel">Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-accent jh-create-entity create-boite-reception"
+        [routerLink]="['/boite-reception/new']"
+      >
+        <fa-icon icon="plus" />
+        <span jhiTranslate="peccnssApp.boiteReception.home.createLabel">Create a new Boite Reception</span>
+      </button>
+    </div>
+  </div>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  @if (boiteReceptions().length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span jhiTranslate="peccnssApp.boiteReception.home.notFound">No Boite Receptions found</span>
+    </div>
+  } @else {
+    <div class="jhi-table-panel table-responsive table-entities" id="entities">
+      <table class="table jhi-table" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="utilisateur.login">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.boiteReception.utilisateur">Utilisateur</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="nombreNonLus">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.boiteReception.nombreNonLus">Nombre Non Lus</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="dateDerniereLecture">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.boiteReception.dateDerniereLecture">Date Derniere Lecture</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="actif">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.boiteReception.actif">Actif</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (boiteReception of boiteReceptions(); track trackId(boiteReception)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/boite-reception', boiteReception.id, 'view']">{{ boiteReception.utilisateur?.login }}</a>
+              </td>
+              <td>{{ boiteReception.nombreNonLus }}</td>
+              <td>{{ boiteReception.dateDerniereLecture | formatMediumDatetime }}</td>
+              <td>
+                <span class="jhi-badge" [ngClass]="boiteReception.actif ? 'jhi-badge-actif-true' : 'jhi-badge-actif-false'">
+                  {{ boiteReception.actif ? 'Actif' : 'Inactif' }}
+                </span>
+              </td>
+              <td class="text-end">
+                <div ngbDropdown class="d-inline-block" container="body">
+                  <button type="button" class="btn btn-secondary btn-sm" ngbDropdownToggle data-cy="entityActionsButton">
+                    <fa-icon icon="ellipsis-vertical" />
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.actions">Actions</span>
+                  </button>
+                  <div ngbDropdownMenu>
+                    <a ngbDropdownItem [routerLink]="['/boite-reception', boiteReception.id, 'view']" data-cy="entityDetailsButton">
+                      <fa-icon icon="eye" class="me-1" />
+                      <span jhiTranslate="entity.action.view">View</span>
+                    </a>
+                    <a ngbDropdownItem [routerLink]="['/boite-reception', boiteReception.id, 'edit']" data-cy="entityEditButton">
+                      <fa-icon icon="pencil-alt" class="me-1" />
+                      <span jhiTranslate="entity.action.edit">Edit</span>
+                    </a>
+                    <button ngbDropdownItem type="button" (click)="delete(boiteReception)" data-cy="entityDeleteButton">
+                      <fa-icon icon="times" class="me-1" />
+                      <span jhiTranslate="entity.action.delete">Delete</span>
+                    </button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+  @if (boiteReceptions().length > 0) {
+    <div>
+      <div class="d-flex justify-content-center">
+        <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+      </div>
+
+      <div class="d-flex justify-content-center">
+        <ngb-pagination
+          [collectionSize]="totalItems()"
+          [page]="page()"
+          [pageSize]="itemsPerPage()"
+          [maxSize]="5"
+          [rotate]="true"
+          [boundaryLinks]="true"
+          (pageChange)="navigateToPage($event)"
+        />
+      </div>
+    </div>
+  }
+</div>

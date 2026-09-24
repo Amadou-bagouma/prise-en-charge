@@ -2,19 +2,19 @@
   "peccnssApp": {
     "StatutDemande": {
       "null": "",
-      "NOUVELLE": "NOUVELLE",
-      "EN_ATTENTE_PIECES": "EN_ATTENTE_PIECES",
-      "A_TRAITER": "A_TRAITER",
-      "EN_COURS_TRAITEMENT": "EN_COURS_TRAITEMENT",
-      "EN_ATTENTE_AVIS_MEDICAL": "EN_ATTENTE_AVIS_MEDICAL",
-      "EN_ATTENTE_DECISION": "EN_ATTENTE_DECISION",
+      "NOUVELLE": "Nouvelle",
+      "EN_ATTENTE_PIECES": "Pièce manquante",
+      "A_TRAITER": "À instruire",
+      "EN_COURS_TRAITEMENT": "En instruction",
+      "EN_ATTENTE_AVIS_MEDICAL": "En attente d'avis médical",
+      "EN_ATTENTE_DECISION": "En attente de décision",
       "EN_ATTENTE_VALIDATION_DRH": "En attente de validation DRH",
       "EN_ATTENTE_VALIDATION_INFIRMERIE": "En attente de validation infirmerie",
       "RETOURNEE": "Retournée pour correction",
-      "VALIDEE": "VALIDEE",
-      "REJETEE": "REJETEE",
-      "ANNULEE": "ANNULEE",
-      "CLOTUREE": "CLOTUREE"
+      "VALIDEE": "Accordée",
+      "REJETEE": "Rejetée",
+      "ANNULEE": "Annulée",
+      "CLOTUREE": "Clôturée"
     }
   }
 }

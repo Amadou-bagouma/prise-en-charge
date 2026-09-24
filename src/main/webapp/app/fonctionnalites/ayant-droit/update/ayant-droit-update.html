@@ -1,0 +1,168 @@
+<div class="d-flex justify-content-center">
+  <div class="col-12 col-xl-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm" class="jhi-form-panel">
+      <h2 id="jhi-ayant-droit-heading" data-cy="AyantDroitCreateUpdateHeading" jhiTranslate="peccnssApp.ayantDroit.home.createOrEditLabel">
+        Create or edit a Ayant Droit
+      </h2>
+
+      <jhi-alert-error />
+
+      @if (editForm.controls.id.value !== null) {
+        <div class="jhi-field mb-3">
+          <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
+          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+        </div>
+      }
+
+      <div class="jhi-form-grid">
+        @let codeRef = editForm.get('codeAyantDroit')!;
+        <div class="jhi-field">
+          <label class="form-label" for="field_codeAyantDroit" jhiTranslate="peccnssApp.ayantDroit.codeAyantDroit">Code</label>
+          <input
+            type="text"
+            class="form-control"
+            name="codeAyantDroit"
+            id="field_codeAyantDroit"
+            data-cy="codeAyantDroit"
+            formControlName="codeAyantDroit"
+          />
+          <small class="form-text text-muted">Identifiant de l'ayant droit. Il doit être unique.</small>
+          @if (codeRef.invalid && (codeRef.dirty || codeRef.touched)) {
+            <div>
+              @if (codeRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+              @if (codeRef.errors?.maxlength) {
+                <small class="form-text text-danger">Le code ne peut pas dépasser 50 caractères.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let nomRef = editForm.get('nom')!;
+        <div class="jhi-field">
+          <label class="form-label" for="field_nom" jhiTranslate="peccnssApp.ayantDroit.nom">Nom</label>
+          <input type="text" class="form-control" name="nom" id="field_nom" data-cy="nom" formControlName="nom" />
+          @if (nomRef.invalid && (nomRef.dirty || nomRef.touched)) {
+            <div>
+              @if (nomRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let prenomRef = editForm.get('prenom')!;
+        <div class="jhi-field">
+          <label class="form-label" for="field_prenom" jhiTranslate="peccnssApp.ayantDroit.prenom">Prenom</label>
+          <input type="text" class="form-control" name="prenom" id="field_prenom" data-cy="prenom" formControlName="prenom" />
+          @if (prenomRef.invalid && (prenomRef.dirty || prenomRef.touched)) {
+            <div>
+              @if (prenomRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="jhi-field">
+          <label class="form-label" for="field_dateNaissance" jhiTranslate="peccnssApp.ayantDroit.dateNaissance">Date Naissance</label>
+          <div class="input-group">
+            <input
+              id="field_dateNaissance"
+              data-cy="dateNaissance"
+              type="text"
+              class="form-control"
+              name="dateNaissance"
+              ngbDatepicker
+              #dateNaissanceDp="ngbDatepicker"
+              formControlName="dateNaissance"
+            />
+            <button type="button" class="btn btn-secondary" (click)="dateNaissanceDp.toggle()"><fa-icon icon="calendar-alt" /></button>
+          </div>
+        </div>
+
+        @let lienRef = editForm.get('lien')!;
+        <div class="jhi-field">
+          <label class="form-label" for="field_lien" jhiTranslate="peccnssApp.ayantDroit.lien">Lien</label>
+          <select class="form-control" name="lien" formControlName="lien" id="field_lien" data-cy="lien">
+            <option [ngValue]="null">{{ 'peccnssApp.LienParente.null' | translate }}</option>
+            @for (lienParente of lienParenteValues; track $index) {
+              <option [value]="lienParente">{{ 'peccnssApp.LienParente.' + lienParente | translate }}</option>
+            }
+          </select>
+          @if (lienRef.invalid && (lienRef.dirty || lienRef.touched)) {
+            <div>
+              @if (lienRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="jhi-field">
+          <label class="form-label" for="field_photo" jhiTranslate="peccnssApp.ayantDroit.photo">Photo</label>
+          @if (editForm.get('photo')!.value) {
+            <div>
+              <img
+                [src]="'data:' + editForm.get('photoContentType')!.value + ';base64,' + editForm.get('photo')!.value"
+                style="max-height: 100px"
+                alt="ayant droit photo"
+              />
+              <div>
+                {{ editForm.get('photoContentType')!.value }}, {{ byteSize(editForm.get('photo')!.value) }}
+                <button type="button" (click)="clearInputImage('photo', 'photoContentType', 'file_photo')" class="btn btn-secondary btn-sm">
+                  <fa-icon icon="times" />
+                </button>
+              </div>
+            </div>
+          }
+          <input type="file" (change)="setFileData($event, 'photo', true)" accept="image/*" id="file_photo" data-cy="photo" />
+          <input
+            type="hidden"
+            class="form-control"
+            name="photo"
+            id="field_photo"
+            data-cy="photo"
+            formControlName="photo"
+            [class.valid]="!editForm.get('photo')!.invalid"
+            [class.invalid]="editForm.get('photo')!.invalid"
+          />
+          <input
+            type="hidden"
+            class="form-control"
+            name="photoContentType"
+            id="field_photoContentType"
+            formControlName="photoContentType"
+          />
+        </div>
+
+        <div class="jhi-field">
+          <label class="form-label" for="field_agent" jhiTranslate="peccnssApp.ayantDroit.agent">Agent</label>
+          <select class="form-control" id="field_agent" data-cy="agent" name="agent" formControlName="agent" [compareWith]="compareAgent">
+            <option [ngValue]="null"></option>
+            @for (agentOption of agentsSharedCollection(); track $index) {
+              <option [ngValue]="agentOption">{{ agentOption.matricule }} - {{ agentOption.nom }} {{ agentOption.prenom }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="jhi-form-actions">
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-accent"
+        >
+          <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

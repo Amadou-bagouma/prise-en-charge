@@ -1,0 +1,144 @@
+<div class="d-flex justify-content-center">
+  <div class="col-12 col-xl-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm" class="jhi-form-panel">
+      <h2
+        id="jhi-historique-action-heading"
+        data-cy="HistoriqueActionCreateUpdateHeading"
+        jhiTranslate="peccnssApp.historiqueAction.home.createOrEditLabel"
+      >
+        Create or edit a Historique Action
+      </h2>
+
+      <jhi-alert-error />
+
+      @if (editForm.controls.id.value !== null) {
+        <div class="jhi-field mb-3">
+          <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
+          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+        </div>
+      }
+
+      <div class="jhi-form-grid">
+        @let actionRef = editForm.get('action')!;
+        <div class="jhi-field">
+          <label class="form-label" for="field_action" jhiTranslate="peccnssApp.historiqueAction.action">Action</label>
+          <input type="text" class="form-control" name="action" id="field_action" data-cy="action" formControlName="action" />
+          @if (actionRef.invalid && (actionRef.dirty || actionRef.touched)) {
+            <div>
+              @if (actionRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let dateActionRef = editForm.get('dateAction')!;
+        <div class="jhi-field">
+          <label class="form-label" for="field_dateAction" jhiTranslate="peccnssApp.historiqueAction.dateAction">Date Action</label>
+          <input
+            id="field_dateAction"
+            data-cy="dateAction"
+            type="datetime-local"
+            class="form-control"
+            name="dateAction"
+            formControlName="dateAction"
+            placeholder="YYYY-MM-DD HH:mm"
+          />
+          @if (dateActionRef.invalid && (dateActionRef.dirty || dateActionRef.touched)) {
+            <div>
+              @if (dateActionRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+              <small
+                class="form-text text-danger"
+                [hidden]="!dateActionRef.errors?.datetimelocal"
+                jhiTranslate="entity.validation.datetimelocal"
+                >This field should be a date and time.</small
+              >
+            </div>
+          }
+        </div>
+
+        <div class="jhi-field jhi-field-full">
+          <label class="form-label" for="field_description" jhiTranslate="peccnssApp.historiqueAction.description">Description</label>
+          <textarea
+            class="form-control"
+            name="description"
+            id="field_description"
+            data-cy="description"
+            rows="2"
+            formControlName="description"
+          ></textarea>
+        </div>
+
+        <div class="jhi-field">
+          <label class="form-label" for="field_demande" jhiTranslate="peccnssApp.historiqueAction.demande">Demande</label>
+          <select
+            class="form-control"
+            id="field_demande"
+            data-cy="demande"
+            name="demande"
+            formControlName="demande"
+            [compareWith]="compareDemandePriseEnCharge"
+          >
+            @if (!editForm.get('demande')!.value) {
+              <option [ngValue]="null" selected></option>
+            }
+            @for (demandePriseEnChargeOption of demandePriseEnChargesSharedCollection(); track $index) {
+              <option [ngValue]="demandePriseEnChargeOption">{{ demandePriseEnChargeOption.reference }}</option>
+            }
+          </select>
+          @if (editForm.get(['demande'])!.invalid && (editForm.get(['demande'])!.dirty || editForm.get(['demande'])!.touched)) {
+            <div>
+              @if (editForm.get(['demande'])?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="jhi-field">
+          <label class="form-label" for="field_utilisateur" jhiTranslate="peccnssApp.historiqueAction.utilisateur">Utilisateur</label>
+          <select
+            class="form-control"
+            id="field_utilisateur"
+            data-cy="utilisateur"
+            name="utilisateur"
+            formControlName="utilisateur"
+            [compareWith]="compareUser"
+          >
+            @if (!editForm.get('utilisateur')!.value) {
+              <option [ngValue]="null" selected></option>
+            }
+            @for (userOption of usersSharedCollection(); track $index) {
+              <option [ngValue]="userOption">{{ userOption.login }}</option>
+            }
+          </select>
+          @if (editForm.get(['utilisateur'])!.invalid && (editForm.get(['utilisateur'])!.dirty || editForm.get(['utilisateur'])!.touched)) {
+            <div>
+              @if (editForm.get(['utilisateur'])?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="jhi-form-actions">
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-accent"
+        >
+          <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

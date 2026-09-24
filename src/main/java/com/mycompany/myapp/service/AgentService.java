@@ -55,4 +55,5 @@ public interface AgentService {
      * @param id the id of the entity.
      */
     void delete(Long id);
+    Optional<Agent> findByMatricule(String matricule);
 }

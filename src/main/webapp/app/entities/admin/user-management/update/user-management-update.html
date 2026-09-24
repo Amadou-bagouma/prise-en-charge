@@ -50,7 +50,7 @@
             @if (passwordRef.invalid && (passwordRef.dirty || passwordRef.touched)) {
               <div>
                 @if (passwordRef.errors?.minlength) {
-                  <small class="form-text text-danger" jhiTranslate="entity.validation.minlength" [translateValues]="{ min: '4' }"
+                  <small class="form-text text-danger" jhiTranslate="entity.validation.minlength" [translateValues]="{ min: '8' }"
                     >This field is required to be at least 4 characters.</small
                   >
                 }

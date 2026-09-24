@@ -7,6 +7,7 @@ import dayjs from 'dayjs/esm';
 import { AppPageTitleStrategy } from 'app/app-page-title-strategy';
 import { AccountService } from 'app/core/auth';
 import Footer from '../footer/footer';
+import { LayoutService } from '../layout.service';
 import PageRibbon from '../profiles/page-ribbon';
 
 @Component({
@@ -23,6 +24,7 @@ export default class Main implements OnInit {
   private readonly appPageTitleStrategy = inject(AppPageTitleStrategy);
   private readonly accountService = inject(AccountService);
   public readonly account = this.accountService.account;
+  readonly layoutService = inject(LayoutService);
   private readonly document = inject(DOCUMENT);
   private readonly translateService = inject(TranslateService);
   private readonly rootRenderer = inject(RendererFactory2);

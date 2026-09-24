@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Adds the Profil entity: a named, reusable bundle of authorities. Assigning a profil is now
+        the only way an admin grants authorities to a user (see 20260920180100_add_user_profil.xml,
+        which makes it mandatory on jhi_user).
+
+        The 4 profils below are reference data, like authority.csv: seeded unconditionally, in every
+        environment including production (no context attribute), never gated behind 'faker'/'test'
+        like the demo user accounts are. Ids are hardcoded (1-4), which is safe: the JPA sequence
+        generator shared by every entity (see sequence_generator in 00000000000000_initial_schema.xml)
+        starts at 1050 and only grows, so it will never collide with these.
+    -->
+    <changeSet id="20260920180000-1" author="manual">
+        <createTable tableName="profil">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="nom" type="varchar(100)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_profil__nom"/>
+            </column>
+            <column name="description" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <!-- Profil extends AbstractAuditingEntity, like User: tracks who created/changed an
+                 authority bundle and when. -->
+            <column name="created_by" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="timestamp"/>
+            <column name="last_modified_by" type="varchar(50)"/>
+            <column name="last_modified_date" type="timestamp"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20260920180000-2" author="manual">
+        <createTable tableName="rel_profil__authority">
+            <column name="profil_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="authority_name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey columnNames="profil_id, authority_name" tableName="rel_profil__authority"/>
+        <addForeignKeyConstraint baseColumnNames="profil_id"
+                                 baseTableName="rel_profil__authority"
+                                 constraintName="fk_rel_profil__authority__profil_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="profil"/>
+        <addForeignKeyConstraint baseColumnNames="authority_name"
+                                 baseTableName="rel_profil__authority"
+                                 constraintName="fk_rel_profil__authority__authority_name"
+                                 referencedColumnNames="name"
+                                 referencedTableName="jhi_authority"/>
+    </changeSet>
+
+    <changeSet id="20260920180000-3" author="manual">
+        <insert tableName="profil">
+            <column name="id" valueNumeric="1"/>
+            <column name="nom" value="Administrateur"/>
+            <column name="description" value="Acces complet a l'administration et a la gestion des demandes."/>
+            <column name="created_by" value="system"/>
+            <column name="created_date" valueDate="${now}"/>
+        </insert>
+        <insert tableName="profil">
+            <column name="id" valueNumeric="2"/>
+            <column name="nom" value="Gestionnaire"/>
+            <column name="description" value="Saisit et suit les demandes de prise en charge. Profil par defaut."/>
+            <column name="created_by" value="system"/>
+            <column name="created_date" valueDate="${now}"/>
+        </insert>
+        <insert tableName="profil">
+            <column name="id" valueNumeric="3"/>
+            <column name="nom" value="Validateur DRH"/>
+            <column name="description" value="Effectue la 1ere validation (DRH) d'une demande de prise en charge."/>
+            <column name="created_by" value="system"/>
+            <column name="created_date" valueDate="${now}"/>
+        </insert>
+        <insert tableName="profil">
+            <column name="id" valueNumeric="4"/>
+            <column name="nom" value="Validateur infirmerie"/>
+            <column name="description" value="Effectue la 2eme validation (infirmerie du personnel) d'une demande."/>
+            <column name="created_by" value="system"/>
+            <column name="created_date" valueDate="${now}"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="20260920180000-4" author="manual">
+        <insert tableName="rel_profil__authority">
+            <column name="profil_id" valueNumeric="1"/>
+            <column name="authority_name" value="ROLE_ADMIN"/>
+        </insert>
+        <insert tableName="rel_profil__authority">
+            <column name="profil_id" valueNumeric="1"/>
+            <column name="authority_name" value="ROLE_USER"/>
+        </insert>
+        <insert tableName="rel_profil__authority">
+            <column name="profil_id" valueNumeric="2"/>
+            <column name="authority_name" value="ROLE_USER"/>
+        </insert>
+        <insert tableName="rel_profil__authority">
+            <column name="profil_id" valueNumeric="3"/>
+            <column name="authority_name" value="ROLE_USER"/>
+        </insert>
+        <insert tableName="rel_profil__authority">
+            <column name="profil_id" valueNumeric="3"/>
+            <column name="authority_name" value="ROLE_VALIDATEUR_DRH"/>
+        </insert>
+        <insert tableName="rel_profil__authority">
+            <column name="profil_id" valueNumeric="4"/>
+            <column name="authority_name" value="ROLE_USER"/>
+        </insert>
+        <insert tableName="rel_profil__authority">
+            <column name="profil_id" valueNumeric="4"/>
+            <column name="authority_name" value="ROLE_VALIDATEUR_INFIRMERIE"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

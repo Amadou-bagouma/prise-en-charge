@@ -25,16 +25,6 @@
     <include file="config/liquibase/changelog/20260910080343_added_entity_BoiteReception.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260910080344_added_entity_Notification.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260910080345_added_entity_HistoriqueAction.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20260911090000_add_validation_authorities.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20260911140000_add_user_must_change_password.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20260914160000_add_agent_ayant_droit_photo.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20260915090000_add_demande_prise_en_charge_type_soin_many_to_many.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20260915140000_add_demande_prise_en_charge_reference_sequence.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20260916110000_replace_type_soin_with_fixed_categories.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20260916150000_add_user_signature.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20260916150100_fix_agent_ayant_droit_photo_type.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20260916160000_add_agent_date_embauche.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20260916170000_drop_agent_user.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <include file="config/liquibase/changelog/20231225055847_added_entity_constraints_Direction.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20231225055947_added_entity_constraints_Agent.xml" relativeToChangelogFile="false"/>
@@ -46,5 +36,31 @@
     <include file="config/liquibase/changelog/20260910080344_added_entity_constraints_Notification.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260910080345_added_entity_constraints_HistoriqueAction.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
+
+    <!--
+        These run after every entity table AND its FK constraints exist, because several of them
+        alter or drop columns/constraints created by the constraints changelogs above (e.g.
+        20260915090000-3 drops fk_demande_prise_en_charge__type_soin_id, created by
+        20231225060347_added_entity_constraints_DemandePriseEnCharge.xml; 20260916170000 drops
+        fk_agent__user_id, created by 20231225055947_added_entity_constraints_Agent.xml). On a fresh
+        database, changesets run in include order, so putting them any earlier makes those drops fail
+        with "constraint ... does not exist". Keep new incremental changelogs here, in date order.
+    -->
+    <include file="config/liquibase/changelog/20260911090000_add_validation_authorities.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260911140000_add_user_must_change_password.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260914160000_add_agent_ayant_droit_photo.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260915090000_add_demande_prise_en_charge_type_soin_many_to_many.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260915140000_add_demande_prise_en_charge_reference_sequence.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260916110000_replace_type_soin_with_fixed_categories.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260916150000_add_user_signature.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260916150100_fix_agent_ayant_droit_photo_type.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260916160000_add_agent_date_embauche.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260916170000_drop_agent_user.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260920180000_add_profil.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260920180100_add_user_profil.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260922100000_add_type_soin_referentiel.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260922110000_add_authority_description.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260922120000_add_audit_columns.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260922130000_add_ayant_droit_code.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>

@@ -1,0 +1,180 @@
+<div>
+  <div class="jhi-page-header">
+    <h2 id="page-heading" data-cy="TacheHeading">
+      <span jhiTranslate="peccnssApp.tache.home.title">Taches</span>
+    </h2>
+
+    <div class="jhi-page-actions">
+      <button class="btn btn-outline-secondary" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span jhiTranslate="peccnssApp.tache.home.refreshListLabel">Refresh list</span>
+      </button>
+
+      <button
+        *jhiHasAnyAuthority="Authority.ADMIN"
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-accent jh-create-entity create-tache"
+        [routerLink]="['/tache/new']"
+      >
+        <fa-icon icon="plus" />
+        <span jhiTranslate="peccnssApp.tache.home.createLabel">Create a new Tache</span>
+      </button>
+    </div>
+  </div>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  <jhi-filter [filters]="filters" />
+
+  @if (taches().length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span jhiTranslate="peccnssApp.tache.home.notFound">No Taches found</span>
+    </div>
+  } @else {
+    <div class="jhi-table-panel table-responsive table-entities" id="entities">
+      <table class="table jhi-table" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="titre">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.tache.titre">Titre</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="demande.reference">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.tache.demande">Demande</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="statut">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.tache.statut">Statut</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="priorite">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.tache.priorite">Priorite</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="dateEcheance">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.tache.dateEcheance">Date Echeance</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="utilisateur.login">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.tache.utilisateur">Utilisateur</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="lu">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.tache.lu">Lu</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (tache of taches(); track trackId(tache)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/tache', tache.id, 'view']">{{ tache.titre }}</a>
+              </td>
+              <td>
+                @if (tache.demande) {
+                  <a [routerLink]="['/demande-prise-en-charge', tache.demande.id, 'view']">{{ tache.demande.reference }}</a>
+                }
+              </td>
+              <td>
+                <span
+                  class="jhi-badge"
+                  [ngClass]="'jhi-badge-statuttache-' + tache.statut"
+                  [jhiTranslate]="'peccnssApp.StatutTache.' + (tache.statut ?? 'null')"
+                >
+                  {{
+                    {
+                      null: '',
+                      A_FAIRE: 'A_FAIRE',
+                      EN_COURS: 'EN_COURS',
+                      EN_ATTENTE: 'EN_ATTENTE',
+                      TERMINEE: 'TERMINEE',
+                      ANNULEE: 'ANNULEE',
+                    }[tache.statut ?? 'null']
+                  }}
+                </span>
+              </td>
+              <td>
+                <span
+                  class="jhi-badge"
+                  [ngClass]="'jhi-badge-priorite-' + tache.priorite"
+                  [jhiTranslate]="'peccnssApp.PrioriteTache.' + (tache.priorite ?? 'null')"
+                >
+                  {{ { null: '', NORMALE: 'NORMALE', IMPORTANTE: 'IMPORTANTE', URGENTE: 'URGENTE' }[tache.priorite ?? 'null'] }}
+                </span>
+              </td>
+              <td>{{ tache.dateEcheance | formatMediumDatetime }}</td>
+              <td>{{ tache.utilisateur?.login }}</td>
+              <td>
+                <span class="jhi-badge" [ngClass]="tache.lu ? 'jhi-badge-actif-true' : 'jhi-badge-actif-false'">
+                  {{ tache.lu ? 'Lu' : 'Non lu' }}
+                </span>
+              </td>
+              <td class="text-end">
+                @if (canManageTaches()) {
+                  <div ngbDropdown class="d-inline-block" container="body">
+                    <button type="button" class="btn btn-secondary btn-sm" ngbDropdownToggle data-cy="entityActionsButton">
+                      <fa-icon icon="ellipsis-vertical" />
+                      <span class="d-none d-md-inline" jhiTranslate="entity.action.actions">Actions</span>
+                    </button>
+                    <div ngbDropdownMenu>
+                      <a ngbDropdownItem [routerLink]="['/tache', tache.id, 'view']" data-cy="entityDetailsButton">
+                        <fa-icon icon="eye" class="me-1" />
+                        <span jhiTranslate="entity.action.view">View</span>
+                      </a>
+                      <a ngbDropdownItem [routerLink]="['/tache', tache.id, 'edit']" data-cy="entityEditButton">
+                        <fa-icon icon="pencil-alt" class="me-1" />
+                        <span jhiTranslate="entity.action.edit">Edit</span>
+                      </a>
+                      <button ngbDropdownItem type="button" (click)="delete(tache)" data-cy="entityDeleteButton">
+                        <fa-icon icon="times" class="me-1" />
+                        <span jhiTranslate="entity.action.delete">Delete</span>
+                      </button>
+                    </div>
+                  </div>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+  @if (taches().length > 0) {
+    <div>
+      <div class="d-flex justify-content-center">
+        <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+      </div>
+
+      <div class="d-flex justify-content-center">
+        <ngb-pagination
+          [collectionSize]="totalItems()"
+          [page]="page()"
+          [pageSize]="itemsPerPage()"
+          [maxSize]="5"
+          [rotate]="true"
+          [boundaryLinks]="true"
+          (pageChange)="navigateToPage($event)"
+        />
+      </div>
+    </div>
+  }
+</div>

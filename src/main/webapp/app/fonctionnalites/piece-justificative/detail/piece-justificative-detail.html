@@ -1,0 +1,54 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (pieceJustificative(); as pieceJustificativeRef) {
+      <div class="jhi-form-panel">
+        <h2 data-cy="pieceJustificativeDetailsHeading">
+          <span jhiTranslate="peccnssApp.pieceJustificative.detail.title">Piece Justificative</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ pieceJustificativeRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.pieceJustificative.nomFichier">Nom Fichier</span></dt>
+          <dd>
+            <span>{{ pieceJustificativeRef.nomFichier }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.pieceJustificative.cheminFichier">Chemin Fichier</span></dt>
+          <dd>
+            <span>{{ pieceJustificativeRef.cheminFichier }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.pieceJustificative.dateAjout">Date Ajout</span></dt>
+          <dd>
+            <span>{{ pieceJustificativeRef.dateAjout | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="peccnssApp.pieceJustificative.demande">Demande</span></dt>
+          <dd>
+            @if (pieceJustificative()!.demande) {
+              <div>
+                <a [routerLink]="['/demande-prise-en-charge', pieceJustificative()!.demande?.id, 'view']">{{
+                  pieceJustificativeRef.demande?.reference
+                }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/piece-justificative', pieceJustificativeRef.id, 'edit']" class="btn btn-accent">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

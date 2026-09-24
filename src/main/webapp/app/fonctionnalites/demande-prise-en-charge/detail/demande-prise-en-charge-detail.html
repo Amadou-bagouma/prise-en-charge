@@ -1,0 +1,335 @@
+@if (current(); as demande) {
+  <div class="pec-ecran">
+    <div class="pec-titre-ecran">
+      <h1 data-cy="demandePriseEnChargeDetailsHeading">
+        <span class="pec-num">{{ demande.reference }}</span>
+      </h1>
+    </div>
+
+    <jhi-alert-error />
+    <jhi-alert />
+
+    <div class="pec-dossier">
+      <!-- Colonne de gauche : le dossier, ce sur quoi l'agent décide. -->
+      <div class="pec-dossier__principal">
+        <section class="pec-panneau">
+          <div class="pec-panneau__tete">
+            <span class="pec-panneau__titre">Circuit de validation</span>
+            <!-- Le statut se lit sur le fond blanc du panneau, où il contraste vraiment. -->
+            <span class="pec-badge" [ngClass]="'pec-badge--' + statutTon(demande.statut)">
+              <span class="pec-badge__pt"></span>
+              <span [jhiTranslate]="'peccnssApp.StatutDemande.' + (demande.statut ?? 'null')">{{ demande.statut }}</span>
+            </span>
+          </div>
+          <div class="pec-panneau__corps">
+            <div class="pec-etapes">
+              @for (etape of etapes(); track etape.numero) {
+                <div
+                  class="pec-etape"
+                  [class.pec-etape--faite]="etape.etat === 'faite'"
+                  [class.pec-etape--active]="etape.etat === 'active'"
+                  [class.pec-etape--rejet]="etape.etat === 'rejet'"
+                >
+                  <div class="pec-etape__rang">
+                    <span class="pec-etape__pt">{{ etape.numero }}</span>
+                    @if (!$last) {
+                      <span class="pec-etape__trait"></span>
+                    }
+                  </div>
+                  <span class="pec-etape__lib">{{ etape.libelle }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        </section>
+
+        @if (motifEnCours(); as motif) {
+          <div class="pec-alerte pec-alerte--danger" role="status">
+            <div class="pec-alerte__corps">
+              <span class="pec-alerte__titre">{{ motif.titre }}</span>
+              <span class="pec-alerte__txt">{{ motif.texte }}</span>
+            </div>
+          </div>
+        }
+
+        <section class="pec-panneau">
+          <div class="pec-panneau__tete">
+            <span class="pec-panneau__titre" jhiTranslate="peccnssApp.demandePriseEnCharge.detail.title">Demande Prise En Charge</span>
+          </div>
+          <div class="pec-panneau__corps">
+            <dl class="pec-defs">
+              <dt jhiTranslate="peccnssApp.demandePriseEnCharge.reference">Reference</dt>
+              <dd class="pec-defs--mono">{{ demande.reference }}</dd>
+
+              <dt jhiTranslate="peccnssApp.demandePriseEnCharge.typeBeneficiaire">Type Beneficiaire</dt>
+              <dd>
+                <span [jhiTranslate]="'peccnssApp.TypeBeneficiaire.' + (demande.typeBeneficiaire ?? 'null')">{{
+                  demande.typeBeneficiaire
+                }}</span>
+              </dd>
+
+              <dt jhiTranslate="peccnssApp.demandePriseEnCharge.typeSoins">Types Soin</dt>
+              <dd>
+                @for (typeSoin of demande.typeSoins ?? []; track typeSoin.id) {
+                  <div>{{ typeSoin.libelle }}</div>
+                } @empty {
+                  <span class="pec-muted">—</span>
+                }
+              </dd>
+
+              <dt jhiTranslate="peccnssApp.demandePriseEnCharge.etablissementSante">Etablissement Sante</dt>
+              <dd>
+                @if (demande.etablissementSante) {
+                  <a [routerLink]="['/etablissement-sante', demande.etablissementSante.id, 'view']">{{ demande.etablissementSante.nom }}</a>
+                } @else {
+                  <span class="pec-muted">—</span>
+                }
+              </dd>
+
+              <dt jhiTranslate="peccnssApp.demandePriseEnCharge.priorite">Priorite</dt>
+              <dd>
+                <span [jhiTranslate]="'peccnssApp.PrioriteDemande.' + (demande.priorite ?? 'null')">{{ demande.priorite }}</span>
+              </dd>
+
+              <dt jhiTranslate="peccnssApp.demandePriseEnCharge.description">Description</dt>
+              <dd>{{ demande.description || '—' }}</dd>
+
+              <dt jhiTranslate="peccnssApp.demandePriseEnCharge.observation">Observation</dt>
+              <dd>{{ demande.observation || '—' }}</dd>
+
+              <dt jhiTranslate="peccnssApp.demandePriseEnCharge.dateEcheance">Date Echeance</dt>
+              <dd class="pec-defs--mono">{{ (demande.dateEcheance | formatMediumDatetime) || '—' }}</dd>
+
+              <!-- Motif d'un retour passé : il n'alerte plus, mais il explique le dossier. -->
+              @if (demande.motifRejet && !motifEnCours()) {
+                <dt jhiTranslate="peccnssApp.demandePriseEnCharge.motifRejet">Motif Rejet</dt>
+                <dd>{{ demande.motifRejet }}</dd>
+              }
+            </dl>
+          </div>
+        </section>
+
+        <!--
+          Les pièces justificatives se gèrent ici : c'est en instruisant le dossier qu'on
+          vérifie ce qui a été fourni, et qu'on joint ce qui manque.
+        -->
+        <section class="pec-panneau">
+          <div class="pec-panneau__tete">
+            <span class="pec-panneau__titre" jhiTranslate="peccnssApp.demandePriseEnCharge.pieces.titre">Pièces justificatives</span>
+            @if (canSaisir()) {
+              <button type="button" (click)="ajouterPiece()" class="pec-btn pec-btn--primaire pec-btn--sm" data-cy="ajouterPiece">
+                <fa-icon class="pec-btn__ico" icon="plus" />
+                <span jhiTranslate="peccnssApp.demandePriseEnCharge.pieces.ajouter">Joindre une pièce</span>
+              </button>
+            }
+          </div>
+          <div class="pec-panneau__corps">
+            @if (chargementPieces()) {
+              <span class="pec-muted">Chargement…</span>
+            } @else if (pieces().length === 0) {
+              <span class="pec-muted" jhiTranslate="peccnssApp.demandePriseEnCharge.pieces.aucune"
+                >Aucune pièce justificative n'est jointe à ce dossier.</span
+              >
+            } @else {
+              <div class="pec-tbl-zone">
+                <table class="pec-tbl">
+                  <thead>
+                    <tr>
+                      <th jhiTranslate="peccnssApp.pieceJustificative.nomFichier">Nom du fichier</th>
+                      <th jhiTranslate="peccnssApp.pieceJustificative.dateAjout">Date d'ajout</th>
+                      <th class="pec-tbl__droite"><span class="visually-hidden">Actions</span></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (piece of pieces(); track piece.id) {
+                      <tr>
+                        <td>
+                          <a [routerLink]="['/piece-justificative', piece.id, 'view']">{{ piece.nomFichier }}</a>
+                        </td>
+                        <td class="pec-tbl__num">{{ (piece.dateAjout | formatMediumDatetime) || '—' }}</td>
+                        <td class="pec-tbl__droite">
+                          @if (canSaisir()) {
+                            <a [routerLink]="['/piece-justificative', piece.id, 'edit']" class="pec-btn pec-btn--discret pec-btn--sm">
+                              <fa-icon class="pec-btn__ico" icon="pencil-alt" />
+                              <span jhiTranslate="entity.action.edit">Edit</span>
+                            </a>
+                            <button
+                              type="button"
+                              (click)="supprimerPiece(piece)"
+                              class="pec-btn pec-btn--discret pec-btn--sm"
+                              data-cy="supprimerPiece"
+                            >
+                              <fa-icon class="pec-btn__ico" icon="times" />
+                              <span jhiTranslate="entity.action.delete">Delete</span>
+                            </button>
+                          }
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+          </div>
+        </section>
+
+        <div class="pec-dossier__actions">
+          @if (canValiderOuRejeter()) {
+            <button
+              type="button"
+              (click)="valider()"
+              [disabled]="isSaving()"
+              class="pec-btn pec-btn--primaire"
+              data-cy="demandePriseEnChargeValiderButton"
+            >
+              <fa-icon class="pec-btn__ico" icon="check" />
+              <span jhiTranslate="peccnssApp.demandePriseEnCharge.workflow.valider">Validate</span>
+            </button>
+            <button
+              type="button"
+              (click)="rejeter()"
+              [disabled]="isSaving()"
+              class="pec-btn pec-btn--danger"
+              data-cy="demandePriseEnChargeRejeterButton"
+            >
+              <fa-icon class="pec-btn__ico" icon="times" />
+              <span jhiTranslate="peccnssApp.demandePriseEnCharge.workflow.rejeter">Return to author</span>
+            </button>
+          }
+
+          @if (canResoumettre()) {
+            <button
+              type="button"
+              (click)="resoumettre()"
+              [disabled]="isSaving()"
+              class="pec-btn pec-btn--primaire"
+              data-cy="demandePriseEnChargeResoumettreButton"
+            >
+              <fa-icon class="pec-btn__ico" icon="paper-plane" />
+              <span jhiTranslate="peccnssApp.demandePriseEnCharge.workflow.resoumettre">Resubmit for validation</span>
+            </button>
+          }
+
+          @if (canSaisir()) {
+            <button type="button" [routerLink]="['/demande-prise-en-charge', demande.id, 'edit']" class="pec-btn pec-btn--secondaire">
+              <fa-icon class="pec-btn__ico" icon="pencil-alt" />
+              <span jhiTranslate="entity.action.edit">Edit</span>
+            </button>
+          }
+
+          @if (canImprimer()) {
+            <button
+              type="button"
+              (click)="imprimer()"
+              [disabled]="isDownloading()"
+              class="pec-btn pec-btn--secondaire"
+              data-cy="demandePriseEnChargeImprimerButton"
+            >
+              <fa-icon class="pec-btn__ico" icon="file-pdf" />
+              <span>Imprimer la prise en charge</span>
+            </button>
+          }
+
+          @if (canSupprimer()) {
+            <button type="button" (click)="supprimer()" class="pec-btn pec-btn--danger" data-cy="entityDeleteButton">
+              <fa-icon class="pec-btn__ico" icon="times" />
+              <span jhiTranslate="entity.action.delete">Delete</span>
+            </button>
+          }
+
+          <button
+            type="button"
+            (click)="previousState()"
+            class="pec-btn pec-btn--discret pec-dossier__actions--fin"
+            data-cy="entityDetailsBackButton"
+          >
+            <fa-icon class="pec-btn__ico" icon="arrow-left" />
+            <span jhiTranslate="entity.action.back">Back</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Colonne de droite : le contexte, ce que l'agent vérifie sans quitter le dossier. -->
+      <aside class="pec-dossier__contexte">
+        <section class="pec-panneau">
+          <div class="pec-panneau__tete">
+            <span class="pec-panneau__titre">Bénéficiaire</span>
+          </div>
+          <div class="pec-panneau__corps">
+            @if (beneficiaire(); as assure) {
+              <div class="pec-assure">
+                @if (assure.initiales) {
+                  <span class="pec-assure__init">{{ assure.initiales }}</span>
+                }
+                <span class="pec-assure__id">
+                  <span class="pec-assure__nom">{{ assure.nom }}</span>
+                  <span class="pec-assure__mat">{{ assure.matricule }}</span>
+                  <span class="pec-assure__meta pec-muted">{{ assure.nature }}</span>
+                </span>
+              </div>
+            }
+            <dl class="pec-defs" style="margin-top: var(--space-4)">
+              <dt jhiTranslate="peccnssApp.demandePriseEnCharge.agent">Agent</dt>
+              <dd>
+                @if (demande.agent) {
+                  <a [routerLink]="['/agent', demande.agent.id, 'view']">{{ demande.agent.matricule }}</a>
+                } @else {
+                  <span class="pec-muted">—</span>
+                }
+              </dd>
+              <dt jhiTranslate="peccnssApp.demandePriseEnCharge.ayantDroit">Ayant Droit</dt>
+              <dd>
+                @if (demande.ayantDroit) {
+                  <a [routerLink]="['/ayant-droit', demande.ayantDroit.id, 'view']">{{ demande.ayantDroit.nom }}</a>
+                } @else {
+                  <span class="pec-muted">—</span>
+                }
+              </dd>
+            </dl>
+          </div>
+        </section>
+
+        <section class="pec-panneau">
+          <div class="pec-panneau__tete">
+            <span class="pec-panneau__titre">Suivi du dossier</span>
+          </div>
+          <div class="pec-panneau__corps">
+            <dl class="pec-defs">
+              <dt jhiTranslate="peccnssApp.demandePriseEnCharge.gestionnaireCreateur">Gestionnaire Createur</dt>
+              <dd>{{ demande.gestionnaireCreateur?.login || '—' }}</dd>
+              <dt jhiTranslate="peccnssApp.demandePriseEnCharge.assigneA">Assigne A</dt>
+              <dd>{{ demande.assigneA?.login || '—' }}</dd>
+              <dt jhiTranslate="peccnssApp.demandePriseEnCharge.dateCreation">Date Creation</dt>
+              <dd class="pec-defs--mono">{{ (demande.dateCreation | formatMediumDatetime) || '—' }}</dd>
+              <dt jhiTranslate="peccnssApp.demandePriseEnCharge.dateModification">Date Modification</dt>
+              <dd class="pec-defs--mono">{{ (demande.dateModification | formatMediumDatetime) || '—' }}</dd>
+            </dl>
+          </div>
+        </section>
+
+        <section class="pec-panneau">
+          <div class="pec-panneau__tete">
+            <span class="pec-panneau__titre">Historique du dossier</span>
+          </div>
+          <div class="pec-panneau__corps">
+            <ul class="pec-journal">
+              @for (entree of historique(); track entree.id) {
+                <li class="pec-journal__entree">
+                  <span class="pec-journal__action">{{ entree.action }}</span>
+                  <span class="pec-journal__meta"
+                    >{{ entree.dateAction | formatMediumDatetime }} · {{ entree.utilisateur?.login || '—' }}</span
+                  >
+                  @if (entree.description) {
+                    <span class="pec-journal__desc">{{ entree.description }}</span>
+                  }
+                </li>
+              } @empty {
+                <span class="pec-muted">Aucune action enregistrée sur ce dossier.</span>
+              }
+            </ul>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </div>
+}

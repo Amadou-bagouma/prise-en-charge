@@ -1,0 +1,343 @@
+<div class="d-flex justify-content-center">
+  <div class="col-12 col-xl-10">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm" class="jhi-form-panel">
+      <h2
+        id="jhi-demande-prise-en-charge-heading"
+        data-cy="DemandePriseEnChargeCreateUpdateHeading"
+        jhiTranslate="peccnssApp.demandePriseEnCharge.home.createOrEditLabel"
+      >
+        Create or edit a Demande Prise En Charge
+      </h2>
+
+      <jhi-alert-error />
+
+      @if (editForm.controls.id.value !== null) {
+        <div class="jhi-field mb-3">
+          <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
+          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+        </div>
+      }
+
+      <h3 class="jhi-form-section">Identification</h3>
+      <div class="jhi-form-grid">
+        @if (editForm.controls.reference.value) {
+          <div class="jhi-field">
+            <label class="form-label" for="field_reference" jhiTranslate="peccnssApp.demandePriseEnCharge.reference">Reference</label>
+            <input
+              type="text"
+              class="form-control"
+              name="reference"
+              id="field_reference"
+              data-cy="reference"
+              formControlName="reference"
+              [readonly]="true"
+            />
+          </div>
+        }
+
+        @let typeBeneficiaireRef = editForm.get('typeBeneficiaire')!;
+        <div class="jhi-field">
+          <label class="form-label" for="field_typeBeneficiaire" jhiTranslate="peccnssApp.demandePriseEnCharge.typeBeneficiaire"
+            >Type Beneficiaire</label
+          >
+          <select
+            class="form-control"
+            name="typeBeneficiaire"
+            formControlName="typeBeneficiaire"
+            id="field_typeBeneficiaire"
+            data-cy="typeBeneficiaire"
+          >
+            <option [ngValue]="null">{{ 'peccnssApp.TypeBeneficiaire.null' | translate }}</option>
+            @for (typeBeneficiaire of typeBeneficiaireValues; track $index) {
+              <option [value]="typeBeneficiaire">{{ 'peccnssApp.TypeBeneficiaire.' + typeBeneficiaire | translate }}</option>
+            }
+          </select>
+          @if (typeBeneficiaireRef.invalid && (typeBeneficiaireRef.dirty || typeBeneficiaireRef.touched)) {
+            <div>
+              @if (typeBeneficiaireRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="jhi-field">
+          <label class="form-label" for="field_agent" jhiTranslate="peccnssApp.demandePriseEnCharge.agent">Agent</label>
+          <select class="form-control" id="field_agent" data-cy="agent" name="agent" formControlName="agent" [compareWith]="compareAgent">
+            <option [ngValue]="null"></option>
+            @for (agentOption of agentsSharedCollection(); track $index) {
+              <option [ngValue]="agentOption">{{ agentOption.matricule }} - {{ agentOption.nom }} {{ agentOption.prenom }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="jhi-field">
+          <label class="form-label" for="field_ayantDroit" jhiTranslate="peccnssApp.demandePriseEnCharge.ayantDroit">Ayant Droit</label>
+          <select
+            class="form-control"
+            id="field_ayantDroit"
+            data-cy="ayantDroit"
+            name="ayantDroit"
+            formControlName="ayantDroit"
+            [compareWith]="compareAyantDroit"
+          >
+            <option [ngValue]="null"></option>
+            @for (ayantDroitOption of ayantDroitsSharedCollection(); track $index) {
+              <option [ngValue]="ayantDroitOption">{{ ayantDroitOption.nom }} {{ ayantDroitOption.prenom }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="jhi-field jhi-field-full">
+          <label class="form-label" for="field_description" jhiTranslate="peccnssApp.demandePriseEnCharge.description">Description</label>
+          <textarea
+            class="form-control"
+            name="description"
+            id="field_description"
+            data-cy="description"
+            rows="2"
+            formControlName="description"
+          ></textarea>
+        </div>
+      </div>
+
+      <h3 class="jhi-form-section">Soin</h3>
+      <div class="jhi-form-grid">
+        @let typeSoinsRef = editForm.get('typeSoins')!;
+        <div class="jhi-field jhi-field-full">
+          <label class="form-label" jhiTranslate="peccnssApp.demandePriseEnCharge.typeSoins">Types Soin</label>
+          <div class="d-flex flex-wrap gap-3">
+            @for (typeSoinOption of typeSoinValues(); track typeSoinOption.id) {
+              <div class="form-check">
+                <input
+                  type="checkbox"
+                  class="form-check-input"
+                  [id]="'field_typeSoin_' + typeSoinOption.id"
+                  [attr.data-cy]="'typeSoin-' + typeSoinOption.code"
+                  [checked]="isTypeSoinChecked(typeSoinOption)"
+                  (change)="toggleTypeSoin(typeSoinOption, $any($event.target).checked)"
+                />
+                <label class="form-check-label" [for]="'field_typeSoin_' + typeSoinOption.id">{{ typeSoinOption.libelle }}</label>
+              </div>
+            } @empty {
+              <span class="text-muted">Aucun type de soin n'est en service. Un administrateur doit en créer dans le référentiel.</span>
+            }
+          </div>
+          @if (typeSoinsRef.invalid && (typeSoinsRef.dirty || typeSoinsRef.touched)) {
+            <div>
+              @if (typeSoinsRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="jhi-field">
+          <label class="form-label" for="field_etablissementSante" jhiTranslate="peccnssApp.demandePriseEnCharge.etablissementSante"
+            >Etablissement Sante</label
+          >
+          <select
+            class="form-control"
+            id="field_etablissementSante"
+            data-cy="etablissementSante"
+            name="etablissementSante"
+            formControlName="etablissementSante"
+            [compareWith]="compareEtablissementSante"
+          >
+            <option [ngValue]="null"></option>
+            @for (etablissementSanteOption of etablissementSantesSharedCollection(); track $index) {
+              <option [ngValue]="etablissementSanteOption">{{ etablissementSanteOption.nom }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <h3 class="jhi-form-section">Suivi</h3>
+      <div class="jhi-form-grid">
+        <div class="jhi-field">
+          <label class="form-label" for="field_statut" jhiTranslate="peccnssApp.demandePriseEnCharge.statut">Statut</label>
+          <input
+            type="text"
+            class="form-control"
+            name="statut"
+            id="field_statut"
+            data-cy="statut"
+            [value]="
+              editForm.get('statut')!.value
+                ? ('peccnssApp.StatutDemande.' + editForm.get('statut')!.value | translate)
+                : ('peccnssApp.StatutDemande.null' | translate)
+            "
+            disabled
+          />
+        </div>
+
+        @let prioriteRef = editForm.get('priorite')!;
+        <div class="jhi-field">
+          <label class="form-label" for="field_priorite" jhiTranslate="peccnssApp.demandePriseEnCharge.priorite">Priorite</label>
+          <select class="form-control" name="priorite" formControlName="priorite" id="field_priorite" data-cy="priorite">
+            <option [ngValue]="null">{{ 'peccnssApp.PrioriteDemande.null' | translate }}</option>
+            @for (prioriteDemande of prioriteDemandeValues; track $index) {
+              <option [value]="prioriteDemande">{{ 'peccnssApp.PrioriteDemande.' + prioriteDemande | translate }}</option>
+            }
+          </select>
+          @if (prioriteRef.invalid && (prioriteRef.dirty || prioriteRef.touched)) {
+            <div>
+              @if (prioriteRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="jhi-field">
+          <label class="form-label" for="field_dateCreation" jhiTranslate="peccnssApp.demandePriseEnCharge.dateCreation"
+            >Date Creation</label
+          >
+          <input
+            id="field_dateCreation"
+            data-cy="dateCreation"
+            type="datetime-local"
+            class="form-control"
+            name="dateCreation"
+            formControlName="dateCreation"
+            placeholder="YYYY-MM-DD HH:mm"
+          />
+          @let dateCreationRef = editForm.get('dateCreation')!;
+          @if (dateCreationRef.invalid && (dateCreationRef.dirty || dateCreationRef.touched)) {
+            <div>
+              @if (dateCreationRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+              <small
+                class="form-text text-danger"
+                [hidden]="!dateCreationRef.errors?.datetimelocal"
+                jhiTranslate="entity.validation.datetimelocal"
+                >This field should be a date and time.</small
+              >
+            </div>
+          }
+        </div>
+
+        <div class="jhi-field">
+          <label class="form-label" for="field_dateModification" jhiTranslate="peccnssApp.demandePriseEnCharge.dateModification"
+            >Date Modification</label
+          >
+          <input
+            id="field_dateModification"
+            data-cy="dateModification"
+            type="datetime-local"
+            class="form-control"
+            name="dateModification"
+            formControlName="dateModification"
+            placeholder="YYYY-MM-DD HH:mm"
+          />
+        </div>
+
+        <div class="jhi-field">
+          <label class="form-label" for="field_dateAssignation" jhiTranslate="peccnssApp.demandePriseEnCharge.dateAssignation"
+            >Date Assignation</label
+          >
+          <input
+            id="field_dateAssignation"
+            data-cy="dateAssignation"
+            type="datetime-local"
+            class="form-control"
+            name="dateAssignation"
+            formControlName="dateAssignation"
+            placeholder="YYYY-MM-DD HH:mm"
+          />
+        </div>
+
+        <div class="jhi-field">
+          <label class="form-label" for="field_dateEcheance" jhiTranslate="peccnssApp.demandePriseEnCharge.dateEcheance"
+            >Date Echeance</label
+          >
+          <input
+            id="field_dateEcheance"
+            data-cy="dateEcheance"
+            type="datetime-local"
+            class="form-control"
+            name="dateEcheance"
+            formControlName="dateEcheance"
+            placeholder="YYYY-MM-DD HH:mm"
+          />
+        </div>
+
+        <div class="jhi-field jhi-field-full">
+          <label class="form-label" for="field_motifRejet" jhiTranslate="peccnssApp.demandePriseEnCharge.motifRejet">Motif Rejet</label>
+          <textarea
+            class="form-control"
+            name="motifRejet"
+            id="field_motifRejet"
+            data-cy="motifRejet"
+            rows="2"
+            formControlName="motifRejet"
+          ></textarea>
+        </div>
+
+        <div class="jhi-field jhi-field-full">
+          <label class="form-label" for="field_observation" jhiTranslate="peccnssApp.demandePriseEnCharge.observation">Observation</label>
+          <textarea
+            class="form-control"
+            name="observation"
+            id="field_observation"
+            data-cy="observation"
+            rows="2"
+            formControlName="observation"
+          ></textarea>
+        </div>
+      </div>
+
+      <h3 class="jhi-form-section">Intervenants</h3>
+      <div class="jhi-form-grid">
+        <div class="jhi-field">
+          <label class="form-label" for="field_gestionnaireCreateur" jhiTranslate="peccnssApp.demandePriseEnCharge.gestionnaireCreateur"
+            >Gestionnaire Createur</label
+          >
+          <input
+            type="text"
+            class="form-control"
+            name="gestionnaireCreateur"
+            id="field_gestionnaireCreateur"
+            data-cy="gestionnaireCreateur"
+            [value]="editForm.get('gestionnaireCreateur')!.value?.login ?? ''"
+            disabled
+          />
+        </div>
+
+        <div class="jhi-field">
+          <label class="form-label" for="field_assigneA" jhiTranslate="peccnssApp.demandePriseEnCharge.assigneA">Assigne A</label>
+          <select
+            class="form-control"
+            id="field_assigneA"
+            data-cy="assigneA"
+            name="assigneA"
+            formControlName="assigneA"
+            [compareWith]="compareUser"
+          >
+            <option [ngValue]="null"></option>
+            @for (userOption of usersSharedCollection(); track $index) {
+              <option [ngValue]="userOption">{{ userOption.login }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="jhi-form-actions">
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-accent"
+        >
+          <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

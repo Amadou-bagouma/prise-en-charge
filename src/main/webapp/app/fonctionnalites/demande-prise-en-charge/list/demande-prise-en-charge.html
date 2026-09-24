@@ -1,0 +1,155 @@
+<div class="pec-root pec-ecran">
+  <div class="pec-titre-ecran">
+    <h1 id="page-heading" data-cy="DemandePriseEnChargeHeading" jhiTranslate="peccnssApp.demandePriseEnCharge.home.title">
+      Demandes de prise en charge
+    </h1>
+    <span class="pec-muted">{{ totalItems() }} dossiers</span>
+  </div>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  <!-- Barre de filtres : recherche à gauche, puces au centre, actions à droite. -->
+  <div class="pec-filtres">
+    <div class="pec-filtres__rech">
+      <span class="pec-filtres__loupe"><fa-icon icon="search" /></span>
+      <input
+        type="search"
+        class="pec-champ__ctrl"
+        placeholder="Numéro de dossier"
+        aria-label="Rechercher un dossier par son numéro"
+        data-cy="searchInput"
+        [value]="searchTerm()"
+        (input)="searchTerm.set($any($event.target).value)"
+        (keyup.enter)="search()"
+      />
+    </div>
+
+    @for (puce of puces; track puce.cle) {
+      <button type="button" class="pec-puce" [attr.aria-pressed]="puceActive() === puce.cle" (click)="choisirPuce(puce.cle)">
+        {{ puce.libelle }}
+        <span class="pec-puce__n">{{ effectifs()[puce.cle] ?? '—' }}</span>
+      </button>
+    }
+
+    <div class="pec-filtres__actions">
+      <button type="button" class="pec-btn pec-btn--discret pec-btn--sm" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span jhiTranslate="peccnssApp.demandePriseEnCharge.home.refreshListLabel">Actualiser</span>
+      </button>
+
+      <button
+        *jhiHasAnyAuthority="[Authority.USER, Authority.VALIDATEUR_DRH]"
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        type="button"
+        class="pec-btn pec-btn--primaire pec-btn--sm"
+        [routerLink]="['/demande-prise-en-charge/new']"
+      >
+        <fa-icon icon="plus" />
+        <span jhiTranslate="peccnssApp.demandePriseEnCharge.home.createLabel">Nouvelle demande</span>
+      </button>
+    </div>
+  </div>
+
+  <jhi-filter [filters]="filters" />
+
+  <div class="pec-panneau">
+    <div class="pec-tbl-zone" id="entities">
+      <table class="pec-tbl" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="reference">Dossier <fa-icon icon="sort" /></th>
+            <th scope="col" jhiSortBy="agent.matricule">Assuré <fa-icon icon="sort" /></th>
+            <th scope="col">Nature</th>
+            <th scope="col" jhiSortBy="etablissementSante.nom">Structure de soins <fa-icon icon="sort" /></th>
+            <th scope="col" jhiSortBy="statut">Statut <fa-icon icon="sort" /></th>
+            <th scope="col" jhiSortBy="dateCreation">Dépôt <fa-icon icon="sort" /></th>
+            <th scope="col">Ancienneté</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (demandePriseEnCharge of demandePriseEnCharges(); track trackId(demandePriseEnCharge)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a class="pec-tbl__num" [routerLink]="['/demande-prise-en-charge', demandePriseEnCharge.id, 'view']">{{
+                  demandePriseEnCharge.reference
+                }}</a>
+              </td>
+              <td>
+                @if (demandePriseEnCharge.typeBeneficiaire === 'AGENT' && demandePriseEnCharge.agent) {
+                  <a class="pec-strong" [routerLink]="['/agent', demandePriseEnCharge.agent.id, 'view']">{{
+                    demandePriseEnCharge.agent.matricule
+                  }}</a>
+                } @else if (demandePriseEnCharge.typeBeneficiaire === 'AYANT_DROIT' && demandePriseEnCharge.ayantDroit) {
+                  <a class="pec-strong" [routerLink]="['/ayant-droit', demandePriseEnCharge.ayantDroit.id, 'view']">{{
+                    demandePriseEnCharge.ayantDroit.nom
+                  }}</a>
+                }
+                <span
+                  class="pec-muted pec-assure__meta"
+                  [jhiTranslate]="'peccnssApp.TypeBeneficiaire.' + (demandePriseEnCharge.typeBeneficiaire ?? 'null')"
+                >
+                  {{ { null: '', AGENT: 'Agent', AYANT_DROIT: 'Ayant droit' }[demandePriseEnCharge.typeBeneficiaire ?? 'null'] }}
+                </span>
+              </td>
+              <td class="pec-tbl__libre">{{ typeSoinsLabel(demandePriseEnCharge) }}</td>
+              <td class="pec-tbl__libre">{{ demandePriseEnCharge.etablissementSante?.nom }}</td>
+              <td>
+                <span
+                  class="pec-badge"
+                  [class]="'pec-badge pec-badge--' + statutTon(demandePriseEnCharge.statut)"
+                  [jhiTranslate]="'peccnssApp.StatutDemande.' + (demandePriseEnCharge.statut ?? 'null')"
+                >
+                  {{ demandePriseEnCharge.statut }}
+                </span>
+              </td>
+              <td class="pec-num">{{ formatDateCourte(demandePriseEnCharge.dateCreation) }}</td>
+              <td class="pec-num" [class.pec-retard]="(ancienneteJours(demandePriseEnCharge) ?? 0) >= 9">
+                @if (ancienneteJours(demandePriseEnCharge) !== null) {
+                  {{ ancienneteJours(demandePriseEnCharge) }} j
+                }
+              </td>
+              <td>
+                <a
+                  class="pec-btn pec-btn--discret pec-btn--sm"
+                  [routerLink]="['/demande-prise-en-charge', demandePriseEnCharge.id, 'view']"
+                  data-cy="entityDetailsButton"
+                  >Ouvrir</a
+                >
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="8" class="pec-tbl__vide">
+                @if (puceActive() !== 'toutes' || searchTerm()) {
+                  Aucun dossier ne correspond aux filtres actifs. Retirez un filtre ci-dessus pour élargir la recherche.
+                } @else {
+                  <span jhiTranslate="peccnssApp.demandePriseEnCharge.home.notFound">Aucune demande de prise en charge</span>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (demandePriseEnCharges().length > 0) {
+      <div class="pec-pied">
+        <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+
+        <ngb-pagination
+          [collectionSize]="totalItems()"
+          [page]="page()"
+          [pageSize]="itemsPerPage()"
+          [maxSize]="5"
+          [rotate]="true"
+          [boundaryLinks]="true"
+          (pageChange)="navigateToPage($event)"
+        />
+      </div>
+    }
+  </div>
+</div>

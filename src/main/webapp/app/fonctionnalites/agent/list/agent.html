@@ -1,0 +1,181 @@
+<div>
+  <div class="jhi-page-header">
+    <h2 id="page-heading" data-cy="AgentHeading">
+      <span jhiTranslate="peccnssApp.agent.home.title">Agents</span>
+    </h2>
+
+    <div class="jhi-page-actions">
+      <div class="jhi-search-bar">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Rechercher par matricule..."
+          data-cy="searchInput"
+          [value]="searchTerm()"
+          (input)="searchTerm.set($any($event.target).value)"
+          (keyup.enter)="search()"
+        />
+        <button type="button" class="btn btn-outline-secondary" data-cy="searchButton" (click)="search()">
+          <fa-icon icon="search" />
+          <span>Rechercher</span>
+        </button>
+      </div>
+
+      <button class="btn btn-outline-secondary" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span jhiTranslate="peccnssApp.agent.home.refreshListLabel">Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-accent jh-create-entity create-agent ms-auto"
+        [routerLink]="['/agent/new']"
+      >
+        <fa-icon icon="plus" />
+        <span jhiTranslate="peccnssApp.agent.home.createLabel">Create a new Agent</span>
+      </button>
+    </div>
+  </div>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  <jhi-filter [filters]="filters" />
+
+  @if (agents().length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span jhiTranslate="peccnssApp.agent.home.notFound">No Agents found</span>
+    </div>
+  } @else {
+    <div class="jhi-table-panel table-responsive table-entities" id="entities">
+      <table class="table jhi-table" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col"></th>
+            <th scope="col" jhiSortBy="matricule">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.agent.matricule">Matricule</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="nom">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.agent.nom">Nom</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="prenom">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.agent.prenom">Prenom</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="fonction">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.agent.fonction">Fonction</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="telephone">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.agent.telephone">Telephone</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="direction.nom">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.agent.direction">Direction</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="gestion.nom">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.agent.gestion">Gestion</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="dateNaissance">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.agent.dateNaissance">Date Naissance</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (agent of agents(); track trackId(agent)) {
+            <tr data-cy="entityTable">
+              <td>
+                @if (agent.photo) {
+                  <img [src]="'data:' + agent.photoContentType + ';base64,' + agent.photo" class="jhi-table-thumbnail" alt="agent photo" />
+                }
+              </td>
+              <td>
+                <a [routerLink]="['/agent', agent.id, 'view']">{{ agent.matricule }}</a>
+              </td>
+              <td>{{ agent.nom }}</td>
+              <td>{{ agent.prenom }}</td>
+              <td>{{ agent.fonction }}</td>
+              <td>{{ agent.telephone }}</td>
+              <td>
+                @if (agent.direction) {
+                  <a [routerLink]="['/direction', agent.direction.id, 'view']">{{ agent.direction.nom }}</a>
+                }
+              </td>
+              <td>
+                @if (agent.gestion) {
+                  <a [routerLink]="['/gestion', agent.gestion.id, 'view']">{{ agent.gestion.nom }}</a>
+                }
+              </td>
+              <td>{{ agent.dateNaissance | formatMediumDate }}</td>
+              <td class="text-end">
+                <div ngbDropdown class="d-inline-block" container="body">
+                  <button type="button" class="btn btn-secondary btn-sm" ngbDropdownToggle data-cy="entityActionsButton">
+                    <fa-icon icon="ellipsis-vertical" />
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.actions">Actions</span>
+                  </button>
+                  <div ngbDropdownMenu>
+                    <a ngbDropdownItem [routerLink]="['/agent', agent.id, 'view']" data-cy="entityDetailsButton">
+                      <fa-icon icon="eye" class="me-1" />
+                      <span jhiTranslate="entity.action.view">View</span>
+                    </a>
+                    <a ngbDropdownItem [routerLink]="['/agent', agent.id, 'edit']" data-cy="entityEditButton">
+                      <fa-icon icon="pencil-alt" class="me-1" />
+                      <span jhiTranslate="entity.action.edit">Edit</span>
+                    </a>
+                    <button ngbDropdownItem type="button" (click)="delete(agent)" data-cy="entityDeleteButton">
+                      <fa-icon icon="times" class="me-1" />
+                      <span jhiTranslate="entity.action.delete">Delete</span>
+                    </button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+  @if (agents().length > 0) {
+    <div>
+      <div class="d-flex justify-content-center">
+        <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+      </div>
+
+      <div class="d-flex justify-content-center">
+        <ngb-pagination
+          [collectionSize]="totalItems()"
+          [page]="page()"
+          [pageSize]="itemsPerPage()"
+          [maxSize]="5"
+          [rotate]="true"
+          [boundaryLinks]="true"
+          (pageChange)="navigateToPage($event)"
+        />
+      </div>
+    </div>
+  }
+</div>

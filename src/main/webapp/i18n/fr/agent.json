@@ -27,7 +27,14 @@
       "fonction": "Fonction",
       "photo": "Photo",
       "direction": "Direction",
-      "gestion": "Gestion"
+      "gestion": "Gestion",
+      "rattachement": "Rattachement",
+      "ayantsDroit": {
+        "titre": "Ayants droit",
+        "ajouter": "Ajouter un ayant droit",
+        "aucun": "Aucun ayant droit rattaché à cet agent.",
+        "chargement": "Chargement…"
+      }
     }
   }
 }

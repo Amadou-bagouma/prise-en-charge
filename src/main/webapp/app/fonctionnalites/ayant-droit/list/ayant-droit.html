@@ -1,0 +1,168 @@
+<div>
+  <div class="jhi-page-header">
+    <h2 id="page-heading" data-cy="AyantDroitHeading">
+      <span jhiTranslate="peccnssApp.ayantDroit.home.title">Ayant Droits</span>
+    </h2>
+
+    <div class="jhi-page-actions">
+      <div class="jhi-search-bar">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Rechercher par nom..."
+          data-cy="searchInput"
+          [value]="searchTerm()"
+          (input)="searchTerm.set($any($event.target).value)"
+          (keyup.enter)="search()"
+        />
+        <button type="button" class="btn btn-outline-secondary" data-cy="searchButton" (click)="search()">
+          <fa-icon icon="search" />
+          <span>Rechercher</span>
+        </button>
+      </div>
+
+      <button class="btn btn-outline-secondary" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span jhiTranslate="peccnssApp.ayantDroit.home.refreshListLabel">Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-accent jh-create-entity create-ayant-droit ms-auto"
+        [routerLink]="['/ayant-droit/new']"
+      >
+        <fa-icon icon="plus" />
+        <span jhiTranslate="peccnssApp.ayantDroit.home.createLabel">Create a new Ayant Droit</span>
+      </button>
+    </div>
+  </div>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  <jhi-filter [filters]="filters" />
+
+  @if (ayantDroits().length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span jhiTranslate="peccnssApp.ayantDroit.home.notFound">No Ayant Droits found</span>
+    </div>
+  } @else {
+    <div class="jhi-table-panel table-responsive table-entities" id="entities">
+      <table class="table jhi-table" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col"></th>
+            <th scope="col" jhiSortBy="nom">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.ayantDroit.nom">Nom</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="prenom">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.ayantDroit.prenom">Prenom</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="lien">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.ayantDroit.lien">Lien</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="dateNaissance">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.ayantDroit.dateNaissance">Date Naissance</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="agent.matricule">
+              <div class="d-flex">
+                <span jhiTranslate="peccnssApp.ayantDroit.agent">Agent</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (ayantDroit of ayantDroits(); track trackId(ayantDroit)) {
+            <tr data-cy="entityTable">
+              <td>
+                @if (ayantDroit.photo) {
+                  <img
+                    [src]="'data:' + ayantDroit.photoContentType + ';base64,' + ayantDroit.photo"
+                    class="jhi-table-thumbnail"
+                    alt="ayant droit photo"
+                  />
+                }
+              </td>
+              <td>
+                <a [routerLink]="['/ayant-droit', ayantDroit.id, 'view']">{{ ayantDroit.nom }}</a>
+              </td>
+              <td>{{ ayantDroit.prenom }}</td>
+              <td>
+                <span
+                  class="jhi-badge"
+                  [ngClass]="'jhi-badge-lien-' + ayantDroit.lien"
+                  [jhiTranslate]="'peccnssApp.LienParente.' + (ayantDroit.lien ?? 'null')"
+                >
+                  {{ { null: '', CONJOINT: 'CONJOINT', ENFANT: 'ENFANT', AUTRE: 'AUTRE' }[ayantDroit.lien ?? 'null'] }}
+                </span>
+              </td>
+              <td>{{ ayantDroit.dateNaissance | formatMediumDate }}</td>
+              <td>
+                @if (ayantDroit.agent) {
+                  <a [routerLink]="['/agent', ayantDroit.agent.id, 'view']">{{ ayantDroit.agent.matricule }}</a>
+                }
+              </td>
+              <td class="text-end">
+                <div ngbDropdown class="d-inline-block" container="body">
+                  <button type="button" class="btn btn-secondary btn-sm" ngbDropdownToggle data-cy="entityActionsButton">
+                    <fa-icon icon="ellipsis-vertical" />
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.actions">Actions</span>
+                  </button>
+                  <div ngbDropdownMenu>
+                    <a ngbDropdownItem [routerLink]="['/ayant-droit', ayantDroit.id, 'view']" data-cy="entityDetailsButton">
+                      <fa-icon icon="eye" class="me-1" />
+                      <span jhiTranslate="entity.action.view">View</span>
+                    </a>
+                    <a ngbDropdownItem [routerLink]="['/ayant-droit', ayantDroit.id, 'edit']" data-cy="entityEditButton">
+                      <fa-icon icon="pencil-alt" class="me-1" />
+                      <span jhiTranslate="entity.action.edit">Edit</span>
+                    </a>
+                    <button ngbDropdownItem type="button" (click)="delete(ayantDroit)" data-cy="entityDeleteButton">
+                      <fa-icon icon="times" class="me-1" />
+                      <span jhiTranslate="entity.action.delete">Delete</span>
+                    </button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+  @if (ayantDroits().length > 0) {
+    <div>
+      <div class="d-flex justify-content-center">
+        <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+      </div>
+
+      <div class="d-flex justify-content-center">
+        <ngb-pagination
+          [collectionSize]="totalItems()"
+          [page]="page()"
+          [pageSize]="itemsPerPage()"
+          [maxSize]="5"
+          [rotate]="true"
+          [boundaryLinks]="true"
+          (pageChange)="navigateToPage($event)"
+        />
+      </div>
+    </div>
+  }
+</div>

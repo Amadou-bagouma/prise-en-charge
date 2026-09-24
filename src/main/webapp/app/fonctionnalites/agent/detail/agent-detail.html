@@ -1,0 +1,203 @@
+@if (agent(); as agentRef) {
+  <div class="pec-ecran">
+    <div class="pec-titre-ecran">
+      <h1 data-cy="agentDetailsHeading">{{ identite() }}</h1>
+      <span class="pec-num">{{ agentRef.matricule }}</span>
+    </div>
+
+    <jhi-alert-error />
+    <jhi-alert />
+
+    <div class="pec-dossier">
+      <!-- Colonne de gauche : la fiche de l'agent et les personnes qu'il couvre. -->
+      <div class="pec-dossier__principal">
+        <section class="pec-panneau">
+          <div class="pec-panneau__tete">
+            <span class="pec-panneau__titre" jhiTranslate="peccnssApp.agent.detail.title">Agent</span>
+          </div>
+          <div class="pec-panneau__corps">
+            <dl class="pec-defs">
+              <dt jhiTranslate="peccnssApp.agent.matricule">Matricule</dt>
+              <dd class="pec-defs--mono">{{ agentRef.matricule }}</dd>
+
+              <dt jhiTranslate="peccnssApp.agent.nom">Nom</dt>
+              <dd>{{ agentRef.nom || '—' }}</dd>
+
+              <dt jhiTranslate="peccnssApp.agent.prenom">Prenom</dt>
+              <dd>{{ agentRef.prenom || '—' }}</dd>
+
+              <dt jhiTranslate="peccnssApp.agent.dateNaissance">Date Naissance</dt>
+              <dd class="pec-defs--mono">
+                {{ (agentRef.dateNaissance | formatMediumDate) || '—' }}
+                <!-- L'âge décide sur un dossier de protection sociale, pas la date. -->
+                @if (age() !== null) {
+                  <span class="pec-muted">· {{ age() }} ans</span>
+                }
+              </dd>
+
+              <dt jhiTranslate="peccnssApp.agent.dateEmbauche">Date Embauche</dt>
+              <dd class="pec-defs--mono">
+                {{ (agentRef.dateEmbauche | formatMediumDate) || '—' }}
+                @if (anciennete() !== null) {
+                  <span class="pec-muted">· {{ anciennete() }} ans de service</span>
+                }
+              </dd>
+
+              <dt jhiTranslate="peccnssApp.agent.telephone">Telephone</dt>
+              <dd class="pec-defs--mono">{{ agentRef.telephone || '—' }}</dd>
+
+              <dt jhiTranslate="peccnssApp.agent.fonction">Fonction</dt>
+              <dd>{{ agentRef.fonction || '—' }}</dd>
+            </dl>
+          </div>
+        </section>
+
+        <!--
+          Les ayants droit se gèrent ici, pas dans une liste générale : c'est sur la fiche de
+          l'agent qu'on vérifie qui est couvert, et c'est là qu'on ajoute un conjoint ou un
+          enfant. Toutes les actions de l'ayant droit sont donc à portée de main.
+        -->
+        <section class="pec-panneau">
+          <div class="pec-panneau__tete">
+            <span class="pec-panneau__titre">
+              <span jhiTranslate="peccnssApp.agent.ayantsDroit.titre">Ayants droit</span>
+              <!-- Le nombre fait partie du titre : c'est la première chose qu'on vérifie. -->
+              @if (!chargementAyantsDroit() && ayantsDroit().length > 0) {
+                <span class="pec-panneau__n">{{ ayantsDroit().length }}</span>
+              }
+            </span>
+            <button type="button" (click)="ajouterAyantDroit()" class="pec-btn pec-btn--primaire pec-btn--sm" data-cy="ajouterAyantDroit">
+              <fa-icon class="pec-btn__ico" icon="plus" />
+              <span jhiTranslate="peccnssApp.agent.ayantsDroit.ajouter">Ajouter un ayant droit</span>
+            </button>
+          </div>
+          <div class="pec-panneau__corps">
+            @if (chargementAyantsDroit()) {
+              <span class="pec-muted" jhiTranslate="peccnssApp.agent.ayantsDroit.chargement">Chargement…</span>
+            } @else if (ayantsDroit().length === 0) {
+              <span class="pec-muted" jhiTranslate="peccnssApp.agent.ayantsDroit.aucun">Aucun ayant droit rattaché à cet agent.</span>
+            } @else {
+              <div class="pec-tbl-zone">
+                <table class="pec-tbl">
+                  <thead>
+                    <tr>
+                      <th jhiTranslate="peccnssApp.ayantDroit.codeAyantDroit">Code</th>
+                      <th jhiTranslate="peccnssApp.ayantDroit.nom">Nom</th>
+                      <th jhiTranslate="peccnssApp.ayantDroit.lien">Lien de parenté</th>
+                      <th jhiTranslate="peccnssApp.ayantDroit.dateNaissance">Date de naissance</th>
+                      <th class="pec-tbl__droite"><span class="visually-hidden">Actions</span></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (ayantDroit of ayantsDroit(); track ayantDroit.id) {
+                      <tr>
+                        <td>
+                          <span class="pec-num">{{ ayantDroit.codeAyantDroit }}</span>
+                        </td>
+                        <td>
+                          <a [routerLink]="['/ayant-droit', ayantDroit.id, 'view']">{{ ayantDroit.prenom }} {{ ayantDroit.nom }}</a>
+                        </td>
+                        <td>
+                          <span class="pec-badge pec-badge--info">
+                            <span class="pec-badge__pt"></span>
+                            <span [jhiTranslate]="'peccnssApp.LienParente.' + (ayantDroit.lien ?? 'null')">{{ ayantDroit.lien }}</span>
+                          </span>
+                        </td>
+                        <td class="pec-tbl__num">{{ (ayantDroit.dateNaissance | formatMediumDate) || '—' }}</td>
+                        <td class="pec-tbl__droite">
+                          <a [routerLink]="['/ayant-droit', ayantDroit.id, 'edit']" class="pec-btn pec-btn--discret pec-btn--sm">
+                            <fa-icon class="pec-btn__ico" icon="pencil-alt" />
+                            <span jhiTranslate="entity.action.edit">Edit</span>
+                          </a>
+                          <button
+                            type="button"
+                            (click)="supprimerAyantDroit(ayantDroit)"
+                            class="pec-btn pec-btn--discret pec-btn--sm"
+                            data-cy="supprimerAyantDroit"
+                          >
+                            <fa-icon class="pec-btn__ico" icon="times" />
+                            <span jhiTranslate="entity.action.delete">Delete</span>
+                          </button>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+          </div>
+        </section>
+
+        <div class="pec-dossier__actions">
+          <button type="button" [routerLink]="['/agent', agentRef.id, 'edit']" class="pec-btn pec-btn--secondaire">
+            <fa-icon class="pec-btn__ico" icon="pencil-alt" />
+            <span jhiTranslate="entity.action.edit">Edit</span>
+          </button>
+
+          <button
+            type="button"
+            (click)="previousState()"
+            class="pec-btn pec-btn--discret pec-dossier__actions--fin"
+            data-cy="entityDetailsBackButton"
+          >
+            <fa-icon class="pec-btn__ico" icon="arrow-left" />
+            <span jhiTranslate="entity.action.back">Back</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Colonne de droite : qui est cet agent, et où il se situe dans l'institution. -->
+      <aside class="pec-dossier__contexte">
+        <section class="pec-panneau">
+          <div class="pec-panneau__corps">
+            <div class="pec-fiche">
+              @if (agentRef.photo) {
+                <img
+                  class="pec-fiche__photo"
+                  [src]="'data:' + agentRef.photoContentType + ';base64,' + agentRef.photo"
+                  alt=""
+                  (click)="openFile(agentRef.photo, agentRef.photoContentType)"
+                />
+              } @else {
+                <span class="pec-fiche__init">{{ initiales() }}</span>
+              }
+              <span class="pec-fiche__id">
+                <span class="pec-fiche__nom">{{ identite() }}</span>
+                <span class="pec-fiche__mat">{{ agentRef.matricule }}</span>
+                @if (agentRef.fonction) {
+                  <span class="pec-fiche__meta">{{ agentRef.fonction }}</span>
+                }
+              </span>
+            </div>
+          </div>
+        </section>
+
+        <section class="pec-panneau">
+          <div class="pec-panneau__tete">
+            <span class="pec-panneau__titre" jhiTranslate="peccnssApp.agent.rattachement">Rattachement</span>
+          </div>
+          <div class="pec-panneau__corps">
+            <dl class="pec-defs">
+              <dt jhiTranslate="peccnssApp.agent.direction">Direction</dt>
+              <dd>
+                @if (agentRef.direction) {
+                  <a [routerLink]="['/direction', agentRef.direction.id, 'view']">{{ agentRef.direction.nom }}</a>
+                } @else {
+                  <span class="pec-muted">—</span>
+                }
+              </dd>
+              <dt jhiTranslate="peccnssApp.agent.gestion">Gestion</dt>
+              <dd>
+                @if (agentRef.gestion) {
+                  <a [routerLink]="['/gestion', agentRef.gestion.id, 'view']">{{ agentRef.gestion.nom }}</a>
+                } @else {
+                  <span class="pec-muted">—</span>
+                }
+              </dd>
+            </dl>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </div>
+}

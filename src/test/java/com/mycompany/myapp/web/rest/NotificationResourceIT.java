@@ -4,6 +4,7 @@ import static com.mycompany.myapp.domain.NotificationAsserts.*;
 import static com.mycompany.myapp.web.rest.TestUtil.createUpdateProxyForBean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -16,6 +17,7 @@ import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.domain.enumeration.TypeNotification;
 import com.mycompany.myapp.repository.NotificationRepository;
 import com.mycompany.myapp.repository.UserRepository;
+import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.service.NotificationService;
 import com.mycompany.myapp.service.dto.NotificationDTO;
 import com.mycompany.myapp.service.mapper.NotificationMapper;
@@ -46,7 +48,7 @@ import tools.jackson.databind.ObjectMapper;
 @IntegrationTest
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
-@WithMockUser
+@WithMockUser(authorities = AuthoritiesConstants.ADMIN)
 class NotificationResourceIT {
 
     private static final String DEFAULT_TITRE = "AAAAAAAAAA";
@@ -942,6 +944,49 @@ class NotificationResourceIT {
 
         // Validate the database contains one less item
         assertDecrementedRepositoryCount(databaseSizeBeforeDelete);
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser(username = "nonadminnotificationowner")
+    void getAllNotificationsAsNonAdminOnlyReturnsOwnNotifications() throws Exception {
+        // A notification addressed to the currently authenticated (non-admin) user
+        User currentUser = UserResourceIT.createEntity();
+        currentUser.setLogin("nonadminnotificationowner");
+        em.persist(currentUser);
+        Notification ownNotification = createEntity(em);
+        ownNotification.setUtilisateur(currentUser);
+        insertedNotification = notificationRepository.saveAndFlush(ownNotification);
+
+        // A notification addressed to a different user
+        Notification otherNotification = notificationRepository.saveAndFlush(createEntity(em));
+
+        try {
+            // The list only contains the current user's own notification
+            restNotificationMockMvc
+                .perform(get(ENTITY_API_URL + "?sort=id,desc"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[*].id").value(hasItem(ownNotification.getId().intValue())))
+                .andExpect(jsonPath("$.[*].id").value(not(hasItem(otherNotification.getId().intValue()))));
+
+            // Fetching another user's notification directly by id is not found either
+            restNotificationMockMvc.perform(get(ENTITY_API_URL_ID, otherNotification.getId())).andExpect(status().isNotFound());
+
+            // Nor may it be updated or deleted
+            restNotificationMockMvc
+                .perform(
+                    put(ENTITY_API_URL_ID, otherNotification.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsBytes(notificationMapper.toDto(otherNotification)))
+                )
+                .andExpect(status().isForbidden());
+            restNotificationMockMvc.perform(delete(ENTITY_API_URL_ID, otherNotification.getId())).andExpect(status().isForbidden());
+
+            // The current user's own notification remains reachable by id
+            restNotificationMockMvc.perform(get(ENTITY_API_URL_ID, ownNotification.getId())).andExpect(status().isOk());
+        } finally {
+            notificationRepository.delete(otherNotification);
+        }
     }
 
     protected long getRepositoryCount() {

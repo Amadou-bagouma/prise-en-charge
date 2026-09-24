@@ -1,0 +1,24 @@
+<form name="confirmForm" (ngSubmit)="confirmer()">
+  <div class="modal-header">
+    <h4 class="modal-title" data-cy="confirmDialogHeading">{{ titre }}</h4>
+  </div>
+
+  <div class="modal-body">
+    <p class="mb-0">{{ message }}</p>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-cy="confirmDialogCancelButton" (click)="annuler()">
+      <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Annuler</span>
+    </button>
+
+    <button
+      type="submit"
+      [class]="ton === 'danger' ? 'btn btn-danger' : 'btn btn-accent'"
+      data-cy="confirmDialogConfirmButton"
+      [disabled]="isBusy()"
+    >
+      {{ libelleConfirmer }}
+    </button>
+  </div>
+</form>

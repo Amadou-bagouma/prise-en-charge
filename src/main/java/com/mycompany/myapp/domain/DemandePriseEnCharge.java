@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.mycompany.myapp.domain.enumeration.PrioriteDemande;
 import com.mycompany.myapp.domain.enumeration.StatutDemande;
 import com.mycompany.myapp.domain.enumeration.TypeBeneficiaire;
-import com.mycompany.myapp.domain.enumeration.TypeSoin;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serial;
@@ -23,7 +22,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Table(name = "demande_prise_en_charge")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @SuppressWarnings("common-java:DuplicatedBlocks")
-public class DemandePriseEnCharge implements Serializable {
+public class DemandePriseEnCharge extends AbstractAuditingEntity<Long> implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -83,11 +82,22 @@ public class DemandePriseEnCharge implements Serializable {
     @JsonIgnoreProperties(value = { "agent" }, allowSetters = true)
     private AyantDroit ayantDroit;
 
-    @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "demande_prise_en_charge_type_soin", joinColumns = @JoinColumn(name = "demande_prise_en_charge_id"))
-    @Column(name = "type_soin")
-    @Enumerated(EnumType.STRING)
+    /**
+     * Les types de soin demandes, choisis dans le referentiel.
+     *
+     * <p>C'etait une enumeration figee dans le code ; c'est desormais une table, pour que
+     * l'administration puisse ajouter une categorie sans livraison. Les quatre categories de
+     * l'imprime officiel y sont livrees comme donnees de reference.
+     */
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "rel_demande_prise_en_charge__type_soin",
+        joinColumns = @JoinColumn(name = "demande_prise_en_charge_id"),
+        inverseJoinColumns = @JoinColumn(name = "type_soin_id")
+    )
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @BatchSize(size = 20)
+    @JsonIgnoreProperties(value = { "demandes" }, allowSetters = true)
     private Set<TypeSoin> typeSoins = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)

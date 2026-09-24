@@ -4,11 +4,15 @@
     "browsehappy": "You are using an <strong>outdated</strong> browser. Please <a href=\"https://browsehappy.com/?locale=en\">upgrade your browser</a> to improve your experience.",
     "menu": {
       "home": "Home",
+      "referentiel": {
+        "main": "Reference data"
+      },
       "jhipster-needle-menu-add-element": "JHipster will add additional menu entries here (do not translate!)",
       "entities": {
         "main": "Entities",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)",
         "adminAuthority": "Authority",
+        "profil": "Profil",
         "gestion": "Gestion",
         "region": "Region",
         "direction": "Direction",
@@ -20,7 +24,8 @@
         "tache": "Tache",
         "boiteReception": "Boite Reception",
         "notification": "Notification",
-        "historiqueAction": "Historique Action"
+        "historiqueAction": "Historique Action",
+        "typeSoin": "Care type"
       },
       "account": {
         "main": "Account",
@@ -157,5 +162,5 @@
       "not.image": "File was expected to be an image but was found to be \"{{ fileType }}\""
     }
   },
-  "footer": "This is your footer"
+  "footer": "Caisse Nationale de Sécurité Sociale — Niger"
 }

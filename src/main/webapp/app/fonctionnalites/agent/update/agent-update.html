@@ -1,0 +1,190 @@
+<div class="d-flex justify-content-center">
+  <div class="col-12 col-xl-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm" class="jhi-form-panel">
+      <h2 id="jhi-agent-heading" data-cy="AgentCreateUpdateHeading" jhiTranslate="peccnssApp.agent.home.createOrEditLabel">
+        Create or edit a Agent
+      </h2>
+
+      <jhi-alert-error />
+
+      @if (editForm.controls.id.value !== null) {
+        <div class="jhi-field mb-3">
+          <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
+          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+        </div>
+      }
+
+      <div class="jhi-form-grid">
+        @let matriculeRef = editForm.get('matricule')!;
+        <div class="jhi-field">
+          <label class="form-label" for="field_matricule" jhiTranslate="peccnssApp.agent.matricule">Matricule</label>
+          <input type="text" class="form-control" name="matricule" id="field_matricule" data-cy="matricule" formControlName="matricule" />
+          @if (matriculeRef.invalid && (matriculeRef.dirty || matriculeRef.touched)) {
+            <div>
+              @if (matriculeRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="jhi-field">
+          <label class="form-label" for="field_dateNaissance" jhiTranslate="peccnssApp.agent.dateNaissance">Date Naissance</label>
+          <div class="input-group">
+            <input
+              id="field_dateNaissance"
+              data-cy="dateNaissance"
+              type="text"
+              class="form-control"
+              name="dateNaissance"
+              ngbDatepicker
+              #dateNaissanceDp="ngbDatepicker"
+              formControlName="dateNaissance"
+            />
+            <button type="button" class="btn btn-secondary" (click)="dateNaissanceDp.toggle()"><fa-icon icon="calendar-alt" /></button>
+          </div>
+        </div>
+
+        <div class="jhi-field">
+          <label class="form-label" for="field_dateEmbauche" jhiTranslate="peccnssApp.agent.dateEmbauche">Date Embauche</label>
+          <div class="input-group">
+            <input
+              id="field_dateEmbauche"
+              data-cy="dateEmbauche"
+              type="text"
+              class="form-control"
+              name="dateEmbauche"
+              ngbDatepicker
+              #dateEmbaucheDp="ngbDatepicker"
+              formControlName="dateEmbauche"
+            />
+            <button type="button" class="btn btn-secondary" (click)="dateEmbaucheDp.toggle()"><fa-icon icon="calendar-alt" /></button>
+          </div>
+        </div>
+
+        @let nomRef = editForm.get('nom')!;
+        <div class="jhi-field">
+          <label class="form-label" for="field_nom" jhiTranslate="peccnssApp.agent.nom">Nom</label>
+          <input type="text" class="form-control" name="nom" id="field_nom" data-cy="nom" formControlName="nom" />
+          @if (nomRef.invalid && (nomRef.dirty || nomRef.touched)) {
+            <div>
+              @if (nomRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let prenomRef = editForm.get('prenom')!;
+        <div class="jhi-field">
+          <label class="form-label" for="field_prenom" jhiTranslate="peccnssApp.agent.prenom">Prenom</label>
+          <input type="text" class="form-control" name="prenom" id="field_prenom" data-cy="prenom" formControlName="prenom" />
+          @if (prenomRef.invalid && (prenomRef.dirty || prenomRef.touched)) {
+            <div>
+              @if (prenomRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="jhi-field">
+          <label class="form-label" for="field_telephone" jhiTranslate="peccnssApp.agent.telephone">Telephone</label>
+          <input type="text" class="form-control" name="telephone" id="field_telephone" data-cy="telephone" formControlName="telephone" />
+        </div>
+
+        <div class="jhi-field">
+          <label class="form-label" for="field_fonction" jhiTranslate="peccnssApp.agent.fonction">Fonction</label>
+          <input type="text" class="form-control" name="fonction" id="field_fonction" data-cy="fonction" formControlName="fonction" />
+        </div>
+
+        <div class="jhi-field">
+          <label class="form-label" for="field_photo" jhiTranslate="peccnssApp.agent.photo">Photo</label>
+          @if (editForm.get('photo')!.value) {
+            <div>
+              <img
+                [src]="'data:' + editForm.get('photoContentType')!.value + ';base64,' + editForm.get('photo')!.value"
+                style="max-height: 100px"
+                alt="agent photo"
+              />
+              <div>
+                {{ editForm.get('photoContentType')!.value }}, {{ byteSize(editForm.get('photo')!.value) }}
+                <button type="button" (click)="clearInputImage('photo', 'photoContentType', 'file_photo')" class="btn btn-secondary btn-sm">
+                  <fa-icon icon="times" />
+                </button>
+              </div>
+            </div>
+          }
+          <input type="file" (change)="setFileData($event, 'photo', true)" accept="image/*" id="file_photo" data-cy="photo" />
+          <input
+            type="hidden"
+            class="form-control"
+            name="photo"
+            id="field_photo"
+            data-cy="photo"
+            formControlName="photo"
+            [class.valid]="!editForm.get('photo')!.invalid"
+            [class.invalid]="editForm.get('photo')!.invalid"
+          />
+          <input
+            type="hidden"
+            class="form-control"
+            name="photoContentType"
+            id="field_photoContentType"
+            formControlName="photoContentType"
+          />
+        </div>
+
+        <div class="jhi-field">
+          <label class="form-label" for="field_direction" jhiTranslate="peccnssApp.agent.direction">Direction</label>
+          <select
+            class="form-control"
+            id="field_direction"
+            data-cy="direction"
+            name="direction"
+            formControlName="direction"
+            [compareWith]="compareDirection"
+          >
+            <option [ngValue]="null"></option>
+            @for (directionOption of directionsSharedCollection(); track $index) {
+              <option [ngValue]="directionOption">{{ directionOption.nom }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="jhi-field">
+          <label class="form-label" for="field_gestion" jhiTranslate="peccnssApp.agent.gestion">Gestion</label>
+          <select
+            class="form-control"
+            id="field_gestion"
+            data-cy="gestion"
+            name="gestion"
+            formControlName="gestion"
+            [compareWith]="compareGestion"
+          >
+            <option [ngValue]="null"></option>
+            @for (gestionOption of gestionsSharedCollection(); track $index) {
+              <option [ngValue]="gestionOption">{{ gestionOption.nom }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="jhi-form-actions">
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-accent"
+        >
+          <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

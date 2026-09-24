@@ -1,0 +1,48 @@
+@if (demandePriseEnCharge) {
+  <form name="rejectForm" (ngSubmit)="confirmReject(demandePriseEnCharge.id)">
+    <div class="modal-header">
+      <h4 class="modal-title" data-cy="demandePriseEnChargeRejectDialogHeading" jhiTranslate="peccnssApp.demandePriseEnCharge.reject.title">
+        Return request to author
+      </h4>
+    </div>
+
+    <div class="modal-body">
+      <jhi-alert-error />
+      <p
+        id="jhi-reject-demandePriseEnCharge-heading"
+        jhiTranslate="peccnssApp.demandePriseEnCharge.reject.question"
+        [translateValues]="{ id: demandePriseEnCharge.id }"
+      >
+        Are you sure you want to return Demande Prise En Charge {{ demandePriseEnCharge.id }} to its author for correction?
+      </p>
+      <div class="form-group">
+        <label class="form-label" for="reject-motif" jhiTranslate="peccnssApp.demandePriseEnCharge.reject.motifLabel">Reason</label>
+        <textarea
+          class="form-control"
+          id="reject-motif"
+          name="motif"
+          rows="3"
+          required
+          [(ngModel)]="motif"
+          data-cy="demandePriseEnChargeRejectMotif"
+        ></textarea>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="cancel()">
+        <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+      </button>
+
+      <button
+        id="jhi-confirm-reject-demandePriseEnCharge"
+        data-cy="entityConfirmRejectButton"
+        type="submit"
+        class="btn btn-danger"
+        [disabled]="!motif.trim() || isSaving()"
+      >
+        <fa-icon icon="times" />&nbsp;<span jhiTranslate="peccnssApp.demandePriseEnCharge.reject.confirm">Return</span>
+      </button>
+    </div>
+  </form>
+}

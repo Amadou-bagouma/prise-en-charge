@@ -46,7 +46,12 @@
       "typeSoins": "Types Soin",
       "etablissementSante": "Etablissement Sante",
       "gestionnaireCreateur": "Gestionnaire Createur",
-      "assigneA": "Assigne A"
+      "assigneA": "Assigne A",
+      "pieces": {
+        "titre": "Supporting documents",
+        "ajouter": "Attach a document",
+        "aucune": "No supporting document is attached to this request."
+      }
     }
   }
 }

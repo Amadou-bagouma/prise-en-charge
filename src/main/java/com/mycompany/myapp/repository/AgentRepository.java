@@ -37,4 +37,6 @@ public interface AgentRepository extends JpaRepository<Agent, Long>, JpaSpecific
 
     @Query("select agent from Agent agent left join fetch agent.direction left join fetch agent.gestion where agent.id =:id")
     Optional<Agent> findOneWithToOneRelationships(@Param("id") Long id);
+
+    Optional<Agent> findByMatricule(String matricule);
 }

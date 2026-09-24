@@ -9,5 +9,7 @@ export class Account {
     public login: string,
     public imageUrl: string | null,
     public mustChangePassword?: boolean,
+    /** Profil affecté à l'agent : c'est lui qui détermine ses authorities. */
+    public profil?: { id: number; nom?: string | null } | null,
   ) {}
 }

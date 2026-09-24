@@ -4,6 +4,7 @@ import static com.mycompany.myapp.domain.DemandePriseEnChargeAsserts.*;
 import static com.mycompany.myapp.web.rest.TestUtil.createUpdateProxyForBean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -13,13 +14,14 @@ import com.mycompany.myapp.domain.Agent;
 import com.mycompany.myapp.domain.AyantDroit;
 import com.mycompany.myapp.domain.DemandePriseEnCharge;
 import com.mycompany.myapp.domain.EtablissementSante;
+import com.mycompany.myapp.domain.TypeSoin;
 import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.domain.enumeration.PrioriteDemande;
 import com.mycompany.myapp.domain.enumeration.StatutDemande;
 import com.mycompany.myapp.domain.enumeration.TypeBeneficiaire;
-import com.mycompany.myapp.domain.enumeration.TypeSoin;
 import com.mycompany.myapp.repository.DemandePriseEnChargeRepository;
 import com.mycompany.myapp.repository.UserRepository;
+import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.service.DemandePriseEnChargeService;
 import com.mycompany.myapp.service.dto.DemandePriseEnChargeDTO;
 import com.mycompany.myapp.service.mapper.DemandePriseEnChargeMapper;
@@ -50,7 +52,7 @@ import tools.jackson.databind.ObjectMapper;
 @IntegrationTest
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
-@WithMockUser
+@WithMockUser(authorities = { AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER })
 class DemandePriseEnChargeResourceIT {
 
     private static final String DEFAULT_REFERENCE = "AAAAAAAAAA";
@@ -144,7 +146,7 @@ class DemandePriseEnChargeResourceIT {
         em.persist(user);
         em.flush();
         demandePriseEnCharge.setGestionnaireCreateur(user);
-        demandePriseEnCharge.addTypeSoin(TypeSoin.CONSULTATIONS);
+        demandePriseEnCharge.addTypeSoin(typeSoinParCode(em, TypeSoin.CODE_CONSULTATIONS));
         return demandePriseEnCharge;
     }
 
@@ -172,8 +174,17 @@ class DemandePriseEnChargeResourceIT {
         em.persist(user);
         em.flush();
         updatedDemandePriseEnCharge.setGestionnaireCreateur(user);
-        updatedDemandePriseEnCharge.addTypeSoin(TypeSoin.EXAMENS_MEDICAUX);
+        updatedDemandePriseEnCharge.addTypeSoin(typeSoinParCode(em, TypeSoin.CODE_EXAMENS_MEDICAUX));
         return updatedDemandePriseEnCharge;
+    }
+
+    /**
+     * Les quatre categories de l'imprime officiel sont livrees par Liquibase, dans tous les
+     * environnements y compris les tests. On les retrouve par leur code plutot que par leur
+     * identifiant : le code est la cle stable du referentiel.
+     */
+    private static TypeSoin typeSoinParCode(EntityManager em, String code) {
+        return em.createQuery("select t from TypeSoin t where t.code = :code", TypeSoin.class).setParameter("code", code).getSingleResult();
     }
 
     @BeforeEach
@@ -1286,6 +1297,52 @@ class DemandePriseEnChargeResourceIT {
 
         // Validate the database contains one less item
         assertDecrementedRepositoryCount(databaseSizeBeforeDelete);
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser(username = "nonadmindemandeowner", authorities = AuthoritiesConstants.USER)
+    void getAllDemandePriseEnChargesAsPlainUserOnlyReturnsOwnDemandes() throws Exception {
+        // A demande created by the currently authenticated (plain, non-validator) user
+        User currentUser = UserResourceIT.createEntity();
+        currentUser.setLogin("nonadmindemandeowner");
+        em.persist(currentUser);
+        DemandePriseEnCharge ownDemande = createEntity(em);
+        ownDemande.setGestionnaireCreateur(currentUser);
+        insertedDemandePriseEnCharge = demandePriseEnChargeRepository.saveAndFlush(ownDemande);
+
+        // A demande created by (and assigned to) a different user
+        DemandePriseEnCharge otherDemande = demandePriseEnChargeRepository.saveAndFlush(createEntity(em));
+
+        try {
+            // The list only contains the current user's own demande
+            restDemandePriseEnChargeMockMvc
+                .perform(get(ENTITY_API_URL + "?sort=id,desc"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[*].id").value(hasItem(ownDemande.getId().intValue())))
+                .andExpect(jsonPath("$.[*].id").value(not(hasItem(otherDemande.getId().intValue()))));
+
+            // Fetching another user's demande directly by id, or its rapport, is forbidden
+            restDemandePriseEnChargeMockMvc.perform(get(ENTITY_API_URL_ID, otherDemande.getId())).andExpect(status().isForbidden());
+            restDemandePriseEnChargeMockMvc
+                .perform(get(ENTITY_API_URL_ID + "/rapport", otherDemande.getId()))
+                .andExpect(status().isForbidden());
+
+            // Nor may it be updated
+            DemandePriseEnChargeDTO otherDto = demandePriseEnChargeMapper.toDto(otherDemande);
+            restDemandePriseEnChargeMockMvc
+                .perform(
+                    put(ENTITY_API_URL_ID, otherDemande.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsBytes(otherDto))
+                )
+                .andExpect(status().isForbidden());
+
+            // The current user's own demande remains reachable by id
+            restDemandePriseEnChargeMockMvc.perform(get(ENTITY_API_URL_ID, ownDemande.getId())).andExpect(status().isOk());
+        } finally {
+            demandePriseEnChargeRepository.delete(otherDemande);
+        }
     }
 
     protected long getRepositoryCount() {

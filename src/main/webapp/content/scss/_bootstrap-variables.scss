@@ -18,18 +18,32 @@ $enable-print-styles: true;
 // Components:
 // Define common padding and border radius sizes and more.
 
-$border-radius: 0.15rem;
-$border-radius-lg: 0.125rem;
-$border-radius-sm: 0.1rem;
+$border-radius: 5px; // --radius-md
+$border-radius-lg: 8px; // --radius-lg
+$border-radius-sm: 3px; // --radius-sm
+
+// Theme colors:
+// Rethemed from the CNSS design system tokens (design-system/tokens.css) rather than replacing
+// Bootstrap, per ADAPTATION.md step 1. Sass variables compile once at build time and cannot read
+// the CSS custom properties in tokens.css, so these are the *light*-theme hex values only -
+// Bootstrap's own components (alerts, badges, form validation) will not react to
+// [data-theme="dark"] until that limitation is revisited; app-authored styles already do, via the
+// --jhi-* aliases in global.scss.
+$primary: #0060a8; // --brand-600
+$success: #0c6b3f; // --ok-600
+$warning: #8a5000; // --warn-600
+$danger: #b3101f; // --danger-600
+$info: #0060a8; // --info-600 (same blue as brand in this system)
 
 // Body:
 // Settings for the `<body>` element.
 
-$body-bg: #ffffff;
+$body-bg: #eef2f7; // --surface-000
 
 // Typography:
 // Font, line-height, and color for body text, headings, and more.
 
+$font-family-sans-serif: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
 $font-size-base: 1rem;
 
 $dropdown-link-hover-color: white;
