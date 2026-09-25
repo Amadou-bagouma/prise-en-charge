@@ -11,8 +11,14 @@
 
   <div class="carte-card">
     <div class="carte-card__header">
-      <span jhiTranslate="peccnssApp.carteBeneficiaire.printView.organism">Caisse Nationale de Sécurité Sociale</span>
-      <span class="carte-card__title" jhiTranslate="peccnssApp.carteBeneficiaire.printView.title">Carte de bénéficiaire</span>
+      <img class="carte-card__logo" src="content/images/logo-cnss.png" alt="CNSS" />
+      <div class="carte-card__header-text">
+        <span jhiTranslate="peccnssApp.carteBeneficiaire.printView.organism">Caisse Nationale de Sécurité Sociale</span>
+        <span class="carte-card__title" jhiTranslate="peccnssApp.carteBeneficiaire.printView.title">Carte de bénéficiaire</span>
+        <span class="carte-card__numero">
+          <span jhiTranslate="peccnssApp.carteBeneficiaire.printView.numero">N° de carte</span> : {{ carte.numeroCarte }}
+        </span>
+      </div>
     </div>
 
     <div class="carte-card__body">
@@ -29,6 +35,7 @@
 
         @if (carte.typeBeneficiaire === 'AGENT') {
           <div><span jhiTranslate="peccnssApp.carteBeneficiaire.printView.matricule">Matricule</span> : {{ matricule() }}</div>
+          <div><span jhiTranslate="peccnssApp.carteBeneficiaire.printView.fonction">Fonction</span> : {{ agent()?.fonction }}</div>
         } @else {
           <div>
             <span jhiTranslate="peccnssApp.carteBeneficiaire.printView.lien">Lien de parenté</span> :
@@ -36,8 +43,6 @@
           </div>
           <div><span jhiTranslate="peccnssApp.carteBeneficiaire.printView.matricule">Matricule</span> : {{ matricule() }}</div>
         }
-
-        <div><span jhiTranslate="peccnssApp.carteBeneficiaire.printView.numero">N° de carte</span> : {{ carte.numeroCarte }}</div>
 
         <div>
           <span jhiTranslate="peccnssApp.carteBeneficiaire.printView.validFrom">Valable du</span>

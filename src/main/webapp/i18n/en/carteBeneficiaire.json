@@ -30,6 +30,7 @@
         "title": "Beneficiary card",
         "organism": "Caisse Nationale de Sécurité Sociale",
         "numero": "Card No.",
+        "fonction": "Position",
         "matricule": "Employee ID",
         "lien": "Relationship",
         "validFrom": "Valid from",

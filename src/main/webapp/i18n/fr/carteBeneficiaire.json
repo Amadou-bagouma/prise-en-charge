@@ -30,6 +30,7 @@
         "title": "Carte de bénéficiaire",
         "organism": "Caisse Nationale de Sécurité Sociale",
         "numero": "N° de carte",
+        "fonction": "Fonction",
         "matricule": "Matricule",
         "lien": "Lien de parenté",
         "validFrom": "Valable du",
