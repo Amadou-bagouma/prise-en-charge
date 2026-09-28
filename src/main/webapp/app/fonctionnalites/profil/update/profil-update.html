@@ -1,79 +1,116 @@
-<div class="d-flex justify-content-center">
-  <div class="col-12 col-xl-5">
-    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm" class="jhi-form-panel">
-      <h2 id="jhi-profil-heading" data-cy="ProfilCreateUpdateHeading" jhiTranslate="peccnssApp.profil.home.createOrEditLabel">
-        Create or edit a Profil
-      </h2>
-
-      <jhi-alert-error />
-
-      @if (editForm.controls.id.value !== null) {
-        <div class="jhi-field mb-3">
-          <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
-          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
-        </div>
+<div class="pec-ecran">
+  <div class="pec-titre-ecran">
+    <h1 id="jhi-profil-heading" data-cy="ProfilCreateUpdateHeading">
+      @if (editForm.controls.id.value === null) {
+        Créer un profil
+      } @else {
+        Modifier le profil
       }
-
-      @let nomRef = editForm.get('nom')!;
-      <div class="jhi-field">
-        <label class="form-label" for="field_nom" jhiTranslate="peccnssApp.profil.nom">Nom</label>
-        <input type="text" class="form-control" name="nom" id="field_nom" data-cy="nom" formControlName="nom" />
-        @if (nomRef.invalid && (nomRef.dirty || nomRef.touched)) {
-          <div>
-            @if (nomRef.errors?.required) {
-              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-            }
-          </div>
-        }
-      </div>
-
-      <div class="jhi-field">
-        <label class="form-label" for="field_description" jhiTranslate="peccnssApp.profil.description">Description</label>
-        <input
-          type="text"
-          class="form-control"
-          name="description"
-          id="field_description"
-          data-cy="description"
-          formControlName="description"
-        />
-      </div>
-
-      @let authoritiesRef = editForm.get('authorities')!;
-      <div class="jhi-field jhi-field-full">
-        <label class="form-label" for="field_authorities" jhiTranslate="peccnssApp.profil.authorities">Authorities</label>
-        <select class="form-control" id="field_authorities" multiple name="authorities" formControlName="authorities">
-          @for (authority of authorities(); track $index) {
-            <option [value]="authority">{{ authority }}</option>
-          }
-        </select>
-        <small class="form-text text-muted" jhiTranslate="peccnssApp.profil.authoritiesHelp"
-          >Every user assigned this profil gets exactly these authorities.</small
-        >
-        @if (authoritiesRef.invalid && (authoritiesRef.dirty || authoritiesRef.touched)) {
-          <div>
-            @if (authoritiesRef.errors?.required || authoritiesRef.errors?.minlength) {
-              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-            }
-          </div>
-        }
-      </div>
-
-      <div class="jhi-form-actions">
-        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
-        </button>
-
-        <button
-          type="submit"
-          id="save-entity"
-          data-cy="entityCreateSaveButton"
-          [disabled]="editForm.invalid || isSaving()"
-          class="btn btn-accent"
-        >
-          <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
-        </button>
-      </div>
-    </form>
+    </h1>
   </div>
+
+  <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+    <jhi-alert-error />
+
+    <section class="pec-panneau">
+      <div class="pec-panneau__tete">
+        <span class="pec-panneau__titre">Identification</span>
+      </div>
+      <div class="pec-panneau__corps">
+        <div class="jhi-form-grid">
+          @let nomRef = editForm.controls.nom;
+          <div class="jhi-field">
+            <label class="form-label" for="field_nom">Nom du profil</label>
+            <input type="text" class="form-control" name="nom" id="field_nom" data-cy="nom" formControlName="nom" />
+            <small class="form-text text-muted">Le nom sous lequel ce profil sera proposé à l'attribution d'un compte.</small>
+            @if (nomRef.invalid && (nomRef.dirty || nomRef.touched) && nomRef.errors?.required) {
+              <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
+            }
+          </div>
+
+          <div class="jhi-field">
+            <label class="form-label" for="field_description">Description</label>
+            <input
+              type="text"
+              class="form-control"
+              name="description"
+              id="field_description"
+              data-cy="description"
+              formControlName="description"
+            />
+            <small class="form-text text-muted">À quoi sert ce profil, en une phrase.</small>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="pec-panneau">
+      <div class="pec-panneau__tete">
+        <span class="pec-panneau__titre">
+          Droits accordés
+          @if (droitsChoisis().length > 0) {
+            <span class="pec-panneau__n">{{ droitsChoisis().length }}</span>
+          }
+        </span>
+      </div>
+      <div class="pec-panneau__corps">
+        <!--
+          Une liste à cocher, décrite en clair : composer un profil, c'est décider ce que ses
+          titulaires pourront faire. Une liste déroulante de `ROLE_*` demandait de connaître par
+          cœur ce que chaque nom recouvre, et de deviner ce qu'on accordait.
+        -->
+        <p class="pec-muted">Tout compte portant ce profil recevra exactement ces droits, et aucun autre.</p>
+
+        @if (droitsDisponibles().length === 0) {
+          <span class="pec-muted" data-cy="droitsIndisponibles">La liste des droits n'a pas pu être chargée.</span>
+        } @else {
+          <ul class="pec-droits">
+            @for (droit of droitsDisponibles(); track droit.name) {
+              <li class="pec-droits__item">
+                <label class="pec-droits__ligne" [attr.for]="'droit_' + droit.name">
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    [id]="'droit_' + droit.name"
+                    [attr.data-cy]="'droit-' + droit.name"
+                    [checked]="estAccorde(droit.name)"
+                    (change)="basculerDroit(droit.name)"
+                  />
+                  <span class="pec-droits__texte">
+                    <span class="pec-droits__libelle">{{ droit.description || droit.name }}</span>
+                    <!-- Le nom technique reste visible, en second plan : c'est lui qui apparaît
+                         dans les journaux et dans les messages d'erreur. -->
+                    <span class="pec-droits__code pec-num">{{ droit.name }}</span>
+                  </span>
+                </label>
+              </li>
+            }
+          </ul>
+        }
+
+        @let droitsRef = editForm.controls.authorities;
+        @if (droitsRef.invalid && (droitsRef.dirty || droitsRef.touched)) {
+          <small class="form-text text-danger" data-cy="droitsRequis">Un profil doit accorder au moins un droit.</small>
+        }
+      </div>
+    </section>
+
+    <div class="pec-dossier__actions">
+      <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="pec-btn pec-btn--discret" (click)="previousState()">
+        <fa-icon class="pec-btn__ico" icon="ban" />
+        <span jhiTranslate="entity.action.cancel">Annuler</span>
+      </button>
+
+      <button
+        type="submit"
+        id="save-entity"
+        data-cy="entityCreateSaveButton"
+        [disabled]="editForm.invalid || isSaving()"
+        class="pec-btn pec-btn--primaire"
+      >
+        <fa-icon class="pec-btn__ico" icon="save" />
+        <span jhiTranslate="entity.action.save">Enregistrer</span>
+      </button>
+    </div>
+  </form>
 </div>

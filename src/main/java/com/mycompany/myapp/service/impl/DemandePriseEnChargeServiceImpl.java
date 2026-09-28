@@ -332,11 +332,11 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         }
         exigerBeneficiaireCouvert(demande);
 
-        demande.setStatut(StatutDemande.EN_VERIFICATION_RH);
+        demande.setStatut(StatutDemande.EN_ATTENTE_VALIDATION_INFIRMERIE);
         demande.setDateModification(Instant.now());
         demande = demandePriseEnChargeRepository.save(demande);
-        logHistorique(demande, currentUser, "SOUMISSION", "Dossier soumis au controle RH");
-        creerTachesValidation(demande, AuthoritiesConstants.VERIFICATEUR_RH, "Verification RH");
+        logHistorique(demande, currentUser, "SOUMISSION", "Dossier soumis a l'avis de l'infirmerie du personnel");
+        creerTachesValidation(demande, AuthoritiesConstants.VALIDATEUR_INFIRMERIE, "Validation infirmerie");
         return demandePriseEnChargeMapper.toDto(demande);
     }
 
@@ -375,11 +375,15 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         StatutDemande statutSuivant;
         String action;
         switch (demande.getStatut()) {
+            // L'infirmerie se prononce en premier : c'est son avis qui dit si le soin releve du
+            // regime, et le demander en dernier ferait instruire des dossiers voues a etre
+            // ecartes. Son accord envoie le dossier au controle des pieces.
             case EN_ATTENTE_VALIDATION_INFIRMERIE -> {
                 requireAuthority(AuthoritiesConstants.VALIDATEUR_INFIRMERIE);
-                statutSuivant = StatutDemande.EN_ATTENTE_VALIDATION_DRH;
+                statutSuivant = StatutDemande.EN_VERIFICATION_RH;
                 action = "VALIDATION_INFIRMERIE";
             }
+            // La DRH tranche en dernier, une fois l'avis medical donne et les pieces verifiees.
             case EN_ATTENTE_VALIDATION_DRH -> {
                 requireAuthority(AuthoritiesConstants.VALIDATEUR_DRH);
                 statutSuivant = StatutDemande.VALIDEE;
@@ -396,8 +400,8 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         demande = demandePriseEnChargeRepository.save(demande);
         logHistorique(demande, currentUser, action, commentaire);
         cloturerTachesValidation(demande.getId());
-        if (statutSuivant == StatutDemande.EN_ATTENTE_VALIDATION_DRH) {
-            creerTachesValidation(demande, AuthoritiesConstants.VALIDATEUR_DRH, "Validation DRH");
+        if (statutSuivant == StatutDemande.EN_VERIFICATION_RH) {
+            creerTachesValidation(demande, AuthoritiesConstants.VERIFICATEUR_RH, "Verification RH");
         } else if (statutSuivant == StatutDemande.VALIDEE && demande.getGestionnaireCreateur() != null) {
             creerNotification(
                 demande.getGestionnaireCreateur(),
@@ -507,14 +511,15 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         if (demande.getGestionnaireCreateur() == null || !currentUser.getId().equals(demande.getGestionnaireCreateur().getId())) {
             throw new AccessDeniedException("Seul l'auteur de la demande peut la resoumettre");
         }
-        // Le dossier corrige repasse par le controle : sauter l'etape reviendrait a faire
-        // valider des pieces que personne n'a revues depuis la correction.
-        demande.setStatut(StatutDemande.EN_VERIFICATION_RH);
+        // Le dossier corrige repart au debut du circuit : une correction peut porter sur le soin
+        // lui-meme, et sauter l'avis medical reviendrait a valider administrativement quelque
+        // chose que l'infirmerie n'a pas revu.
+        demande.setStatut(StatutDemande.EN_ATTENTE_VALIDATION_INFIRMERIE);
         demande.setMotifRejet(null);
         demande.setDateModification(Instant.now());
         demande = demandePriseEnChargeRepository.save(demande);
-        logHistorique(demande, currentUser, "RESOUMISSION", "Dossier corrige et resoumis au controle RH");
-        creerTachesValidation(demande, AuthoritiesConstants.VERIFICATEUR_RH, "Verification RH");
+        logHistorique(demande, currentUser, "RESOUMISSION", "Dossier corrige et resoumis a l'avis de l'infirmerie");
+        creerTachesValidation(demande, AuthoritiesConstants.VALIDATEUR_INFIRMERIE, "Validation infirmerie");
         return demandePriseEnChargeMapper.toDto(demande);
     }
 

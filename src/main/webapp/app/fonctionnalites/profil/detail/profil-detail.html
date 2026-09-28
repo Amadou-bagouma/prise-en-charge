@@ -1,44 +1,80 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    @if (profil(); as profilRef) {
-      <div class="jhi-form-panel">
-        <h2 data-cy="profilDetailsHeading"><span jhiTranslate="peccnssApp.profil.detail.title">Profil</span></h2>
+@if (profil(); as profilRef) {
+  <div class="pec-ecran">
+    <div class="pec-titre-ecran">
+      <h1 data-cy="profilDetailsHeading">{{ profilRef.nom }}</h1>
+      <span class="pec-muted">
+        {{ profilRef.authorities?.length ?? 0 }} droit{{ (profilRef.authorities?.length ?? 0) > 1 ? 's' : '' }}
+      </span>
+    </div>
 
-        <hr />
+    <jhi-alert-error />
+    <jhi-alert />
 
-        <jhi-alert-error />
-
-        <jhi-alert />
-
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="global.field.id">ID</span></dt>
-          <dd>
-            <span>{{ profilRef.id }}</span>
-          </dd>
-          <dt><span jhiTranslate="peccnssApp.profil.nom">Nom</span></dt>
-          <dd>
-            <span>{{ profilRef.nom }}</span>
-          </dd>
-          <dt><span jhiTranslate="peccnssApp.profil.description">Description</span></dt>
-          <dd>
-            <span>{{ profilRef.description }}</span>
-          </dd>
-          <dt><span jhiTranslate="peccnssApp.profil.authorities">Authorities</span></dt>
-          <dd>
-            @for (authority of profilRef.authorities; track authority) {
-              <span class="jhi-badge me-1">{{ authority }}</span>
-            }
-          </dd>
-        </dl>
-
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
-        </button>
-
-        <button type="button" [routerLink]="['/profil', profilRef.id, 'edit']" class="btn btn-accent">
-          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
-        </button>
+    <section class="pec-panneau">
+      <div class="pec-panneau__tete">
+        <span class="pec-panneau__titre">Identification</span>
       </div>
-    }
+      <div class="pec-panneau__corps">
+        <dl class="pec-defs">
+          <dt>Nom</dt>
+          <dd>{{ profilRef.nom }}</dd>
+
+          <dt>Description</dt>
+          <dd>{{ profilRef.description || '—' }}</dd>
+        </dl>
+      </div>
+    </section>
+
+    <section class="pec-panneau">
+      <div class="pec-panneau__tete">
+        <span class="pec-panneau__titre">
+          Droits accordés
+          @if ((profilRef.authorities?.length ?? 0) > 0) {
+            <span class="pec-panneau__n">{{ profilRef.authorities?.length }}</span>
+          }
+        </span>
+      </div>
+      <div class="pec-panneau__corps">
+        @if (!profilRef.authorities || profilRef.authorities.length === 0) {
+          <!-- Un profil sans droit est un profil dont les titulaires ne peuvent rien faire :
+               le dire, plutôt que d'afficher une liste vide sans explication. -->
+          <span class="pec-muted" data-cy="profilSansDroit">
+            Ce profil n'accorde aucun droit. Les comptes qui le portent ne pourront rien faire dans l'application.
+          </span>
+        } @else {
+          <p class="pec-muted">Tout compte portant ce profil reçoit exactement ces droits, et aucun autre.</p>
+          <ul class="pec-droits">
+            @for (droit of profilRef.authorities; track droit) {
+              <li class="pec-droits__item">
+                <div class="pec-droits__ligne">
+                  <fa-icon icon="check" />
+                  <span class="pec-droits__texte">
+                    <span class="pec-droits__libelle">{{ description(droit) }}</span>
+                    <span class="pec-droits__code pec-num">{{ droit }}</span>
+                  </span>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    </section>
+
+    <div class="pec-dossier__actions">
+      <button type="button" [routerLink]="['/profil', profilRef.id, 'edit']" class="pec-btn pec-btn--primaire" data-cy="entityEditButton">
+        <fa-icon class="pec-btn__ico" icon="pencil-alt" />
+        <span jhiTranslate="entity.action.edit">Editer</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="previousState()"
+        class="pec-btn pec-btn--discret pec-dossier__actions--fin"
+        data-cy="entityDetailsBackButton"
+      >
+        <fa-icon class="pec-btn__ico" icon="arrow-left" />
+        <span jhiTranslate="entity.action.back">Retour</span>
+      </button>
+    </div>
   </div>
-</div>
+}

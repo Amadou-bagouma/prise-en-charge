@@ -28,8 +28,22 @@ export class ProfilUpdate implements OnInit {
   protected activatedRoute = inject(ActivatedRoute);
   protected readonly confirmService = inject(ConfirmService);
   protected readonly authorityService = inject(AuthorityService);
+
+  /**
+   * Les droits proposés, avec leur description.
+   *
+   * Lus au serveur plutôt que codés en dur : la liste est administrable, et une liste figée ici
+   * s'en écarterait au premier ajout. La description vient de `InitialisationHabilitations`.
+   */
   // eslint-disable-next-line @typescript-eslint/member-ordering
-  readonly authorities = computed(() => this.authorityService.authorities().map(authority => authority.name));
+  readonly droitsDisponibles = computed(() => this.authorityService.authorities());
+
+  /** Les droits actuellement cochés, lus dans le formulaire. */
+  // eslint-disable-next-line @typescript-eslint/member-ordering
+  readonly droitsChoisis = computed(() => this.droitsCoches());
+
+  // eslint-disable-next-line @typescript-eslint/member-ordering
+  private readonly droitsCoches = signal<string[]>([]);
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   editForm: ProfilFormGroup = this.profilFormService.createProfilFormGroup();
@@ -42,6 +56,26 @@ export class ProfilUpdate implements OnInit {
         this.updateForm(profil);
       }
     });
+  }
+
+  /** Vrai si ce droit est accordé par le profil en cours d'édition. */
+  estAccorde(nom: string): boolean {
+    return this.droitsCoches().includes(nom);
+  }
+
+  /**
+   * Coche ou décoche un droit, et reporte la liste dans le formulaire.
+   *
+   * Le contrôle est marqué modifié : sans cela, le message « au moins un droit » ne
+   * s'afficherait jamais tant que l'agent n'aurait pas touché un autre champ.
+   */
+  basculerDroit(nom: string): void {
+    const courant = this.droitsCoches();
+    const suivant = courant.includes(nom) ? courant.filter(droit => droit !== nom) : [...courant, nom];
+    this.droitsCoches.set(suivant);
+    this.editForm.controls.authorities.setValue(suivant);
+    this.editForm.controls.authorities.markAsDirty();
+    this.editForm.controls.authorities.markAsTouched();
   }
 
   previousState(): void {
@@ -82,5 +116,6 @@ export class ProfilUpdate implements OnInit {
   protected updateForm(profil: IProfil): void {
     this.profil = profil;
     this.profilFormService.resetForm(this.editForm, profil);
+    this.droitsCoches.set([...(profil.authorities ?? [])]);
   }
 }

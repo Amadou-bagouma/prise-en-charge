@@ -51,14 +51,20 @@ export class ChargeTravailService {
     });
   }
 
-  /** Les statuts sur lesquels l'agent courant a la main. */
+  /**
+   * Les statuts sur lesquels l'agent courant a la main, dans l'ordre du circuit :
+   * infirmerie, puis contrôle RH, puis DRH.
+   */
   private statutsQuiMAttendent(): string[] {
     const statuts: string[] = [];
-    if (this.accountService.hasAnyAuthority(Authority.VALIDATEUR_DRH)) {
-      statuts.push('EN_ATTENTE_VALIDATION_DRH');
-    }
     if (this.accountService.hasAnyAuthority(Authority.VALIDATEUR_INFIRMERIE)) {
       statuts.push('EN_ATTENTE_VALIDATION_INFIRMERIE');
+    }
+    if (this.accountService.hasAnyAuthority(Authority.VERIFICATEUR_RH)) {
+      statuts.push('EN_VERIFICATION_RH');
+    }
+    if (this.accountService.hasAnyAuthority(Authority.VALIDATEUR_DRH)) {
+      statuts.push('EN_ATTENTE_VALIDATION_DRH');
     }
     // Un gestionnaire sans rôle de validation suit ce qui lui revient à corriger.
     if (statuts.length === 0) {

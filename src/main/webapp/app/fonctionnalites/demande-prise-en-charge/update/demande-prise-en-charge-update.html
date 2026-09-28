@@ -153,27 +153,16 @@
       </div>
 
       <h3 class="jhi-form-section">Suivi</h3>
+      <!--
+        Seuls la priorité et l'observation se saisissent ici. Le statut, les dates, le motif
+        de rejet et les intervenants sont posés par le circuit et par le serveur : les
+        présenter dans un formulaire revenait à offrir des champs que l'enregistrement
+        ignore, ce qui apprend à se méfier de l'écran.
+      -->
       <div class="jhi-form-grid">
-        <div class="jhi-field">
-          <label class="form-label" for="field_statut" jhiTranslate="peccnssApp.demandePriseEnCharge.statut">Statut</label>
-          <input
-            type="text"
-            class="form-control"
-            name="statut"
-            id="field_statut"
-            data-cy="statut"
-            [value]="
-              editForm.get('statut')!.value
-                ? ('peccnssApp.StatutDemande.' + editForm.get('statut')!.value | translate)
-                : ('peccnssApp.StatutDemande.null' | translate)
-            "
-            disabled
-          />
-        </div>
-
         @let prioriteRef = editForm.get('priorite')!;
         <div class="jhi-field">
-          <label class="form-label" for="field_priorite" jhiTranslate="peccnssApp.demandePriseEnCharge.priorite">Priorite</label>
+          <label class="form-label" for="field_priorite" jhiTranslate="peccnssApp.demandePriseEnCharge.priorite">Priorité</label>
           <select class="form-control" name="priorite" formControlName="priorite" id="field_priorite" data-cy="priorite">
             <option [ngValue]="null">{{ 'peccnssApp.PrioriteDemande.null' | translate }}</option>
             @for (prioriteDemande of prioriteDemandeValues; track $index) {
@@ -189,92 +178,6 @@
           }
         </div>
 
-        <div class="jhi-field">
-          <label class="form-label" for="field_dateCreation" jhiTranslate="peccnssApp.demandePriseEnCharge.dateCreation"
-            >Date Creation</label
-          >
-          <input
-            id="field_dateCreation"
-            data-cy="dateCreation"
-            type="datetime-local"
-            class="form-control"
-            name="dateCreation"
-            formControlName="dateCreation"
-            placeholder="YYYY-MM-DD HH:mm"
-          />
-          @let dateCreationRef = editForm.get('dateCreation')!;
-          @if (dateCreationRef.invalid && (dateCreationRef.dirty || dateCreationRef.touched)) {
-            <div>
-              @if (dateCreationRef.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-              <small
-                class="form-text text-danger"
-                [hidden]="!dateCreationRef.errors?.datetimelocal"
-                jhiTranslate="entity.validation.datetimelocal"
-                >This field should be a date and time.</small
-              >
-            </div>
-          }
-        </div>
-
-        <div class="jhi-field">
-          <label class="form-label" for="field_dateModification" jhiTranslate="peccnssApp.demandePriseEnCharge.dateModification"
-            >Date Modification</label
-          >
-          <input
-            id="field_dateModification"
-            data-cy="dateModification"
-            type="datetime-local"
-            class="form-control"
-            name="dateModification"
-            formControlName="dateModification"
-            placeholder="YYYY-MM-DD HH:mm"
-          />
-        </div>
-
-        <div class="jhi-field">
-          <label class="form-label" for="field_dateAssignation" jhiTranslate="peccnssApp.demandePriseEnCharge.dateAssignation"
-            >Date Assignation</label
-          >
-          <input
-            id="field_dateAssignation"
-            data-cy="dateAssignation"
-            type="datetime-local"
-            class="form-control"
-            name="dateAssignation"
-            formControlName="dateAssignation"
-            placeholder="YYYY-MM-DD HH:mm"
-          />
-        </div>
-
-        <div class="jhi-field">
-          <label class="form-label" for="field_dateEcheance" jhiTranslate="peccnssApp.demandePriseEnCharge.dateEcheance"
-            >Date Echeance</label
-          >
-          <input
-            id="field_dateEcheance"
-            data-cy="dateEcheance"
-            type="datetime-local"
-            class="form-control"
-            name="dateEcheance"
-            formControlName="dateEcheance"
-            placeholder="YYYY-MM-DD HH:mm"
-          />
-        </div>
-
-        <div class="jhi-field jhi-field-full">
-          <label class="form-label" for="field_motifRejet" jhiTranslate="peccnssApp.demandePriseEnCharge.motifRejet">Motif Rejet</label>
-          <textarea
-            class="form-control"
-            name="motifRejet"
-            id="field_motifRejet"
-            data-cy="motifRejet"
-            rows="2"
-            formControlName="motifRejet"
-          ></textarea>
-        </div>
-
         <div class="jhi-field jhi-field-full">
           <label class="form-label" for="field_observation" jhiTranslate="peccnssApp.demandePriseEnCharge.observation">Observation</label>
           <textarea
@@ -285,41 +188,6 @@
             rows="2"
             formControlName="observation"
           ></textarea>
-        </div>
-      </div>
-
-      <h3 class="jhi-form-section">Intervenants</h3>
-      <div class="jhi-form-grid">
-        <div class="jhi-field">
-          <label class="form-label" for="field_gestionnaireCreateur" jhiTranslate="peccnssApp.demandePriseEnCharge.gestionnaireCreateur"
-            >Gestionnaire Createur</label
-          >
-          <input
-            type="text"
-            class="form-control"
-            name="gestionnaireCreateur"
-            id="field_gestionnaireCreateur"
-            data-cy="gestionnaireCreateur"
-            [value]="editForm.get('gestionnaireCreateur')!.value?.login ?? ''"
-            disabled
-          />
-        </div>
-
-        <div class="jhi-field">
-          <label class="form-label" for="field_assigneA" jhiTranslate="peccnssApp.demandePriseEnCharge.assigneA">Assigne A</label>
-          <select
-            class="form-control"
-            id="field_assigneA"
-            data-cy="assigneA"
-            name="assigneA"
-            formControlName="assigneA"
-            [compareWith]="compareUser"
-          >
-            <option [ngValue]="null"></option>
-            @for (userOption of usersSharedCollection(); track $index) {
-              <option [ngValue]="userOption">{{ userOption.login }}</option>
-            }
-          </select>
         </div>
       </div>
 

@@ -1694,4 +1694,68 @@ Formulaires : lecture en deux colonnes, champs groupés, barre d'actions collant
   background: transparent;
 }
 
+/* Liste des droits d'un profil : une case a cocher par droit, decrite en clair.
+
+   Deux colonnes des que la place le permet, parce que la liste s'allonge a chaque nouvelle
+   habilitation et qu'une colonne unique obligerait a faire defiler pour comparer. */
+.pec-droits {
+  list-style: none;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-2);
+}
+
+@media (min-width: 860px) {
+  .pec-droits {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.pec-droits__item {
+  border: 1px solid var(--border-100);
+  border-radius: var(--radius-2, 6px);
+  background: var(--surface-000);
+}
+
+/* Toute la ligne est cliquable : viser une case a cocher de 16 pixels est une precision
+   inutile a exiger. */
+.pec-droits__ligne {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  margin: 0;
+  cursor: pointer;
+}
+
+.pec-droits__ligne:hover {
+  background: var(--surface-100);
+}
+
+.pec-droits__ligne:focus-within {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+
+.pec-droits__texte {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.pec-droits__libelle {
+  color: var(--ink-900);
+  line-height: 1.35;
+}
+
+/* Le nom technique reste lisible sans occuper le premier plan : c'est lui qu'on retrouve dans
+   les journaux et les messages d'erreur. */
+.pec-droits__code {
+  font-size: 0.78rem;
+  color: var(--ink-500);
+}
+
 /* jhipster-needle-scss-add-main JHipster will add new css style */

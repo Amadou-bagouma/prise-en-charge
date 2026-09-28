@@ -36,12 +36,12 @@ const ETAPES_CIRCUIT: { libelle: string; statuts: string[] }[] = [
     libelle: 'Saisie du dossier',
     statuts: ['EN_SAISIE', 'NOUVELLE', 'EN_ATTENTE_PIECES', 'A_TRAITER', 'EN_COURS_TRAITEMENT', 'RETOURNEE'],
   },
-  { libelle: 'Vérification RH', statuts: ['EN_VERIFICATION_RH'] },
-  { libelle: 'Validation DRH', statuts: ['EN_ATTENTE_VALIDATION_DRH'] },
   {
     libelle: 'Validation infirmerie',
     statuts: ['EN_ATTENTE_VALIDATION_INFIRMERIE', 'EN_ATTENTE_AVIS_MEDICAL', 'EN_ATTENTE_DECISION'],
   },
+  { libelle: 'Vérification RH', statuts: ['EN_VERIFICATION_RH'] },
+  { libelle: 'Validation DRH', statuts: ['EN_ATTENTE_VALIDATION_DRH'] },
   { libelle: 'Décision', statuts: ['VALIDEE', 'REJETEE'] },
 ];
 
@@ -307,10 +307,12 @@ export class DemandePriseEnChargeDetail {
     if (!demande) {
       return;
     }
-    const etape = this.canValiderDrh() ? 'la validation DRH' : "la validation de l'infirmerie du personnel";
+    const etape = this.canValiderDrh() ? 'la validation DRH' : "l'avis de l'infirmerie du personnel";
+    // Dire ce qui suit, pas seulement ce que l'on signe : le validateur doit savoir s'il clôt
+    // le circuit ou s'il le fait avancer d'un cran.
     const suite = this.canValiderDrh()
-      ? "La demande passera ensuite en attente de validation de l'infirmerie du personnel."
-      : 'La demande sera accordée et la prise en charge pourra être imprimée.';
+      ? 'La demande sera accordée et la prise en charge pourra être imprimée.'
+      : 'Le dossier passera ensuite au contrôle des pièces par la direction des ressources humaines.';
     this.confirmer(
       {
         titre: 'Accorder la prise en charge',
@@ -338,9 +340,9 @@ export class DemandePriseEnChargeDetail {
     }
     this.confirmer(
       {
-        titre: 'Soumettre au contrôle RH',
-        message: `Le dossier ${demande.reference ?? ''} sera transmis au contrôle de la direction des ressources humaines. Il ne pourra plus être supprimé, seulement annulé.`,
-        libelleConfirmer: 'Soumettre au contrôle',
+        titre: "Soumettre à l'avis de l'infirmerie",
+        message: `Le dossier ${demande.reference ?? ''} sera transmis à l'infirmerie du personnel, qui se prononce la première sur la prise en charge du soin. Il ne pourra plus être supprimé, seulement annulé.`,
+        libelleConfirmer: "Soumettre à l'infirmerie",
         ton: 'primaire',
       },
       () => {
