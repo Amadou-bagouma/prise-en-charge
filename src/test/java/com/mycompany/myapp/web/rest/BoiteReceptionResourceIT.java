@@ -1,567 +1,206 @@
 package com.mycompany.myapp.web.rest;
 
-import static com.mycompany.myapp.domain.BoiteReceptionAsserts.*;
-import static com.mycompany.myapp.web.rest.TestUtil.createUpdateProxyForBean;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.mycompany.myapp.IntegrationTest;
+import com.mycompany.myapp.domain.Authority;
 import com.mycompany.myapp.domain.BoiteReception;
+import com.mycompany.myapp.domain.DemandePriseEnCharge;
+import com.mycompany.myapp.domain.Profil;
+import com.mycompany.myapp.domain.Tache;
 import com.mycompany.myapp.domain.User;
+import com.mycompany.myapp.domain.enumeration.PrioriteTache;
+import com.mycompany.myapp.domain.enumeration.StatutDemande;
+import com.mycompany.myapp.domain.enumeration.StatutTache;
+import com.mycompany.myapp.repository.AuthorityRepository;
 import com.mycompany.myapp.repository.BoiteReceptionRepository;
+import com.mycompany.myapp.repository.ProfilRepository;
+import com.mycompany.myapp.repository.TacheRepository;
 import com.mycompany.myapp.repository.UserRepository;
-import com.mycompany.myapp.service.BoiteReceptionService;
-import com.mycompany.myapp.service.dto.BoiteReceptionDTO;
-import com.mycompany.myapp.service.mapper.BoiteReceptionMapper;
+import com.mycompany.myapp.security.AuthoritiesConstants;
+import com.mycompany.myapp.service.ProfilService;
+import com.mycompany.myapp.service.dto.ProfilDTO;
 import jakarta.persistence.EntityManager;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicLong;
-import org.junit.jupiter.api.AfterEach;
+import java.util.HashSet;
+import java.util.Set;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import tools.jackson.databind.ObjectMapper;
 
 /**
  * Integration tests for the {@link BoiteReceptionResource} REST controller.
+ *
+ * <p>La boite de reception n'a plus de CRUD : elle appartient a un profil, elle est creee
+ * automatiquement, et son contenu se deduit des droits. Ces tests verifient donc trois choses
+ * qui, si elles cassaient, passeraient inapercues : la boite nait bien avec le profil, un
+ * utilisateur ne voit que les taches de son perimetre, et la console globale reste fermee aux
+ * non-administrateurs.
  */
 @IntegrationTest
-@ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
-@WithMockUser
 class BoiteReceptionResourceIT {
 
-    private static final Instant DEFAULT_DATE_CREATION = Instant.ofEpochMilli(0L);
-    private static final Instant UPDATED_DATE_CREATION = Instant.ofEpochMilli(1703483747250L);
-
-    private static final Instant DEFAULT_DATE_DERNIERE_LECTURE = Instant.ofEpochMilli(0L);
-    private static final Instant UPDATED_DATE_DERNIERE_LECTURE = Instant.ofEpochMilli(1703483747250L);
-
-    private static final Integer DEFAULT_NOMBRE_NON_LUS = 1;
-    private static final Integer UPDATED_NOMBRE_NON_LUS = 2;
-
-    private static final Boolean DEFAULT_ACTIF = false;
-    private static final Boolean UPDATED_ACTIF = true;
-
     private static final String ENTITY_API_URL = "/api/boite-receptions";
-    private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
-
-    private static final Random random = new Random();
-    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + 2L * Integer.MAX_VALUE);
 
     @Autowired
-    private ObjectMapper om;
+    private MockMvc restBoiteReceptionMockMvc;
 
     @Autowired
     private BoiteReceptionRepository boiteReceptionRepository;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Mock
-    private BoiteReceptionRepository boiteReceptionRepositoryMock;
+    private ProfilRepository profilRepository;
 
     @Autowired
-    private BoiteReceptionMapper boiteReceptionMapper;
+    private ProfilService profilService;
 
-    @Mock
-    private BoiteReceptionService boiteReceptionServiceMock;
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private TacheRepository tacheRepository;
+
+    @Autowired
+    private AuthorityRepository authorityRepository;
 
     @Autowired
     private EntityManager em;
 
-    @Autowired
-    private MockMvc restBoiteReceptionMockMvc;
-
-    private BoiteReception boiteReception;
-
-    private BoiteReception insertedBoiteReception;
-
-    /**
-     * Create an entity for this test.
-     *
-     * This is a static method, as tests for other entities might also need it,
-     * if they test an entity which requires the current entity.
-     */
-    public static BoiteReception createEntity(EntityManager em) {
-        BoiteReception boiteReception = new BoiteReception()
-            .dateCreation(DEFAULT_DATE_CREATION)
-            .dateDerniereLecture(DEFAULT_DATE_DERNIERE_LECTURE)
-            .nombreNonLus(DEFAULT_NOMBRE_NON_LUS)
-            .actif(DEFAULT_ACTIF);
-        // Add required entity
-        User user = UserResourceIT.createEntity();
-        em.persist(user);
-        em.flush();
-        boiteReception.setUtilisateur(user);
-        return boiteReception;
-    }
-
-    /**
-     * Create an updated entity for this test.
-     *
-     * This is a static method, as tests for other entities might also need it,
-     * if they test an entity which requires the current entity.
-     */
-    public static BoiteReception createUpdatedEntity(EntityManager em) {
-        BoiteReception updatedBoiteReception = new BoiteReception()
-            .dateCreation(UPDATED_DATE_CREATION)
-            .dateDerniereLecture(UPDATED_DATE_DERNIERE_LECTURE)
-            .nombreNonLus(UPDATED_NOMBRE_NON_LUS)
-            .actif(UPDATED_ACTIF);
-        // Add required entity
-        User user = UserResourceIT.createEntity();
-        em.persist(user);
-        em.flush();
-        updatedBoiteReception.setUtilisateur(user);
-        return updatedBoiteReception;
-    }
+    private String login;
 
     @BeforeEach
     void initTest() {
-        boiteReception = createEntity(em);
+        login = "boite-" + RandomStringUtils.insecure().nextAlphabetic(8).toLowerCase();
     }
 
-    @AfterEach
-    void cleanup() {
-        if (insertedBoiteReception != null) {
-            boiteReceptionRepository.delete(insertedBoiteReception);
-            insertedBoiteReception = null;
+    @Test
+    @Transactional
+    void creerUnProfilCreeSaBoiteDeReception() throws Exception {
+        ProfilDTO dto = new ProfilDTO();
+        dto.setNom("profil-" + RandomStringUtils.insecure().nextAlphanumeric(10));
+        dto.setAuthorities(Set.of(AuthoritiesConstants.USER));
+
+        ProfilDTO cree = profilService.save(dto);
+
+        assertThat(boiteReceptionRepository.existsByProfilId(cree.getId())).as("la boite nait avec le profil, sans intervention").isTrue();
+    }
+
+    @Test
+    @Transactional
+    void synchroniserEstIdempotent() throws Exception {
+        creerProfil(AuthoritiesConstants.USER);
+        long avant = boiteReceptionRepository.count();
+
+        restBoiteReceptionMockMvc
+            .perform(post(ENTITY_API_URL + "/synchroniser").with(user("admin").authorities(autorite(AuthoritiesConstants.ADMIN))))
+            .andExpect(status().isOk());
+        restBoiteReceptionMockMvc
+            .perform(post(ENTITY_API_URL + "/synchroniser").with(user("admin").authorities(autorite(AuthoritiesConstants.ADMIN))))
+            .andExpect(status().isOk());
+
+        assertThat(boiteReceptionRepository.count()).as("relancer la synchronisation ne cree pas de doublon").isEqualTo(avant);
+    }
+
+    @Test
+    @Transactional
+    void maBoiteNeMontreQueLesTachesDeMesDroits() throws Exception {
+        // Un validateur DRH : seules les demandes en attente de SA validation le concernent.
+        Profil profil = creerProfil(AuthoritiesConstants.VALIDATEUR_DRH);
+        User utilisateur = creerUtilisateur(profil);
+        Tache aMoi = creerTache(utilisateur, StatutDemande.EN_ATTENTE_VALIDATION_DRH);
+        Tache pasAMoi = creerTache(utilisateur, StatutDemande.EN_ATTENTE_VALIDATION_INFIRMERIE);
+        em.flush();
+
+        restBoiteReceptionMockMvc
+            .perform(get(ENTITY_API_URL + "/mienne/taches?size=100").with(user(login)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[?(@.id == " + aMoi.getId() + ")]").exists())
+            .andExpect(jsonPath("$[?(@.id == " + pasAMoi.getId() + ")]").doesNotExist());
+    }
+
+    @Test
+    @Transactional
+    void maBoiteEstCelleDeMonProfil() throws Exception {
+        Profil profil = creerProfil(AuthoritiesConstants.VALIDATEUR_DRH);
+        creerUtilisateur(profil);
+        em.flush();
+
+        restBoiteReceptionMockMvc
+            .perform(get(ENTITY_API_URL + "/mienne").with(user(login)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.profil.id").value(profil.getId().intValue()))
+            .andExpect(jsonPath("$.profil.nom").value(profil.getNom()));
+    }
+
+    @Test
+    @Transactional
+    void laConsoleGlobaleEstReserveeAuxAdministrateurs() throws Exception {
+        restBoiteReceptionMockMvc.perform(get(ENTITY_API_URL).with(user(login))).andExpect(status().isForbidden());
+    }
+
+    @Test
+    @Transactional
+    void aucuneRouteDeCreationNiDeSuppression() throws Exception {
+        // Une boite ne se cree ni ne se supprime a la main : ces verbes n'existent plus.
+        restBoiteReceptionMockMvc
+            .perform(post(ENTITY_API_URL).with(user(login)).contentType("application/json").content("{}"))
+            .andExpect(status().isMethodNotAllowed());
+        restBoiteReceptionMockMvc.perform(delete(ENTITY_API_URL + "/1").with(user(login))).andExpect(status().isMethodNotAllowed());
+    }
+
+    private static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor user(
+        String login
+    ) {
+        return org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user(login);
+    }
+
+    private static org.springframework.security.core.authority.SimpleGrantedAuthority autorite(String nom) {
+        return new org.springframework.security.core.authority.SimpleGrantedAuthority(nom);
+    }
+
+    private Profil creerProfil(String... droits) {
+        Profil profil = new Profil();
+        profil.setNom("profil-" + RandomStringUtils.insecure().nextAlphanumeric(10));
+        Set<Authority> authorities = new HashSet<>();
+        for (String droit : droits) {
+            authorityRepository.findById(droit).ifPresent(authorities::add);
         }
+        profil.setAuthorities(authorities);
+        profil = profilRepository.saveAndFlush(profil);
+
+        BoiteReception boite = new BoiteReception().profil(profil).dateCreation(Instant.now()).nombreNonLus(0).actif(Boolean.TRUE);
+        boiteReceptionRepository.saveAndFlush(boite);
+        return profil;
     }
 
-    @Test
-    @Transactional
-    void createBoiteReception() throws Exception {
-        long databaseSizeBeforeCreate = getRepositoryCount();
-        // Create the BoiteReception
-        BoiteReceptionDTO boiteReceptionDTO = boiteReceptionMapper.toDto(boiteReception);
-        var returnedBoiteReceptionDTO = om.readValue(
-            restBoiteReceptionMockMvc
-                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(boiteReceptionDTO)))
-                .andExpect(status().isCreated())
-                .andReturn()
-                .getResponse()
-                .getContentAsString(),
-            BoiteReceptionDTO.class
-        );
-
-        // Validate the BoiteReception in the database
-        assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
-        var returnedBoiteReception = boiteReceptionMapper.toEntity(returnedBoiteReceptionDTO);
-        assertBoiteReceptionUpdatableFieldsEquals(returnedBoiteReception, getPersistedBoiteReception(returnedBoiteReception));
-
-        insertedBoiteReception = returnedBoiteReception;
+    private User creerUtilisateur(Profil profil) {
+        User utilisateur = UserResourceIT.createEntity();
+        utilisateur.setLogin(login);
+        utilisateur.setProfil(profil);
+        return userRepository.saveAndFlush(utilisateur);
     }
 
-    @Test
-    @Transactional
-    void createBoiteReceptionWithExistingId() throws Exception {
-        // Create the BoiteReception with an existing ID
-        boiteReception.setId(1L);
-        BoiteReceptionDTO boiteReceptionDTO = boiteReceptionMapper.toDto(boiteReception);
-
-        long databaseSizeBeforeCreate = getRepositoryCount();
-
-        // An entity with an existing ID cannot be created, so this API call must fail
-        restBoiteReceptionMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(boiteReceptionDTO)))
-            .andExpect(status().isBadRequest());
-
-        // Validate the BoiteReception in the database
-        assertSameRepositoryCount(databaseSizeBeforeCreate);
-    }
-
-    @Test
-    @Transactional
-    void checkDateCreationIsRequired() throws Exception {
-        long databaseSizeBeforeTest = getRepositoryCount();
-        // set the field null
-        boiteReception.setDateCreation(null);
-
-        // Create the BoiteReception, which fails.
-        BoiteReceptionDTO boiteReceptionDTO = boiteReceptionMapper.toDto(boiteReception);
-
-        restBoiteReceptionMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(boiteReceptionDTO)))
-            .andExpect(status().isBadRequest());
-
-        assertSameRepositoryCount(databaseSizeBeforeTest);
-    }
-
-    @Test
-    @Transactional
-    void checkNombreNonLusIsRequired() throws Exception {
-        long databaseSizeBeforeTest = getRepositoryCount();
-        // set the field null
-        boiteReception.setNombreNonLus(null);
-
-        // Create the BoiteReception, which fails.
-        BoiteReceptionDTO boiteReceptionDTO = boiteReceptionMapper.toDto(boiteReception);
-
-        restBoiteReceptionMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(boiteReceptionDTO)))
-            .andExpect(status().isBadRequest());
-
-        assertSameRepositoryCount(databaseSizeBeforeTest);
-    }
-
-    @Test
-    @Transactional
-    void checkActifIsRequired() throws Exception {
-        long databaseSizeBeforeTest = getRepositoryCount();
-        // set the field null
-        boiteReception.setActif(null);
-
-        // Create the BoiteReception, which fails.
-        BoiteReceptionDTO boiteReceptionDTO = boiteReceptionMapper.toDto(boiteReception);
-
-        restBoiteReceptionMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(boiteReceptionDTO)))
-            .andExpect(status().isBadRequest());
-
-        assertSameRepositoryCount(databaseSizeBeforeTest);
-    }
-
-    @Test
-    @Transactional
-    void getAllBoiteReceptions() throws Exception {
-        // Initialize the database
-        insertedBoiteReception = boiteReceptionRepository.saveAndFlush(boiteReception);
-
-        // Get all the boiteReceptionList
-        restBoiteReceptionMockMvc
-            .perform(get(ENTITY_API_URL + "?sort=id,desc"))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(boiteReception.getId().intValue())))
-            .andExpect(jsonPath("$.[*].dateCreation").value(hasItem(DEFAULT_DATE_CREATION.toString())))
-            .andExpect(jsonPath("$.[*].dateDerniereLecture").value(hasItem(DEFAULT_DATE_DERNIERE_LECTURE.toString())))
-            .andExpect(jsonPath("$.[*].nombreNonLus").value(hasItem(DEFAULT_NOMBRE_NON_LUS)))
-            .andExpect(jsonPath("$.[*].actif").value(hasItem(DEFAULT_ACTIF)));
-    }
-
-    @SuppressWarnings({ "unchecked" })
-    void getAllBoiteReceptionsWithEagerRelationshipsIsEnabled() throws Exception {
-        when(boiteReceptionServiceMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
-
-        restBoiteReceptionMockMvc.perform(get(ENTITY_API_URL + "?eagerload=true")).andExpect(status().isOk());
-
-        verify(boiteReceptionServiceMock, times(1)).findAllWithEagerRelationships(any());
-    }
-
-    @SuppressWarnings({ "unchecked" })
-    void getAllBoiteReceptionsWithEagerRelationshipsIsNotEnabled() throws Exception {
-        when(boiteReceptionServiceMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
-
-        restBoiteReceptionMockMvc.perform(get(ENTITY_API_URL + "?eagerload=false")).andExpect(status().isOk());
-        verify(boiteReceptionRepositoryMock, times(1)).findAll(any(Pageable.class));
-    }
-
-    @Test
-    @Transactional
-    void getBoiteReception() throws Exception {
-        // Initialize the database
-        insertedBoiteReception = boiteReceptionRepository.saveAndFlush(boiteReception);
-
-        // Get the boiteReception
-        restBoiteReceptionMockMvc
-            .perform(get(ENTITY_API_URL_ID, boiteReception.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.id").value(boiteReception.getId().intValue()))
-            .andExpect(jsonPath("$.dateCreation").value(DEFAULT_DATE_CREATION.toString()))
-            .andExpect(jsonPath("$.dateDerniereLecture").value(DEFAULT_DATE_DERNIERE_LECTURE.toString()))
-            .andExpect(jsonPath("$.nombreNonLus").value(DEFAULT_NOMBRE_NON_LUS))
-            .andExpect(jsonPath("$.actif").value(DEFAULT_ACTIF));
-    }
-
-    @Test
-    @Transactional
-    void getNonExistingBoiteReception() throws Exception {
-        // Get the boiteReception
-        restBoiteReceptionMockMvc.perform(get(ENTITY_API_URL_ID, Long.MAX_VALUE)).andExpect(status().isNotFound());
-    }
-
-    @Test
-    @Transactional
-    void putExistingBoiteReception() throws Exception {
-        // Initialize the database
-        insertedBoiteReception = boiteReceptionRepository.saveAndFlush(boiteReception);
-
-        long databaseSizeBeforeUpdate = getRepositoryCount();
-
-        // Update the boiteReception
-        BoiteReception updatedBoiteReception = boiteReceptionRepository.findById(boiteReception.getId()).orElseThrow();
-        // Disconnect from session so that the updates on updatedBoiteReception are not directly saved in db
-        em.detach(updatedBoiteReception);
-        updatedBoiteReception
-            .dateCreation(UPDATED_DATE_CREATION)
-            .dateDerniereLecture(UPDATED_DATE_DERNIERE_LECTURE)
-            .nombreNonLus(UPDATED_NOMBRE_NON_LUS)
-            .actif(UPDATED_ACTIF);
-        BoiteReceptionDTO boiteReceptionDTO = boiteReceptionMapper.toDto(updatedBoiteReception);
-
-        restBoiteReceptionMockMvc
-            .perform(
-                put(ENTITY_API_URL_ID, boiteReceptionDTO.getId())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(boiteReceptionDTO))
-            )
-            .andExpect(status().isOk());
-
-        // Validate the BoiteReception in the database
-        assertSameRepositoryCount(databaseSizeBeforeUpdate);
-        assertPersistedBoiteReceptionToMatchAllProperties(updatedBoiteReception);
-    }
-
-    @Test
-    @Transactional
-    void putNonExistingBoiteReception() throws Exception {
-        long databaseSizeBeforeUpdate = getRepositoryCount();
-        boiteReception.setId(longCount.incrementAndGet());
-
-        // Create the BoiteReception
-        BoiteReceptionDTO boiteReceptionDTO = boiteReceptionMapper.toDto(boiteReception);
-
-        // If the entity doesn't have an ID, it will throw BadRequestAlertException
-        restBoiteReceptionMockMvc
-            .perform(
-                put(ENTITY_API_URL_ID, boiteReceptionDTO.getId())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(boiteReceptionDTO))
-            )
-            .andExpect(status().isBadRequest());
-
-        // Validate the BoiteReception in the database
-        assertSameRepositoryCount(databaseSizeBeforeUpdate);
-    }
-
-    @Test
-    @Transactional
-    void putWithIdMismatchBoiteReception() throws Exception {
-        long databaseSizeBeforeUpdate = getRepositoryCount();
-        boiteReception.setId(longCount.incrementAndGet());
-
-        // Create the BoiteReception
-        BoiteReceptionDTO boiteReceptionDTO = boiteReceptionMapper.toDto(boiteReception);
-
-        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
-        restBoiteReceptionMockMvc
-            .perform(
-                put(ENTITY_API_URL_ID, longCount.incrementAndGet())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(boiteReceptionDTO))
-            )
-            .andExpect(status().isBadRequest());
-
-        // Validate the BoiteReception in the database
-        assertSameRepositoryCount(databaseSizeBeforeUpdate);
-    }
-
-    @Test
-    @Transactional
-    void putWithMissingIdPathParamBoiteReception() throws Exception {
-        long databaseSizeBeforeUpdate = getRepositoryCount();
-        boiteReception.setId(longCount.incrementAndGet());
-
-        // Create the BoiteReception
-        BoiteReceptionDTO boiteReceptionDTO = boiteReceptionMapper.toDto(boiteReception);
-
-        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
-        restBoiteReceptionMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(boiteReceptionDTO)))
-            .andExpect(status().isMethodNotAllowed());
-
-        // Validate the BoiteReception in the database
-        assertSameRepositoryCount(databaseSizeBeforeUpdate);
-    }
-
-    @Test
-    @Transactional
-    void partialUpdateBoiteReceptionWithPatch() throws Exception {
-        // Initialize the database
-        insertedBoiteReception = boiteReceptionRepository.saveAndFlush(boiteReception);
-
-        long databaseSizeBeforeUpdate = getRepositoryCount();
-
-        // Update the boiteReception using partial update
-        BoiteReception partialUpdatedBoiteReception = new BoiteReception();
-        partialUpdatedBoiteReception.setId(boiteReception.getId());
-
-        partialUpdatedBoiteReception
-            .dateDerniereLecture(UPDATED_DATE_DERNIERE_LECTURE)
-            .nombreNonLus(UPDATED_NOMBRE_NON_LUS)
-            .actif(UPDATED_ACTIF);
-
-        restBoiteReceptionMockMvc
-            .perform(
-                patch(ENTITY_API_URL_ID, partialUpdatedBoiteReception.getId())
-                    .contentType("application/merge-patch+json")
-                    .content(om.writeValueAsBytes(partialUpdatedBoiteReception))
-            )
-            .andExpect(status().isOk());
-
-        // Validate the BoiteReception in the database
-
-        assertSameRepositoryCount(databaseSizeBeforeUpdate);
-        assertBoiteReceptionUpdatableFieldsEquals(
-            createUpdateProxyForBean(partialUpdatedBoiteReception, boiteReception),
-            getPersistedBoiteReception(boiteReception)
-        );
-    }
-
-    @Test
-    @Transactional
-    void fullUpdateBoiteReceptionWithPatch() throws Exception {
-        // Initialize the database
-        insertedBoiteReception = boiteReceptionRepository.saveAndFlush(boiteReception);
-
-        long databaseSizeBeforeUpdate = getRepositoryCount();
-
-        // Update the boiteReception using partial update
-        BoiteReception partialUpdatedBoiteReception = new BoiteReception();
-        partialUpdatedBoiteReception.setId(boiteReception.getId());
-
-        partialUpdatedBoiteReception
-            .dateCreation(UPDATED_DATE_CREATION)
-            .dateDerniereLecture(UPDATED_DATE_DERNIERE_LECTURE)
-            .nombreNonLus(UPDATED_NOMBRE_NON_LUS)
-            .actif(UPDATED_ACTIF);
-
-        restBoiteReceptionMockMvc
-            .perform(
-                patch(ENTITY_API_URL_ID, partialUpdatedBoiteReception.getId())
-                    .contentType("application/merge-patch+json")
-                    .content(om.writeValueAsBytes(partialUpdatedBoiteReception))
-            )
-            .andExpect(status().isOk());
-
-        // Validate the BoiteReception in the database
-
-        assertSameRepositoryCount(databaseSizeBeforeUpdate);
-        assertBoiteReceptionUpdatableFieldsEquals(partialUpdatedBoiteReception, getPersistedBoiteReception(partialUpdatedBoiteReception));
-    }
-
-    @Test
-    @Transactional
-    void patchNonExistingBoiteReception() throws Exception {
-        long databaseSizeBeforeUpdate = getRepositoryCount();
-        boiteReception.setId(longCount.incrementAndGet());
-
-        // Create the BoiteReception
-        BoiteReceptionDTO boiteReceptionDTO = boiteReceptionMapper.toDto(boiteReception);
-
-        // If the entity doesn't have an ID, it will throw BadRequestAlertException
-        restBoiteReceptionMockMvc
-            .perform(
-                patch(ENTITY_API_URL_ID, boiteReceptionDTO.getId())
-                    .contentType("application/merge-patch+json")
-                    .content(om.writeValueAsBytes(boiteReceptionDTO))
-            )
-            .andExpect(status().isBadRequest());
-
-        // Validate the BoiteReception in the database
-        assertSameRepositoryCount(databaseSizeBeforeUpdate);
-    }
-
-    @Test
-    @Transactional
-    void patchWithIdMismatchBoiteReception() throws Exception {
-        long databaseSizeBeforeUpdate = getRepositoryCount();
-        boiteReception.setId(longCount.incrementAndGet());
-
-        // Create the BoiteReception
-        BoiteReceptionDTO boiteReceptionDTO = boiteReceptionMapper.toDto(boiteReception);
-
-        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
-        restBoiteReceptionMockMvc
-            .perform(
-                patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
-                    .contentType("application/merge-patch+json")
-                    .content(om.writeValueAsBytes(boiteReceptionDTO))
-            )
-            .andExpect(status().isBadRequest());
-
-        // Validate the BoiteReception in the database
-        assertSameRepositoryCount(databaseSizeBeforeUpdate);
-    }
-
-    @Test
-    @Transactional
-    void patchWithMissingIdPathParamBoiteReception() throws Exception {
-        long databaseSizeBeforeUpdate = getRepositoryCount();
-        boiteReception.setId(longCount.incrementAndGet());
-
-        // Create the BoiteReception
-        BoiteReceptionDTO boiteReceptionDTO = boiteReceptionMapper.toDto(boiteReception);
-
-        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
-        restBoiteReceptionMockMvc
-            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(boiteReceptionDTO)))
-            .andExpect(status().isMethodNotAllowed());
-
-        // Validate the BoiteReception in the database
-        assertSameRepositoryCount(databaseSizeBeforeUpdate);
-    }
-
-    @Test
-    @Transactional
-    void deleteBoiteReception() throws Exception {
-        // Initialize the database
-        insertedBoiteReception = boiteReceptionRepository.saveAndFlush(boiteReception);
-
-        long databaseSizeBeforeDelete = getRepositoryCount();
-
-        // Delete the boiteReception
-        restBoiteReceptionMockMvc
-            .perform(delete(ENTITY_API_URL_ID, boiteReception.getId()).accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isNoContent());
-
-        // Validate the database contains one less item
-        assertDecrementedRepositoryCount(databaseSizeBeforeDelete);
-    }
-
-    protected long getRepositoryCount() {
-        return boiteReceptionRepository.count();
-    }
-
-    protected void assertIncrementedRepositoryCount(long countBefore) {
-        assertThat(countBefore + 1).isEqualTo(getRepositoryCount());
-    }
-
-    protected void assertDecrementedRepositoryCount(long countBefore) {
-        assertThat(countBefore - 1).isEqualTo(getRepositoryCount());
-    }
-
-    protected void assertSameRepositoryCount(long countBefore) {
-        assertThat(countBefore).isEqualTo(getRepositoryCount());
-    }
-
-    protected BoiteReception getPersistedBoiteReception(BoiteReception boiteReception) {
-        return boiteReceptionRepository.findById(boiteReception.getId()).orElseThrow();
-    }
-
-    protected void assertPersistedBoiteReceptionToMatchAllProperties(BoiteReception expectedBoiteReception) {
-        assertBoiteReceptionAllPropertiesEquals(expectedBoiteReception, getPersistedBoiteReception(expectedBoiteReception));
-    }
-
-    protected void assertPersistedBoiteReceptionToMatchUpdatableProperties(BoiteReception expectedBoiteReception) {
-        assertBoiteReceptionAllUpdatablePropertiesEquals(expectedBoiteReception, getPersistedBoiteReception(expectedBoiteReception));
+    private Tache creerTache(User utilisateur, StatutDemande statutDemande) {
+        DemandePriseEnCharge demande = DemandePriseEnChargeResourceIT.createEntity(em);
+        demande.setStatut(statutDemande);
+        em.persist(demande);
+
+        Tache tache = new Tache()
+            .titre("tache " + statutDemande)
+            .dateCreation(Instant.now())
+            .statut(StatutTache.A_FAIRE)
+            .priorite(PrioriteTache.NORMALE)
+            .lu(Boolean.FALSE)
+            .demande(demande)
+            .utilisateur(utilisateur);
+        return tacheRepository.saveAndFlush(tache);
     }
 }

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Une tache s'adresse desormais a une habilitation, et non plus a une personne.
+
+        Jusqu'ici une tache etait creee par titulaire du droit : quatre validateurs DRH
+        produisaient quatre lignes pour un seul dossier. La boite de reception, qui est par
+        profil, les affichait toutes les quatre. Cette migration pose l'habilitation sur les
+        taches existantes, supprime les doublons encore ouverts, et rend l'utilisateur
+        facultatif - il ne designe plus le destinataire mais celui qui a pris la tache en charge.
+    -->
+
+    <!-- 1. La colonne, d'abord nullable : les lignes existantes n'ont rien a y mettre encore. -->
+    <changeSet id="20260925160000-1" author="cnss">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="tache" columnName="droit_requis"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="tache">
+            <column name="droit_requis" type="varchar(50)"/>
+        </addColumn>
+    </changeSet>
+
+    <!--
+        2. L'habilitation est deduite du titre, seul indice disponible sur les taches deja
+        creees : le circuit ecrivait « Validation DRH - <reference> » ou « Validation
+        infirmerie - <reference> ». Tout le reste releve du travail courant de gestion.
+    -->
+    <changeSet id="20260925160000-2" author="cnss">
+        <update tableName="tache">
+            <column name="droit_requis" value="ROLE_VALIDATEUR_DRH"/>
+            <where>droit_requis is null and titre like 'Validation DRH%'</where>
+        </update>
+        <update tableName="tache">
+            <column name="droit_requis" value="ROLE_VALIDATEUR_INFIRMERIE"/>
+            <where>droit_requis is null and titre like 'Validation infirmerie%'</where>
+        </update>
+        <update tableName="tache">
+            <column name="droit_requis" value="ROLE_USER"/>
+            <where>droit_requis is null</where>
+        </update>
+    </changeSet>
+
+    <!--
+        3. Les doublons encore ouverts disparaissent : pour un meme dossier et une meme
+        habilitation, une seule tache attend. On garde la plus ancienne - c'est elle qui porte la
+        date a laquelle le travail a ete demande. Les taches deja terminees ou annulees sont
+        laissees telles quelles : ce sont des traces de ce qui a ete fait, pas du travail en
+        attente, et les effacer reecrirait l'historique.
+    -->
+    <changeSet id="20260925160000-3" author="cnss">
+        <sql>
+            delete from tache t
+            where t.statut not in ('TERMINEE', 'ANNULEE')
+              and t.id &gt; (
+                  select min(autre.id)
+                  from tache autre
+                  where autre.demande_id = t.demande_id
+                    and autre.droit_requis = t.droit_requis
+                    and autre.statut not in ('TERMINEE', 'ANNULEE')
+              )
+        </sql>
+    </changeSet>
+
+    <!-- 4. La colonne devient obligatoire, maintenant que toutes les lignes la portent. -->
+    <changeSet id="20260925160000-4" author="cnss">
+        <addNotNullConstraint tableName="tache" columnName="droit_requis" columnDataType="varchar(50)"/>
+    </changeSet>
+
+    <!--
+        5. L'utilisateur devient facultatif : il ne designe plus a qui la tache est adressee, mais
+        qui s'en est saisi. Les taches reprises de l'ancien modele gardent leur utilisateur, ce
+        qui revient a les declarer prises en charge par lui - ce qu'elles etaient.
+    -->
+    <changeSet id="20260925160000-5" author="cnss">
+        <dropNotNullConstraint tableName="tache" columnName="utilisateur_id" columnDataType="bigint"/>
+    </changeSet>
+</databaseChangeLog>

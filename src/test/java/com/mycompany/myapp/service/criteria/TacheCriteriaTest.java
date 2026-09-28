@@ -84,7 +84,6 @@ class TacheCriteriaTest {
         tacheCriteria.commentaire();
         tacheCriteria.demandeId();
         tacheCriteria.utilisateurId();
-        tacheCriteria.boiteReceptionId();
         tacheCriteria.distinct();
     }
 
@@ -104,7 +103,6 @@ class TacheCriteriaTest {
                 condition.apply(criteria.getCommentaire()) &&
                 condition.apply(criteria.getDemandeId()) &&
                 condition.apply(criteria.getUtilisateurId()) &&
-                condition.apply(criteria.getBoiteReceptionId()) &&
                 condition.apply(criteria.getDistinct()),
             "every filter matches"
         );
@@ -126,7 +124,6 @@ class TacheCriteriaTest {
                 condition.apply(criteria.getCommentaire(), copy.getCommentaire()) &&
                 condition.apply(criteria.getDemandeId(), copy.getDemandeId()) &&
                 condition.apply(criteria.getUtilisateurId(), copy.getUtilisateurId()) &&
-                condition.apply(criteria.getBoiteReceptionId(), copy.getBoiteReceptionId()) &&
                 condition.apply(criteria.getDistinct(), copy.getDistinct()),
             "every filter matches"
         );

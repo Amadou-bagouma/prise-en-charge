@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        L'historique enregistre aussi ce qui arrive aux beneficiaires.
+
+        Jusqu'ici une trace devait viser une demande. Les changements de situation d'un agent ou
+        d'un ayant droit - une suspension, une radiation - n'en visent aucune : ils n'etaient donc
+        pas traçables du tout, alors que ce sont precisement les decisions qu'il faut pouvoir
+        justifier six mois plus tard.
+    -->
+    <changeSet id="20260925180000-1" author="cnss">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="historique_action" columnName="cible_type"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="historique_action">
+            <column name="cible_type" type="varchar(50)"/>
+            <column name="cible_id" type="bigint"/>
+        </addColumn>
+    </changeSet>
+
+    <!-- La demande devient facultative : une radiation ne porte sur aucun dossier. -->
+    <changeSet id="20260925180000-2" author="cnss">
+        <dropNotNullConstraint tableName="historique_action" columnName="demande_id" columnDataType="bigint"/>
+    </changeSet>
+
+    <!--
+        L'auteur aussi : un traitement automatique n'en a pas, et savoir qu'une action a eu lieu
+        sans savoir par qui vaut mieux que de ne pas la tracer.
+    -->
+    <changeSet id="20260925180000-3" author="cnss">
+        <dropNotNullConstraint tableName="historique_action" columnName="utilisateur_id" columnDataType="bigint"/>
+    </changeSet>
+
+    <!--
+        Les traces de beneficiaire se lisent par cible : sans index, afficher l'historique d'un
+        agent imposerait de parcourir toute la table a chaque ouverture de sa fiche.
+    -->
+    <changeSet id="20260925180000-4" author="cnss">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="idx_historique_action_cible"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="idx_historique_action_cible" tableName="historique_action">
+            <column name="cible_type"/>
+            <column name="cible_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

@@ -142,6 +142,47 @@
           l'alimente rarement, alors que les écrans d'instruction servent tous les jours. Le
           groupe s'ouvre tout seul quand on travaille dedans.
         -->
+        <!--
+          Les bénéficiaires — les personnes couvertes — sont séparés du référentiel. On les
+          consulte tous les jours pour instruire un dossier, alors que le référentiel décrit
+          l'institution et ne s'alimente que rarement. Les mêler faisait chercher un agent
+          parmi des régions et des directions.
+        -->
+        <li class="sidebar-nav-item">
+          <button
+            type="button"
+            class="sidebar-link sidebar-link-toggle"
+            (click)="toggleBeneficiaires()"
+            [attr.aria-expanded]="!beneficiairesCollapsed()"
+            aria-controls="beneficiairesSubmenu"
+            data-cy="beneficiairesMenu"
+          >
+            <fa-icon icon="users" [fixedWidth]="true" />
+            <span class="sidebar-link-text" jhiTranslate="global.menu.beneficiaires.main">Bénéficiaires</span>
+            <fa-icon class="sidebar-link-caret" icon="chevron-down" [class.sidebar-link-caret--open]="!beneficiairesCollapsed()" />
+          </button>
+
+          <ul id="beneficiairesSubmenu" class="sidebar-submenu" [ngbCollapse]="beneficiairesCollapsed()">
+            <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+              <a class="sidebar-link" [title]="'global.menu.entities.agent' | translate" routerLink="/agent" (click)="collapseNavbar()">
+                <fa-icon icon="id-card" [fixedWidth]="true" />
+                <span jhiTranslate="global.menu.entities.agent">Agent</span>
+              </a>
+            </li>
+            <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+              <a
+                class="sidebar-link"
+                [title]="'global.menu.entities.ayantDroit' | translate"
+                routerLink="/ayant-droit"
+                (click)="collapseNavbar()"
+              >
+                <fa-icon icon="user-plus" [fixedWidth]="true" />
+                <span jhiTranslate="global.menu.entities.ayantDroit">Ayant Droit</span>
+              </a>
+            </li>
+          </ul>
+        </li>
+
         <li class="sidebar-nav-item">
           <button
             type="button"
@@ -157,23 +198,6 @@
           </button>
 
           <ul id="referentielSubmenu" class="sidebar-submenu" [ngbCollapse]="referentielCollapsed()">
-            <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-              <a class="sidebar-link" [title]="'global.menu.entities.agent' | translate" routerLink="/agent" (click)="collapseNavbar()">
-                <fa-icon icon="id-card" [fixedWidth]="true" />
-                <span jhiTranslate="global.menu.entities.agent">Agent</span>
-              </a>
-            </li>
-            <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-              <a
-                class="sidebar-link"
-                [title]="'global.menu.entities.ayantDroit' | translate"
-                routerLink="/ayant-droit"
-                (click)="collapseNavbar()"
-              >
-                <fa-icon icon="users" [fixedWidth]="true" />
-                <span jhiTranslate="global.menu.entities.ayantDroit">Ayant Droit</span>
-              </a>
-            </li>
             <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
               <a
                 class="sidebar-link"
@@ -237,17 +261,6 @@
               <a class="sidebar-link" [title]="'global.menu.entities.region' | translate" routerLink="/region" (click)="collapseNavbar()">
                 <fa-icon icon="location-dot" [fixedWidth]="true" />
                 <span jhiTranslate="global.menu.entities.region">Region</span>
-              </a>
-            </li>
-            <li
-              class="sidebar-nav-item"
-              *jhiHasAnyAuthority="'ROLE_ADMIN'"
-              routerLinkActive="active"
-              [routerLinkActiveOptions]="{ exact: true }"
-            >
-              <a class="sidebar-link" [title]="'global.menu.entities.profil' | translate" routerLink="/profil" (click)="collapseNavbar()">
-                <fa-icon icon="users-cog" [fixedWidth]="true" />
-                <span jhiTranslate="global.menu.entities.profil">Profil</span>
               </a>
             </li>
           </ul>
@@ -349,6 +362,17 @@
             >
               <fa-icon icon="users" [fixedWidth]="true" />
               <span jhiTranslate="userManagement.home.title">User Management</span>
+            </a>
+          </li>
+          <li
+            class="sidebar-nav-item"
+            *jhiHasAnyAuthority="'ROLE_ADMIN'"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+          >
+            <a class="sidebar-link" [title]="'global.menu.entities.profil' | translate" routerLink="/profil" (click)="collapseNavbar()">
+              <fa-icon icon="users-cog" [fixedWidth]="true" />
+              <span jhiTranslate="global.menu.entities.profil">Profils</span>
             </a>
           </li>
           <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">

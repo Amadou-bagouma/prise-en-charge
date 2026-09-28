@@ -1,10 +1,12 @@
 package com.mycompany.myapp.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.mycompany.myapp.domain.enumeration.StatutAgent;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.Instant;
 import java.time.LocalDate;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -64,6 +66,26 @@ public class Agent extends AbstractAuditingEntity<Long> implements Serializable 
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Gestion gestion;
+
+    /**
+     * Situation au regard de la couverture medicale. Jamais nulle : un dossier sans situation
+     * connue laisserait le guichet decider au cas par cas.
+     */
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "statut", nullable = false)
+    private StatutAgent statut = StatutAgent.ACTIF;
+
+    /** Date du dernier changement de situation. */
+    @Column(name = "date_statut")
+    private Instant dateStatut;
+
+    /**
+     * Motif du dernier changement. Exige des que l'on sort de ACTIF : une radiation sans raison
+     * ecrite est incontestable au guichet et inexplicable six mois plus tard.
+     */
+    @Column(name = "motif_statut", length = 500)
+    private String motifStatut;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -223,6 +245,45 @@ public class Agent extends AbstractAuditingEntity<Long> implements Serializable 
         return this;
     }
 
+    public StatutAgent getStatut() {
+        return this.statut;
+    }
+
+    public void setStatut(StatutAgent statut) {
+        this.statut = statut;
+    }
+
+    public Agent statut(StatutAgent statut) {
+        this.setStatut(statut);
+        return this;
+    }
+
+    public Instant getDateStatut() {
+        return this.dateStatut;
+    }
+
+    public void setDateStatut(Instant dateStatut) {
+        this.dateStatut = dateStatut;
+    }
+
+    public Agent dateStatut(Instant dateStatut) {
+        this.setDateStatut(dateStatut);
+        return this;
+    }
+
+    public String getMotifStatut() {
+        return this.motifStatut;
+    }
+
+    public void setMotifStatut(String motifStatut) {
+        this.motifStatut = motifStatut;
+    }
+
+    public Agent motifStatut(String motifStatut) {
+        this.setMotifStatut(motifStatut);
+        return this;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -254,6 +315,7 @@ public class Agent extends AbstractAuditingEntity<Long> implements Serializable 
             ", dateEmbauche='" + getDateEmbauche() + "'" +
             ", telephone='" + getTelephone() + "'" +
             ", fonction='" + getFonction() + "'" +
+            ", statut='" + getStatut() + "'" +
             "}";
     }
 }

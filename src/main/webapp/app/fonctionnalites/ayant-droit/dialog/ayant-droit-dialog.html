@@ -1,0 +1,126 @@
+<form name="ayantDroitDialogForm" novalidate (ngSubmit)="enregistrer()" [formGroup]="editForm">
+  <div class="modal-header">
+    <h2 class="modal-title" id="jhi-ayant-droit-dialog-heading" data-cy="AyantDroitDialogHeading">Ajouter un ayant droit</h2>
+    <button type="button" class="btn-close" data-cy="fermerDialogue" aria-label="Fermer" (click)="annuler()"></button>
+  </div>
+
+  <div class="modal-body">
+    <jhi-alert-error />
+
+    <!--
+      L'agent est rappelé, pas redemandé : on est sur sa fiche, et une liste déroulante
+      n'offrirait ici que l'occasion de rattacher l'ayant droit au mauvais dossier.
+    -->
+    <p class="pec-muted" data-cy="agentRattache">
+      Rattaché à <strong>{{ agent.prenom }} {{ agent.nom }}</strong> — matricule {{ agent.matricule }}
+    </p>
+
+    <div class="jhi-form-grid">
+      @let nomRef = editForm.controls.nom;
+      <div class="jhi-field">
+        <label class="form-label" for="dialog_nom" jhiTranslate="peccnssApp.ayantDroit.nom">Nom</label>
+        <input type="text" class="form-control" name="nom" id="dialog_nom" data-cy="nom" formControlName="nom" />
+        @if (nomRef.invalid && (nomRef.dirty || nomRef.touched) && nomRef.errors?.required) {
+          <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
+        }
+      </div>
+
+      @let prenomRef = editForm.controls.prenom;
+      <div class="jhi-field">
+        <label class="form-label" for="dialog_prenom" jhiTranslate="peccnssApp.ayantDroit.prenom">Prenom</label>
+        <input type="text" class="form-control" name="prenom" id="dialog_prenom" data-cy="prenom" formControlName="prenom" />
+        @if (prenomRef.invalid && (prenomRef.dirty || prenomRef.touched) && prenomRef.errors?.required) {
+          <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
+        }
+      </div>
+
+      @let lienRef = editForm.controls.lien;
+      <div class="jhi-field">
+        <label class="form-label" for="dialog_lien" jhiTranslate="peccnssApp.ayantDroit.lien">Lien</label>
+        <select class="form-control" name="lien" formControlName="lien" id="dialog_lien" data-cy="lien">
+          <option [ngValue]="null">{{ 'peccnssApp.LienParente.null' | translate }}</option>
+          @for (lienParente of lienParenteValues; track $index) {
+            <option [value]="lienParente">{{ 'peccnssApp.LienParente.' + lienParente | translate }}</option>
+          }
+        </select>
+        @if (lienRef.invalid && (lienRef.dirty || lienRef.touched) && lienRef.errors?.required) {
+          <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
+        }
+      </div>
+
+      <div class="jhi-field">
+        <label class="form-label" for="dialog_dateNaissance" jhiTranslate="peccnssApp.ayantDroit.dateNaissance">Date de naissance</label>
+        <div class="input-group">
+          <input
+            id="dialog_dateNaissance"
+            data-cy="dateNaissance"
+            type="text"
+            class="form-control"
+            name="dateNaissance"
+            ngbDatepicker
+            #dateNaissanceDp="ngbDatepicker"
+            formControlName="dateNaissance"
+          />
+          <button type="button" class="btn btn-secondary" (click)="dateNaissanceDp.toggle()" aria-label="Choisir une date">
+            <fa-icon icon="calendar-alt" />
+          </button>
+        </div>
+      </div>
+
+      <div class="jhi-field">
+        <label class="form-label" for="dialog_codeAyantDroit" jhiTranslate="peccnssApp.ayantDroit.codeAyantDroit">Code</label>
+        <input
+          type="text"
+          class="form-control"
+          name="codeAyantDroit"
+          id="dialog_codeAyantDroit"
+          data-cy="codeAyantDroit"
+          formControlName="codeAyantDroit"
+          [readonly]="true"
+        />
+        <!-- Ce qui s'affiche est un aperçu : le code définitif est attribué par le serveur à
+             l'enregistrement, pour que deux saisies simultanées n'obtiennent pas le même. -->
+        <small class="form-text text-muted">
+          Attribué automatiquement : les 4 caractères du matricule, puis 2 pour un conjoint ou 3 pour un enfant ou un proche, puis un numéro
+          d'ordre.
+        </small>
+      </div>
+
+      <div class="jhi-field">
+        <label class="form-label" for="dialog_file_photo" jhiTranslate="peccnssApp.ayantDroit.photo">Photo</label>
+        @if (editForm.controls.photo.value) {
+          <div>
+            <img
+              [src]="'data:' + editForm.controls.photoContentType.value + ';base64,' + editForm.controls.photo.value"
+              style="max-height: 100px"
+              alt="Photo de l'ayant droit"
+            />
+            <div>
+              {{ editForm.controls.photoContentType.value }}, {{ byteSize(editForm.controls.photo.value) }}
+              <button
+                type="button"
+                (click)="clearInputImage('photo', 'photoContentType', 'dialog_file_photo')"
+                class="btn btn-secondary btn-sm"
+                aria-label="Retirer la photo"
+              >
+                <fa-icon icon="times" />
+              </button>
+            </div>
+          </div>
+        }
+        <input type="file" (change)="setFileData($event, 'photo', true)" accept="image/*" id="dialog_file_photo" data-cy="photo" />
+        <input type="hidden" name="photo" formControlName="photo" />
+        <input type="hidden" name="photoContentType" formControlName="photoContentType" />
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-cy="annulerAyantDroit" (click)="annuler()">
+      <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Annuler</span>
+    </button>
+    <button type="submit" class="btn btn-accent" data-cy="enregistrerAyantDroit" [disabled]="editForm.invalid || isSaving()">
+      <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Enregistrer</span>
+    </button>
+  </div>
+</form>

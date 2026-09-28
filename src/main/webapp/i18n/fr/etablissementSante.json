@@ -2,11 +2,11 @@
   "peccnssApp": {
     "etablissementSante": {
       "home": {
-        "title": "EtablissementSantes",
-        "refreshListLabel": "Actualiser la liste",
-        "createLabel": "Créer un nouveau Etablissement Sante",
+        "title": "Établissements de santé",
+        "refreshListLabel": "Actualiser",
+        "createLabel": "Créer un établissement",
         "createOrEditLabel": "Créer un Etablissement Sante",
-        "notFound": "Aucun Etablissement Sante trouvé"
+        "notFound": "Aucun établissement de santé"
       },
       "created": "Un nouveau Etablissement Sante a été créé avec l'identifiant {{ param }}",
       "updated": "Le Etablissement Sante avec l'identifiant {{ param }} a été mis à jour",

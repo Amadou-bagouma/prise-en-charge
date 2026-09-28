@@ -5,6 +5,7 @@ import com.mycompany.myapp.service.AgentQueryService;
 import com.mycompany.myapp.service.AgentService;
 import com.mycompany.myapp.service.criteria.AgentCriteria;
 import com.mycompany.myapp.service.dto.AgentDTO;
+import com.mycompany.myapp.service.dto.ChangementStatutDTO;
 import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -102,6 +103,25 @@ public class AgentResource {
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, agentDTO.getId().toString()))
             .body(agentDTO);
+    }
+
+    /**
+     * {@code PUT  /agents/:id/statut} : change la situation d'un agent.
+     *
+     * <p>Seul point d'entree pour cela : les formulaires de modification ne touchent pas a la
+     * situation, faute de quoi on pourrait retirer un droit sans motif et sans que les ayants droit suivent.
+     *
+     * @param id l'agent concerne.
+     * @param changement le nouveau statut et sa raison.
+     * @return {@link ResponseEntity} avec le statut {@code 200 (OK)} et l'entite mise a jour.
+     */
+    @PutMapping("/{id}/statut")
+    public ResponseEntity<AgentDTO> changerStatut(@PathVariable("id") Long id, @Valid @RequestBody ChangementStatutDTO changement) {
+        LOG.debug("REST request to change the status of Agent {} to {}", id, changement.statut());
+        AgentDTO misAJour = agentService.changerStatut(id, changement.statut(), changement.motif());
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, id.toString()))
+            .body(misAJour);
     }
 
     /**

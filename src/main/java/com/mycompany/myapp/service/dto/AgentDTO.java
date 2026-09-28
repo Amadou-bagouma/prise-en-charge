@@ -1,7 +1,9 @@
 package com.mycompany.myapp.service.dto;
 
+import com.mycompany.myapp.domain.enumeration.StatutAgent;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -14,6 +16,8 @@ public class AgentDTO implements Serializable {
     private Long id;
 
     @NotNull
+    @Size(min = 4, max = 4)
+    @Pattern(regexp = "^[A-Z0-9]{4}$", message = "Le matricule doit faire 4 caracteres, en majuscules ou chiffres.")
     private String matricule;
 
     @NotNull
@@ -37,6 +41,15 @@ public class AgentDTO implements Serializable {
     private DirectionDTO direction;
 
     private GestionDTO gestion;
+
+    /** Situation au regard de la couverture medicale. Toujours renseignee. */
+    @NotNull
+    private StatutAgent statut;
+
+    private Instant dateStatut;
+
+    @Size(max = 500)
+    private String motifStatut;
 
     public Long getId() {
         return id;
@@ -134,6 +147,30 @@ public class AgentDTO implements Serializable {
         this.gestion = gestion;
     }
 
+    public StatutAgent getStatut() {
+        return statut;
+    }
+
+    public void setStatut(StatutAgent statut) {
+        this.statut = statut;
+    }
+
+    public Instant getDateStatut() {
+        return dateStatut;
+    }
+
+    public void setDateStatut(Instant dateStatut) {
+        this.dateStatut = dateStatut;
+    }
+
+    public String getMotifStatut() {
+        return motifStatut;
+    }
+
+    public void setMotifStatut(String motifStatut) {
+        this.motifStatut = motifStatut;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -169,6 +206,7 @@ public class AgentDTO implements Serializable {
             ", fonction='" + getFonction() + "'" +
             ", direction=" + getDirection() +
             ", gestion=" + getGestion() +
+            ", statut='" + getStatut() + "'" +
             "}";
     }
 }

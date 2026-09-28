@@ -15,7 +15,6 @@
       }
 
       <div class="jhi-form-grid">
-        @let codeRef = editForm.get('codeAyantDroit')!;
         <div class="jhi-field">
           <label class="form-label" for="field_codeAyantDroit" jhiTranslate="peccnssApp.ayantDroit.codeAyantDroit">Code</label>
           <input
@@ -25,18 +24,14 @@
             id="field_codeAyantDroit"
             data-cy="codeAyantDroit"
             formControlName="codeAyantDroit"
+            [readonly]="true"
           />
-          <small class="form-text text-muted">Identifiant de l'ayant droit. Il doit être unique.</small>
-          @if (codeRef.invalid && (codeRef.dirty || codeRef.touched)) {
-            <div>
-              @if (codeRef.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-              @if (codeRef.errors?.maxlength) {
-                <small class="form-text text-danger">Le code ne peut pas dépasser 50 caractères.</small>
-              }
-            </div>
-          }
+          <!-- Le code est attribué par le serveur à l'enregistrement : ce qui s'affiche ici est
+               un aperçu, recalculé dès que l'agent ou le lien change. -->
+          <small class="form-text text-muted">
+            Attribué automatiquement : les 4 caractères du matricule de l'agent, puis 2 pour un conjoint ou 3 pour un enfant ou un proche,
+            puis un numéro d'ordre.
+          </small>
         </div>
 
         @let nomRef = editForm.get('nom')!;

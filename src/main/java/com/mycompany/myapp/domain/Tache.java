@@ -74,13 +74,25 @@ public class Tache extends AbstractAuditingEntity<Long> implements Serializable 
     )
     private DemandePriseEnCharge demande;
 
-    @ManyToOne(optional = false)
-    @NotNull
+    /**
+     * Qui a pris la tache en charge. Nul tant que personne ne s'en est saisi : c'est ce qui
+     * distingue, dans une file partagee, ce qui attend de ce qui est deja traite par quelqu'un.
+     */
+    @ManyToOne
     private User utilisateur;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "utilisateur" }, allowSetters = true)
-    private BoiteReception boiteReception;
+    /**
+     * L'habilitation qui donne la charge de cette tache, par exemple {@code ROLE_VALIDATEUR_DRH}.
+     *
+     * <p>Une tache s'adresse a un droit, pas a une personne. Creer une tache par titulaire du
+     * droit montrait le meme travail a quatre validateurs, qui se demandaient lequel devait s'en
+     * occuper, et imposait de rattraper la file a chaque nomination. Une seule tache par etape :
+     * tous ceux qui portent le droit la voient, le premier qui l'ouvre se l'attribue.
+     */
+    @NotNull
+    @Size(max = 50)
+    @Column(name = "droit_requis", nullable = false, length = 50)
+    private String droitRequis;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -253,16 +265,16 @@ public class Tache extends AbstractAuditingEntity<Long> implements Serializable 
         return this;
     }
 
-    public BoiteReception getBoiteReception() {
-        return this.boiteReception;
+    public String getDroitRequis() {
+        return this.droitRequis;
     }
 
-    public void setBoiteReception(BoiteReception boiteReception) {
-        this.boiteReception = boiteReception;
+    public void setDroitRequis(String droitRequis) {
+        this.droitRequis = droitRequis;
     }
 
-    public Tache boiteReception(BoiteReception boiteReception) {
-        this.setBoiteReception(boiteReception);
+    public Tache droitRequis(String droitRequis) {
+        this.setDroitRequis(droitRequis);
         return this;
     }
 
@@ -300,6 +312,7 @@ public class Tache extends AbstractAuditingEntity<Long> implements Serializable 
             ", priorite='" + getPriorite() + "'" +
             ", lu='" + getLu() + "'" +
             ", commentaire='" + getCommentaire() + "'" +
+            ", droitRequis='" + getDroitRequis() + "'" +
             "}";
     }
 }

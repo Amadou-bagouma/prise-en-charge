@@ -2,9 +2,9 @@
   "peccnssApp": {
     "LienParente": {
       "null": "",
-      "CONJOINT": "CONJOINT",
-      "ENFANT": "ENFANT",
-      "AUTRE": "AUTRE"
+      "CONJOINT": "Spouse",
+      "ENFANT": "Child",
+      "AUTRE": "Other dependant"
     }
   }
 }

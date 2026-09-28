@@ -10,6 +10,20 @@ import org.springframework.data.domain.Pageable;
  */
 public interface AyantDroitService {
     /**
+     * Change la situation d'un ayant droit.
+     *
+     * <p>Le changement est une decision prise sur l'ayant droit lui-meme : il efface la memoire
+     * d'une eventuelle repercussion, de sorte que reactiver l'agent ne vienne pas ensuite
+     * defaire ce que l'on vient de decider.
+     *
+     * @param id l'ayant droit concerne.
+     * @param statut le nouveau statut, nomme comme dans {@code StatutAyantDroit}.
+     * @param motif la raison. Obligatoire des que l'on quitte ACTIF.
+     * @return l'ayant droit mis a jour.
+     */
+    AyantDroitDTO changerStatut(Long id, String statut, String motif);
+
+    /**
      * Save a ayantDroit.
      *
      * @param ayantDroitDTO the entity to save.

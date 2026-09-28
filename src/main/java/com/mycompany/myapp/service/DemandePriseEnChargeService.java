@@ -1,6 +1,5 @@
 package com.mycompany.myapp.service;
 
-import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.service.dto.DemandePriseEnChargeDTO;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -65,6 +64,26 @@ public interface DemandePriseEnChargeService {
      * @param commentaire an optional comment to record in the history.
      * @return the persisted entity.
      */
+    /**
+     * Soumet au controle RH un dossier encore en saisie.
+     *
+     * <p>C'est le geste qui fait sortir le dossier du brouillon : jusque-la il n'attend personne
+     * et peut etre supprime, apres il entre dans le circuit et ne peut plus qu'etre annule.
+     *
+     * @param id le dossier, qui doit etre en saisie.
+     * @return le dossier mis a jour.
+     */
+    DemandePriseEnChargeDTO soumettre(Long id);
+
+    /**
+     * Declare le controle RH fait : le dossier passe en attente de validation.
+     *
+     * @param id le dossier, qui doit etre en verification.
+     * @param commentaire l'observation du controleur, facultative.
+     * @return le dossier mis a jour.
+     */
+    DemandePriseEnChargeDTO verifier(Long id, String commentaire);
+
     DemandePriseEnChargeDTO valider(Long id, String commentaire);
 
     /**
@@ -83,17 +102,20 @@ public interface DemandePriseEnChargeService {
      * @param id the id of the entity.
      * @return the persisted entity.
      */
-    DemandePriseEnChargeDTO resoumettre(Long id);
-
     /**
-     * Catches up a user who was just granted a validation authority (DRH or infirmerie): creates a
-     * validation Tache for every already-pending demande matching that step which doesn't already have
-     * an open task for them. Without this, a demande stuck in a validation step before the user held the
-     * role would never surface in their "Mes taches".
+     * Refuse definitivement un dossier.
      *
-     * @param validateur the user who was granted the authority.
-     * @param authority the granted authority (only {@code ROLE_VALIDATEUR_DRH} and
-     *     {@code ROLE_VALIDATEUR_INFIRMERIE} trigger a catch-up; anything else is a no-op).
+     * <p>A distinguer du retour pour correction : celui-ci attend une suite, celui-la clot le
+     * dossier. Sans cette distinction, un dossier qui ne peut aboutir - beneficiaire non couvert,
+     * soin hors garanties - reste indefiniment « retourne », et l'agent attend une correction
+     * qu'il ne peut pas faire.
+     *
+     * @param id le dossier a refuser.
+     * @param motif la raison, obligatoire : c'est ce qui figurera sur la notification remise a
+     *        l'agent, et ce sur quoi portera un eventuel recours.
+     * @return le dossier mis a jour.
      */
-    void rattraperTachesValidationPourNouveauValidateur(User validateur, String authority);
+    DemandePriseEnChargeDTO rejeterDefinitivement(Long id, String motif);
+
+    DemandePriseEnChargeDTO resoumettre(Long id);
 }

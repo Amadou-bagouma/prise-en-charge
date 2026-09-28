@@ -1,124 +1,113 @@
-<div>
-  <div class="jhi-page-header">
-    <h2 id="page-heading" data-cy="UserManagementHeading">
-      <span jhiTranslate="userManagement.home.title">Users</span>
-    </h2>
+<div class="pec-ecran">
+  <div class="pec-titre-ecran">
+    <h1 id="page-heading" data-cy="userManagementPageHeading">Comptes utilisateurs</h1>
+    <span class="pec-muted">{{ totalItems() }} compte{{ totalItems() > 1 ? 's' : '' }}</span>
+  </div>
 
-    <div class="jhi-page-actions">
-      <button class="btn btn-outline-secondary" (click)="load()" [disabled]="isLoading()">
-        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
-        <span jhiTranslate="userManagement.home.refreshListLabel">Refresh list</span>
+  <jhi-alert-error />
+  <jhi-alert />
+
+  <div class="pec-filtres">
+    <div class="pec-filtres__actions">
+      <button type="button" class="pec-btn pec-btn--discret pec-btn--sm" (click)="load()" [disabled]="isLoading()" data-cy="actualiser">
+        <fa-icon class="pec-btn__ico" icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Actualiser</span>
       </button>
 
       <button
+        type="button"
         id="jh-create-entity"
         data-cy="entityCreateButton"
-        class="btn btn-accent jh-create-entity create-user-management"
+        class="pec-btn pec-btn--primaire pec-btn--sm"
         [routerLink]="['/user-management/new']"
       >
-        <fa-icon icon="plus" />
-        <span jhiTranslate="userManagement.home.createLabel">Create a new user</span>
+        <fa-icon class="pec-btn__ico" icon="plus" />
+        <span>Créer un compte</span>
       </button>
     </div>
   </div>
 
-  <jhi-alert-error />
-
-  <jhi-alert />
-
-  @if (userManagements().length === 0) {
-    <div class="alert alert-warning" id="no-result">
-      <span jhiTranslate="userManagement.home.notFound">No user found</span>
-    </div>
-  } @else {
-    <div class="jhi-table-panel table-responsive table-entities" id="entities">
-      <table class="table jhi-table" aria-describedby="page-heading">
+  <div class="pec-panneau">
+    <div class="pec-tbl-zone" id="entities">
+      <table class="pec-tbl" aria-describedby="page-heading">
         <thead>
           <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
             <th scope="col" jhiSortBy="login">
               <div class="d-flex">
-                <span jhiTranslate="userManagement.login">Login</span>
+                <span>Identifiant</span>
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
-            <th scope="col"></th>
-            <th scope="col" jhiSortBy="langKey">
-              <div class="d-flex">
-                <span jhiTranslate="userManagement.langKey">Language</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
+            <th scope="col">Accès</th>
             <th scope="col" jhiSortBy="profil.nom">
               <div class="d-flex">
-                <span jhiTranslate="userManagement.profil">Profil</span>
+                <span>Profil</span>
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
-            <th scope="col">
-              <div class="d-flex">
-                <span jhiTranslate="userManagement.profiles">Profiles</span>
-              </div>
-            </th>
+            <th scope="col">Habilitations</th>
             <th scope="col" jhiSortBy="createdDate">
               <div class="d-flex">
-                <span jhiTranslate="userManagement.createdDate">Created date</span>
+                <span>Créé le</span>
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
-            <th scope="col"></th>
+            <th scope="col" class="pec-tbl__droite"><span class="visually-hidden">Actions</span></th>
           </tr>
         </thead>
         <tbody>
           @for (userManagement of userManagements(); track trackLogin(userManagement)) {
             <tr data-cy="entityTable">
               <td>
-                <a [routerLink]="['/user-management', userManagement.login, 'view']">{{ userManagement.login }}</a>
+                <a class="pec-strong" [routerLink]="['/user-management', userManagement.login, 'view']">{{ userManagement.login }}</a>
               </td>
               <td>
+                <!--
+                  L'accès se bascule d'un clic, depuis la liste : c'est le geste le plus fréquent
+                  sur cet écran, et le faire depuis la fiche imposerait deux navigations.
+                  Se désactiver soi-même est refusé — on s'enfermerait dehors.
+                -->
                 @if (!userManagement.activated) {
-                  <button class="btn btn-danger btn-sm" (click)="setActive(userManagement, true)" jhiTranslate="userManagement.deactivated">
-                    Deactivated
+                  <button type="button" class="pec-btn pec-btn--discret pec-btn--sm" (click)="setActive(userManagement, true)">
+                    <span class="pec-badge pec-badge--danger"><span class="pec-badge__pt"></span>Désactivé</span>
                   </button>
                 } @else {
                   <button
-                    class="btn btn-success btn-sm"
+                    type="button"
+                    class="pec-btn pec-btn--discret pec-btn--sm"
                     (click)="setActive(userManagement, false)"
                     [disabled]="!currentAccount() || currentAccount()?.login === userManagement.login"
-                    jhiTranslate="userManagement.activated"
                   >
-                    Activated
+                    <span class="pec-badge pec-badge--ok"><span class="pec-badge__pt"></span>Actif</span>
                   </button>
                 }
               </td>
-              <td>{{ userManagement.langKey }}</td>
               <td>
                 @if (userManagement.profil) {
                   <a [routerLink]="['/profil', userManagement.profil.id, 'view']">{{ userManagement.profil.nom }}</a>
+                } @else {
+                  <span class="pec-muted">—</span>
                 }
               </td>
-              <td>
-                @for (authority of userManagement.authorities; track $index; let last = $last) {
-                  <span>
-                    <a class="jhi-badge jhi-badge-type-AS" [routerLink]="['/authority', authority, 'view']">{{ authority }}</a
-                    >{{ last ? '' : ' ' }}
-                  </span>
+              <td class="pec-tbl__libre">
+                @for (authority of userManagement.authorities; track $index) {
+                  <span class="pec-badge pec-badge--neutre"><span class="pec-badge__pt"></span>{{ authority }}</span>
                 }
               </td>
-              <td>{{ userManagement.createdDate | formatMediumDatetime }}</td>
-              <td class="text-end">
-                <div ngbDropdown class="d-inline-block" container="body">
-                  <button type="button" class="btn btn-secondary btn-sm" ngbDropdownToggle data-cy="entityActionsButton">
-                    <fa-icon icon="ellipsis-vertical" />
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.actions">Actions</span>
+              <td class="pec-num">{{ userManagement.createdDate | formatMediumDatetime }}</td>
+              <td class="pec-tbl__droite">
+                <div ngbDropdown container="body" class="d-inline-block">
+                  <button type="button" class="pec-btn pec-btn--discret pec-btn--sm" ngbDropdownToggle data-cy="entityActionsButton">
+                    <span jhiTranslate="entity.action.actions">Actions</span>
                   </button>
                   <div ngbDropdownMenu>
                     <a ngbDropdownItem [routerLink]="['/user-management', userManagement.login, 'view']" data-cy="entityDetailsButton">
                       <fa-icon icon="eye" class="me-1" />
-                      <span jhiTranslate="entity.action.view">View</span>
+                      <span jhiTranslate="entity.action.view">Voir</span>
                     </a>
                     <a ngbDropdownItem [routerLink]="['/user-management', userManagement.login, 'edit']" data-cy="entityEditButton">
                       <fa-icon icon="pencil-alt" class="me-1" />
-                      <span jhiTranslate="entity.action.edit">Edit</span>
+                      <span jhiTranslate="entity.action.edit">Editer</span>
                     </a>
                     <button
                       ngbDropdownItem
@@ -128,24 +117,25 @@
                       data-cy="entityDeleteButton"
                     >
                       <fa-icon icon="times" class="me-1" />
-                      <span jhiTranslate="entity.action.delete">Delete</span>
+                      <span jhiTranslate="entity.action.delete">Supprimer</span>
                     </button>
                   </div>
                 </div>
               </td>
             </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="pec-tbl__vide">Aucun compte</td>
+            </tr>
           }
         </tbody>
       </table>
     </div>
-  }
-  @if (userManagements().length > 0) {
-    <div>
-      <div class="d-flex justify-content-center">
-        <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
-      </div>
 
-      <div class="d-flex justify-content-center">
+    @if (userManagements().length > 0) {
+      <div class="pec-pied">
+        <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+
         <ngb-pagination
           [collectionSize]="totalItems()"
           [page]="page()"
@@ -156,6 +146,6 @@
           (pageChange)="navigateToPage($event)"
         />
       </div>
-    </div>
-  }
+    }
+  </div>
 </div>

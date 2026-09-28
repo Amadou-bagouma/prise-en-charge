@@ -81,6 +81,7 @@ public class AyantDroitQueryService extends QueryService<AyantDroit> {
                 Specification.allOf(
                     Boolean.TRUE.equals(criteria.getDistinct()) ? distinct(criteria.getDistinct()) : Specification.unrestricted(),
                     buildRangeSpecification(criteria.getId(), AyantDroit_.id),
+                    buildSpecification(criteria.getStatut(), AyantDroit_.statut),
                     buildStringSpecification(criteria.getNom(), AyantDroit_.nom),
                     buildStringSpecification(criteria.getPrenom(), AyantDroit_.prenom),
                     buildRangeSpecification(criteria.getDateNaissance(), AyantDroit_.dateNaissance),

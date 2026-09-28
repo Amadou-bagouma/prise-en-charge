@@ -1,6 +1,5 @@
 import dayjs from 'dayjs/esm';
 
-import { IBoiteReception } from 'app/entities/boite-reception/boite-reception.model';
 import { IDemandePriseEnCharge } from 'app/entities/demande-prise-en-charge/demande-prise-en-charge.model';
 import { PrioriteTache } from 'app/entities/enumerations/priorite-tache.model';
 import { StatutTache } from 'app/entities/enumerations/statut-tache.model';
@@ -19,8 +18,10 @@ export interface ITache {
   lu?: boolean | null;
   commentaire?: string | null;
   demande?: Pick<IDemandePriseEnCharge, 'id' | 'reference'> | null;
+  /** L'habilitation qui donne la charge de cette tâche, par exemple `ROLE_VALIDATEUR_DRH`. */
+  droitRequis?: string | null;
+  /** Qui a pris la tâche en charge. Nul tant que personne ne s'en est saisi. */
   utilisateur?: Pick<IUser, 'id' | 'login'> | null;
-  boiteReception?: Pick<IBoiteReception, 'id'> | null;
 }
 
 export type NewTache = Omit<ITache, 'id'> & { id: null };

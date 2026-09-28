@@ -11,6 +11,8 @@ import { AyantDroitService, RestAyantDroit } from './ayant-droit.service';
 const requireRestSample: RestAyantDroit = {
   ...sampleWithRequiredData,
   dateNaissance: sampleWithRequiredData.dateNaissance?.format(DATE_FORMAT),
+  // La date de situation est un instant : elle voyage en ISO, pas au format date seule.
+  dateStatut: sampleWithRequiredData.dateStatut?.toJSON(),
 };
 
 describe('AyantDroit Service', () => {

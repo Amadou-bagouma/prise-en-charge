@@ -1,112 +1,110 @@
-<div>
-  <div class="jhi-page-header">
-    <h2 id="page-heading" data-cy="PieceJustificativeHeading">
-      <span jhiTranslate="peccnssApp.pieceJustificative.home.title">Piece Justificatives</span>
-    </h2>
+<div class="pec-ecran">
+  <div class="pec-titre-ecran">
+    <h1 id="page-heading" data-cy="PieceJustificativeHeading">Pièces justificatives</h1>
+    <span class="pec-muted">{{ totalItems() }} pièces</span>
+  </div>
 
-    <div class="jhi-page-actions">
-      <button class="btn btn-outline-secondary" (click)="load()" [disabled]="isLoading()">
-        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
-        <span jhiTranslate="peccnssApp.pieceJustificative.home.refreshListLabel">Refresh list</span>
+  <jhi-alert-error />
+  <jhi-alert />
+
+  <div class="pec-filtres">
+    <div class="pec-filtres__actions">
+      <button type="button" class="pec-btn pec-btn--discret pec-btn--sm" (click)="load()" [disabled]="isLoading()" data-cy="actualiser">
+        <fa-icon class="pec-btn__ico" icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Actualiser</span>
       </button>
-
       <button
+        type="button"
         id="jh-create-entity"
         data-cy="entityCreateButton"
-        class="btn btn-accent jh-create-entity create-piece-justificative"
+        class="pec-btn pec-btn--primaire pec-btn--sm"
         [routerLink]="['/piece-justificative/new']"
       >
-        <fa-icon icon="plus" />
-        <span jhiTranslate="peccnssApp.pieceJustificative.home.createLabel">Create a new Piece Justificative</span>
+        <fa-icon class="pec-btn__ico" icon="plus" />
+        <span>Joindre une pièce</span>
       </button>
     </div>
   </div>
 
-  <jhi-alert-error />
-
-  <jhi-alert />
-
-  @if (pieceJustificatives().length === 0) {
-    <div class="alert alert-warning" id="no-result">
-      <span jhiTranslate="peccnssApp.pieceJustificative.home.notFound">No Piece Justificatives found</span>
-    </div>
-  } @else {
-    <div class="jhi-table-panel table-responsive table-entities" id="entities">
-      <table class="table jhi-table" aria-describedby="page-heading">
+  <div class="pec-panneau">
+    <div class="pec-tbl-zone" id="entities">
+      <table class="pec-tbl" aria-describedby="page-heading">
         <thead>
           <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
             <th scope="col" jhiSortBy="nomFichier">
               <div class="d-flex">
-                <span jhiTranslate="peccnssApp.pieceJustificative.nomFichier">Nom Fichier</span>
+                <span>Nom du fichier</span>
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
             <th scope="col" jhiSortBy="demande.reference">
               <div class="d-flex">
-                <span jhiTranslate="peccnssApp.pieceJustificative.demande">Demande</span>
+                <span>Dossier</span>
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
             <th scope="col" jhiSortBy="dateAjout">
               <div class="d-flex">
-                <span jhiTranslate="peccnssApp.pieceJustificative.dateAjout">Date Ajout</span>
+                <span>Date d'ajout</span>
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
-            <th scope="col"></th>
+            <th scope="col" class="pec-tbl__droite"><span class="visually-hidden">Actions</span></th>
           </tr>
         </thead>
         <tbody>
           @for (pieceJustificative of pieceJustificatives(); track trackId(pieceJustificative)) {
             <tr data-cy="entityTable">
               <td>
-                <a [routerLink]="['/piece-justificative', pieceJustificative.id, 'view']">
-                  <fa-icon icon="file" class="me-1" />{{ pieceJustificative.nomFichier }}
-                </a>
+                <a class="pec-strong" [routerLink]="['/piece-justificative', pieceJustificative.id, 'view']">{{
+                  pieceJustificative.nomFichier
+                }}</a>
               </td>
               <td>
                 @if (pieceJustificative.demande) {
-                  <a [routerLink]="['/demande-prise-en-charge', pieceJustificative.demande.id, 'view']">{{
+                  <a class="pec-num" [routerLink]="['/demande-prise-en-charge', pieceJustificative.demande.id, 'view']">{{
                     pieceJustificative.demande.reference
                   }}</a>
+                } @else {
+                  <span class="pec-muted">—</span>
                 }
               </td>
-              <td>{{ pieceJustificative.dateAjout | formatMediumDatetime }}</td>
-              <td class="text-end">
-                <div ngbDropdown class="d-inline-block" container="body">
-                  <button type="button" class="btn btn-secondary btn-sm" ngbDropdownToggle data-cy="entityActionsButton">
-                    <fa-icon icon="ellipsis-vertical" />
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.actions">Actions</span>
+              <td class="pec-num">{{ (pieceJustificative.dateAjout | formatMediumDatetime) || '—' }}</td>
+              <td class="pec-tbl__droite">
+                <div ngbDropdown container="body" class="d-inline-block">
+                  <button type="button" class="pec-btn pec-btn--discret pec-btn--sm" ngbDropdownToggle data-cy="entityActionsButton">
+                    <span jhiTranslate="entity.action.actions">Actions</span>
                   </button>
                   <div ngbDropdownMenu>
                     <a ngbDropdownItem [routerLink]="['/piece-justificative', pieceJustificative.id, 'view']" data-cy="entityDetailsButton">
                       <fa-icon icon="eye" class="me-1" />
-                      <span jhiTranslate="entity.action.view">View</span>
+                      <span jhiTranslate="entity.action.view">Voir</span>
                     </a>
                     <a ngbDropdownItem [routerLink]="['/piece-justificative', pieceJustificative.id, 'edit']" data-cy="entityEditButton">
                       <fa-icon icon="pencil-alt" class="me-1" />
-                      <span jhiTranslate="entity.action.edit">Edit</span>
+                      <span jhiTranslate="entity.action.edit">Editer</span>
                     </a>
                     <button ngbDropdownItem type="button" (click)="delete(pieceJustificative)" data-cy="entityDeleteButton">
                       <fa-icon icon="times" class="me-1" />
-                      <span jhiTranslate="entity.action.delete">Delete</span>
+                      <span jhiTranslate="entity.action.delete">Supprimer</span>
                     </button>
                   </div>
                 </div>
               </td>
             </tr>
+          } @empty {
+            <tr>
+              <td colspan="4" class="pec-tbl__vide">Aucune pièce justificative</td>
+            </tr>
           }
         </tbody>
       </table>
     </div>
-  }
-  @if (pieceJustificatives().length > 0) {
-    <div>
-      <div class="d-flex justify-content-center">
-        <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
-      </div>
 
-      <div class="d-flex justify-content-center">
+    @if (pieceJustificatives().length > 0) {
+      <div class="pec-pied">
+        <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+
         <ngb-pagination
           [collectionSize]="totalItems()"
           [page]="page()"
@@ -117,6 +115,6 @@
           (pageChange)="navigateToPage($event)"
         />
       </div>
-    </div>
-  }
+    }
+  </div>
 </div>

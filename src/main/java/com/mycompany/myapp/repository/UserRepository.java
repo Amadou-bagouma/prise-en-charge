@@ -47,4 +47,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findAllByAuthoritiesNameAndActivatedIsTrue(String authorityName);
 
     boolean existsByProfilId(Long profilId);
+
+    /** Les comptes portant ce profil, pour leur repercuter un changement de droits. */
+    @EntityGraph(attributePaths = "authorities")
+    List<User> findAllByProfilId(Long profilId);
 }

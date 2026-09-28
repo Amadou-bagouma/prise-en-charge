@@ -86,6 +86,8 @@ public class HistoriqueActionQueryService extends QueryService<HistoriqueAction>
                     Boolean.TRUE.equals(criteria.getDistinct()) ? distinct(criteria.getDistinct()) : Specification.unrestricted(),
                     buildRangeSpecification(criteria.getId(), HistoriqueAction_.id),
                     buildStringSpecification(criteria.getAction(), HistoriqueAction_.action),
+                    buildStringSpecification(criteria.getCibleType(), HistoriqueAction_.cibleType),
+                    buildRangeSpecification(criteria.getCibleId(), HistoriqueAction_.cibleId),
                     buildStringSpecification(criteria.getDescription(), HistoriqueAction_.description),
                     buildRangeSpecification(criteria.getDateAction(), HistoriqueAction_.dateAction),
                     buildSpecification(criteria.getDemandeId(), root ->

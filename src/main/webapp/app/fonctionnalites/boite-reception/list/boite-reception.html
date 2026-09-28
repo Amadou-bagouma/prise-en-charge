@@ -1,109 +1,159 @@
-<div>
-  <div class="jhi-page-header">
-    <h2 id="page-heading" data-cy="BoiteReceptionHeading">
-      <span jhiTranslate="peccnssApp.boiteReception.home.title">Boite Receptions</span>
-    </h2>
+<div class="pec-ecran">
+  <div class="pec-titre-ecran">
+    <h1 id="page-heading" data-cy="BoiteReceptionHeading">Boîte de réception</h1>
+    @if (boite(); as b) {
+      <!--
+        Le nom du profil est affiché parce que la boîte n'est pas personnelle : savoir au nom de
+        quel rôle on lit évite de croire qu'une tâche vous est adressée à vous seul.
+      -->
+      <span class="pec-muted" data-cy="profilBoite">
+        Profil {{ b.profil?.nom }} — {{ b.nombreTaches ?? 0 }} tâche{{ (b.nombreTaches ?? 0) > 1 ? 's' : '' }} adressée{{
+          (b.nombreTaches ?? 0) > 1 ? 's' : ''
+        }}
+      </span>
+    }
+  </div>
 
-    <div class="jhi-page-actions">
-      <button class="btn btn-outline-secondary" (click)="load()" [disabled]="isLoading()">
-        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
-        <span jhiTranslate="peccnssApp.boiteReception.home.refreshListLabel">Refresh list</span>
-      </button>
+  <jhi-alert-error />
+  <jhi-alert />
 
-      <button
-        id="jh-create-entity"
-        data-cy="entityCreateButton"
-        class="btn btn-accent jh-create-entity create-boite-reception"
-        [routerLink]="['/boite-reception/new']"
-      >
-        <fa-icon icon="plus" />
-        <span jhiTranslate="peccnssApp.boiteReception.home.createLabel">Create a new Boite Reception</span>
+  <section class="pec-panneau">
+    <div class="pec-panneau__corps">
+      <p class="pec-muted mb-0">
+        Vous ne voyez ici que les tâches dont vos droits vous donnent la charge. Cette boîte est celle de votre profil : tout agent portant
+        le même profil y accède, de sorte qu'un dossier reste traitable en votre absence.
+      </p>
+    </div>
+  </section>
+
+  <div class="pec-filtres">
+    <button
+      type="button"
+      class="pec-puce"
+      [class.pec-puce--active]="vue() === 'aTraiter'"
+      (click)="changerVue('aTraiter')"
+      data-cy="vue-aTraiter"
+    >
+      À traiter
+      <span class="pec-puce__n">{{ boite()?.nombreOuvertes ?? 0 }}</span>
+    </button>
+    <button
+      type="button"
+      class="pec-puce"
+      [class.pec-puce--active]="vue() === 'toutes'"
+      (click)="changerVue('toutes')"
+      data-cy="vue-toutes"
+    >
+      Tout
+      <span class="pec-puce__n">{{ boite()?.nombreTaches ?? 0 }}</span>
+    </button>
+
+    <div class="pec-filtres__actions">
+      @if (boite()?.dateDerniereLecture) {
+        <span class="pec-muted">Dernière consultation {{ boite()!.dateDerniereLecture | formatMediumDatetime }}</span>
+      }
+      <button type="button" class="pec-btn pec-btn--discret pec-btn--sm" (click)="charger()" [disabled]="isLoading()" data-cy="actualiser">
+        <fa-icon class="pec-btn__ico" icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Actualiser</span>
       </button>
     </div>
   </div>
 
-  <jhi-alert-error />
-
-  <jhi-alert />
-
-  @if (boiteReceptions().length === 0) {
-    <div class="alert alert-warning" id="no-result">
-      <span jhiTranslate="peccnssApp.boiteReception.home.notFound">No Boite Receptions found</span>
-    </div>
-  } @else {
-    <div class="jhi-table-panel table-responsive table-entities" id="entities">
-      <table class="table jhi-table" aria-describedby="page-heading">
-        <thead>
-          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
-            <th scope="col" jhiSortBy="utilisateur.login">
-              <div class="d-flex">
-                <span jhiTranslate="peccnssApp.boiteReception.utilisateur">Utilisateur</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="nombreNonLus">
-              <div class="d-flex">
-                <span jhiTranslate="peccnssApp.boiteReception.nombreNonLus">Nombre Non Lus</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="dateDerniereLecture">
-              <div class="d-flex">
-                <span jhiTranslate="peccnssApp.boiteReception.dateDerniereLecture">Date Derniere Lecture</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="actif">
-              <div class="d-flex">
-                <span jhiTranslate="peccnssApp.boiteReception.actif">Actif</span>
-                <fa-icon class="p-1" icon="sort" />
-              </div>
-            </th>
-            <th scope="col"></th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (boiteReception of boiteReceptions(); track trackId(boiteReception)) {
-            <tr data-cy="entityTable">
-              <td>
-                <a [routerLink]="['/boite-reception', boiteReception.id, 'view']">{{ boiteReception.utilisateur?.login }}</a>
-              </td>
-              <td>{{ boiteReception.nombreNonLus }}</td>
-              <td>{{ boiteReception.dateDerniereLecture | formatMediumDatetime }}</td>
-              <td>
-                <span class="jhi-badge" [ngClass]="boiteReception.actif ? 'jhi-badge-actif-true' : 'jhi-badge-actif-false'">
-                  {{ boiteReception.actif ? 'Actif' : 'Inactif' }}
-                </span>
-              </td>
-              <td class="text-end">
-                <div ngbDropdown class="d-inline-block" container="body">
-                  <button type="button" class="btn btn-secondary btn-sm" ngbDropdownToggle data-cy="entityActionsButton">
-                    <fa-icon icon="ellipsis-vertical" />
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.actions">Actions</span>
-                  </button>
-                  <div ngbDropdownMenu>
-                    <a ngbDropdownItem [routerLink]="['/boite-reception', boiteReception.id, 'view']" data-cy="entityDetailsButton">
-                      <fa-icon icon="eye" class="me-1" />
-                      <span jhiTranslate="entity.action.view">View</span>
-                    </a>
-                    <a ngbDropdownItem [routerLink]="['/boite-reception', boiteReception.id, 'edit']" data-cy="entityEditButton">
-                      <fa-icon icon="pencil-alt" class="me-1" />
-                      <span jhiTranslate="entity.action.edit">Edit</span>
-                    </a>
-                    <button ngbDropdownItem type="button" (click)="delete(boiteReception)" data-cy="entityDeleteButton">
-                      <fa-icon icon="times" class="me-1" />
-                      <span jhiTranslate="entity.action.delete">Delete</span>
-                    </button>
-                  </div>
-                </div>
-              </td>
-            </tr>
+  @if (premierChargement()) {
+    <section class="pec-panneau">
+      <div class="pec-panneau__corps"><span class="pec-muted">Chargement de votre boîte…</span></div>
+    </section>
+  } @else if (taches().length === 0) {
+    <section class="pec-panneau">
+      <div class="pec-panneau__corps">
+        <span class="pec-muted" data-cy="boiteVide">
+          @if (vue() === 'aTraiter') {
+            Aucune tâche à traiter. Votre boîte est à jour.
+          } @else {
+            Aucune tâche n'est adressée à votre profil.
           }
-        </tbody>
-      </table>
-    </div>
-  }
-  @if (boiteReceptions().length > 0) {
+        </span>
+      </div>
+    </section>
+  } @else {
+    <ul class="pec-boite">
+      @for (tache of taches(); track trackId(tache)) {
+        <li class="pec-boite__item" [class.pec-boite__item--non-lue]="!tache.lu" data-cy="entityTable">
+          <div class="pec-boite__tete">
+            <span class="pec-boite__titre">{{ tache.titre }}</span>
+
+            <span class="pec-badge" [ngClass]="'pec-badge--' + tonStatut(tache.statut)">
+              <span class="pec-badge__pt"></span>
+              <span [jhiTranslate]="'peccnssApp.StatutTache.' + (tache.statut ?? 'null')">{{ tache.statut }}</span>
+            </span>
+
+            <span class="pec-badge" [ngClass]="'pec-badge--' + tonPriorite(tache.priorite)">
+              <span class="pec-badge__pt"></span>
+              <span [jhiTranslate]="'peccnssApp.PrioriteTache.' + (tache.priorite ?? 'null')">{{ tache.priorite }}</span>
+            </span>
+
+            <span class="pec-boite__date">{{ tache.dateCreation | formatMediumDatetime }}</span>
+          </div>
+
+          @if (tache.description) {
+            <p class="pec-boite__message">{{ tache.description }}</p>
+          }
+
+          <div class="pec-boite__actions">
+            @if (tache.demande) {
+              <a
+                [routerLink]="['/demande-prise-en-charge', tache.demande.id, 'view']"
+                class="pec-btn pec-btn--discret pec-btn--sm"
+                data-cy="ouvrirDossier"
+              >
+                <fa-icon class="pec-btn__ico" icon="eye" />
+                <span>Ouvrir le dossier {{ tache.demande.reference }}</span>
+              </a>
+            }
+
+            @if (estEnRetard(tache)) {
+              <span class="pec-badge pec-badge--danger">
+                <span class="pec-badge__pt"></span>
+                <span>Échéance dépassée le {{ tache.dateEcheance | formatMediumDatetime }}</span>
+              </span>
+            } @else if (tache.dateEcheance) {
+              <span class="pec-muted">Échéance {{ tache.dateEcheance | formatMediumDatetime }}</span>
+            }
+
+            <!--
+              La file est partagée : savoir si quelqu'un s'en occupe déjà évite que deux
+              personnes traitent le même dossier pendant qu'un autre attend.
+            -->
+            @if (priseParUnAutre(tache)) {
+              <span class="pec-badge pec-badge--neutre" data-cy="prisePar">
+                <span class="pec-badge__pt"></span>
+                <span>Prise en charge par {{ tache.utilisateur?.login }}</span>
+              </span>
+            } @else if (priseParMoi(tache)) {
+              <button type="button" class="pec-btn pec-btn--discret pec-btn--sm" (click)="relacher(tache)" data-cy="relacher">
+                <fa-icon class="pec-btn__ico" icon="times" />
+                <span>Rendre à la file</span>
+              </button>
+            } @else {
+              <button type="button" class="pec-btn pec-btn--primaire pec-btn--sm" (click)="prendreEnCharge(tache)" data-cy="prendre">
+                <fa-icon class="pec-btn__ico" icon="check" />
+                <span>Prendre en charge</span>
+              </button>
+            }
+
+            @if (!tache.lu) {
+              <button type="button" class="pec-btn pec-btn--discret pec-btn--sm" (click)="marquerLue(tache)" data-cy="marquerLue">
+                <fa-icon class="pec-btn__ico" icon="check" />
+                <span>Marquer comme lue</span>
+              </button>
+            } @else {
+              <span class="pec-muted pec-boite__lue">Lue</span>
+            }
+          </div>
+        </li>
+      }
+    </ul>
+
     <div>
       <div class="d-flex justify-content-center">
         <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
@@ -117,7 +167,7 @@
           [maxSize]="5"
           [rotate]="true"
           [boundaryLinks]="true"
-          (pageChange)="navigateToPage($event)"
+          (pageChange)="changerPage($event)"
         />
       </div>
     </div>

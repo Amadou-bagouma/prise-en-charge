@@ -11,6 +11,19 @@ import org.springframework.data.domain.Pageable;
  */
 public interface AgentService {
     /**
+     * Change la situation d'un agent et la repercute sur ses ayants droit.
+     *
+     * <p>Sortir un agent de l'activite retire le droit a ses ayants droit ; l'y ramener leur rend
+     * le statut qu'ils avaient avant - voir {@link RepercussionStatutAyantDroit}.
+     *
+     * @param id l'agent concerne.
+     * @param statut le nouveau statut, nomme comme dans {@code StatutAgent}.
+     * @param motif la raison. Obligatoire des que l'on quitte ACTIF.
+     * @return l'agent mis a jour.
+     */
+    AgentDTO changerStatut(Long id, String statut, String motif);
+
+    /**
      * Save a agent.
      *
      * @param agentDTO the entity to save.
@@ -56,5 +69,12 @@ public interface AgentService {
      * @param id the id of the entity.
      */
     void delete(Long id);
+
+    /**
+     * Retrouve un agent par son matricule.
+     *
+     * @param matricule le matricule recherche.
+     * @return l'agent, vide si aucun ne porte ce matricule.
+     */
     Optional<Agent> findByMatricule(String matricule);
 }

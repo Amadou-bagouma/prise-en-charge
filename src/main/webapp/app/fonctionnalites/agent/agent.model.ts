@@ -3,9 +3,16 @@ import dayjs from 'dayjs/esm';
 import { IDirection } from 'app/entities/direction/direction.model';
 import { IGestion } from 'app/entities/gestion/gestion.model';
 
+/** Situation d'un agent au regard de la couverture médicale. */
+export type StatutAgent = 'ACTIF' | 'SUSPENDU' | 'RETRAITE' | 'RADIE' | 'DECEDE';
+
 export interface IAgent {
   id: number;
   matricule?: string | null;
+  /** Toujours renseignée : un dossier sans situation connue laisserait le guichet décider au cas par cas. */
+  statut?: StatutAgent | null;
+  dateStatut?: dayjs.Dayjs | null;
+  motifStatut?: string | null;
   nom?: string | null;
   prenom?: string | null;
   dateNaissance?: dayjs.Dayjs | null;

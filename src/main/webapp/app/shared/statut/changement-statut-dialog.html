@@ -1,0 +1,88 @@
+<form name="changementStatutForm" novalidate (ngSubmit)="valider()">
+  <div class="modal-header">
+    <h2 class="modal-title" data-cy="ChangementStatutHeading">Changer la situation</h2>
+    <button type="button" class="btn-close" aria-label="Fermer" (click)="annuler()" data-cy="fermerStatut"></button>
+  </div>
+
+  <div class="modal-body">
+    <jhi-alert-error />
+
+    <p class="pec-muted" data-cy="intituleStatut">
+      <strong>{{ intitule }}</strong>
+      @if (libelleCourant) {
+        — actuellement <strong>{{ libelleCourant }}</strong>
+      }
+    </p>
+
+    <div class="jhi-field">
+      <label class="form-label" for="statut_nouveau">Nouvelle situation</label>
+      <select
+        class="form-control"
+        id="statut_nouveau"
+        name="statut"
+        data-cy="nouveauStatut"
+        [ngModel]="statutChoisi()"
+        (ngModelChange)="statutChoisi.set($event)"
+      >
+        <option value="">— choisir —</option>
+        @for (option of options; track option.valeur) {
+          <option [value]="option.valeur" [disabled]="option.valeur === statutCourant">{{ option.libelle }}</option>
+        }
+      </select>
+      @if (consequence()) {
+        <small class="form-text text-muted" data-cy="consequenceStatut">{{ consequence() }}</small>
+      }
+    </div>
+
+    @if (repercute && statutChoisi() && statutChoisi() !== statutCourant) {
+      <!--
+        Dit avant l'envoi, pas découvert après : la couverture des ayants droit dérive de celle
+        de l'agent, et une radiation les emporte.
+      -->
+      <div class="pec-panneau" data-cy="avertissementCascade">
+        <div class="pec-panneau__corps">
+          <span class="pec-muted">
+            @if (statutChoisi() === 'ACTIF') {
+              Les ayants droit de cet agent retrouveront la situation qui était la leur avant la répercussion.
+            } @else {
+              Les ayants droit de cet agent suivront cette situation. Leur situation propre est conservée et leur sera rendue si l'agent
+              redevient actif.
+            }
+          </span>
+        </div>
+      </div>
+    }
+
+    <div class="jhi-field">
+      <label class="form-label" for="statut_motif">
+        Motif
+        @if (motifObligatoire()) {
+          <span class="text-danger">*</span>
+        }
+      </label>
+      <textarea
+        class="form-control"
+        id="statut_motif"
+        name="motif"
+        rows="3"
+        data-cy="motifStatut"
+        [ngModel]="motif()"
+        (ngModelChange)="motif.set($event)"
+      ></textarea>
+      @if (motifObligatoire()) {
+        <small class="form-text text-muted">
+          Obligatoire pour retirer le droit : c'est ce qui sera présenté à l'intéressé s'il conteste.
+        </small>
+      }
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="annuler()" data-cy="annulerStatut">
+      <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Annuler</span>
+    </button>
+    <button type="submit" class="btn btn-accent" [disabled]="!peutValider() || enCours()" data-cy="validerStatut">
+      <fa-icon icon="save" />&nbsp;<span>Enregistrer</span>
+    </button>
+  </div>
+</form>

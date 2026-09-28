@@ -3,10 +3,10 @@
     "typeSoin": {
       "home": {
         "title": "Types de soin",
-        "refreshListLabel": "Actualiser la liste",
+        "refreshListLabel": "Actualiser",
         "createLabel": "Créer un type de soin",
         "createOrEditLabel": "Créer ou modifier un type de soin",
-        "notFound": "Aucun type de soin trouvé"
+        "notFound": "Aucun type de soin"
       },
       "created": "Le type de soin {{ param }} a été créé",
       "updated": "Le type de soin {{ param }} a été mis à jour",

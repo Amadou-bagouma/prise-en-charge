@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Situation d'un agent et d'un ayant droit au regard de la couverture medicale.
+
+        Les lignes existantes sont declarees ACTIF : c'est ce qu'elles etaient implicitement
+        jusqu'ici, aucune n'ayant jamais ete retiree de la couverture. La colonne est NOT NULL -
+        un dossier sans situation connue laisserait le guichet decider au cas par cas.
+
+        La valeur par defaut est conservee apres le remplissage : Hibernate envoie toujours la
+        colonne, mais un import ou un correctif SQL direct ne doit pas pouvoir creer de ligne
+        sans situation.
+    -->
+    <changeSet id="20260925140000-1" author="cnss">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="agent" columnName="statut"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="agent">
+            <column name="statut" type="varchar(20)" defaultValue="ACTIF">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_statut" type="${datetimeType}"/>
+            <column name="motif_statut" type="varchar(500)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20260925140000-2" author="cnss">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="ayant_droit" columnName="statut"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="ayant_droit">
+            <column name="statut" type="varchar(20)" defaultValue="ACTIF">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_statut" type="${datetimeType}"/>
+            <column name="motif_statut" type="varchar(500)"/>
+            <!-- Memoire du statut propre de l'ayant droit pendant qu'une repercussion du statut
+                 de l'agent le recouvre. Nulle en dehors de ce cas : sa presence signifie
+                 exactement « ce statut vient de l'agent ». -->
+            <column name="statut_avant_cascade" type="varchar(20)"/>
+        </addColumn>
+    </changeSet>
+
+    <!--
+        Le motif propre de l'ayant droit, mis de cote en meme temps que son statut.
+
+        Changeset distinct du precedent, et non ajout dans celui-ci : le -2 a deja ete joue sur
+        les bases existantes, le retoucher ferait echouer le demarrage sur une somme de controle
+        differente de celle enregistree.
+    -->
+    <changeSet id="20260925140000-3" author="cnss">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="ayant_droit" columnName="motif_avant_cascade"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="ayant_droit">
+            <column name="motif_avant_cascade" type="varchar(500)"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

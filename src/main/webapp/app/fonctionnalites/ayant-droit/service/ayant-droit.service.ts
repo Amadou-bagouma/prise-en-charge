@@ -10,8 +10,9 @@ import { IAyantDroit, NewAyantDroit } from '../ayant-droit.model';
 
 export type PartialUpdateAyantDroit = Partial<IAyantDroit> & Pick<IAyantDroit, 'id'>;
 
-type RestOf<T extends IAyantDroit | NewAyantDroit> = Omit<T, 'dateNaissance'> & {
+type RestOf<T extends IAyantDroit | NewAyantDroit> = Omit<T, 'dateNaissance' | 'dateStatut'> & {
   dateNaissance?: string | null;
+  dateStatut?: string | null;
 };
 
 export type RestAyantDroit = RestOf<IAyantDroit>;
@@ -45,6 +46,7 @@ export class AyantDroitsService {
     return {
       ...restAyantDroit,
       dateNaissance: restAyantDroit.dateNaissance ? dayjs(restAyantDroit.dateNaissance) : undefined,
+      dateStatut: restAyantDroit.dateStatut ? dayjs(restAyantDroit.dateStatut) : undefined,
     };
   }
 }
@@ -72,6 +74,13 @@ export class AyantDroitService extends AyantDroitsService {
       .pipe(map(res => this.convertResponseFromServer(res)));
   }
 
+  /** Change la situation de l'ayant droit. Voir `AgentService.changerStatut`. */
+  changerStatut(id: number, statut: string, motif: string): Observable<IAyantDroit> {
+    return this.http
+      .put<RestAyantDroit>(`${this.resourceUrl}/${encodeURIComponent(id)}/statut`, { statut, motif })
+      .pipe(map(res => this.convertResponseFromServer(res)));
+  }
+
   find(id: number): Observable<IAyantDroit> {
     return this.http
       .get<RestAyantDroit>(`${this.resourceUrl}/${encodeURIComponent(id)}`)
@@ -83,6 +92,20 @@ export class AyantDroitService extends AyantDroitsService {
     return this.http
       .get<RestAyantDroit[]>(this.resourceUrl, { params: options, observe: 'response' })
       .pipe(map(res => res.clone({ body: this.convertResponseArrayFromServer(res.body!) })));
+  }
+
+  /**
+   * Aperçu du code qui sera attribué à la création.
+   *
+   * Sert à montrer le code pendant la saisie. Celui qui fait foi est calculé par le serveur
+   * à l'enregistrement : entre l'aperçu et la validation, un autre agent a pu créer un ayant
+   * droit pour le même titulaire.
+   */
+  codeSuggere(agentId: number, lien: string): Observable<string> {
+    return this.http.get(`${this.resourceUrl}/code-suggere`, {
+      params: { agentId, lien },
+      responseType: 'text',
+    });
   }
 
   delete(id: number): Observable<undefined> {
@@ -121,6 +144,7 @@ export class AyantDroitService extends AyantDroitsService {
     return {
       ...ayantDroit,
       dateNaissance: ayantDroit.dateNaissance?.format(DATE_FORMAT) ?? null,
+      dateStatut: ayantDroit.dateStatut?.toJSON() ?? null,
     };
   }
 

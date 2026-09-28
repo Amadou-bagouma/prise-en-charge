@@ -2,8 +2,33 @@
   <div class="pec-ecran">
     <div class="pec-titre-ecran">
       <h1 data-cy="agentDetailsHeading">{{ identite() }}</h1>
+      <!--
+        La situation est au titre : c'est elle qui décide si un dossier peut être ouvert, et on
+        doit la voir avant de commencer à en saisir un. La pastille porte toujours son mot.
+      -->
+      <span class="pec-badge" [ngClass]="'pec-badge--' + tonStatut()" data-cy="statutAgent">
+        <span class="pec-badge__pt"></span>
+        <span>{{ libelleStatut() }}</span>
+      </span>
       <span class="pec-num">{{ agentRef.matricule }}</span>
+      <button type="button" class="pec-btn pec-btn--discret pec-btn--sm" (click)="changerStatut()" data-cy="changerStatutAgent">
+        <fa-icon class="pec-btn__ico" icon="pencil-alt" />
+        <span>Changer la situation</span>
+      </button>
     </div>
+
+    @if (motifStatut() && statutAffiche() !== 'ACTIF') {
+      <section class="pec-panneau">
+        <div class="pec-panneau__corps">
+          <span class="pec-muted" data-cy="motifStatutAgent">
+            Motif : {{ motifStatut() }}
+            @if (dateStatut()) {
+              · depuis le {{ dateStatut() | formatMediumDatetime }}
+            }
+          </span>
+        </div>
+      </section>
+    }
 
     <jhi-alert-error />
     <jhi-alert />
@@ -84,13 +109,14 @@
                       <th jhiTranslate="peccnssApp.ayantDroit.codeAyantDroit">Code</th>
                       <th jhiTranslate="peccnssApp.ayantDroit.nom">Nom</th>
                       <th jhiTranslate="peccnssApp.ayantDroit.lien">Lien de parenté</th>
+                      <th>Situation</th>
                       <th jhiTranslate="peccnssApp.ayantDroit.dateNaissance">Date de naissance</th>
                       <th class="pec-tbl__droite"><span class="visually-hidden">Actions</span></th>
                     </tr>
                   </thead>
                   <tbody>
                     @for (ayantDroit of ayantsDroit(); track ayantDroit.id) {
-                      <tr>
+                      <tr data-cy="ligneAyantDroit">
                         <td>
                           <span class="pec-num">{{ ayantDroit.codeAyantDroit }}</span>
                         </td>
@@ -102,6 +128,19 @@
                             <span class="pec-badge__pt"></span>
                             <span [jhiTranslate]="'peccnssApp.LienParente.' + (ayantDroit.lien ?? 'null')">{{ ayantDroit.lien }}</span>
                           </span>
+                        </td>
+                        <td>
+                          <span class="pec-badge" [ngClass]="'pec-badge--' + tonStatutAyantDroit(ayantDroit)">
+                            <span class="pec-badge__pt"></span>
+                            <span>{{ libelleStatutAyantDroit(ayantDroit) }}</span>
+                          </span>
+                          <!--
+                            Dire d'où vient la situation évite de croire qu'une décision a été
+                            prise sur l'ayant droit alors qu'elle vient de son agent.
+                          -->
+                          @if (ayantDroit.statutAvantCascade) {
+                            <span class="pec-muted" data-cy="repercuteDepuisAgent"> · répercuté depuis l'agent</span>
+                          }
                         </td>
                         <td class="pec-tbl__num">{{ (ayantDroit.dateNaissance | formatMediumDate) || '—' }}</td>
                         <td class="pec-tbl__droite">

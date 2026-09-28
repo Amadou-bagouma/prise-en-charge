@@ -2,10 +2,12 @@ package com.mycompany.myapp.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.mycompany.myapp.domain.enumeration.LienParente;
+import com.mycompany.myapp.domain.enumeration.StatutAyantDroit;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.Instant;
 import java.time.LocalDate;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -60,6 +62,48 @@ public class AyantDroit extends AbstractAuditingEntity<Long> implements Serializ
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "direction", "gestion", "user" }, allowSetters = true)
     private Agent agent;
+
+    /**
+     * Situation au regard de la couverture medicale. Jamais nulle : un dossier sans situation
+     * connue laisserait le guichet decider au cas par cas.
+     */
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "statut", nullable = false)
+    private StatutAyantDroit statut = StatutAyantDroit.ACTIF;
+
+    /** Date du dernier changement de situation. */
+    @Column(name = "date_statut")
+    private Instant dateStatut;
+
+    /**
+     * Motif du dernier changement. Exige des que l'on sort de ACTIF : une radiation sans raison
+     * ecrite est incontestable au guichet et inexplicable six mois plus tard.
+     */
+    @Column(name = "motif_statut", length = 500)
+    private String motifStatut;
+
+    /**
+     * Le statut propre de l'ayant droit, mis de cote quand celui de l'agent se repercute sur lui.
+     *
+     * <p>Sans cette memoire, reactiver un agent rendrait actifs des ayants droit qui ne l'etaient
+     * pas : un enfant radie pour depassement d'age redeviendrait couvert. Renseigne uniquement
+     * pendant une repercussion, et efface des qu'elle est levee - sa presence signifie donc
+     * exactement « ce statut vient de l'agent, pas de l'ayant droit ».
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "statut_avant_cascade")
+    private StatutAyantDroit statutAvantCascade;
+
+    /**
+     * Le motif propre mis de cote en meme temps que le statut.
+     *
+     * <p>Rendre le statut sans son motif laisserait un enfant radie pour depassement d'age
+     * porter, apres reactivation de l'agent, la raison de la radiation de celui-ci : statut
+     * juste, explication fausse.
+     */
+    @Column(name = "motif_avant_cascade", length = 500)
+    private String motifAvantCascade;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -180,6 +224,61 @@ public class AyantDroit extends AbstractAuditingEntity<Long> implements Serializ
         return this;
     }
 
+    public StatutAyantDroit getStatut() {
+        return this.statut;
+    }
+
+    public void setStatut(StatutAyantDroit statut) {
+        this.statut = statut;
+    }
+
+    public AyantDroit statut(StatutAyantDroit statut) {
+        this.setStatut(statut);
+        return this;
+    }
+
+    public Instant getDateStatut() {
+        return this.dateStatut;
+    }
+
+    public void setDateStatut(Instant dateStatut) {
+        this.dateStatut = dateStatut;
+    }
+
+    public AyantDroit dateStatut(Instant dateStatut) {
+        this.setDateStatut(dateStatut);
+        return this;
+    }
+
+    public String getMotifStatut() {
+        return this.motifStatut;
+    }
+
+    public void setMotifStatut(String motifStatut) {
+        this.motifStatut = motifStatut;
+    }
+
+    public AyantDroit motifStatut(String motifStatut) {
+        this.setMotifStatut(motifStatut);
+        return this;
+    }
+
+    public StatutAyantDroit getStatutAvantCascade() {
+        return this.statutAvantCascade;
+    }
+
+    public void setStatutAvantCascade(StatutAyantDroit statutAvantCascade) {
+        this.statutAvantCascade = statutAvantCascade;
+    }
+
+    public String getMotifAvantCascade() {
+        return this.motifAvantCascade;
+    }
+
+    public void setMotifAvantCascade(String motifAvantCascade) {
+        this.motifAvantCascade = motifAvantCascade;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -208,6 +307,7 @@ public class AyantDroit extends AbstractAuditingEntity<Long> implements Serializ
             ", prenom='" + getPrenom() + "'" +
             ", dateNaissance='" + getDateNaissance() + "'" +
             ", lien='" + getLien() + "'" +
+            ", statut='" + getStatut() + "'" +
             "}";
     }
 }

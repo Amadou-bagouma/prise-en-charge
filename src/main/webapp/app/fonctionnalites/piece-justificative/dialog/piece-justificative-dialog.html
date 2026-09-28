@@ -1,0 +1,60 @@
+<form name="pieceJustificativeDialogForm" novalidate (ngSubmit)="enregistrer()">
+  <div class="modal-header">
+    <h2 class="modal-title" data-cy="PieceJustificativeDialogHeading">Joindre une pièce</h2>
+    <button type="button" class="btn-close" aria-label="Fermer" (click)="annuler()" data-cy="fermerPiece"></button>
+  </div>
+
+  <div class="modal-body">
+    <jhi-alert-error />
+
+    <!-- Le dossier est rappelé, pas redemandé : on est dessus. -->
+    <p class="pec-muted" data-cy="demandeRattachee">
+      Dossier <strong>{{ demande.reference }}</strong>
+    </p>
+
+    <div class="jhi-form-grid">
+      <div class="jhi-field">
+        <label class="form-label" for="piece_nomFichier" jhiTranslate="peccnssApp.pieceJustificative.nomFichier">Nom du fichier</label>
+        <input
+          type="text"
+          class="form-control"
+          id="piece_nomFichier"
+          name="nomFichier"
+          data-cy="nomFichier"
+          [ngModel]="nomFichier()"
+          (ngModelChange)="nomFichier.set($event)"
+        />
+        <small class="form-text text-muted">Le nom sous lequel la pièce sera retrouvée dans le dossier.</small>
+      </div>
+
+      <div class="jhi-field">
+        <label class="form-label" for="piece_cheminFichier" jhiTranslate="peccnssApp.pieceJustificative.cheminFichier"> Emplacement </label>
+        <input
+          type="text"
+          class="form-control"
+          id="piece_cheminFichier"
+          name="cheminFichier"
+          data-cy="cheminFichier"
+          [ngModel]="cheminFichier()"
+          (ngModelChange)="cheminFichier.set($event)"
+        />
+        <small class="form-text text-muted">Où la pièce est conservée : référence de classement ou chemin du document.</small>
+      </div>
+    </div>
+
+    <!--
+      La date d'ajout est celle du jour et n'est pas saisissable : la rendre modifiable
+      n'offrirait que l'occasion d'antidater une pièce.
+    -->
+    <p class="pec-muted">La date d'ajout sera celle d'aujourd'hui.</p>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="annuler()" data-cy="annulerPiece">
+      <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Annuler</span>
+    </button>
+    <button type="submit" class="btn btn-accent" [disabled]="!peutEnregistrer()" data-cy="enregistrerPiece">
+      <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Enregistrer</span>
+    </button>
+  </div>
+</form>

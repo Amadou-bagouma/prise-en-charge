@@ -1,6 +1,5 @@
 package com.mycompany.myapp.domain;
 
-import static com.mycompany.myapp.domain.BoiteReceptionTestSamples.*;
 import static com.mycompany.myapp.domain.DemandePriseEnChargeTestSamples.*;
 import static com.mycompany.myapp.domain.TacheTestSamples.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,17 +33,5 @@ class TacheTest {
 
         tache.demande(null);
         assertThat(tache.getDemande()).isNull();
-    }
-
-    @Test
-    void boiteReceptionTest() {
-        Tache tache = getTacheRandomSampleGenerator();
-        BoiteReception boiteReceptionBack = getBoiteReceptionRandomSampleGenerator();
-
-        tache.setBoiteReception(boiteReceptionBack);
-        assertThat(tache.getBoiteReception()).isEqualTo(boiteReceptionBack);
-
-        tache.boiteReception(null);
-        assertThat(tache.getBoiteReception()).isNull();
     }
 }

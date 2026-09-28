@@ -27,16 +27,27 @@ public interface BoiteReceptionRepository extends JpaRepository<BoiteReception, 
     }
 
     @Query(
-        value = "select boiteReception from BoiteReception boiteReception left join fetch boiteReception.utilisateur",
+        value = "select boiteReception from BoiteReception boiteReception left join fetch boiteReception.profil",
         countQuery = "select count(boiteReception) from BoiteReception boiteReception"
     )
     Page<BoiteReception> findAllWithToOneRelationships(Pageable pageable);
 
-    @Query("select boiteReception from BoiteReception boiteReception left join fetch boiteReception.utilisateur")
+    @Query("select boiteReception from BoiteReception boiteReception left join fetch boiteReception.profil")
     List<BoiteReception> findAllWithToOneRelationships();
 
-    @Query(
-        "select boiteReception from BoiteReception boiteReception left join fetch boiteReception.utilisateur where boiteReception.id =:id"
-    )
+    @Query("select boiteReception from BoiteReception boiteReception left join fetch boiteReception.profil where boiteReception.id =:id")
     Optional<BoiteReception> findOneWithToOneRelationships(@Param("id") Long id);
+
+    /**
+     * La boite d'un profil, avec ses droits charges : le routage des taches lit les authorities du
+     * profil juste apres, hors transaction ouverte dans le cas de l'appel REST.
+     */
+    @Query("select b from BoiteReception b left join fetch b.profil p left join fetch p.authorities where p.id = :profilId")
+    Optional<BoiteReception> trouverParProfil(@Param("profilId") Long profilId);
+
+    boolean existsByProfilId(Long profilId);
+
+    /** Les profils qui n'ont pas encore de boite : la synchronisation leur en cree une. */
+    @Query("select p.id from Profil p where p.id not in (select b.profil.id from BoiteReception b where b.profil is not null)")
+    List<Long> trouverProfilsSansBoite();
 }

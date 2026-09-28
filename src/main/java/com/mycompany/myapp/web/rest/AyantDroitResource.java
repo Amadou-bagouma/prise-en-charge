@@ -1,10 +1,15 @@
 package com.mycompany.myapp.web.rest;
 
+import com.mycompany.myapp.domain.Agent;
+import com.mycompany.myapp.domain.enumeration.LienParente;
+import com.mycompany.myapp.repository.AgentRepository;
 import com.mycompany.myapp.repository.AyantDroitRepository;
 import com.mycompany.myapp.service.AyantDroitQueryService;
 import com.mycompany.myapp.service.AyantDroitService;
+import com.mycompany.myapp.service.GenerateurCodeAyantDroit;
 import com.mycompany.myapp.service.criteria.AyantDroitCriteria;
 import com.mycompany.myapp.service.dto.AyantDroitDTO;
+import com.mycompany.myapp.service.dto.ChangementStatutDTO;
 import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -46,14 +51,22 @@ public class AyantDroitResource {
 
     private final AyantDroitQueryService ayantDroitQueryService;
 
+    private final AgentRepository agentRepository;
+
+    private final GenerateurCodeAyantDroit generateurCodeAyantDroit;
+
     public AyantDroitResource(
         AyantDroitService ayantDroitService,
         AyantDroitRepository ayantDroitRepository,
-        AyantDroitQueryService ayantDroitQueryService
+        AyantDroitQueryService ayantDroitQueryService,
+        AgentRepository agentRepository,
+        GenerateurCodeAyantDroit generateurCodeAyantDroit
     ) {
         this.ayantDroitService = ayantDroitService;
         this.ayantDroitRepository = ayantDroitRepository;
         this.ayantDroitQueryService = ayantDroitQueryService;
+        this.agentRepository = agentRepository;
+        this.generateurCodeAyantDroit = generateurCodeAyantDroit;
     }
 
     /**
@@ -106,6 +119,25 @@ public class AyantDroitResource {
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, ayantDroitDTO.getId().toString()))
             .body(ayantDroitDTO);
+    }
+
+    /**
+     * {@code PUT  /ayant-droits/:id/statut} : change la situation d'un ayant droit.
+     *
+     * <p>Seul point d'entree pour cela : les formulaires de modification ne touchent pas a la
+     * situation, faute de quoi on pourrait retirer un droit sans motif.
+     *
+     * @param id l'ayant droit concerne.
+     * @param changement le nouveau statut et sa raison.
+     * @return {@link ResponseEntity} avec le statut {@code 200 (OK)} et l'entite mise a jour.
+     */
+    @PutMapping("/{id}/statut")
+    public ResponseEntity<AyantDroitDTO> changerStatut(@PathVariable("id") Long id, @Valid @RequestBody ChangementStatutDTO changement) {
+        LOG.debug("REST request to change the status of AyantDroit {} to {}", id, changement.statut());
+        AyantDroitDTO misAJour = ayantDroitService.changerStatut(id, changement.statut(), changement.motif());
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, id.toString()))
+            .body(misAJour);
     }
 
     /**
@@ -181,6 +213,23 @@ public class AyantDroitResource {
      * @param id the id of the ayantDroitDTO to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the ayantDroitDTO, or with status {@code 404 (Not Found)}.
      */
+    /**
+     * {@code GET /ayant-droits/code-suggere} : l'apercu du code qui sera attribue.
+     *
+     * <p>Sert uniquement a montrer le code a l'agent pendant la saisie. Celui qui fait foi est
+     * calcule au moment de l'enregistrement : entre l'apercu et la validation du formulaire, un
+     * autre agent a pu creer un ayant droit pour le meme titulaire.
+     */
+    @GetMapping("/code-suggere")
+    public ResponseEntity<String> codeSuggere(@RequestParam("agentId") Long agentId, @RequestParam("lien") LienParente lien) {
+        LOG.debug("REST request to preview AyantDroit code for agent {} and lien {}", agentId, lien);
+        String matricule = agentRepository
+            .findById(agentId)
+            .map(Agent::getMatricule)
+            .orElseThrow(() -> new BadRequestAlertException("Agent introuvable", ENTITY_NAME, "agent.introuvable"));
+        return ResponseEntity.ok().body(generateurCodeAyantDroit.genererPour(matricule, lien));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<AyantDroitDTO> getAyantDroit(@PathVariable("id") Long id) {
         LOG.debug("REST request to get AyantDroit : {}", id);

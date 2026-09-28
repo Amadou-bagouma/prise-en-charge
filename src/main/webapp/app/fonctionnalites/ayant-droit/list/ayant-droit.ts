@@ -1,4 +1,3 @@
-import { NgClass } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
 import { Component, effect, inject, signal, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -25,7 +24,6 @@ import { AyantDroitService } from '../service/ayant-droit.service';
   selector: 'jhi-ayant-droit',
   templateUrl: './ayant-droit.html',
   imports: [
-    NgClass,
     RouterLink,
     FontAwesomeModule,
     AlertError,

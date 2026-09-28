@@ -1,5 +1,6 @@
 package com.mycompany.myapp.service.criteria;
 
+import com.mycompany.myapp.domain.enumeration.StatutAgent;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
@@ -24,7 +25,26 @@ public class AgentCriteria implements Serializable, Criteria {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Class for filtering StatutAgent
+     */
+    public static class StatutAgentFilter extends Filter<StatutAgent> {
+
+        public StatutAgentFilter() {}
+
+        public StatutAgentFilter(StatutAgentFilter filter) {
+            super(filter);
+        }
+
+        @Override
+        public StatutAgentFilter copy() {
+            return new StatutAgentFilter(this);
+        }
+    }
+
     private LongFilter id;
+
+    private StatutAgentFilter statut;
 
     private StringFilter matricule;
 
@@ -48,6 +68,7 @@ public class AgentCriteria implements Serializable, Criteria {
 
     public AgentCriteria(AgentCriteria other) {
         this.id = other.optionalId().map(LongFilter::copy).orElse(null);
+        this.statut = other.optionalStatut().map(StatutAgentFilter::copy).orElse(null);
         this.matricule = other.optionalMatricule().map(StringFilter::copy).orElse(null);
         this.nom = other.optionalNom().map(StringFilter::copy).orElse(null);
         this.prenom = other.optionalPrenom().map(StringFilter::copy).orElse(null);
@@ -62,6 +83,25 @@ public class AgentCriteria implements Serializable, Criteria {
     @Override
     public AgentCriteria copy() {
         return new AgentCriteria(this);
+    }
+
+    public StatutAgentFilter getStatut() {
+        return statut;
+    }
+
+    public Optional<StatutAgentFilter> optionalStatut() {
+        return Optional.ofNullable(statut);
+    }
+
+    public StatutAgentFilter statut() {
+        if (statut == null) {
+            setStatut(new StatutAgentFilter());
+        }
+        return statut;
+    }
+
+    public void setStatut(StatutAgentFilter statut) {
+        this.statut = statut;
     }
 
     public LongFilter getId() {
@@ -265,6 +305,7 @@ public class AgentCriteria implements Serializable, Criteria {
         final AgentCriteria that = (AgentCriteria) o;
         return (
             Objects.equals(id, that.id) &&
+            Objects.equals(statut, that.statut) &&
             Objects.equals(matricule, that.matricule) &&
             Objects.equals(nom, that.nom) &&
             Objects.equals(prenom, that.prenom) &&
@@ -279,7 +320,7 @@ public class AgentCriteria implements Serializable, Criteria {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, matricule, nom, prenom, dateNaissance, telephone, fonction, directionId, gestionId, distinct);
+        return Objects.hash(id, statut, matricule, nom, prenom, dateNaissance, telephone, fonction, directionId, gestionId, distinct);
     }
 
     // prettier-ignore
@@ -287,6 +328,7 @@ public class AgentCriteria implements Serializable, Criteria {
     public String toString() {
         return "AgentCriteria{" +
             optionalId().map(f -> "id=" + f + ", ").orElse("") +
+            optionalStatut().map(f -> "statut=" + f + ", ").orElse("") +
             optionalMatricule().map(f -> "matricule=" + f + ", ").orElse("") +
             optionalNom().map(f -> "nom=" + f + ", ").orElse("") +
             optionalPrenom().map(f -> "prenom=" + f + ", ").orElse("") +

@@ -6,7 +6,7 @@ import { ActivatedRoute } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbInputDatepicker } from '@ng-bootstrap/ng-bootstrap/datepicker';
 import { TranslatePipe } from '@ngx-translate/core';
-import { Observable, finalize, map } from 'rxjs';
+import { Observable, catchError, finalize, map, of } from 'rxjs';
 
 import { AlertService } from 'app/core/util/alert.service';
 import { DataUtils, FileLoadError } from 'app/core/util/data-util.service';
@@ -56,7 +56,36 @@ export class AyantDroitUpdate implements OnInit {
       }
 
       this.loadRelationshipsOptions();
+      this.surveillerCodeSuggere();
     });
+  }
+
+  /**
+   * Recalcule l'aperçu du code dès que l'agent ou le lien change.
+   *
+   * Uniquement en création : le code d'un ayant droit existant ne se recalcule pas, il
+   * l'identifie. Un échec reste silencieux — l'aperçu est un confort, et le serveur attribuera
+   * de toute façon le bon code à l'enregistrement.
+   */
+  private surveillerCodeSuggere(): void {
+    const rafraichir = () => {
+      if (this.ayantDroit?.id) {
+        return;
+      }
+      const agent = this.editForm.controls.agent.value;
+      const lien = this.editForm.controls.lien.value;
+      if (!agent?.id || !lien) {
+        this.editForm.controls.codeAyantDroit.setValue(null);
+        return;
+      }
+      this.ayantDroitService
+        .codeSuggere(agent.id, lien)
+        .pipe(catchError(() => of(null)))
+        .subscribe(code => this.editForm.controls.codeAyantDroit.setValue(code));
+    };
+    this.editForm.controls.agent.valueChanges.subscribe(rafraichir);
+    this.editForm.controls.lien.valueChanges.subscribe(rafraichir);
+    rafraichir();
   }
 
   previousState(): void {

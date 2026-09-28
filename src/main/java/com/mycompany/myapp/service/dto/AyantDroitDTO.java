@@ -1,8 +1,10 @@
 package com.mycompany.myapp.service.dto;
 
 import com.mycompany.myapp.domain.enumeration.LienParente;
+import com.mycompany.myapp.domain.enumeration.StatutAyantDroit;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -14,7 +16,10 @@ public class AyantDroitDTO implements Serializable {
 
     private Long id;
 
-    @NotNull
+    /**
+     * Attribue par le serveur a la creation quand il est absent (voir GenerateurCodeAyantDroit).
+     * Non obligatoire dans la charge utile, pour que le client n'ait pas a le calculer.
+     */
     @Size(max = 50)
     private String codeAyantDroit;
 
@@ -34,6 +39,21 @@ public class AyantDroitDTO implements Serializable {
     private String photoContentType;
 
     private AgentDTO agent;
+
+    /** Situation au regard de la couverture medicale. Toujours renseignee. */
+    @NotNull
+    private StatutAyantDroit statut;
+
+    private Instant dateStatut;
+
+    @Size(max = 500)
+    private String motifStatut;
+
+    /**
+     * Non nul quand le statut courant vient d'une repercussion du statut de l'agent : l'ecran
+     * peut alors le dire, au lieu de laisser croire a une decision prise sur l'ayant droit.
+     */
+    private StatutAyantDroit statutAvantCascade;
 
     public Long getId() {
         return id;
@@ -107,6 +127,38 @@ public class AyantDroitDTO implements Serializable {
         this.agent = agent;
     }
 
+    public StatutAyantDroit getStatut() {
+        return statut;
+    }
+
+    public void setStatut(StatutAyantDroit statut) {
+        this.statut = statut;
+    }
+
+    public Instant getDateStatut() {
+        return dateStatut;
+    }
+
+    public void setDateStatut(Instant dateStatut) {
+        this.dateStatut = dateStatut;
+    }
+
+    public StatutAyantDroit getStatutAvantCascade() {
+        return statutAvantCascade;
+    }
+
+    public void setStatutAvantCascade(StatutAyantDroit statutAvantCascade) {
+        this.statutAvantCascade = statutAvantCascade;
+    }
+
+    public String getMotifStatut() {
+        return motifStatut;
+    }
+
+    public void setMotifStatut(String motifStatut) {
+        this.motifStatut = motifStatut;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -138,6 +190,7 @@ public class AyantDroitDTO implements Serializable {
             ", dateNaissance='" + getDateNaissance() + "'" +
             ", lien='" + getLien() + "'" +
             ", agent=" + getAgent() +
+            ", statut='" + getStatut() + "'" +
             "}";
     }
 }

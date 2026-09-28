@@ -41,12 +41,15 @@ public class TacheDTO implements Serializable {
     private String commentaire;
 
     @NotNull
+    /** L'habilitation qui donne la charge de cette tache. */
+    @NotNull
+    @Size(max = 50)
+    private String droitRequis;
+
     private DemandePriseEnChargeDTO demande;
 
-    @NotNull
+    /** Qui a pris la tache en charge. Nul tant que personne ne s'en est saisi. */
     private UserDTO utilisateur;
-
-    private BoiteReceptionDTO boiteReception;
 
     public Long getId() {
         return id;
@@ -136,6 +139,14 @@ public class TacheDTO implements Serializable {
         this.commentaire = commentaire;
     }
 
+    public String getDroitRequis() {
+        return droitRequis;
+    }
+
+    public void setDroitRequis(String droitRequis) {
+        this.droitRequis = droitRequis;
+    }
+
     public DemandePriseEnChargeDTO getDemande() {
         return demande;
     }
@@ -150,14 +161,6 @@ public class TacheDTO implements Serializable {
 
     public void setUtilisateur(UserDTO utilisateur) {
         this.utilisateur = utilisateur;
-    }
-
-    public BoiteReceptionDTO getBoiteReception() {
-        return boiteReception;
-    }
-
-    public void setBoiteReception(BoiteReceptionDTO boiteReception) {
-        this.boiteReception = boiteReception;
     }
 
     @Override
@@ -196,9 +199,9 @@ public class TacheDTO implements Serializable {
             ", priorite='" + getPriorite() + "'" +
             ", lu='" + getLu() + "'" +
             ", commentaire='" + getCommentaire() + "'" +
+            ", droitRequis='" + getDroitRequis() + "'" +
             ", demande=" + getDemande() +
             ", utilisateur=" + getUtilisateur() +
-            ", boiteReception=" + getBoiteReception() +
             "}";
     }
 }

@@ -10,8 +10,9 @@ import { IAgent, NewAgent } from '../agent.model';
 
 export type PartialUpdateAgent = Partial<IAgent> & Pick<IAgent, 'id'>;
 
-type RestOf<T extends IAgent | NewAgent> = Omit<T, 'dateNaissance'> & {
+type RestOf<T extends IAgent | NewAgent> = Omit<T, 'dateNaissance' | 'dateStatut'> & {
   dateNaissance?: string | null;
+  dateStatut?: string | null;
 };
 
 export type RestAgent = RestOf<IAgent>;
@@ -43,6 +44,7 @@ export class AgentsService {
     return {
       ...restAgent,
       dateNaissance: restAgent.dateNaissance ? dayjs(restAgent.dateNaissance) : undefined,
+      dateStatut: restAgent.dateStatut ? dayjs(restAgent.dateStatut) : undefined,
     };
   }
 }
@@ -67,6 +69,16 @@ export class AgentService extends AgentsService {
     const copy = this.convertValueFromClient(agent);
     return this.http
       .patch<RestAgent>(`${this.resourceUrl}/${encodeURIComponent(this.getAgentIdentifier(agent))}`, copy)
+      .pipe(map(res => this.convertResponseFromServer(res)));
+  }
+
+  /**
+   * Change la situation de l'agent. Seul point d'entrée : le formulaire de modification n'y
+   * touche pas, faute de quoi on radierait un agent sans motif et sans répercussion.
+   */
+  changerStatut(id: number, statut: string, motif: string): Observable<IAgent> {
+    return this.http
+      .put<RestAgent>(`${this.resourceUrl}/${encodeURIComponent(id)}/statut`, { statut, motif })
       .pipe(map(res => this.convertResponseFromServer(res)));
   }
 
@@ -117,6 +129,7 @@ export class AgentService extends AgentsService {
     return {
       ...agent,
       dateNaissance: agent.dateNaissance?.format(DATE_FORMAT) ?? null,
+      dateStatut: agent.dateStatut?.toJSON() ?? null,
     };
   }
 

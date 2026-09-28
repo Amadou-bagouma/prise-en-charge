@@ -7,6 +7,8 @@ export const AUTHENTICATION_TOKEN_KEY = 'jhi-authenticationToken';
 export enum Authority {
   ADMIN = 'ROLE_ADMIN',
   USER = 'ROLE_USER',
+  /** Contrôle d'un dossier avant validation : complétude et conformité des pièces. */
+  VERIFICATEUR_RH = 'ROLE_VERIFICATEUR_RH',
   VALIDATEUR_DRH = 'ROLE_VALIDATEUR_DRH',
   VALIDATEUR_INFIRMERIE = 'ROLE_VALIDATEUR_INFIRMERIE',
 }

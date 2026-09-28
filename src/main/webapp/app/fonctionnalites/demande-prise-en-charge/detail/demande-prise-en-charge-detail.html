@@ -174,6 +174,42 @@
         </section>
 
         <div class="pec-dossier__actions">
+          @if (canSoumettre()) {
+            <button
+              type="button"
+              (click)="soumettre()"
+              [disabled]="isSaving()"
+              class="pec-btn pec-btn--primaire"
+              data-cy="demandePriseEnChargeSoumettreButton"
+            >
+              <fa-icon class="pec-btn__ico" icon="paper-plane" />
+              <span>Soumettre au contrôle RH</span>
+            </button>
+          }
+
+          @if (canVerifier()) {
+            <button
+              type="button"
+              (click)="verifier()"
+              [disabled]="isSaving()"
+              class="pec-btn pec-btn--primaire"
+              data-cy="demandePriseEnChargeVerifierButton"
+            >
+              <fa-icon class="pec-btn__ico" icon="check" />
+              <span>Déclarer le contrôle fait</span>
+            </button>
+            <button
+              type="button"
+              (click)="rejeter()"
+              [disabled]="isSaving()"
+              class="pec-btn pec-btn--danger"
+              data-cy="demandePriseEnChargeRetournerButton"
+            >
+              <fa-icon class="pec-btn__ico" icon="times" />
+              <span>Retourner pour correction</span>
+            </button>
+          }
+
           @if (canValiderOuRejeter()) {
             <button
               type="button"
@@ -214,6 +250,19 @@
             <button type="button" [routerLink]="['/demande-prise-en-charge', demande.id, 'edit']" class="pec-btn pec-btn--secondaire">
               <fa-icon class="pec-btn__ico" icon="pencil-alt" />
               <span jhiTranslate="entity.action.edit">Edit</span>
+            </button>
+          }
+
+          @if (canEditerNotification()) {
+            <button
+              type="button"
+              (click)="editerNotification()"
+              [disabled]="isDownloading()"
+              class="pec-btn pec-btn--secondaire"
+              data-cy="demandePriseEnChargeNotificationButton"
+            >
+              <fa-icon class="pec-btn__ico" icon="file-pdf" />
+              <span>Notification de décision</span>
             </button>
           }
 

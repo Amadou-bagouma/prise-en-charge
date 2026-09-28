@@ -9,7 +9,17 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * A BoiteReception.
+ * La boite de reception d'un {@link Profil}, et non d'une personne.
+ *
+ * <p>Une boite par profil, creee automatiquement : a la creation du profil, et au demarrage pour
+ * les profils qui n'en ont pas encore (voir {@code BoiteReceptionService.synchroniser()}). Elle
+ * n'est jamais creee ni supprimee a la main - un profil sans boite serait un role dont les
+ * taches ne parviennent nulle part.
+ *
+ * <p>Son contenu n'est pas stocke : les taches visibles se deduisent des droits du profil (voir
+ * {@code RoutageBoiteReception}). Deux utilisateurs partageant un profil voient donc exactement
+ * la meme boite, ce qui est le but : le travail est adresse a un role, pas a un agent en
+ * particulier, et reste traitable quand celui-ci est absent.
  */
 @Entity
 @Table(name = "boite_reception")
@@ -44,7 +54,7 @@ public class BoiteReception extends AbstractAuditingEntity<Long> implements Seri
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @NotNull
     @JoinColumn(unique = true)
-    private User utilisateur;
+    private Profil profil;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -113,16 +123,16 @@ public class BoiteReception extends AbstractAuditingEntity<Long> implements Seri
         this.actif = actif;
     }
 
-    public User getUtilisateur() {
-        return this.utilisateur;
+    public Profil getProfil() {
+        return this.profil;
     }
 
-    public void setUtilisateur(User user) {
-        this.utilisateur = user;
+    public void setProfil(Profil profil) {
+        this.profil = profil;
     }
 
-    public BoiteReception utilisateur(User user) {
-        this.setUtilisateur(user);
+    public BoiteReception profil(Profil profil) {
+        this.setProfil(profil);
         return this;
     }
 

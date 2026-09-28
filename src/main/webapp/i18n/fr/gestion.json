@@ -3,10 +3,10 @@
     "gestion": {
       "home": {
         "title": "Gestions",
-        "refreshListLabel": "Actualiser la liste",
-        "createLabel": "Créer un nouveau Gestion",
+        "refreshListLabel": "Actualiser",
+        "createLabel": "Créer une gestion",
         "createOrEditLabel": "Créer un Gestion",
-        "notFound": "Aucun Gestion trouvé"
+        "notFound": "Aucune gestion"
       },
       "created": "Un nouveau Gestion a été créé avec l'identifiant {{ param }}",
       "updated": "Le Gestion avec l'identifiant {{ param }} a été mis à jour",

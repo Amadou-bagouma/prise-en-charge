@@ -200,8 +200,25 @@
 
       <h3 class="jhi-form-section">Intervenants</h3>
       <div class="jhi-form-grid">
+        @let droitRef = editForm.controls.droitRequis;
         <div class="jhi-field">
-          <label class="form-label" for="field_utilisateur" jhiTranslate="peccnssApp.tache.utilisateur">Utilisateur</label>
+          <label class="form-label" for="field_droitRequis">Habilitation requise</label>
+          <select class="form-control" id="field_droitRequis" data-cy="droitRequis" name="droitRequis" formControlName="droitRequis">
+            <option [ngValue]="null"></option>
+            @for (droit of droitsDisponibles(); track droit.name) {
+              <option [value]="droit.name">{{ droit.description || droit.name }}</option>
+            }
+          </select>
+          <!-- Une tâche s'adresse à un droit, pas à une personne : tous ceux qui le portent la
+               voient, et le premier disponible se l'attribue. -->
+          <small class="form-text text-muted">Détermine dans quelle boîte de réception la tâche apparaît.</small>
+          @if (droitRef.invalid && (droitRef.dirty || droitRef.touched) && droitRef.errors?.required) {
+            <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
+          }
+        </div>
+
+        <div class="jhi-field">
+          <label class="form-label" for="field_utilisateur">Pris en charge par</label>
           <select
             class="form-control"
             id="field_utilisateur"
@@ -210,9 +227,7 @@
             formControlName="utilisateur"
             [compareWith]="compareUser"
           >
-            @if (!editForm.get('utilisateur')!.value) {
-              <option [ngValue]="null" selected></option>
-            }
+            <option [ngValue]="null">— personne pour l'instant</option>
             @for (userOption of usersSharedCollection(); track $index) {
               <option [ngValue]="userOption">{{ userOption.login }}</option>
             }
@@ -224,23 +239,6 @@
               }
             </div>
           }
-        </div>
-
-        <div class="jhi-field">
-          <label class="form-label" for="field_boiteReception" jhiTranslate="peccnssApp.tache.boiteReception">Boite Reception</label>
-          <select
-            class="form-control"
-            id="field_boiteReception"
-            data-cy="boiteReception"
-            name="boiteReception"
-            formControlName="boiteReception"
-            [compareWith]="compareBoiteReception"
-          >
-            <option [ngValue]="null"></option>
-            @for (boiteReceptionOption of boiteReceptionsSharedCollection(); track $index) {
-              <option [ngValue]="boiteReceptionOption">{{ boiteReceptionOption.id }}</option>
-            }
-          </select>
         </div>
       </div>
 

@@ -3,10 +3,10 @@
     "profil": {
       "home": {
         "title": "Profils",
-        "refreshListLabel": "Actualiser la liste",
-        "createLabel": "Créer un nouveau Profil",
+        "refreshListLabel": "Actualiser",
+        "createLabel": "Créer un profil",
         "createOrEditLabel": "Créer un Profil",
-        "notFound": "Aucun Profil trouvé"
+        "notFound": "Aucun profil"
       },
       "created": "Un nouveau Profil a été créé avec l'identifiant {{ param }}",
       "updated": "Le Profil avec l'identifiant {{ param }} a été mis à jour",

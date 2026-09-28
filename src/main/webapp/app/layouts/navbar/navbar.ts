@@ -20,8 +20,14 @@ import { FindLanguageFromKeyPipe, TranslateDirective } from 'app/shared/language
 
 import ActiveMenuDirective from './active-menu.directive';
 
+/** Les écrans des bénéficiaires : les personnes couvertes. */
+const SEGMENTS_BENEFICIAIRES = ['agent', 'ayant-droit'];
+
+/** Les écrans d'administration : comptes, habilitations, profils. */
+const SEGMENTS_ADMINISTRATION = ['user-management', 'authority', 'profil'];
+
 /** Les écrans du référentiel, dans l'ordre du menu. */
-const SEGMENTS_REFERENTIEL = ['agent', 'ayant-droit', 'etablissement-sante', 'type-soin', 'direction', 'gestion', 'region', 'profil'];
+const SEGMENTS_REFERENTIEL = ['etablissement-sante', 'type-soin', 'direction', 'gestion', 'region'];
 
 @Component({
   selector: 'jhi-navbar',
@@ -48,6 +54,7 @@ export default class Navbar implements OnInit {
   readonly entitiesCollapsed = signal(true);
   readonly adminCollapsed = signal(true);
   readonly referentielCollapsed = signal(true);
+  readonly beneficiairesCollapsed = signal(true);
   readonly languages = LANGUAGES;
   readonly openAPIEnabled = signal(false);
   readonly version: string;
@@ -128,8 +135,15 @@ export default class Navbar implements OnInit {
     // Arriver sur un écran du référentiel sans voir où l'on se trouve dans la navigation
     // désoriente : le groupe s'ouvre de lui-même. Il reste refermable à la main.
     effect(() => {
-      if (SEGMENTS_REFERENTIEL.includes(this.segmentCourant())) {
+      const segment = this.segmentCourant();
+      if (SEGMENTS_REFERENTIEL.includes(segment)) {
         this.referentielCollapsed.set(false);
+      }
+      if (SEGMENTS_ADMINISTRATION.includes(segment)) {
+        this.adminCollapsed.set(false);
+      }
+      if (SEGMENTS_BENEFICIAIRES.includes(segment)) {
+        this.beneficiairesCollapsed.set(false);
       }
     });
 
@@ -172,6 +186,10 @@ export default class Navbar implements OnInit {
 
   toggleReferentiel(): void {
     this.referentielCollapsed.update(collapsed => !collapsed);
+  }
+
+  toggleBeneficiaires(): void {
+    this.beneficiairesCollapsed.update(collapsed => !collapsed);
   }
 
   login(): void {

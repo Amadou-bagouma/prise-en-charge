@@ -116,6 +116,32 @@ export class DemandePriseEnChargeService extends DemandePriseEnChargesService {
     return this.http.delete<undefined>(`${this.resourceUrl}/${encodeURIComponent(id)}`);
   }
 
+  /** Fait sortir le dossier du brouillon : il part au contrôle RH. */
+  soumettre(id: number): Observable<IDemandePriseEnCharge> {
+    return this.http
+      .post<RestDemandePriseEnCharge>(`${this.resourceUrl}/${encodeURIComponent(id)}/soumettre`, {})
+      .pipe(map(res => this.convertResponseFromServer(res)));
+  }
+
+  /** Déclare le contrôle RH fait : le dossier passe en attente de validation. */
+  verifier(id: number, commentaire?: string | null): Observable<IDemandePriseEnCharge> {
+    return this.http
+      .post<RestDemandePriseEnCharge>(`${this.resourceUrl}/${encodeURIComponent(id)}/verifier`, { commentaire })
+      .pipe(map(res => this.convertResponseFromServer(res)));
+  }
+
+  /** Refuse définitivement le dossier, à la différence de `rejeter` qui le retourne pour correction. */
+  rejeterDefinitivement(id: number, commentaire: string): Observable<IDemandePriseEnCharge> {
+    return this.http
+      .post<RestDemandePriseEnCharge>(`${this.resourceUrl}/${encodeURIComponent(id)}/rejeter-definitivement`, { commentaire })
+      .pipe(map(res => this.convertResponseFromServer(res)));
+  }
+
+  /** La notification de décision remise à l'agent, en PDF. */
+  telechargerNotification(id: number): Observable<Blob> {
+    return this.http.get(`${this.resourceUrl}/${encodeURIComponent(id)}/notification`, { responseType: 'blob' });
+  }
+
   valider(id: number, commentaire?: string | null): Observable<IDemandePriseEnCharge> {
     return this.http
       .post<RestDemandePriseEnCharge>(`${this.resourceUrl}/${encodeURIComponent(id)}/valider`, { commentaire })

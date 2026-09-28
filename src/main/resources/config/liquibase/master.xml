@@ -63,5 +63,9 @@
     <include file="config/liquibase/changelog/20260922110000_add_authority_description.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260922120000_add_audit_columns.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260922130000_add_ayant_droit_code.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260925100000_boite_reception_par_profil.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260925140000_add_statut_agent_ayant_droit.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260925160000_tache_par_droit.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260925180000_historique_action_cible.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>
