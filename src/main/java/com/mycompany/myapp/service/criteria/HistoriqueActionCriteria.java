@@ -28,6 +28,10 @@ public class HistoriqueActionCriteria implements Serializable, Criteria {
 
     private StringFilter action;
 
+    private StringFilter cibleType;
+
+    private LongFilter cibleId;
+
     private StringFilter description;
 
     private InstantFilter dateAction;
@@ -43,6 +47,8 @@ public class HistoriqueActionCriteria implements Serializable, Criteria {
     public HistoriqueActionCriteria(HistoriqueActionCriteria other) {
         this.id = other.optionalId().map(LongFilter::copy).orElse(null);
         this.action = other.optionalAction().map(StringFilter::copy).orElse(null);
+        this.cibleType = other.optionalCibleType().map(StringFilter::copy).orElse(null);
+        this.cibleId = other.optionalCibleId().map(LongFilter::copy).orElse(null);
         this.description = other.optionalDescription().map(StringFilter::copy).orElse(null);
         this.dateAction = other.optionalDateAction().map(InstantFilter::copy).orElse(null);
         this.demandeId = other.optionalDemandeId().map(LongFilter::copy).orElse(null);
@@ -72,6 +78,44 @@ public class HistoriqueActionCriteria implements Serializable, Criteria {
 
     public void setId(LongFilter id) {
         this.id = id;
+    }
+
+    public StringFilter getCibleType() {
+        return cibleType;
+    }
+
+    public Optional<StringFilter> optionalCibleType() {
+        return Optional.ofNullable(cibleType);
+    }
+
+    public StringFilter cibleType() {
+        if (cibleType == null) {
+            setCibleType(new StringFilter());
+        }
+        return cibleType;
+    }
+
+    public void setCibleType(StringFilter cibleType) {
+        this.cibleType = cibleType;
+    }
+
+    public LongFilter getCibleId() {
+        return cibleId;
+    }
+
+    public Optional<LongFilter> optionalCibleId() {
+        return Optional.ofNullable(cibleId);
+    }
+
+    public LongFilter cibleId() {
+        if (cibleId == null) {
+            setCibleId(new LongFilter());
+        }
+        return cibleId;
+    }
+
+    public void setCibleId(LongFilter cibleId) {
+        this.cibleId = cibleId;
     }
 
     public StringFilter getAction() {
@@ -200,6 +244,8 @@ public class HistoriqueActionCriteria implements Serializable, Criteria {
         return (
             Objects.equals(id, that.id) &&
             Objects.equals(action, that.action) &&
+            Objects.equals(cibleType, that.cibleType) &&
+            Objects.equals(cibleId, that.cibleId) &&
             Objects.equals(description, that.description) &&
             Objects.equals(dateAction, that.dateAction) &&
             Objects.equals(demandeId, that.demandeId) &&
@@ -219,6 +265,8 @@ public class HistoriqueActionCriteria implements Serializable, Criteria {
         return "HistoriqueActionCriteria{" +
             optionalId().map(f -> "id=" + f + ", ").orElse("") +
             optionalAction().map(f -> "action=" + f + ", ").orElse("") +
+            optionalCibleType().map(f -> "cibleType=" + f + ", ").orElse("") +
+            optionalCibleId().map(f -> "cibleId=" + f + ", ").orElse("") +
             optionalDescription().map(f -> "description=" + f + ", ").orElse("") +
             optionalDateAction().map(f -> "dateAction=" + f + ", ").orElse("") +
             optionalDemandeId().map(f -> "demandeId=" + f + ", ").orElse("") +

@@ -2,11 +2,11 @@
   "peccnssApp": {
     "region": {
       "home": {
-        "title": "Regions",
-        "refreshListLabel": "Actualiser la liste",
-        "createLabel": "Créer un nouveau Region",
+        "title": "Régions",
+        "refreshListLabel": "Actualiser",
+        "createLabel": "Créer une région",
         "createOrEditLabel": "Créer un Region",
-        "notFound": "Aucun Region trouvé"
+        "notFound": "Aucune région"
       },
       "created": "Un nouveau Region a été créé avec l'identifiant {{ param }}",
       "updated": "Le Region avec l'identifiant {{ param }} a été mis à jour",

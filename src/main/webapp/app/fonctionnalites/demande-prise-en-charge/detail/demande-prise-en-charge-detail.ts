@@ -17,6 +17,7 @@ import { IHistoriqueAction } from 'app/fonctionnalites/historique-action/histori
 import { HistoriqueActionService } from 'app/fonctionnalites/historique-action/service/historique-action.service';
 import { IPieceJustificative } from 'app/fonctionnalites/piece-justificative/piece-justificative.model';
 import { PieceJustificativeDeleteDialog } from 'app/fonctionnalites/piece-justificative/delete/piece-justificative-delete-dialog';
+import { PieceJustificativeDialog } from 'app/fonctionnalites/piece-justificative/dialog/piece-justificative-dialog';
 import { PieceJustificativeService } from 'app/fonctionnalites/piece-justificative/service/piece-justificative.service';
 import { DemandePriseEnChargeDeleteDialog } from '../delete/demande-prise-en-charge-delete-dialog';
 import { IDemandePriseEnCharge } from '../demande-prise-en-charge.model';
@@ -25,13 +26,17 @@ import { DEMANDE_REJECTED_EVENT, DemandePriseEnChargeRejectDialog } from '../rej
 
 /**
  * Le circuit d'une demande, dans l'ordre où elle le parcourt. Chaque étape regroupe les
- * statuts qui la désignent : la saisie couvre tout ce qui précède l'envoi en validation.
+ * statuts qui la désignent : la saisie couvre tout ce qui précède l'envoi au contrôle.
+ *
+ * Un dossier retourné pour correction revient à l'étape de saisie : c'est bien là qu'il attend,
+ * et l'afficher plus loin laisserait croire qu'il progresse.
  */
 const ETAPES_CIRCUIT: { libelle: string; statuts: string[] }[] = [
   {
     libelle: 'Saisie du dossier',
-    statuts: ['NOUVELLE', 'EN_ATTENTE_PIECES', 'A_TRAITER', 'EN_COURS_TRAITEMENT', 'RETOURNEE'],
+    statuts: ['EN_SAISIE', 'NOUVELLE', 'EN_ATTENTE_PIECES', 'A_TRAITER', 'EN_COURS_TRAITEMENT', 'RETOURNEE'],
   },
+  { libelle: 'Vérification RH', statuts: ['EN_VERIFICATION_RH'] },
   { libelle: 'Validation DRH', statuts: ['EN_ATTENTE_VALIDATION_DRH'] },
   {
     libelle: 'Validation infirmerie',
@@ -58,6 +63,30 @@ export class DemandePriseEnChargeDetail {
   protected readonly historiqueActionService = inject(HistoriqueActionService);
   protected readonly pieceJustificativeService = inject(PieceJustificativeService);
 
+  /**
+   * Le dossier est encore en saisie et m'appartient : je peux le soumettre au contrôle.
+   *
+   * C'est le geste qui le fait sortir du brouillon. Avant, il n'attend personne et peut être
+   * supprimé ; après, il entre dans le circuit et ne peut plus qu'être annulé.
+   */
+  readonly canSoumettre = computed(() => {
+    const demande = this.current();
+    const account = this.accountService.account();
+    return demande?.statut === 'EN_SAISIE' && !!account && demande.gestionnaireCreateur?.login === account.login;
+  });
+
+  /** Le contrôleur RH ne vise pas son propre dossier : c'est le principe du double regard. */
+  readonly canVerifier = computed(() => {
+    const demande = this.current();
+    const account = this.accountService.account();
+    return (
+      demande?.statut === 'EN_VERIFICATION_RH' &&
+      this.accountService.hasAnyAuthority(Authority.VERIFICATEUR_RH) &&
+      !!account &&
+      demande.gestionnaireCreateur?.login !== account.login
+    );
+  });
+
   readonly canValiderDrh = computed(
     () => this.current()?.statut === 'EN_ATTENTE_VALIDATION_DRH' && this.accountService.hasAnyAuthority(Authority.VALIDATEUR_DRH),
   );
@@ -76,7 +105,26 @@ export class DemandePriseEnChargeDetail {
   // (« Pas de menu à trois points : si le dossier a plusieurs actions, elles sont sur l'écran
   // de détail »). Elles ont donc été déplacées ici, avec les mêmes conditions d'accès.
   readonly canImprimer = computed(() => this.current()?.statut === 'VALIDEE' && this.accountService.hasAnyAuthority(Authority.USER));
-  readonly canSupprimer = computed(() => this.accountService.hasAnyAuthority(Authority.ADMIN));
+
+  /**
+   * La notification de décision s'édite dès qu'une décision est prise, favorable ou non.
+   *
+   * C'est ce qui la distingue de l'imprimé de prise en charge : un refus sans document
+   * opposable ne se conteste pas — l'agent n'a aucune trace de ce qu'on lui a dit, ni du motif.
+   */
+  readonly canEditerNotification = computed(() => {
+    const statut = this.current()?.statut;
+    return statut === 'VALIDEE' || statut === 'REJETEE' || statut === 'RETOURNEE';
+  });
+  /**
+   * Un dossier ne se supprime qu'en saisie : au-delà il porte des décisions, et les effacer
+   * effacerait la trace de ce qui a été décidé. Le serveur le refuse déjà — le bouton ne
+   * s'affiche pas, plutôt que d'échouer à chaque fois.
+   */
+  readonly canSupprimer = computed(() => {
+    const statut = this.current()?.statut;
+    return this.accountService.hasAnyAuthority(Authority.ADMIN) && (statut === 'EN_SAISIE' || statut === 'NOUVELLE');
+  });
   readonly isDownloading = signal(false);
 
   /** Journal des actions du dossier, affiché dans la colonne de contexte. */
@@ -154,12 +202,28 @@ export class DemandePriseEnChargeDetail {
     });
   }
 
-  /** Ouvre la saisie d'une pièce avec le dossier déjà rattaché. */
+  /**
+   * Joint une pièce dans un dialogue, sans quitter le dossier.
+   *
+   * La ligne est insérée à sa place puis la liste relue en arrière-plan : l'insertion immédiate
+   * évite le clignotement d'un rechargement complet, et la relecture garde l'écran d'accord avec
+   * la base.
+   */
   ajouterPiece(): void {
-    const demandeId = this.current()?.id;
-    if (demandeId) {
-      this.router.navigate(['/piece-justificative', 'new'], { queryParams: { demande: demandeId } });
+    const demande = this.current();
+    if (!demande?.id) {
+      return;
     }
+    const modalRef = this.modalService.open(PieceJustificativeDialog, { size: 'lg', backdrop: 'static', scrollable: true });
+    modalRef.componentInstance.demande = { id: demande.id, reference: demande.reference };
+    // `closed` seulement : un abandon ne doit rien changer à l'écran.
+    modalRef.closed.subscribe((creee: IPieceJustificative) => {
+      if (!creee) {
+        return;
+      }
+      this.pieces.update(liste => [creee, ...liste]);
+      this.chargerPieces(demande.id, { discret: true });
+    });
   }
 
   supprimerPiece(piece: IPieceJustificative): void {
@@ -174,17 +238,27 @@ export class DemandePriseEnChargeDetail {
   }
 
   /** L'absence de pièces n'empêche pas d'instruire : un échec reste silencieux. */
-  private chargerPieces(demandeId?: number): void {
+  private chargerPieces(demandeId?: number, options?: { discret: boolean }): void {
     if (!demandeId) {
       this.pieces.set([]);
       return;
     }
-    this.chargementPieces.set(true);
+    // En mode discret, le voyant de chargement reste éteint : la liste est déjà à l'écran et la
+    // remplacer par « Chargement… » ferait clignoter ce que l'on vient d'ajouter.
+    if (!options?.discret) {
+      this.chargementPieces.set(true);
+    }
     this.pieceJustificativeService
       .query({ demandeId, size: 50, sort: ['dateAjout,desc'] })
       .pipe(catchError(() => of(null)))
       .subscribe(reponse => {
-        this.pieces.set(reponse?.body ?? []);
+        // Une relecture en échec laisse la liste en place : la pièce est enregistrée, l'effacer
+        // de l'écran serait mentir.
+        if (reponse?.body) {
+          this.pieces.set(reponse.body);
+        } else if (!options?.discret) {
+          this.pieces.set([]);
+        }
         this.chargementPieces.set(false);
       });
   }
@@ -197,9 +271,13 @@ export class DemandePriseEnChargeDetail {
       case 'RETOURNEE':
       case 'REJETEE':
         return 'danger';
+      case 'EN_VERIFICATION_RH':
       case 'EN_ATTENTE_VALIDATION_DRH':
       case 'EN_ATTENTE_VALIDATION_INFIRMERIE':
         return 'warn';
+      // Un brouillon n'attend personne : il ne doit pas attirer l'œil comme une étape en cours.
+      case 'EN_SAISIE':
+        return 'neutre';
       case 'ANNULEE':
       case 'CLOTUREE':
         return 'neutre';
@@ -251,6 +329,79 @@ export class DemandePriseEnChargeDetail {
         });
       },
     );
+  }
+
+  soumettre(): void {
+    const demande = this.current();
+    if (!demande) {
+      return;
+    }
+    this.confirmer(
+      {
+        titre: 'Soumettre au contrôle RH',
+        message: `Le dossier ${demande.reference ?? ''} sera transmis au contrôle de la direction des ressources humaines. Il ne pourra plus être supprimé, seulement annulé.`,
+        libelleConfirmer: 'Soumettre au contrôle',
+        ton: 'primaire',
+      },
+      () => {
+        this.isSaving.set(true);
+        this.demandePriseEnChargeService.soumettre(demande.id).subscribe({
+          next: misAJour => {
+            this.isSaving.set(false);
+            this.current.set(misAJour);
+            this.chargerHistorique(demande.id);
+          },
+          error: () => this.isSaving.set(false),
+        });
+      },
+    );
+  }
+
+  verifier(): void {
+    const demande = this.current();
+    if (!demande) {
+      return;
+    }
+    this.confirmer(
+      {
+        titre: 'Déclarer le contrôle fait',
+        message: `Vous attestez que le dossier ${demande.reference ?? ''} est complet et que ses pièces sont conformes. Il passera en attente de validation DRH.`,
+        libelleConfirmer: 'Déclarer le contrôle fait',
+        ton: 'primaire',
+      },
+      () => {
+        this.isSaving.set(true);
+        this.demandePriseEnChargeService.verifier(demande.id).subscribe({
+          next: misAJour => {
+            this.isSaving.set(false);
+            this.current.set(misAJour);
+            this.chargerHistorique(demande.id);
+          },
+          error: () => this.isSaving.set(false),
+        });
+      },
+    );
+  }
+
+  /** Édite la notification de décision et la remet à l'agent. */
+  editerNotification(): void {
+    const demande = this.current();
+    if (!demande) {
+      return;
+    }
+    this.isDownloading.set(true);
+    this.demandePriseEnChargeService.telechargerNotification(demande.id).subscribe({
+      next: blob => {
+        this.isDownloading.set(false);
+        const url = URL.createObjectURL(blob);
+        const lien = document.createElement('a');
+        lien.href = url;
+        lien.download = `notification-${demande.reference ?? demande.id}.pdf`;
+        lien.click();
+        URL.revokeObjectURL(url);
+      },
+      error: () => this.isDownloading.set(false),
+    });
   }
 
   /** Ouvre le dialogue de confirmation, et n'exécute l'action que si l'agent confirme. */

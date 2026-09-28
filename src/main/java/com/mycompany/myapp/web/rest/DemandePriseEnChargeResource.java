@@ -7,6 +7,7 @@ import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.security.SecurityUtils;
 import com.mycompany.myapp.service.DemandePriseEnChargeQueryService;
 import com.mycompany.myapp.service.DemandePriseEnChargeService;
+import com.mycompany.myapp.service.NotificationDecisionService;
 import com.mycompany.myapp.service.RapportDemandeService;
 import com.mycompany.myapp.service.criteria.DemandePriseEnChargeCriteria;
 import com.mycompany.myapp.service.dto.DemandePriseEnChargeDTO;
@@ -60,6 +61,8 @@ public class DemandePriseEnChargeResource {
 
     private final RapportDemandeService rapportDemandeService;
 
+    private final NotificationDecisionService notificationDecisionService;
+
     private final UserRepository userRepository;
 
     public DemandePriseEnChargeResource(
@@ -67,25 +70,33 @@ public class DemandePriseEnChargeResource {
         DemandePriseEnChargeRepository demandePriseEnChargeRepository,
         DemandePriseEnChargeQueryService demandePriseEnChargeQueryService,
         RapportDemandeService rapportDemandeService,
+        NotificationDecisionService notificationDecisionService,
         UserRepository userRepository
     ) {
         this.demandePriseEnChargeService = demandePriseEnChargeService;
         this.demandePriseEnChargeRepository = demandePriseEnChargeRepository;
         this.demandePriseEnChargeQueryService = demandePriseEnChargeQueryService;
         this.rapportDemandeService = rapportDemandeService;
+        this.notificationDecisionService = notificationDecisionService;
         this.userRepository = userRepository;
     }
 
     /**
-     * Demandes carry sensitive health information, so a plain gestionnaire (ROLE_USER only) may only
-     * browse or open demandes they created or are assigned to. Admins and validators (who must review
-     * every pending demande) see everything - returning {@code null} here means "no restriction" to
-     * {@link DemandePriseEnChargeQueryService}.
+     * Un dossier porte des informations de sante : un gestionnaire ordinaire ne voit que les
+     * siens, ceux qu'il a ouverts ou qui lui sont assignes.
+     *
+     * <p>Y echappent ceux dont la fonction est d'examiner les dossiers des autres :
+     * l'administrateur, les deux validateurs, et le controleur RH - sans quoi l'etape de
+     * verification serait impossible a executer, la tache lui etant adressee alors que le
+     * dossier lui serait refuse.
+     *
+     * @return {@code null} pour « aucune restriction », sinon l'identifiant auquel se limiter.
      */
     private Long restrictToUserIdUnlessAdminOrValidateur() {
         if (
             SecurityUtils.hasCurrentUserAnyOfAuthorities(
                 AuthoritiesConstants.ADMIN,
+                AuthoritiesConstants.VERIFICATEUR_RH,
                 AuthoritiesConstants.VALIDATEUR_DRH,
                 AuthoritiesConstants.VALIDATEUR_INFIRMERIE
             )
@@ -275,6 +286,43 @@ public class DemandePriseEnChargeResource {
     }
 
     /**
+     * {@code POST  /demande-prise-en-charges/:id/soumettre} : soumet au controle RH un dossier
+     * encore en saisie.
+     *
+     * @param id le dossier a soumettre.
+     * @return {@link ResponseEntity} avec le statut {@code 200 (OK)} et le dossier mis a jour.
+     */
+    @PostMapping("/{id}/soumettre")
+    public ResponseEntity<DemandePriseEnChargeDTO> soumettreDemandePriseEnCharge(@PathVariable("id") Long id) {
+        LOG.debug("REST request to soumettre DemandePriseEnCharge : {}", id);
+        DemandePriseEnChargeDTO result = demandePriseEnChargeService.soumettre(id);
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, id.toString()))
+            .body(result);
+    }
+
+    /**
+     * {@code POST  /demande-prise-en-charges/:id/verifier} : declare le controle RH fait.
+     *
+     * @param id le dossier controle.
+     * @param actionVM l'observation du controleur, facultative.
+     * @return {@link ResponseEntity} avec le statut {@code 200 (OK)} et le dossier mis a jour.
+     */
+    @PostMapping("/{id}/verifier")
+    @PreAuthorize("hasAuthority('" + AuthoritiesConstants.VERIFICATEUR_RH + "')")
+    public ResponseEntity<DemandePriseEnChargeDTO> verifierDemandePriseEnCharge(
+        @PathVariable("id") Long id,
+        @RequestBody(required = false) DemandeWorkflowActionVM actionVM
+    ) {
+        LOG.debug("REST request to verifier DemandePriseEnCharge : {}", id);
+        String commentaire = actionVM != null ? actionVM.getCommentaire() : null;
+        DemandePriseEnChargeDTO result = demandePriseEnChargeService.verifier(id, commentaire);
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, id.toString()))
+            .body(result);
+    }
+
+    /**
      * {@code POST  /demande-prise-en-charges/:id/valider} : validates the current workflow step (DRH, then
      * infirmerie du personnel) of the "id" demandePriseEnCharge.
      *
@@ -305,13 +353,52 @@ public class DemandePriseEnChargeResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated demandePriseEnChargeDTO.
      */
     @PostMapping("/{id}/rejeter")
-    @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.VALIDATEUR_DRH + "', '" + AuthoritiesConstants.VALIDATEUR_INFIRMERIE + "')")
+    @PreAuthorize(
+        "hasAnyAuthority('" +
+            AuthoritiesConstants.VERIFICATEUR_RH +
+            "', '" +
+            AuthoritiesConstants.VALIDATEUR_DRH +
+            "', '" +
+            AuthoritiesConstants.VALIDATEUR_INFIRMERIE +
+            "')"
+    )
     public ResponseEntity<DemandePriseEnChargeDTO> rejeterDemandePriseEnCharge(
         @PathVariable("id") Long id,
         @RequestBody DemandeWorkflowActionVM actionVM
     ) {
         LOG.debug("REST request to rejeter DemandePriseEnCharge : {}", id);
         DemandePriseEnChargeDTO result = demandePriseEnChargeService.rejeter(id, actionVM.getCommentaire());
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, id.toString()))
+            .body(result);
+    }
+
+    /**
+     * {@code POST  /demande-prise-en-charges/:id/rejeter-definitivement} : refuse le dossier.
+     *
+     * <p>A distinguer de {@code /rejeter}, qui le retourne pour correction. Ici le dossier est
+     * clos : l'agent recoit une notification de decision, editable en PDF.
+     *
+     * @param id le dossier a refuser.
+     * @param actionVM le motif, obligatoire.
+     * @return {@link ResponseEntity} avec le statut {@code 200 (OK)} et le dossier mis a jour.
+     */
+    @PostMapping("/{id}/rejeter-definitivement")
+    @PreAuthorize(
+        "hasAnyAuthority('" +
+            AuthoritiesConstants.VERIFICATEUR_RH +
+            "', '" +
+            AuthoritiesConstants.VALIDATEUR_DRH +
+            "', '" +
+            AuthoritiesConstants.VALIDATEUR_INFIRMERIE +
+            "')"
+    )
+    public ResponseEntity<DemandePriseEnChargeDTO> rejeterDefinitivementDemandePriseEnCharge(
+        @PathVariable("id") Long id,
+        @RequestBody DemandeWorkflowActionVM actionVM
+    ) {
+        LOG.debug("REST request to reject definitively DemandePriseEnCharge : {}", id);
+        DemandePriseEnChargeDTO result = demandePriseEnChargeService.rejeterDefinitivement(id, actionVM.getCommentaire());
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .body(result);
@@ -356,5 +443,33 @@ public class DemandePriseEnChargeResource {
                     .toString()
             )
             .body(rapport);
+    }
+
+    /**
+     * {@code GET  /demande-prise-en-charges/:id/notification} : la notification de decision
+     * remise a l'agent, en PDF.
+     *
+     * <p>Disponible des qu'une decision a ete prise, favorable ou non - a la difference de
+     * l'imprime de prise en charge, qui ne s'edite que pour un dossier valide. Un refus sans
+     * document opposable ne se conteste pas.
+     *
+     * @param id le dossier concerne.
+     * @return le PDF de la notification.
+     */
+    @GetMapping("/{id}/notification")
+    public ResponseEntity<byte[]> getNotificationDecision(@PathVariable("id") Long id) {
+        LOG.debug("REST request to get the decision notice for DemandePriseEnCharge : {}", id);
+        demandePriseEnChargeService.findOne(id).ifPresent(this::checkCanViewDemande);
+        byte[] notification = notificationDecisionService.genererNotification(id);
+        return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_PDF)
+            .header(
+                HttpHeaders.CONTENT_DISPOSITION,
+                ContentDisposition.attachment()
+                    .filename("notification-" + id + ".pdf")
+                    .build()
+                    .toString()
+            )
+            .body(notification);
     }
 }

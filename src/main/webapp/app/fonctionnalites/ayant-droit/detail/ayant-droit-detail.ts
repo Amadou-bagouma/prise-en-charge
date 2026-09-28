@@ -1,22 +1,42 @@
-import { Component, computed, inject, input } from '@angular/core';
+import { NgClass } from '@angular/common';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap/modal';
 import dayjs from 'dayjs/esm';
 
 import { DataUtils } from 'app/core/util/data-util.service';
 import { Alert, AlertError } from 'app/shared/alert';
-import { FormatMediumDatePipe } from 'app/shared/date';
+import { FormatMediumDatePipe, FormatMediumDatetimePipe } from 'app/shared/date';
+import { ChangementStatutDialog, ResultatChangementStatut } from 'app/shared/statut/changement-statut-dialog';
+import { STATUTS_AYANT_DROIT, libelleStatut, tonStatut } from 'app/shared/statut/statuts';
 import { TranslateDirective } from 'app/shared/language';
 import { IAyantDroit } from '../ayant-droit.model';
+import { AyantDroitService } from '../service/ayant-droit.service';
 
 @Component({
   selector: 'jhi-ayant-droit-detail',
   templateUrl: './ayant-droit-detail.html',
-  imports: [FontAwesomeModule, Alert, AlertError, TranslateDirective, RouterLink, FormatMediumDatePipe],
+  imports: [NgClass, FontAwesomeModule, Alert, AlertError, TranslateDirective, RouterLink, FormatMediumDatePipe, FormatMediumDatetimePipe],
 })
 export class AyantDroitDetail {
   readonly ayantDroit = input<IAyantDroit | null>(null);
+
+  /**
+   * L'ayant droit tel qu'il doit s'afficher : celui que le serveur vient de rendre, sinon celui
+   * qui a été chargé. Voir `AgentDetail.agentAffiche` — une entrée ne se réassigne pas.
+   */
+  readonly ayantDroitAffiche = computed(() => this.ayantDroitRemplace() ?? this.ayantDroit());
+
+  readonly statutAffiche = computed(() => this.ayantDroitAffiche()?.statut ?? null);
+
+  readonly motifStatut = computed(() => this.ayantDroitAffiche()?.motifStatut ?? null);
+
+  readonly dateStatut = computed(() => this.ayantDroitAffiche()?.dateStatut ?? null);
+
+  /** Vrai quand la situation vient d'une répercussion du statut de l'agent. */
+  readonly repercuteDepuisAgent = computed(() => !!this.ayantDroitAffiche()?.statutAvantCascade);
 
   readonly identite = computed(() => {
     const ayantDroit = this.ayantDroit();
@@ -53,6 +73,42 @@ export class AyantDroitDetail {
   });
 
   protected dataUtils = inject(DataUtils);
+  protected readonly ayantDroitService = inject(AyantDroitService);
+  protected readonly modalService = inject(NgbModal);
+
+  private readonly ayantDroitRemplace = signal<IAyantDroit | null>(null);
+
+  libelleStatut(): string {
+    return libelleStatut(STATUTS_AYANT_DROIT, this.statutAffiche());
+  }
+
+  tonStatut(): string {
+    return tonStatut(this.statutAffiche());
+  }
+
+  /**
+   * Change la situation de l'ayant droit.
+   *
+   * Une décision prise ici prime sur celle répercutée depuis l'agent : elle efface la mémoire de
+   * la répercussion, de sorte que réactiver l'agent ne vienne pas défaire ce que l'on décide.
+   */
+  changerStatut(): void {
+    const ayantDroit = this.ayantDroitAffiche();
+    if (!ayantDroit?.id) {
+      return;
+    }
+    const modalRef = this.modalService.open(ChangementStatutDialog, { size: 'lg', backdrop: 'static' });
+    modalRef.componentInstance.intitule = `${this.identite()} — code ${ayantDroit.codeAyantDroit ?? ''}`;
+    modalRef.componentInstance.statutCourant = this.statutAffiche();
+    modalRef.componentInstance.libelleCourant = this.libelleStatut();
+    modalRef.componentInstance.options = STATUTS_AYANT_DROIT;
+    // `closed` seulement : un abandon ne doit rien changer à l'écran.
+    modalRef.closed.subscribe((resultat: ResultatChangementStatut) => {
+      this.ayantDroitService
+        .changerStatut(ayantDroit.id, resultat.statut, resultat.motif)
+        .subscribe(misAJour => this.ayantDroitRemplace.set(misAJour));
+    });
+  }
 
   previousState(): void {
     globalThis.history.back();

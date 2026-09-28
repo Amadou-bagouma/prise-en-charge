@@ -73,7 +73,6 @@ public class TacheQueryService extends QueryService<Tache> {
             if (Long.class != query.getResultType()) {
                 root.fetch(Tache_.demande, JoinType.LEFT);
                 root.fetch(Tache_.utilisateur, JoinType.LEFT);
-                root.fetch(Tache_.boiteReception, JoinType.LEFT);
             }
             return null;
         });
@@ -93,13 +92,11 @@ public class TacheQueryService extends QueryService<Tache> {
                     buildSpecification(criteria.getPriorite(), Tache_.priorite),
                     buildSpecification(criteria.getLu(), Tache_.lu),
                     buildStringSpecification(criteria.getCommentaire(), Tache_.commentaire),
+                    buildStringSpecification(criteria.getDroitRequis(), Tache_.droitRequis),
                     buildSpecification(criteria.getDemandeId(), root ->
                         root.join(Tache_.demande, JoinType.LEFT).get(DemandePriseEnCharge_.id)
                     ),
-                    buildSpecification(criteria.getUtilisateurId(), root -> root.join(Tache_.utilisateur, JoinType.LEFT).get(User_.id)),
-                    buildSpecification(criteria.getBoiteReceptionId(), root ->
-                        root.join(Tache_.boiteReception, JoinType.LEFT).get(BoiteReception_.id)
-                    )
+                    buildSpecification(criteria.getUtilisateurId(), root -> root.join(Tache_.utilisateur, JoinType.LEFT).get(User_.id))
                 )
             );
         }

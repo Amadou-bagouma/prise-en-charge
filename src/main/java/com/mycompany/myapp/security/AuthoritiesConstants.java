@@ -11,6 +11,12 @@ public final class AuthoritiesConstants {
 
     public static final String ANONYMOUS = "ROLE_ANONYMOUS";
 
+    /**
+     * Peut controler une DemandePriseEnCharge avant qu'elle soit soumise a validation :
+     * completude du dossier et conformite des pieces.
+     */
+    public static final String VERIFICATEUR_RH = "ROLE_VERIFICATEUR_RH";
+
     /** Peut effectuer la 1ere validation (DRH) d'une DemandePriseEnCharge. */
     public static final String VALIDATEUR_DRH = "ROLE_VALIDATEUR_DRH";
 

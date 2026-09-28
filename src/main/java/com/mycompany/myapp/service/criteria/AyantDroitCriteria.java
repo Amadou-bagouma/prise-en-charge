@@ -1,6 +1,7 @@
 package com.mycompany.myapp.service.criteria;
 
 import com.mycompany.myapp.domain.enumeration.LienParente;
+import com.mycompany.myapp.domain.enumeration.StatutAyantDroit;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
@@ -42,7 +43,26 @@ public class AyantDroitCriteria implements Serializable, Criteria {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Class for filtering StatutAyantDroit
+     */
+    public static class StatutAyantDroitFilter extends Filter<StatutAyantDroit> {
+
+        public StatutAyantDroitFilter() {}
+
+        public StatutAyantDroitFilter(StatutAyantDroitFilter filter) {
+            super(filter);
+        }
+
+        @Override
+        public StatutAyantDroitFilter copy() {
+            return new StatutAyantDroitFilter(this);
+        }
+    }
+
     private LongFilter id;
+
+    private StatutAyantDroitFilter statut;
 
     private StringFilter nom;
 
@@ -60,6 +80,7 @@ public class AyantDroitCriteria implements Serializable, Criteria {
 
     public AyantDroitCriteria(AyantDroitCriteria other) {
         this.id = other.optionalId().map(LongFilter::copy).orElse(null);
+        this.statut = other.optionalStatut().map(StatutAyantDroitFilter::copy).orElse(null);
         this.nom = other.optionalNom().map(StringFilter::copy).orElse(null);
         this.prenom = other.optionalPrenom().map(StringFilter::copy).orElse(null);
         this.dateNaissance = other.optionalDateNaissance().map(LocalDateFilter::copy).orElse(null);
@@ -71,6 +92,25 @@ public class AyantDroitCriteria implements Serializable, Criteria {
     @Override
     public AyantDroitCriteria copy() {
         return new AyantDroitCriteria(this);
+    }
+
+    public StatutAyantDroitFilter getStatut() {
+        return statut;
+    }
+
+    public Optional<StatutAyantDroitFilter> optionalStatut() {
+        return Optional.ofNullable(statut);
+    }
+
+    public StatutAyantDroitFilter statut() {
+        if (statut == null) {
+            setStatut(new StatutAyantDroitFilter());
+        }
+        return statut;
+    }
+
+    public void setStatut(StatutAyantDroitFilter statut) {
+        this.statut = statut;
     }
 
     public LongFilter getId() {
@@ -217,6 +257,7 @@ public class AyantDroitCriteria implements Serializable, Criteria {
         final AyantDroitCriteria that = (AyantDroitCriteria) o;
         return (
             Objects.equals(id, that.id) &&
+            Objects.equals(statut, that.statut) &&
             Objects.equals(nom, that.nom) &&
             Objects.equals(prenom, that.prenom) &&
             Objects.equals(dateNaissance, that.dateNaissance) &&
@@ -228,7 +269,7 @@ public class AyantDroitCriteria implements Serializable, Criteria {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, nom, prenom, dateNaissance, lien, agentId, distinct);
+        return Objects.hash(id, statut, nom, prenom, dateNaissance, lien, agentId, distinct);
     }
 
     // prettier-ignore
@@ -236,6 +277,7 @@ public class AyantDroitCriteria implements Serializable, Criteria {
     public String toString() {
         return "AyantDroitCriteria{" +
             optionalId().map(f -> "id=" + f + ", ").orElse("") +
+            optionalStatut().map(f -> "statut=" + f + ", ").orElse("") +
             optionalNom().map(f -> "nom=" + f + ", ").orElse("") +
             optionalPrenom().map(f -> "prenom=" + f + ", ").orElse("") +
             optionalDateNaissance().map(f -> "dateNaissance=" + f + ", ").orElse("") +

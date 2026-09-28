@@ -7,6 +7,10 @@ import java.util.Objects;
 
 /**
  * A DTO for the {@link com.mycompany.myapp.domain.BoiteReception} entity.
+ *
+ * <p>La boite appartient a un profil. {@link #nombreNonLus} et {@link #nombreTaches} sont
+ * recalcules a la lecture a partir des taches reellement en portee : ils ne sont jamais servis
+ * depuis la colonne seule, qui se perimerait des qu'une demande change d'etape.
  */
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class BoiteReceptionDTO implements Serializable {
@@ -25,7 +29,13 @@ public class BoiteReceptionDTO implements Serializable {
     private Boolean actif;
 
     @NotNull
-    private UserDTO utilisateur;
+    private ProfilDTO profil;
+
+    /** Le nombre total de taches adressees a la boite, lues ou non. */
+    private Long nombreTaches;
+
+    /** Parmi elles, celles qui restent a traiter : ni terminees, ni annulees. */
+    private Long nombreOuvertes;
 
     public Long getId() {
         return id;
@@ -67,12 +77,28 @@ public class BoiteReceptionDTO implements Serializable {
         this.actif = actif;
     }
 
-    public UserDTO getUtilisateur() {
-        return utilisateur;
+    public ProfilDTO getProfil() {
+        return profil;
     }
 
-    public void setUtilisateur(UserDTO utilisateur) {
-        this.utilisateur = utilisateur;
+    public void setProfil(ProfilDTO profil) {
+        this.profil = profil;
+    }
+
+    public Long getNombreTaches() {
+        return nombreTaches;
+    }
+
+    public void setNombreTaches(Long nombreTaches) {
+        this.nombreTaches = nombreTaches;
+    }
+
+    public Long getNombreOuvertes() {
+        return nombreOuvertes;
+    }
+
+    public void setNombreOuvertes(Long nombreOuvertes) {
+        this.nombreOuvertes = nombreOuvertes;
     }
 
     @Override
@@ -105,7 +131,9 @@ public class BoiteReceptionDTO implements Serializable {
             ", dateDerniereLecture='" + getDateDerniereLecture() + "'" +
             ", nombreNonLus=" + getNombreNonLus() +
             ", actif='" + getActif() + "'" +
-            ", utilisateur=" + getUtilisateur() +
+            ", nombreTaches=" + getNombreTaches() +
+            ", nombreOuvertes=" + getNombreOuvertes() +
+            ", profil=" + getProfil() +
             "}";
     }
 }

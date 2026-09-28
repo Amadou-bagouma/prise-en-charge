@@ -7,8 +7,6 @@ import { ActivatedRoute } from '@angular/router';
 import { provideTranslateService } from '@ngx-translate/core';
 import { Subject, from, of } from 'rxjs';
 
-import { IBoiteReception } from 'app/entities/boite-reception/boite-reception.model';
-import { BoiteReceptionService } from 'app/entities/boite-reception/service/boite-reception.service';
 import { IDemandePriseEnCharge } from 'app/entities/demande-prise-en-charge/demande-prise-en-charge.model';
 import { DemandePriseEnChargeService } from 'app/entities/demande-prise-en-charge/service/demande-prise-en-charge.service';
 import { UserService } from 'app/entities/user/service/user.service';
@@ -29,7 +27,6 @@ describe('Tache Management Update Component', () => {
   let tacheService: TacheService;
   let demandePriseEnChargeService: DemandePriseEnChargeService;
   let userService: UserService;
-  let boiteReceptionService: BoiteReceptionService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -54,7 +51,6 @@ describe('Tache Management Update Component', () => {
     tacheService = TestBed.inject(TacheService);
     demandePriseEnChargeService = TestBed.inject(DemandePriseEnChargeService);
     userService = TestBed.inject(UserService);
-    boiteReceptionService = TestBed.inject(BoiteReceptionService);
 
     comp = fixture.componentInstance;
   });
@@ -104,43 +100,18 @@ describe('Tache Management Update Component', () => {
       expect(comp.usersSharedCollection()).toEqual(expectedCollection);
     });
 
-    it('should call BoiteReception query and add missing value', () => {
-      const tache: ITache = { id: 26209 };
-      const boiteReception: IBoiteReception = { id: 19151 };
-      tache.boiteReception = boiteReception;
-
-      const boiteReceptionCollection: IBoiteReception[] = [{ id: 19151 }];
-      vi.spyOn(boiteReceptionService, 'query').mockReturnValue(of(new HttpResponse({ body: boiteReceptionCollection })));
-      const additionalBoiteReceptions = [boiteReception];
-      const expectedCollection: IBoiteReception[] = [...additionalBoiteReceptions, ...boiteReceptionCollection];
-      vi.spyOn(boiteReceptionService, 'addBoiteReceptionToCollectionIfMissing').mockReturnValue(expectedCollection);
-
-      activatedRoute.data = of({ tache });
-      comp.ngOnInit();
-
-      expect(boiteReceptionService.query).toHaveBeenCalled();
-      expect(boiteReceptionService.addBoiteReceptionToCollectionIfMissing).toHaveBeenCalledWith(
-        boiteReceptionCollection,
-        ...additionalBoiteReceptions.map(i => expect.objectContaining(i) as typeof i),
-      );
-      expect(comp.boiteReceptionsSharedCollection()).toEqual(expectedCollection);
-    });
-
     it('should update editForm', () => {
       const tache: ITache = { id: 26209 };
       const demande: IDemandePriseEnCharge = { id: 17525 };
       tache.demande = demande;
       const utilisateur: IUser = { id: 3944 };
       tache.utilisateur = utilisateur;
-      const boiteReception: IBoiteReception = { id: 19151 };
-      tache.boiteReception = boiteReception;
 
       activatedRoute.data = of({ tache });
       comp.ngOnInit();
 
       expect(comp.demandePriseEnChargesSharedCollection()).toContainEqual(demande);
       expect(comp.usersSharedCollection()).toContainEqual(utilisateur);
-      expect(comp.boiteReceptionsSharedCollection()).toContainEqual(boiteReception);
       expect(comp.tache).toEqual(tache);
     });
   });
@@ -231,16 +202,6 @@ describe('Tache Management Update Component', () => {
         vi.spyOn(userService, 'compareUser');
         comp.compareUser(entity, entity2);
         expect(userService.compareUser).toHaveBeenCalledWith(entity, entity2);
-      });
-    });
-
-    describe('compareBoiteReception', () => {
-      it('should forward to boiteReceptionService', () => {
-        const entity = { id: 19151 };
-        const entity2 = { id: 25149 };
-        vi.spyOn(boiteReceptionService, 'compareBoiteReception');
-        comp.compareBoiteReception(entity, entity2);
-        expect(boiteReceptionService.compareBoiteReception).toHaveBeenCalledWith(entity, entity2);
       });
     });
   });

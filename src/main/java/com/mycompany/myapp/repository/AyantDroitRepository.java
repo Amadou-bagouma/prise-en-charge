@@ -37,4 +37,20 @@ public interface AyantDroitRepository extends JpaRepository<AyantDroit, Long>, J
 
     @Query("select ayantDroit from AyantDroit ayantDroit left join fetch ayantDroit.agent where ayantDroit.id =:id")
     Optional<AyantDroit> findOneWithToOneRelationships(@Param("id") Long id);
+
+    /**
+     * Le plus grand code deja attribue pour un prefixe donne.
+     *
+     * <p>Le prefixe vaut « matricule + chiffre de type » : la sequence repart donc de zero pour
+     * chaque agent et chaque famille de lien. Conjoints et enfants ne partagent pas la meme
+     * serie, mais enfants et « autres » si, puisqu'ils partagent le chiffre 3.
+     *
+     * <p>Le tri est lexicographique, ce qui est exact ici parce que la sequence est sur deux
+     * chiffres a longueur fixe : « 09 » precede bien « 10 ».
+     */
+    /** Les ayants droit d'un agent, pour repercuter le statut de celui-ci. */
+    List<AyantDroit> findByAgentId(Long agentId);
+
+    @Query("select max(a.codeAyantDroit) from AyantDroit a where a.codeAyantDroit like concat(:prefixe, '%')")
+    Optional<String> trouverDernierCode(@Param("prefixe") String prefixe);
 }

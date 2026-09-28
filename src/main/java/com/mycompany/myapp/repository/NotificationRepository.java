@@ -57,4 +57,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
         "update Notification n set n.lu = true, n.dateLecture = :dateLecture where n.utilisateur.id = :utilisateurId and (n.lu = false or n.lu is null)"
     )
     int marquerToutLu(@Param("utilisateurId") Long utilisateurId, @Param("dateLecture") Instant dateLecture);
+
+    /** Tout ce qui est rattache a une demande, pour la supprimer avec elle. */
+    List<Notification> findByDemandeId(Long demandeId);
 }

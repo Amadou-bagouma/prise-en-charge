@@ -1,5 +1,6 @@
+import { NgClass } from '@angular/common';
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap/modal';
@@ -9,10 +10,14 @@ import { catchError, filter, of, tap } from 'rxjs';
 import { ITEM_DELETED_EVENT } from 'app/config';
 import { DataUtils } from 'app/core/util/data-util.service';
 import { AyantDroitDeleteDialog } from 'app/fonctionnalites/ayant-droit/delete/ayant-droit-delete-dialog';
+import { AyantDroitDialog } from 'app/fonctionnalites/ayant-droit/dialog/ayant-droit-dialog';
+import { AgentService } from 'app/fonctionnalites/agent/service/agent.service';
+import { ChangementStatutDialog, ResultatChangementStatut } from 'app/shared/statut/changement-statut-dialog';
+import { STATUTS_AGENT, STATUTS_AYANT_DROIT, libelleStatut, tonStatut } from 'app/shared/statut/statuts';
 import { IAyantDroit } from 'app/fonctionnalites/ayant-droit/ayant-droit.model';
 import { AyantDroitService } from 'app/fonctionnalites/ayant-droit/service/ayant-droit.service';
 import { Alert, AlertError } from 'app/shared/alert';
-import { FormatMediumDatePipe } from 'app/shared/date';
+import { FormatMediumDatePipe, FormatMediumDatetimePipe } from 'app/shared/date';
 import { TranslateDirective } from 'app/shared/language';
 import { IAgent } from '../agent.model';
 
@@ -33,7 +38,7 @@ function anneesRevolues(date?: dayjs.Dayjs | null): number | null {
 @Component({
   selector: 'jhi-agent-detail',
   templateUrl: './agent-detail.html',
-  imports: [FontAwesomeModule, Alert, AlertError, TranslateDirective, RouterLink, FormatMediumDatePipe],
+  imports: [NgClass, FontAwesomeModule, Alert, AlertError, TranslateDirective, RouterLink, FormatMediumDatePipe, FormatMediumDatetimePipe],
 })
 export class AgentDetail {
   readonly agent = input<IAgent | null>(null);
@@ -80,11 +85,74 @@ export class AgentDetail {
 
   protected dataUtils = inject(DataUtils);
   protected readonly ayantDroitService = inject(AyantDroitService);
+  protected readonly agentService = inject(AgentService);
   protected readonly modalService = inject(NgbModal);
-  protected readonly router = inject(Router);
+
+  private readonly agentRemplace = signal<IAgent | null>(null);
 
   constructor() {
     effect(() => this.chargerAyantsDroit(this.agent()?.id));
+  }
+
+  /**
+   * L'agent tel qu'il doit s'afficher : celui que le serveur vient de rendre, sinon celui qui a
+   * été chargé à l'ouverture.
+   *
+   * Un signal local plutôt qu'une écriture dans l'entrée : une entrée ne se réassigne pas, et
+   * recharger l'écran entier pour un changement de situation ferait clignoter toute la fiche.
+   * Lire la situation dans l'entrée laisserait l'écran afficher l'état d'avant - et proposerait
+   * de nouveau, dans le dialogue, la situation que l'on vient de quitter.
+   */
+  readonly agentAffiche = computed(() => this.agentRemplace() ?? this.agent());
+
+  readonly statutAffiche = computed(() => this.agentAffiche()?.statut ?? null);
+
+  readonly motifStatut = computed(() => this.agentAffiche()?.motifStatut ?? null);
+
+  readonly dateStatut = computed(() => this.agentAffiche()?.dateStatut ?? null);
+
+  /** Le mot de la situation, pour que la pastille ne soit jamais seule. */
+  libelleStatut(): string {
+    return libelleStatut(STATUTS_AGENT, this.statutAffiche());
+  }
+
+  tonStatut(): string {
+    return tonStatut(this.statutAffiche());
+  }
+
+  libelleStatutAyantDroit(ayantDroit: IAyantDroit): string {
+    return libelleStatut(STATUTS_AYANT_DROIT, ayantDroit.statut);
+  }
+
+  tonStatutAyantDroit(ayantDroit: IAyantDroit): string {
+    return tonStatut(ayantDroit.statut);
+  }
+
+  /**
+   * Change la situation de l'agent, en disant d'abord ce que cela entraîne pour ses ayants
+   * droit : leur couverture dérive de la sienne, et une radiation les emporte.
+   */
+  changerStatut(): void {
+    const agent = this.agent();
+    if (!agent?.id) {
+      return;
+    }
+    const modalRef = this.modalService.open(ChangementStatutDialog, { size: 'lg', backdrop: 'static' });
+    modalRef.componentInstance.intitule = `${this.identite()} — matricule ${agent.matricule ?? ''}`;
+    modalRef.componentInstance.statutCourant = this.statutAffiche();
+    modalRef.componentInstance.libelleCourant = this.libelleStatut();
+    modalRef.componentInstance.options = STATUTS_AGENT;
+    modalRef.componentInstance.repercute = true;
+    modalRef.closed.subscribe((resultat: ResultatChangementStatut) => {
+      if (!resultat) {
+        return;
+      }
+      this.agentService.changerStatut(agent.id, resultat.statut, resultat.motif).subscribe(misAJour => {
+        this.agentRemplace.set(misAJour);
+        // La répercussion a pu changer les ayants droit : la liste est relue, sans vider l'écran.
+        this.chargerAyantsDroit(agent.id, { discret: true });
+      });
+    });
   }
 
   previousState(): void {
@@ -99,12 +167,22 @@ export class AgentDetail {
     this.dataUtils.openFile(base64String, contentType);
   }
 
-  /** Ouvre la saisie d'un ayant droit avec l'agent déjà rattaché. */
+  /**
+   * Ouvre la saisie d'un ayant droit dans un dialogue, sans quitter la fiche.
+   *
+   * L'ajout se fait à côté de la liste qu'il alimente : on voit la ligne apparaître là où on
+   * l'attend. Quitter l'écran pour un formulaire plein puis y revenir ferait perdre la lecture
+   * en cours pour cinq champs de saisie.
+   */
   ajouterAyantDroit(): void {
-    const agentId = this.agent()?.id;
-    if (agentId) {
-      this.router.navigate(['/ayant-droit', 'new'], { queryParams: { agent: agentId } });
+    const agent = this.agent();
+    if (!agent?.id) {
+      return;
     }
+    const modalRef = this.modalService.open(AyantDroitDialog, { size: 'lg', backdrop: 'static', scrollable: true });
+    modalRef.componentInstance.agent = agent;
+    // `closed` seulement : un abandon ne doit rien changer à l'écran.
+    modalRef.closed.subscribe((cree: IAyantDroit) => this.integrerAyantDroit(cree));
   }
 
   supprimerAyantDroit(ayantDroit: IAyantDroit): void {
@@ -118,18 +196,45 @@ export class AgentDetail {
       .subscribe();
   }
 
+  /**
+   * Insère le nouvel ayant droit à sa place, puis resynchronise en arrière-plan.
+   *
+   * L'insertion immédiate évite le clignotement d'un rechargement complet — c'est le serveur
+   * qui a attribué le code, la ligne affichée est donc déjà la bonne. La relecture qui suit ne
+   * sert qu'à rester d'accord avec la base, et elle se fait sans vider la liste.
+   */
+  private integrerAyantDroit(cree?: IAyantDroit): void {
+    if (!cree) {
+      return;
+    }
+    this.ayantsDroit.update(liste =>
+      [...liste, cree].sort((a, b) => (a.nom ?? '').localeCompare(b.nom ?? '') || (a.prenom ?? '').localeCompare(b.prenom ?? '')),
+    );
+    this.chargerAyantsDroit(this.agent()?.id, { discret: true });
+  }
+
   /** Le rattachement se lit sur le serveur : `agentId.equals` existe déjà sur les critères. */
-  private chargerAyantsDroit(agentId?: number): void {
+  private chargerAyantsDroit(agentId?: number, options?: { discret: boolean }): void {
     if (!agentId) {
       this.ayantsDroit.set([]);
       return;
     }
-    this.chargementAyantsDroit.set(true);
+    // En mode discret, le voyant de chargement reste éteint : la liste est déjà à l'écran et
+    // la remplacer par « Chargement… » ferait clignoter ce que l'on vient d'ajouter.
+    if (!options?.discret) {
+      this.chargementAyantsDroit.set(true);
+    }
     this.ayantDroitService
       .query({ 'agentId.equals': agentId, size: 50, sort: ['nom,asc', 'prenom,asc'] })
       .pipe(catchError(() => of(null)))
       .subscribe(reponse => {
-        this.ayantsDroit.set(reponse?.body ?? []);
+        // Une relecture en échec laisse la liste en place plutôt que de la vider : ce qui vient
+        // d'être ajouté est déjà enregistré, l'effacer de l'écran serait mentir.
+        if (reponse?.body) {
+          this.ayantsDroit.set(reponse.body);
+        } else if (!options?.discret) {
+          this.ayantsDroit.set([]);
+        }
         this.chargementAyantsDroit.set(false);
       });
   }

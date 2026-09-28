@@ -1,4 +1,3 @@
-import { NgClass } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
 import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -13,7 +12,6 @@ import { combineLatest, filter, map, tap } from 'rxjs';
 import { DEFAULT_SORT_DATA, ITEMS_PER_PAGE, ITEM_DELETED_EVENT, PAGE_HEADER, SORT, TOTAL_COUNT_RESPONSE_HEADER } from 'app/config';
 import { Alert, AlertError } from 'app/shared/alert';
 import { AccountService } from 'app/core/auth';
-import { HasAnyAuthorityDirective } from 'app/shared/auth';
 import { FormatMediumDatetimePipe } from 'app/shared/date';
 import { Filter, FilterOptions, IFilterOption, IFilterOptions } from 'app/shared/filter';
 import { Authority } from 'app/shared/jhipster/constants';
@@ -28,7 +26,6 @@ import { ITache } from '../tache.model';
   selector: 'jhi-tache',
   templateUrl: './tache.html',
   imports: [
-    NgClass,
     RouterLink,
     FontAwesomeModule,
     AlertError,
@@ -44,7 +41,6 @@ import { ITache } from '../tache.model';
     NgbDropdownToggle,
     NgbPagination,
     ItemCount,
-    HasAnyAuthorityDirective,
   ],
 })
 export class Tache {

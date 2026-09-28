@@ -32,7 +32,6 @@ describe('Tache Form Service', () => {
             commentaire: expect.any(Object),
             demande: expect.any(Object),
             utilisateur: expect.any(Object),
-            boiteReception: expect.any(Object),
           }),
         );
       });
@@ -55,7 +54,6 @@ describe('Tache Form Service', () => {
             commentaire: expect.any(Object),
             demande: expect.any(Object),
             utilisateur: expect.any(Object),
-            boiteReception: expect.any(Object),
           }),
         );
       });

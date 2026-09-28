@@ -1,143 +1,96 @@
-import { HttpClient, HttpResponse, httpResource } from '@angular/common/http';
-import { Service, computed, inject, signal } from '@angular/core';
+import { HttpClient, HttpResponse } from '@angular/common/http';
+import { Service, inject } from '@angular/core';
 
 import dayjs from 'dayjs/esm';
 import { Observable, map } from 'rxjs';
 
 import { serverApiUrl } from 'app/config';
 import { createRequestOption } from 'app/core/request';
-import { IBoiteReception, NewBoiteReception } from '../boite-reception.model';
+import { ITache } from 'app/fonctionnalites/tache/tache.model';
+import { IBoiteReception } from '../boite-reception.model';
 
-export type PartialUpdateBoiteReception = Partial<IBoiteReception> & Pick<IBoiteReception, 'id'>;
-
-type RestOf<T extends IBoiteReception | NewBoiteReception> = Omit<T, 'dateCreation' | 'dateDerniereLecture'> & {
+type RestBoiteReception = Omit<IBoiteReception, 'dateCreation' | 'dateDerniereLecture'> & {
   dateCreation?: string | null;
   dateDerniereLecture?: string | null;
 };
 
-export type RestBoiteReception = RestOf<IBoiteReception>;
+type RestTache = Omit<ITache, 'dateCreation' | 'dateAssignation' | 'dateEcheance' | 'dateTerminaison'> & {
+  dateCreation?: string | null;
+  dateAssignation?: string | null;
+  dateEcheance?: string | null;
+  dateTerminaison?: string | null;
+};
 
-export type NewRestBoiteReception = RestOf<NewBoiteReception>;
-
-export type PartialUpdateRestBoiteReception = RestOf<PartialUpdateBoiteReception>;
-
+/**
+ * Accès à la boîte de réception.
+ *
+ * Aucune méthode de création, de modification ni de suppression : une boîte existe parce qu'un
+ * profil existe, et le serveur n'expose aucune route pour en fabriquer une.
+ *
+ * Aucun identifiant de boîte n'est jamais envoyé : le serveur résout lui-même le profil du compte
+ * appelant. C'est ce qui garantit qu'un utilisateur ne peut pas lire la boîte d'un autre rôle en
+ * changeant un numéro dans l'URL.
+ */
 @Service()
-export class BoiteReceptionsService {
-  readonly boiteReceptionsParams = signal<Record<string, string | number | boolean | readonly (string | number | boolean)[]> | undefined>(
-    undefined,
-  );
-  readonly boiteReceptionsResource = httpResource<RestBoiteReception[]>(() => {
-    const params = this.boiteReceptionsParams();
-    if (!params) {
-      return undefined;
-    }
-    return { url: this.resourceUrl, params };
-  });
-  /**
-   * This signal holds the list of boiteReception that have been fetched. It is updated when the boiteReceptionsResource emits a new value.
-   * In case of error while fetching the boiteReceptions, the signal is set to an empty array.
-   */
-  readonly boiteReceptions = computed(() =>
-    (this.boiteReceptionsResource.hasValue() ? this.boiteReceptionsResource.value() : []).map(item => this.convertValueFromServer(item)),
-  );
+export class BoiteReceptionService {
   protected readonly resourceUrl = `${serverApiUrl}api/boite-receptions`;
 
-  protected convertValueFromServer(restBoiteReception: RestBoiteReception): IBoiteReception {
-    return {
-      ...restBoiteReception,
-      dateCreation: restBoiteReception.dateCreation ? dayjs(restBoiteReception.dateCreation) : undefined,
-      dateDerniereLecture: restBoiteReception.dateDerniereLecture ? dayjs(restBoiteReception.dateDerniereLecture) : undefined,
-    };
-  }
-}
+  private readonly http = inject(HttpClient);
 
-@Service()
-export class BoiteReceptionService extends BoiteReceptionsService {
-  protected readonly http = inject(HttpClient);
-
-  create(boiteReception: NewBoiteReception): Observable<IBoiteReception> {
-    const copy = this.convertValueFromClient(boiteReception);
-    return this.http.post<RestBoiteReception>(this.resourceUrl, copy).pipe(map(res => this.convertResponseFromServer(res)));
+  /** La boîte du profil de l'utilisateur courant, compteurs recalculés. */
+  maBoite(): Observable<IBoiteReception> {
+    return this.http.get<RestBoiteReception>(`${this.resourceUrl}/mienne`).pipe(map(boite => this.convertirBoite(boite)));
   }
 
-  update(boiteReception: IBoiteReception): Observable<IBoiteReception> {
-    const copy = this.convertValueFromClient(boiteReception);
-    return this.http
-      .put<RestBoiteReception>(`${this.resourceUrl}/${encodeURIComponent(this.getBoiteReceptionIdentifier(boiteReception))}`, copy)
-      .pipe(map(res => this.convertResponseFromServer(res)));
-  }
-
-  partialUpdate(boiteReception: PartialUpdateBoiteReception): Observable<IBoiteReception> {
-    const copy = this.convertValueFromClient(boiteReception);
-    return this.http
-      .patch<RestBoiteReception>(`${this.resourceUrl}/${encodeURIComponent(this.getBoiteReceptionIdentifier(boiteReception))}`, copy)
-      .pipe(map(res => this.convertResponseFromServer(res)));
-  }
-
-  find(id: number): Observable<IBoiteReception> {
-    return this.http
-      .get<RestBoiteReception>(`${this.resourceUrl}/${encodeURIComponent(id)}`)
-      .pipe(map(res => this.convertResponseFromServer(res)));
-  }
-
-  query(req?: any): Observable<HttpResponse<IBoiteReception[]>> {
+  /** Les tâches que les droits de l'utilisateur lui donnent à traiter. */
+  mesTaches(req?: any): Observable<HttpResponse<ITache[]>> {
     const options = createRequestOption(req);
     return this.http
-      .get<RestBoiteReception[]>(this.resourceUrl, { params: options, observe: 'response' })
-      .pipe(map(res => res.clone({ body: this.convertResponseArrayFromServer(res.body!) })));
+      .get<RestTache[]>(`${this.resourceUrl}/mienne/taches`, { params: options, observe: 'response' })
+      .pipe(map(res => res.clone({ body: (res.body ?? []).map(tache => this.convertirTache(tache)) })));
   }
 
-  delete(id: number): Observable<undefined> {
-    return this.http.delete<undefined>(`${this.resourceUrl}/${encodeURIComponent(id)}`);
+  /** Enregistre que la boîte vient d'être ouverte. */
+  marquerConsultee(): Observable<IBoiteReception> {
+    return this.http.put<RestBoiteReception>(`${this.resourceUrl}/mienne/consultee`, {}).pipe(map(boite => this.convertirBoite(boite)));
   }
 
-  getBoiteReceptionIdentifier(boiteReception: Pick<IBoiteReception, 'id'>): number {
-    return boiteReception.id;
+  /** S'attribuer une tâche de sa boîte. */
+  prendreEnCharge(id: number): Observable<ITache> {
+    return this.http
+      .put<RestTache>(`${this.resourceUrl}/mienne/taches/${encodeURIComponent(id)}/prendre`, {})
+      .pipe(map(tache => this.convertirTache(tache)));
   }
 
-  compareBoiteReception(o1: Pick<IBoiteReception, 'id'> | null, o2: Pick<IBoiteReception, 'id'> | null): boolean {
-    return o1 && o2 ? this.getBoiteReceptionIdentifier(o1) === this.getBoiteReceptionIdentifier(o2) : o1 === o2;
+  /** Rendre une tâche à la file, si l'on ne peut finalement pas la traiter. */
+  relacher(id: number): Observable<ITache> {
+    return this.http
+      .put<RestTache>(`${this.resourceUrl}/mienne/taches/${encodeURIComponent(id)}/relacher`, {})
+      .pipe(map(tache => this.convertirTache(tache)));
   }
 
-  addBoiteReceptionToCollectionIfMissing<Type extends Pick<IBoiteReception, 'id'>>(
-    boiteReceptionCollection: Type[],
-    ...boiteReceptionsToCheck: (Type | null | undefined)[]
-  ): Type[] {
-    const boiteReceptions: Type[] = boiteReceptionsToCheck.filter(
-      boiteReceptionItem => boiteReceptionItem !== null && boiteReceptionItem !== undefined,
-    );
-    if (boiteReceptions.length > 0) {
-      const boiteReceptionCollectionIdentifiers = boiteReceptionCollection.map(boiteReceptionItem =>
-        this.getBoiteReceptionIdentifier(boiteReceptionItem),
-      );
-      const boiteReceptionsToAdd = boiteReceptions.filter(boiteReceptionItem => {
-        const boiteReceptionIdentifier = this.getBoiteReceptionIdentifier(boiteReceptionItem);
-        if (boiteReceptionCollectionIdentifiers.includes(boiteReceptionIdentifier)) {
-          return false;
-        }
-        boiteReceptionCollectionIdentifiers.push(boiteReceptionIdentifier);
-        return true;
-      });
-      return [...boiteReceptionsToAdd, ...boiteReceptionCollection];
-    }
-    return boiteReceptionCollection;
+  /** Marque une tâche de sa propre boîte comme lue. */
+  marquerTacheLue(id: number): Observable<ITache> {
+    return this.http
+      .put<RestTache>(`${this.resourceUrl}/mienne/taches/${encodeURIComponent(id)}/lue`, {})
+      .pipe(map(tache => this.convertirTache(tache)));
   }
 
-  protected convertValueFromClient<T extends IBoiteReception | NewBoiteReception | PartialUpdateBoiteReception>(
-    boiteReception: T,
-  ): RestOf<T> {
+  private convertirBoite(boite: RestBoiteReception): IBoiteReception {
     return {
-      ...boiteReception,
-      dateCreation: boiteReception.dateCreation?.toJSON() ?? null,
-      dateDerniereLecture: boiteReception.dateDerniereLecture?.toJSON() ?? null,
+      ...boite,
+      dateCreation: boite.dateCreation ? dayjs(boite.dateCreation) : undefined,
+      dateDerniereLecture: boite.dateDerniereLecture ? dayjs(boite.dateDerniereLecture) : undefined,
     };
   }
 
-  protected convertResponseFromServer(res: RestBoiteReception): IBoiteReception {
-    return this.convertValueFromServer(res);
-  }
-
-  protected convertResponseArrayFromServer(res: RestBoiteReception[]): IBoiteReception[] {
-    return res.map(item => this.convertValueFromServer(item));
+  private convertirTache(tache: RestTache): ITache {
+    return {
+      ...tache,
+      dateCreation: tache.dateCreation ? dayjs(tache.dateCreation) : undefined,
+      dateAssignation: tache.dateAssignation ? dayjs(tache.dateAssignation) : undefined,
+      dateEcheance: tache.dateEcheance ? dayjs(tache.dateEcheance) : undefined,
+      dateTerminaison: tache.dateTerminaison ? dayjs(tache.dateTerminaison) : undefined,
+    };
   }
 }

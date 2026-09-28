@@ -1,14 +1,13 @@
-import { HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { TranslatePipe } from '@ngx-translate/core';
-import { Observable, finalize, map } from 'rxjs';
+import { Observable, catchError, finalize, map, of } from 'rxjs';
 
-import { IBoiteReception } from 'app/entities/boite-reception/boite-reception.model';
-import { BoiteReceptionService } from 'app/entities/boite-reception/service/boite-reception.service';
+import { serverApiUrl } from 'app/config';
 import { IDemandePriseEnCharge } from 'app/entities/demande-prise-en-charge/demande-prise-en-charge.model';
 import { DemandePriseEnChargeService } from 'app/entities/demande-prise-en-charge/service/demande-prise-en-charge.service';
 import { UserService } from 'app/entities/user/service/user.service';
@@ -37,14 +36,21 @@ export class TacheUpdate implements OnInit {
 
   demandePriseEnChargesSharedCollection = signal<IDemandePriseEnCharge[]>([]);
   usersSharedCollection = signal<IUser[]>([]);
-  boiteReceptionsSharedCollection = signal<IBoiteReception[]>([]);
+
+  /**
+   * Les habilitations auxquelles une tâche peut être adressée.
+   *
+   * Lues au serveur plutôt que codées en dur : la liste des droits est administrable, et une
+   * liste figée ici s'en écarterait au premier ajout.
+   */
+  readonly droitsDisponibles = signal<{ name: string; description?: string | null }[]>([]);
 
   protected tacheService = inject(TacheService);
   protected tacheFormService = inject(TacheFormService);
   protected demandePriseEnChargeService = inject(DemandePriseEnChargeService);
   protected userService = inject(UserService);
-  protected boiteReceptionService = inject(BoiteReceptionService);
   protected activatedRoute = inject(ActivatedRoute);
+  protected readonly http = inject(HttpClient);
   protected readonly confirmService = inject(ConfirmService);
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
@@ -55,9 +61,6 @@ export class TacheUpdate implements OnInit {
 
   compareUser = (o1: IUser | null, o2: IUser | null): boolean => this.userService.compareUser(o1, o2);
 
-  compareBoiteReception = (o1: IBoiteReception | null, o2: IBoiteReception | null): boolean =>
-    this.boiteReceptionService.compareBoiteReception(o1, o2);
-
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ tache }) => {
       this.tache = tache;
@@ -66,6 +69,7 @@ export class TacheUpdate implements OnInit {
       }
 
       this.loadRelationshipsOptions();
+      this.chargerDroits();
     });
   }
 
@@ -115,9 +119,14 @@ export class TacheUpdate implements OnInit {
       ),
     );
     this.usersSharedCollection.update(users => this.userService.addUserToCollectionIfMissing<IUser>(users, tache.utilisateur));
-    this.boiteReceptionsSharedCollection.update(boiteReceptions =>
-      this.boiteReceptionService.addBoiteReceptionToCollectionIfMissing<IBoiteReception>(boiteReceptions, tache.boiteReception),
-    );
+  }
+
+  /** Un échec laisse la liste vide : le champ reste saisissable, rien n'est inventé. */
+  private chargerDroits(): void {
+    this.http
+      .get<{ name: string; description?: string | null }[]>(`${serverApiUrl}api/authorities/attribuables`)
+      .pipe(catchError(() => of([])))
+      .subscribe(droits => this.droitsDisponibles.set(droits));
   }
 
   protected loadRelationshipsOptions(): void {
@@ -139,15 +148,5 @@ export class TacheUpdate implements OnInit {
       .pipe(map((res: HttpResponse<IUser[]>) => res.body ?? []))
       .pipe(map((users: IUser[]) => this.userService.addUserToCollectionIfMissing<IUser>(users, this.tache?.utilisateur)))
       .subscribe((users: IUser[]) => this.usersSharedCollection.set(users));
-
-    this.boiteReceptionService
-      .query()
-      .pipe(map((res: HttpResponse<IBoiteReception[]>) => res.body ?? []))
-      .pipe(
-        map((boiteReceptions: IBoiteReception[]) =>
-          this.boiteReceptionService.addBoiteReceptionToCollectionIfMissing<IBoiteReception>(boiteReceptions, this.tache?.boiteReception),
-        ),
-      )
-      .subscribe((boiteReceptions: IBoiteReception[]) => this.boiteReceptionsSharedCollection.set(boiteReceptions));
   }
 }

@@ -1,41 +1,18 @@
 import { Routes } from '@angular/router';
 
-import { DESC } from 'app/config';
 import { userRouteAccessService } from 'app/core/auth';
 
-import BoiteReceptionResolve from './route/boite-reception-routing-resolve.service';
-
+/**
+ * Une seule route : la boite de reception de son propre profil.
+ *
+ * Il n'y a ni creation, ni modification, ni suppression - une boite nait avec son profil - et
+ * aucune route ne prend d'identifiant de boite : c'est le serveur qui resout le profil du compte
+ * appelant, de sorte qu'aucune URL ne permet d'aller lire la boite d'un autre role.
+ */
 const boiteReceptionRoute: Routes = [
   {
     path: '',
     loadComponent: () => import('./list/boite-reception').then(m => m.BoiteReception),
-    data: {
-      defaultSort: `id,${DESC}`,
-    },
-    canActivate: [userRouteAccessService],
-  },
-  {
-    path: ':id/view',
-    loadComponent: () => import('./detail/boite-reception-detail').then(m => m.BoiteReceptionDetail),
-    resolve: {
-      boiteReception: BoiteReceptionResolve,
-    },
-    canActivate: [userRouteAccessService],
-  },
-  {
-    path: 'new',
-    loadComponent: () => import('./update/boite-reception-update').then(m => m.BoiteReceptionUpdate),
-    resolve: {
-      boiteReception: BoiteReceptionResolve,
-    },
-    canActivate: [userRouteAccessService],
-  },
-  {
-    path: ':id/edit',
-    loadComponent: () => import('./update/boite-reception-update').then(m => m.BoiteReceptionUpdate),
-    resolve: {
-      boiteReception: BoiteReceptionResolve,
-    },
     canActivate: [userRouteAccessService],
   },
 ];

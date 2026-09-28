@@ -2,6 +2,8 @@
   "peccnssApp": {
     "StatutDemande": {
       "null": "",
+      "EN_SAISIE": "En saisie",
+      "EN_VERIFICATION_RH": "En vérification RH",
       "NOUVELLE": "Nouvelle",
       "EN_ATTENTE_PIECES": "Pièce manquante",
       "A_TRAITER": "À instruire",

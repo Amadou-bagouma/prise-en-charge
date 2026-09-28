@@ -82,6 +82,7 @@ public class AgentQueryService extends QueryService<Agent> {
                 Specification.allOf(
                     Boolean.TRUE.equals(criteria.getDistinct()) ? distinct(criteria.getDistinct()) : Specification.unrestricted(),
                     buildRangeSpecification(criteria.getId(), Agent_.id),
+                    buildSpecification(criteria.getStatut(), Agent_.statut),
                     buildStringSpecification(criteria.getMatricule(), Agent_.matricule),
                     buildStringSpecification(criteria.getNom(), Agent_.nom),
                     buildStringSpecification(criteria.getPrenom(), Agent_.prenom),

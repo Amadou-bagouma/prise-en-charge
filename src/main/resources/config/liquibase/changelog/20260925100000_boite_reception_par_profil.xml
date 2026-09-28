@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        La boite de reception devient celle d'un profil, et non plus d'une personne.
+
+        Les boites existantes ne sont pas reprises : elles etaient nominatives et plusieurs
+        d'entre elles tomberaient sur le meme profil, ce que la contrainte d'unicite refuse. Elles
+        ne portaient aucun contenu propre (la date de creation, un compteur denormalise et un
+        drapeau actif), le contenu etant les taches, qui ne sont pas touchees ici. Les nouvelles
+        boites sont creees au demarrage, une par profil.
+    -->
+
+    <!-- 1. La tache n'est plus rangee dans une boite : elle y est routee par les droits du profil
+         (voir RoutageBoiteReception). Une colonne que plus rien ne met a jour derive en silence. -->
+    <changeSet id="20260925100000-1" author="cnss">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="tache" columnName="boite_reception_id"/>
+        </preConditions>
+        <dropForeignKeyConstraint baseTableName="tache" constraintName="fk_tache__boite_reception_id"/>
+        <dropColumn tableName="tache" columnName="boite_reception_id"/>
+    </changeSet>
+
+    <!-- 2. Les boites nominatives disparaissent. -->
+    <changeSet id="20260925100000-2" author="cnss">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="boite_reception" columnName="utilisateur_id"/>
+        </preConditions>
+        <delete tableName="boite_reception"/>
+        <dropForeignKeyConstraint baseTableName="boite_reception" constraintName="fk_boite_reception__utilisateur_id"/>
+        <dropUniqueConstraint tableName="boite_reception" constraintName="ux_boite_reception__utilisateur_id"/>
+        <dropColumn tableName="boite_reception" columnName="utilisateur_id"/>
+    </changeSet>
+
+    <!-- 3. La boite porte desormais son profil. La colonne est NOT NULL des la creation : la
+         table vient d'etre videe, aucune ligne existante ne peut la violer. -->
+    <changeSet id="20260925100000-3" author="cnss">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="boite_reception" columnName="profil_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="boite_reception">
+            <column name="profil_id" type="bigint">
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_boite_reception__profil_id"/>
+            </column>
+        </addColumn>
+        <addForeignKeyConstraint baseColumnNames="profil_id"
+                                 baseTableName="boite_reception"
+                                 constraintName="fk_boite_reception__profil_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="profil"/>
+    </changeSet>
+</databaseChangeLog>

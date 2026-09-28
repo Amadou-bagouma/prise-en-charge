@@ -21,10 +21,14 @@ public class HistoriqueActionDTO implements Serializable {
     @NotNull
     private Instant dateAction;
 
-    @NotNull
     private DemandePriseEnChargeDTO demande;
 
-    @NotNull
+    /** Ce sur quoi porte l'action quand ce n'est pas une demande : AGENT, AYANT_DROIT. */
+    @Size(max = 50)
+    private String cibleType;
+
+    private Long cibleId;
+
     private UserDTO utilisateur;
 
     public Long getId() {
@@ -57,6 +61,22 @@ public class HistoriqueActionDTO implements Serializable {
 
     public void setDateAction(Instant dateAction) {
         this.dateAction = dateAction;
+    }
+
+    public String getCibleType() {
+        return cibleType;
+    }
+
+    public void setCibleType(String cibleType) {
+        this.cibleType = cibleType;
+    }
+
+    public Long getCibleId() {
+        return cibleId;
+    }
+
+    public void setCibleId(Long cibleId) {
+        this.cibleId = cibleId;
     }
 
     public DemandePriseEnChargeDTO getDemande() {

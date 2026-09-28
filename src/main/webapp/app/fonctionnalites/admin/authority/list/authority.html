@@ -1,77 +1,83 @@
-<div>
-  <div class="jhi-page-header">
-    <h2 id="page-heading" data-cy="AuthorityHeading">
-      <span jhiTranslate="peccnssApp.adminAuthority.home.title">Authorities</span>
-    </h2>
+<div class="pec-ecran">
+  <div class="pec-titre-ecran">
+    <h1 id="page-heading" data-cy="AuthorityHeading">Habilitations</h1>
+    <span class="pec-muted">{{ authorities().length }} habilitation{{ authorities().length > 1 ? 's' : '' }}</span>
+  </div>
 
-    <div class="jhi-page-actions">
-      <button class="btn btn-outline-secondary" (click)="load()" [disabled]="isLoading()">
-        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
-        <span jhiTranslate="peccnssApp.adminAuthority.home.refreshListLabel">Refresh list</span>
+  <jhi-alert-error />
+  <jhi-alert />
+
+  <div class="pec-filtres">
+    <div class="pec-filtres__actions">
+      <button type="button" class="pec-btn pec-btn--discret pec-btn--sm" (click)="load()" [disabled]="isLoading()" data-cy="actualiser">
+        <fa-icon class="pec-btn__ico" icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Actualiser</span>
       </button>
 
       <button
+        type="button"
         id="jh-create-entity"
         data-cy="entityCreateButton"
-        class="btn btn-accent jh-create-entity create-authority"
+        class="pec-btn pec-btn--primaire pec-btn--sm"
         [routerLink]="['/authority/new']"
       >
-        <fa-icon icon="plus" />
-        <span jhiTranslate="peccnssApp.adminAuthority.home.createLabel">Create a new Authority</span>
+        <fa-icon class="pec-btn__ico" icon="plus" />
+        <span>Créer une habilitation</span>
       </button>
     </div>
   </div>
 
-  <jhi-alert-error />
-
-  <jhi-alert />
-
-  @if (authorities().length === 0) {
-    <div class="alert alert-warning" id="no-result">
-      <span jhiTranslate="peccnssApp.adminAuthority.home.notFound">No Authorities found</span>
-    </div>
-  } @else {
-    <div class="jhi-table-panel table-responsive table-entities" id="entities">
-      <table class="table jhi-table" aria-describedby="page-heading">
+  <div class="pec-panneau">
+    <div class="pec-tbl-zone" id="entities">
+      <table class="pec-tbl" aria-describedby="page-heading">
         <thead>
           <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
             <th scope="col" jhiSortBy="name">
               <div class="d-flex">
-                <span jhiTranslate="peccnssApp.adminAuthority.name">Name</span>
+                <span>Nom</span>
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
-            <th scope="col"></th>
+            <th scope="col">Ce qu'elle autorise</th>
+            <th scope="col" class="pec-tbl__droite"><span class="visually-hidden">Actions</span></th>
           </tr>
         </thead>
         <tbody>
           @for (authority of authorities(); track trackName(authority)) {
             <tr data-cy="entityTable">
               <td>
-                <a [routerLink]="['/authority', authority.name, 'view']">{{ authority.name }}</a>
+                <a class="pec-num" [routerLink]="['/authority', authority.name, 'view']">{{ authority.name }}</a>
               </td>
-              <td class="text-end">
-                <div ngbDropdown class="d-inline-block" container="body">
-                  <button type="button" class="btn btn-secondary btn-sm" ngbDropdownToggle data-cy="entityActionsButton">
-                    <fa-icon icon="ellipsis-vertical" />
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.actions">Actions</span>
+              <!--
+                La description est ce qui permet de composer un profil sans deviner : un nom
+                technique seul n'apprend rien a qui attribue le droit.
+              -->
+              <td class="pec-tbl__libre">{{ authority.description || '—' }}</td>
+              <td class="pec-tbl__droite">
+                <div ngbDropdown container="body" class="d-inline-block">
+                  <button type="button" class="pec-btn pec-btn--discret pec-btn--sm" ngbDropdownToggle data-cy="entityActionsButton">
+                    <span jhiTranslate="entity.action.actions">Actions</span>
                   </button>
                   <div ngbDropdownMenu>
                     <a ngbDropdownItem [routerLink]="['/authority', authority.name, 'view']" data-cy="entityDetailsButton">
                       <fa-icon icon="eye" class="me-1" />
-                      <span jhiTranslate="entity.action.view">View</span>
+                      <span jhiTranslate="entity.action.view">Voir</span>
                     </a>
                     <button ngbDropdownItem type="button" (click)="delete(authority)" data-cy="entityDeleteButton">
                       <fa-icon icon="times" class="me-1" />
-                      <span jhiTranslate="entity.action.delete">Delete</span>
+                      <span jhiTranslate="entity.action.delete">Supprimer</span>
                     </button>
                   </div>
                 </div>
               </td>
             </tr>
+          } @empty {
+            <tr>
+              <td colspan="3" class="pec-tbl__vide">Aucune habilitation</td>
+            </tr>
           }
         </tbody>
       </table>
     </div>
-  }
+  </div>
 </div>

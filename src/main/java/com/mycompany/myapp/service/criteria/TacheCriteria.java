@@ -82,11 +82,11 @@ public class TacheCriteria implements Serializable, Criteria {
 
     private StringFilter commentaire;
 
+    private StringFilter droitRequis;
+
     private LongFilter demandeId;
 
     private LongFilter utilisateurId;
-
-    private LongFilter boiteReceptionId;
 
     private Boolean distinct;
 
@@ -104,9 +104,9 @@ public class TacheCriteria implements Serializable, Criteria {
         this.priorite = other.optionalPriorite().map(PrioriteTacheFilter::copy).orElse(null);
         this.lu = other.optionalLu().map(BooleanFilter::copy).orElse(null);
         this.commentaire = other.optionalCommentaire().map(StringFilter::copy).orElse(null);
+        this.droitRequis = other.optionalDroitRequis().map(StringFilter::copy).orElse(null);
         this.demandeId = other.optionalDemandeId().map(LongFilter::copy).orElse(null);
         this.utilisateurId = other.optionalUtilisateurId().map(LongFilter::copy).orElse(null);
-        this.boiteReceptionId = other.optionalBoiteReceptionId().map(LongFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
@@ -305,6 +305,25 @@ public class TacheCriteria implements Serializable, Criteria {
         this.lu = lu;
     }
 
+    public StringFilter getDroitRequis() {
+        return droitRequis;
+    }
+
+    public Optional<StringFilter> optionalDroitRequis() {
+        return Optional.ofNullable(droitRequis);
+    }
+
+    public StringFilter droitRequis() {
+        if (droitRequis == null) {
+            setDroitRequis(new StringFilter());
+        }
+        return droitRequis;
+    }
+
+    public void setDroitRequis(StringFilter droitRequis) {
+        this.droitRequis = droitRequis;
+    }
+
     public StringFilter getCommentaire() {
         return commentaire;
     }
@@ -362,25 +381,6 @@ public class TacheCriteria implements Serializable, Criteria {
         this.utilisateurId = utilisateurId;
     }
 
-    public LongFilter getBoiteReceptionId() {
-        return boiteReceptionId;
-    }
-
-    public Optional<LongFilter> optionalBoiteReceptionId() {
-        return Optional.ofNullable(boiteReceptionId);
-    }
-
-    public LongFilter boiteReceptionId() {
-        if (boiteReceptionId == null) {
-            setBoiteReceptionId(new LongFilter());
-        }
-        return boiteReceptionId;
-    }
-
-    public void setBoiteReceptionId(LongFilter boiteReceptionId) {
-        this.boiteReceptionId = boiteReceptionId;
-    }
-
     public Boolean getDistinct() {
         return distinct;
     }
@@ -421,9 +421,9 @@ public class TacheCriteria implements Serializable, Criteria {
             Objects.equals(priorite, that.priorite) &&
             Objects.equals(lu, that.lu) &&
             Objects.equals(commentaire, that.commentaire) &&
+            Objects.equals(droitRequis, that.droitRequis) &&
             Objects.equals(demandeId, that.demandeId) &&
             Objects.equals(utilisateurId, that.utilisateurId) &&
-            Objects.equals(boiteReceptionId, that.boiteReceptionId) &&
             Objects.equals(distinct, that.distinct)
         );
     }
@@ -442,9 +442,9 @@ public class TacheCriteria implements Serializable, Criteria {
             priorite,
             lu,
             commentaire,
+            droitRequis,
             demandeId,
             utilisateurId,
-            boiteReceptionId,
             distinct
         );
     }
@@ -464,9 +464,9 @@ public class TacheCriteria implements Serializable, Criteria {
             optionalPriorite().map(f -> "priorite=" + f + ", ").orElse("") +
             optionalLu().map(f -> "lu=" + f + ", ").orElse("") +
             optionalCommentaire().map(f -> "commentaire=" + f + ", ").orElse("") +
+            optionalDroitRequis().map(f -> "droitRequis=" + f + ", ").orElse("") +
             optionalDemandeId().map(f -> "demandeId=" + f + ", ").orElse("") +
             optionalUtilisateurId().map(f -> "utilisateurId=" + f + ", ").orElse("") +
-            optionalBoiteReceptionId().map(f -> "boiteReceptionId=" + f + ", ").orElse("") +
             optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
         "}";
     }

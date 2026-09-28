@@ -1,12 +1,11 @@
-import { NgClass } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
 import { Component, effect, inject, signal, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Data, ParamMap, Router, RouterLink } from '@angular/router';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { NgbDropdown, NgbDropdownItem, NgbDropdownMenu, NgbDropdownToggle } from '@ng-bootstrap/ng-bootstrap/dropdown';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap/modal';
+import { NgbDropdown, NgbDropdownItem, NgbDropdownMenu, NgbDropdownToggle } from '@ng-bootstrap/ng-bootstrap/dropdown';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap/pagination';
 import { combineLatest, filter, map, tap } from 'rxjs';
 
@@ -22,22 +21,7 @@ import { GestionService } from '../service/gestion.service';
 @Component({
   selector: 'jhi-gestion',
   templateUrl: './gestion.html',
-  imports: [
-    NgClass,
-    RouterLink,
-    FontAwesomeModule,
-    AlertError,
-    Alert,
-    SortDirective,
-    SortByDirective,
-    TranslateDirective,
-    NgbDropdown,
-    NgbDropdownItem,
-    NgbDropdownMenu,
-    NgbDropdownToggle,
-    NgbPagination,
-    ItemCount,
-  ],
+  imports: [RouterLink, FontAwesomeModule, AlertError, Alert, SortDirective, SortByDirective, TranslateDirective, NgbPagination, ItemCount],
 })
 export class Gestion {
   readonly gestions = signal<IGestion[]>([]);

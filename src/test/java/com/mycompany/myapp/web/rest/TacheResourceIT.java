@@ -10,7 +10,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.mycompany.myapp.IntegrationTest;
-import com.mycompany.myapp.domain.BoiteReception;
 import com.mycompany.myapp.domain.DemandePriseEnCharge;
 import com.mycompany.myapp.domain.Tache;
 import com.mycompany.myapp.domain.User;
@@ -85,6 +84,9 @@ class TacheResourceIT {
     private static final String DEFAULT_COMMENTAIRE = "AAAAAAAAAA";
     private static final String UPDATED_COMMENTAIRE = "BBBBBBBBBB";
 
+    private static final String DEFAULT_DROIT_REQUIS = "ROLE_USER";
+    private static final String UPDATED_DROIT_REQUIS = "ROLE_VALIDATEUR_DRH";
+
     private static final String ENTITY_API_URL = "/api/taches";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
@@ -136,7 +138,8 @@ class TacheResourceIT {
             .statut(DEFAULT_STATUT)
             .priorite(DEFAULT_PRIORITE)
             .lu(DEFAULT_LU)
-            .commentaire(DEFAULT_COMMENTAIRE);
+            .commentaire(DEFAULT_COMMENTAIRE)
+            .droitRequis(DEFAULT_DROIT_REQUIS);
         // Add required entity
         DemandePriseEnCharge demandePriseEnCharge;
         if (TestUtil.findAll(em, DemandePriseEnCharge.class).isEmpty()) {
@@ -172,7 +175,8 @@ class TacheResourceIT {
             .statut(UPDATED_STATUT)
             .priorite(UPDATED_PRIORITE)
             .lu(UPDATED_LU)
-            .commentaire(UPDATED_COMMENTAIRE);
+            .commentaire(UPDATED_COMMENTAIRE)
+            .droitRequis(UPDATED_DROIT_REQUIS);
         // Add required entity
         DemandePriseEnCharge demandePriseEnCharge;
         if (TestUtil.findAll(em, DemandePriseEnCharge.class).isEmpty()) {
@@ -827,28 +831,6 @@ class TacheResourceIT {
         defaultTacheShouldNotBeFound("utilisateurId.equals=" + (utilisateurId + 1));
     }
 
-    @Test
-    @Transactional
-    void getAllTachesByBoiteReceptionIsEqualToSomething() throws Exception {
-        BoiteReception boiteReception;
-        if (TestUtil.findAll(em, BoiteReception.class).isEmpty()) {
-            tacheRepository.saveAndFlush(tache);
-            boiteReception = BoiteReceptionResourceIT.createEntity(em);
-        } else {
-            boiteReception = TestUtil.findAll(em, BoiteReception.class).get(0);
-        }
-        em.persist(boiteReception);
-        em.flush();
-        tache.setBoiteReception(boiteReception);
-        tacheRepository.saveAndFlush(tache);
-        Long boiteReceptionId = boiteReception.getId();
-        // Get all the tacheList where boiteReception equals to boiteReceptionId
-        defaultTacheShouldBeFound("boiteReceptionId.equals=" + boiteReceptionId);
-
-        // Get all the tacheList where boiteReception equals to (boiteReceptionId + 1)
-        defaultTacheShouldNotBeFound("boiteReceptionId.equals=" + (boiteReceptionId + 1));
-    }
-
     private void defaultTacheFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {
         defaultTacheShouldBeFound(shouldBeFound);
         defaultTacheShouldNotBeFound(shouldNotBeFound);
@@ -930,7 +912,8 @@ class TacheResourceIT {
             .statut(UPDATED_STATUT)
             .priorite(UPDATED_PRIORITE)
             .lu(UPDATED_LU)
-            .commentaire(UPDATED_COMMENTAIRE);
+            .commentaire(UPDATED_COMMENTAIRE)
+            .droitRequis(UPDATED_DROIT_REQUIS);
         TacheDTO tacheDTO = tacheMapper.toDto(updatedTache);
 
         restTacheMockMvc
@@ -1058,7 +1041,8 @@ class TacheResourceIT {
             .statut(UPDATED_STATUT)
             .priorite(UPDATED_PRIORITE)
             .lu(UPDATED_LU)
-            .commentaire(UPDATED_COMMENTAIRE);
+            .commentaire(UPDATED_COMMENTAIRE)
+            .droitRequis(UPDATED_DROIT_REQUIS);
 
         restTacheMockMvc
             .perform(

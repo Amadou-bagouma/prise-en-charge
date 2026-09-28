@@ -157,9 +157,13 @@ export class DemandePriseEnCharge {
       case 'RETOURNEE':
       case 'REJETEE':
         return 'danger';
+      case 'EN_VERIFICATION_RH':
       case 'EN_ATTENTE_VALIDATION_DRH':
       case 'EN_ATTENTE_VALIDATION_INFIRMERIE':
         return 'warn';
+      // Un brouillon n'attend personne : il ne doit pas attirer l'œil comme une étape en cours.
+      case 'EN_SAISIE':
+        return 'neutre';
       case 'ANNULEE':
       case 'CLOTUREE':
         return 'neutre';

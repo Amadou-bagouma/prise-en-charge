@@ -83,14 +83,6 @@
           <dd>
             <span>{{ tacheRef.utilisateur?.login }}</span>
           </dd>
-          <dt><span jhiTranslate="peccnssApp.tache.boiteReception">Boite Reception</span></dt>
-          <dd>
-            @if (tache()!.boiteReception) {
-              <div>
-                <a [routerLink]="['/boite-reception', tache()!.boiteReception?.id, 'view']">{{ tacheRef.boiteReception?.id }}</a>
-              </div>
-            }
-          </dd>
         </dl>
 
         <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">

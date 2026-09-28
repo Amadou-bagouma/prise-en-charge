@@ -48,7 +48,10 @@
         "database": "Base de données",
         "jhipster-needle-menu-add-admin-element": "JHipster will add additional menu entries here (do not translate!)"
       },
-      "language": "Langue"
+      "language": "Langue",
+      "beneficiaires": {
+        "main": "Bénéficiaires"
+      }
     },
     "form": {
       "username.label": "Nom d'utilisateur",

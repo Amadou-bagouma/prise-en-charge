@@ -68,7 +68,6 @@ public class TacheAsserts {
     public static void assertTacheUpdatableRelationshipsEquals(Tache expected, Tache actual) {
         assertThat(actual)
             .as("Verify Tache relationships")
-            .satisfies(a -> assertThat(a.getDemande()).as("check demande").isEqualTo(expected.getDemande()))
-            .satisfies(a -> assertThat(a.getBoiteReception()).as("check boiteReception").isEqualTo(expected.getBoiteReception()));
+            .satisfies(a -> assertThat(a.getDemande()).as("check demande").isEqualTo(expected.getDemande()));
     }
 }

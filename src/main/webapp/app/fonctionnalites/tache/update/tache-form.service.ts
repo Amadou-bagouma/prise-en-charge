@@ -46,8 +46,8 @@ type TacheFormGroupContent = {
   lu: FormControl<TacheFormRawValue['lu']>;
   commentaire: FormControl<TacheFormRawValue['commentaire']>;
   demande: FormControl<TacheFormRawValue['demande']>;
+  droitRequis: FormControl<TacheFormRawValue['droitRequis']>;
   utilisateur: FormControl<TacheFormRawValue['utilisateur']>;
-  boiteReception: FormControl<TacheFormRawValue['boiteReception']>;
 };
 
 export type TacheFormGroup = FormGroup<TacheFormGroupContent>;
@@ -91,10 +91,12 @@ export class TacheFormService {
       demande: new FormControl(tacheRawValue.demande, {
         validators: [Validators.required],
       }),
+      droitRequis: new FormControl(tacheRawValue.droitRequis, {
+        validators: [Validators.required],
+      }),
       utilisateur: new FormControl(tacheRawValue.utilisateur, {
         validators: [Validators.required],
       }),
-      boiteReception: new FormControl(tacheRawValue.boiteReception),
     });
   }
 

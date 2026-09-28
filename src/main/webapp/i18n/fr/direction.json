@@ -3,10 +3,10 @@
     "direction": {
       "home": {
         "title": "Directions",
-        "refreshListLabel": "Actualiser la liste",
-        "createLabel": "Créer un nouveau Direction",
+        "refreshListLabel": "Actualiser",
+        "createLabel": "Créer une direction",
         "createOrEditLabel": "Créer un Direction",
-        "notFound": "Aucun Direction trouvé"
+        "notFound": "Aucune direction"
       },
       "created": "Un nouveau Direction a été créé avec l'identifiant {{ param }}",
       "updated": "Le Direction avec l'identifiant {{ param }} a été mis à jour",

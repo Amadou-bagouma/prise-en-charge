@@ -2,8 +2,37 @@
   <div class="pec-ecran">
     <div class="pec-titre-ecran">
       <h1 data-cy="ayantDroitDetailsHeading">{{ identite() }}</h1>
+      <!-- La situation décide si un dossier peut être ouvert : elle est au titre. -->
+      <span class="pec-badge" [ngClass]="'pec-badge--' + tonStatut()" data-cy="statutAyantDroit">
+        <span class="pec-badge__pt"></span>
+        <span>{{ libelleStatut() }}</span>
+      </span>
       <span class="pec-num">{{ ayantDroitRef.codeAyantDroit }}</span>
+      <button type="button" class="pec-btn pec-btn--discret pec-btn--sm" (click)="changerStatut()" data-cy="changerStatutAyantDroit">
+        <fa-icon class="pec-btn__ico" icon="pencil-alt" />
+        <span>Changer la situation</span>
+      </button>
     </div>
+
+    @if (statutAffiche() !== 'ACTIF' && motifStatut()) {
+      <section class="pec-panneau">
+        <div class="pec-panneau__corps">
+          <span class="pec-muted" data-cy="motifStatutAyantDroit">
+            @if (repercuteDepuisAgent()) {
+              <!--
+                Dit explicitement : sans cela, on chercherait sur l'ayant droit une décision qui
+                a été prise sur son agent.
+              -->
+              Situation répercutée depuis l'agent.
+            }
+            Motif : {{ motifStatut() }}
+            @if (dateStatut()) {
+              · depuis le {{ dateStatut() | formatMediumDatetime }}
+            }
+          </span>
+        </div>
+      </section>
+    }
 
     <jhi-alert-error />
     <jhi-alert />

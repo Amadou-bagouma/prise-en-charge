@@ -1,38 +1,36 @@
-<div>
-  <div class="jhi-page-header">
-    <h2 id="page-heading" data-cy="GestionHeading">
-      <span jhiTranslate="peccnssApp.gestion.home.title">Gestions</span>
-    </h2>
+<div class="pec-ecran">
+  <div class="pec-titre-ecran">
+    <h1 id="page-heading" data-cy="GestionHeading" jhiTranslate="peccnssApp.gestion.home.title">Gestions</h1>
+    <!-- Le nombre fait partie du titre : c'est ce qu'on vient verifier sur un referentiel. -->
+    <span class="pec-muted">{{ totalItems() }} gestion{{ totalItems() > 1 ? 's' : '' }}</span>
+  </div>
 
-    <div class="jhi-page-actions">
-      <button class="btn btn-outline-secondary" (click)="load()" [disabled]="isLoading()">
-        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
-        <span jhiTranslate="peccnssApp.gestion.home.refreshListLabel">Refresh list</span>
+  <jhi-alert-error />
+  <jhi-alert />
+
+  <div class="pec-filtres">
+    <div class="pec-filtres__actions">
+      <button type="button" class="pec-btn pec-btn--discret pec-btn--sm" (click)="load()" [disabled]="isLoading()" data-cy="actualiser">
+        <fa-icon class="pec-btn__ico" icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span jhiTranslate="peccnssApp.gestion.home.refreshListLabel">Actualiser</span>
       </button>
 
       <button
+        type="button"
         id="jh-create-entity"
         data-cy="entityCreateButton"
-        class="btn btn-accent jh-create-entity create-gestion"
+        class="pec-btn pec-btn--primaire pec-btn--sm"
         [routerLink]="['/gestion/new']"
       >
-        <fa-icon icon="plus" />
-        <span jhiTranslate="peccnssApp.gestion.home.createLabel">Create a new Gestion</span>
+        <fa-icon class="pec-btn__ico" icon="plus" />
+        <span jhiTranslate="peccnssApp.gestion.home.createLabel">Créer une gestion</span>
       </button>
     </div>
   </div>
 
-  <jhi-alert-error />
-
-  <jhi-alert />
-
-  @if (gestions().length === 0) {
-    <div class="alert alert-warning" id="no-result">
-      <span jhiTranslate="peccnssApp.gestion.home.notFound">No Gestions found</span>
-    </div>
-  } @else {
-    <div class="jhi-table-panel table-responsive table-entities" id="entities">
-      <table class="table jhi-table" aria-describedby="page-heading">
+  <div class="pec-panneau">
+    <div class="pec-tbl-zone" id="entities">
+      <table class="pec-tbl" aria-describedby="page-heading">
         <thead>
           <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
             <th scope="col" jhiSortBy="nom">
@@ -47,59 +45,58 @@
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
-            <th scope="col"></th>
+            <th scope="col" class="pec-tbl__droite"><span class="visually-hidden">Actions</span></th>
           </tr>
         </thead>
         <tbody>
           @for (gestion of gestions(); track trackId(gestion)) {
             <tr data-cy="entityTable">
               <td>
-                <a [routerLink]="['/gestion', gestion.id, 'view']">{{ gestion.nom }}</a>
+                <a class="pec-strong" [routerLink]="['/gestion', gestion.id, 'view']">{{ gestion.nom }}</a>
               </td>
               <td>
-                <span
-                  class="jhi-badge"
-                  [ngClass]="'jhi-badge-type-' + gestion.type"
-                  [jhiTranslate]="'peccnssApp.TypeGestion.' + (gestion.type ?? 'null')"
-                >
-                  {{ { null: '', AS: 'AS', OA: 'OA' }[gestion.type ?? 'null'] }}
+                <span class="pec-badge pec-badge--info">
+                  <span class="pec-badge__pt"></span>
+                  <span [jhiTranslate]="'peccnssApp.TypeGestion.' + (gestion.type ?? 'null')">{{ gestion.type }}</span>
                 </span>
               </td>
-              <td class="text-end">
-                <div ngbDropdown class="d-inline-block" container="body">
-                  <button type="button" class="btn btn-secondary btn-sm" ngbDropdownToggle data-cy="entityActionsButton">
-                    <fa-icon icon="ellipsis-vertical" />
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.actions">Actions</span>
+              <td class="pec-tbl__droite">
+                <div ngbDropdown container="body" class="d-inline-block">
+                  <button type="button" class="pec-btn pec-btn--discret pec-btn--sm" ngbDropdownToggle data-cy="entityActionsButton">
+                    <span jhiTranslate="entity.action.actions">Actions</span>
                   </button>
                   <div ngbDropdownMenu>
                     <a ngbDropdownItem [routerLink]="['/gestion', gestion.id, 'view']" data-cy="entityDetailsButton">
                       <fa-icon icon="eye" class="me-1" />
-                      <span jhiTranslate="entity.action.view">View</span>
+                      <span jhiTranslate="entity.action.view">Voir</span>
                     </a>
                     <a ngbDropdownItem [routerLink]="['/gestion', gestion.id, 'edit']" data-cy="entityEditButton">
                       <fa-icon icon="pencil-alt" class="me-1" />
-                      <span jhiTranslate="entity.action.edit">Edit</span>
+                      <span jhiTranslate="entity.action.edit">Editer</span>
                     </a>
                     <button ngbDropdownItem type="button" (click)="delete(gestion)" data-cy="entityDeleteButton">
                       <fa-icon icon="times" class="me-1" />
-                      <span jhiTranslate="entity.action.delete">Delete</span>
+                      <span jhiTranslate="entity.action.delete">Supprimer</span>
                     </button>
                   </div>
                 </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="3" class="pec-tbl__vide">
+                <span jhiTranslate="peccnssApp.gestion.home.notFound">Aucune gestion</span>
               </td>
             </tr>
           }
         </tbody>
       </table>
     </div>
-  }
-  @if (gestions().length > 0) {
-    <div>
-      <div class="d-flex justify-content-center">
-        <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
-      </div>
 
-      <div class="d-flex justify-content-center">
+    @if (gestions().length > 0) {
+      <div class="pec-pied">
+        <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+
         <ngb-pagination
           [collectionSize]="totalItems()"
           [page]="page()"
@@ -110,6 +107,6 @@
           (pageChange)="navigateToPage($event)"
         />
       </div>
-    </div>
-  }
+    }
+  </div>
 </div>

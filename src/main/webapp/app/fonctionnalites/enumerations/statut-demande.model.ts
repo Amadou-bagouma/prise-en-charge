@@ -1,4 +1,10 @@
 export enum StatutDemande {
+  /** En cours de saisie : le dossier n'attend personne et peut encore être supprimé. */
+  EN_SAISIE = 'EN_SAISIE',
+
+  /** Soumis au contrôle RH : complétude du dossier et conformité des pièces. */
+  EN_VERIFICATION_RH = 'EN_VERIFICATION_RH',
+
   NOUVELLE = 'NOUVELLE',
 
   EN_ATTENTE_PIECES = 'EN_ATTENTE_PIECES',

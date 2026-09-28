@@ -72,6 +72,22 @@ public class AuthorityResource {
     }
 
     /**
+     * {@code GET  /authorities/attribuables} : les habilitations auxquelles une tache peut etre
+     * adressee.
+     *
+     * <p>Ouvert a tout utilisateur authentifie, a la difference de la liste d'administration :
+     * composer une tache suppose de choisir une habilitation, et le nom d'un droit n'est pas un
+     * secret - ce qui est protege, c'est de l'attribuer.
+     *
+     * @return la liste des habilitations, nom et description.
+     */
+    @GetMapping("/attribuables")
+    public List<Authority> getAuthoritiesAttribuables() {
+        LOG.debug("REST request to get assignable Authorities");
+        return authorityRepository.findAll();
+    }
+
+    /**
      * {@code GET  /authorities/:id} : get the "id" authority.
      *
      * @param id the id of the authority to retrieve.

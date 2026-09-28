@@ -1,14 +1,20 @@
 package com.mycompany.myapp.service.impl;
 
+import com.mycompany.myapp.domain.Agent;
+import com.mycompany.myapp.domain.AyantDroit;
 import com.mycompany.myapp.domain.DemandePriseEnCharge;
 import com.mycompany.myapp.domain.HistoriqueAction;
 import com.mycompany.myapp.domain.Notification;
 import com.mycompany.myapp.domain.Tache;
 import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.domain.enumeration.PrioriteTache;
+import com.mycompany.myapp.domain.enumeration.StatutAgent;
+import com.mycompany.myapp.domain.enumeration.StatutAyantDroit;
 import com.mycompany.myapp.domain.enumeration.StatutDemande;
 import com.mycompany.myapp.domain.enumeration.StatutTache;
 import com.mycompany.myapp.domain.enumeration.TypeNotification;
+import com.mycompany.myapp.repository.AgentRepository;
+import com.mycompany.myapp.repository.AyantDroitRepository;
 import com.mycompany.myapp.repository.DemandePriseEnChargeRepository;
 import com.mycompany.myapp.repository.HistoriqueActionRepository;
 import com.mycompany.myapp.repository.NotificationRepository;
@@ -67,6 +73,10 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
 
     private final TypeSoinRepository typeSoinRepository;
 
+    private final AgentRepository agentRepository;
+
+    private final AyantDroitRepository ayantDroitRepository;
+
     private static final List<StatutTache> STATUTS_TACHE_CLOTURES = List.of(StatutTache.TERMINEE, StatutTache.ANNULEE);
 
     private static final DateTimeFormatter REFERENCE_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyMMdd");
@@ -78,7 +88,9 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         HistoriqueActionRepository historiqueActionRepository,
         TacheRepository tacheRepository,
         NotificationRepository notificationRepository,
-        TypeSoinRepository typeSoinRepository
+        TypeSoinRepository typeSoinRepository,
+        AgentRepository agentRepository,
+        AyantDroitRepository ayantDroitRepository
     ) {
         this.demandePriseEnChargeRepository = demandePriseEnChargeRepository;
         this.demandePriseEnChargeMapper = demandePriseEnChargeMapper;
@@ -87,6 +99,8 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         this.tacheRepository = tacheRepository;
         this.notificationRepository = notificationRepository;
         this.typeSoinRepository = typeSoinRepository;
+        this.agentRepository = agentRepository;
+        this.ayantDroitRepository = ayantDroitRepository;
     }
 
     @Override
@@ -94,18 +108,19 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         LOG.debug("Request to save DemandePriseEnCharge : {}", demandePriseEnChargeDTO);
         DemandePriseEnCharge demandePriseEnCharge = demandePriseEnChargeMapper.toEntity(demandePriseEnChargeDTO);
         demandePriseEnCharge.setTypeSoins(resoudreTypeSoins(demandePriseEnChargeDTO));
+        exigerBeneficiaireCouvert(demandePriseEnCharge);
         User currentUser = getCurrentUser();
         Instant now = Instant.now();
-        // The workflow always starts with the current user as author and the 1st validation step (DRH),
-        // regardless of what the client sent.
+        // L'auteur et la reference sont poses par le serveur, quoi qu'ait envoye le client.
+        // Le dossier nait en saisie : creer un dossier ne doit pas, du meme geste, mobiliser un
+        // controleur pour quelque chose qui n'est pas encore fini d'ecrire.
         demandePriseEnCharge.setReference(genererReference());
         demandePriseEnCharge.setGestionnaireCreateur(currentUser);
         demandePriseEnCharge.setDateCreation(now);
         demandePriseEnCharge.setDateModification(now);
-        demandePriseEnCharge.setStatut(StatutDemande.EN_ATTENTE_VALIDATION_DRH);
+        demandePriseEnCharge.setStatut(StatutDemande.EN_SAISIE);
         demandePriseEnCharge = demandePriseEnChargeRepository.save(demandePriseEnCharge);
-        logHistorique(demandePriseEnCharge, currentUser, "SOUMISSION", "Demande soumise pour validation DRH");
-        creerTachesValidation(demandePriseEnCharge, AuthoritiesConstants.VALIDATEUR_DRH, "Validation DRH");
+        logHistorique(demandePriseEnCharge, currentUser, "CREATION", "Dossier ouvert, en cours de saisie");
         return demandePriseEnChargeMapper.toDto(demandePriseEnCharge);
     }
 
@@ -164,6 +179,58 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
     }
 
     /**
+     * Refuse d'ouvrir une demande pour un beneficiaire qui n'est plus couvert.
+     *
+     * <p>Le statut est relu en base et non pris dans le corps de la requete : le client envoie
+     * l'objet complet, et rien ne l'empecherait d'y declarer un agent actif.
+     *
+     * <p>La couverture d'un ayant droit derive de celle de son agent. Un ayant droit actif
+     * rattache a un agent radie n'ouvre donc aucun droit, et le message le dit, faute de quoi le
+     * gestionnaire chercherait l'erreur du mauvais cote.
+     */
+    private void exigerBeneficiaireCouvert(DemandePriseEnCharge demande) {
+        if (demande.getAgent() != null && demande.getAgent().getId() != null) {
+            Agent agent = agentRepository
+                .findById(demande.getAgent().getId())
+                .orElseThrow(() -> new BadRequestAlertException("Agent introuvable", ENTITY_NAME, "agent.introuvable"));
+            exigerAgentActif(agent);
+        }
+        if (demande.getAyantDroit() != null && demande.getAyantDroit().getId() != null) {
+            AyantDroit ayantDroit = ayantDroitRepository
+                .findById(demande.getAyantDroit().getId())
+                .orElseThrow(() -> new BadRequestAlertException("Ayant droit introuvable", ENTITY_NAME, "ayantdroit.introuvable"));
+            if (ayantDroit.getStatut() != StatutAyantDroit.ACTIF) {
+                throw new BadRequestAlertException(
+                    "Cet ayant droit n'ouvre plus droit a la prise en charge (%s). Motif : %s".formatted(
+                        ayantDroit.getStatut(),
+                        ayantDroit.getMotifStatut() == null ? "non precise" : ayantDroit.getMotifStatut()
+                    ),
+                    ENTITY_NAME,
+                    "ayantdroit.inactif"
+                );
+            }
+            if (ayantDroit.getAgent() != null) {
+                exigerAgentActif(ayantDroit.getAgent());
+            }
+        }
+    }
+
+    private void exigerAgentActif(Agent agent) {
+        if (agent.getStatut() == StatutAgent.ACTIF) {
+            return;
+        }
+        throw new BadRequestAlertException(
+            "L'agent %s n'ouvre plus droit a la prise en charge (%s). Motif : %s".formatted(
+                agent.getMatricule(),
+                agent.getStatut(),
+                agent.getMotifStatut() == null ? "non precise" : agent.getMotifStatut()
+            ),
+            ENTITY_NAME,
+            "agent.inactif"
+        );
+    }
+
+    /**
      * Relit les types de soin dans le referentiel, plutot que de faire confiance a ce que le
      * client a envoye.
      *
@@ -197,10 +264,106 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         return demandePriseEnChargeRepository.findOneWithEagerRelationships(id).map(demandePriseEnChargeMapper::toDto);
     }
 
+    /**
+     * Les etapes ou une demande n'a encore ete soumise au jugement de personne.
+     *
+     * <p>Au-dela, le dossier porte une decision - une validation, un retour, un rejet - et la
+     * supprimer effacerait la trace de cette decision. Un dossier que l'on ne veut plus suivre
+     * s'annule, il ne disparait pas.
+     */
+    private static final List<StatutDemande> STATUTS_SUPPRIMABLES = List.of(StatutDemande.EN_SAISIE, StatutDemande.NOUVELLE);
+
+    /** La seule action que peut porter une demande encore supprimable. */
+    private static final String ACTION_CREATION = "CREATION";
+
     @Override
     public void delete(Long id) {
         LOG.debug("Request to delete DemandePriseEnCharge : {}", id);
-        demandePriseEnChargeRepository.deleteById(id);
+        DemandePriseEnCharge demande = getDemandeOrThrow(id);
+        exigerSuppressionPossible(demande);
+
+        // Les objets rattaches partent avec le dossier : sans cela la suppression echouerait sur
+        // les cles etrangeres, et les taches resteraient a jamais dans les boites de reception.
+        notificationRepository.deleteAll(notificationRepository.findByDemandeId(id));
+        tacheRepository.deleteAll(tacheRepository.findByDemandeId(id));
+        historiqueActionRepository.deleteAll(historiqueActionRepository.findByDemandeIdOrderByDateActionAsc(id));
+        demandePriseEnChargeRepository.delete(demande);
+    }
+
+    /**
+     * Refuse la suppression d'un dossier sur lequel quelque chose a deja ete decide.
+     *
+     * <p>Deux conditions, et non une seule : le statut dit ou en est le dossier, l'historique dit
+     * ce qui lui est arrive. Une demande retournee puis resoumise repasse par
+     * {@code EN_ATTENTE_VALIDATION_DRH} - le statut seul la declarerait supprimable alors qu'un
+     * validateur s'est deja prononce.
+     */
+    private void exigerSuppressionPossible(DemandePriseEnCharge demande) {
+        if (!STATUTS_SUPPRIMABLES.contains(demande.getStatut())) {
+            throw new BadRequestAlertException(
+                "Cette demande a deja ete instruite (%s) et ne peut plus etre supprimee. Elle peut etre annulee.".formatted(
+                    demande.getStatut()
+                ),
+                ENTITY_NAME,
+                "suppression.instruite"
+            );
+        }
+        boolean dejaInstruite = historiqueActionRepository
+            .findByDemandeIdOrderByDateActionAsc(demande.getId())
+            .stream()
+            .anyMatch(action -> !ACTION_CREATION.equals(action.getAction()));
+        if (dejaInstruite) {
+            throw new BadRequestAlertException(
+                "Cette demande porte deja des decisions et ne peut plus etre supprimee. Elle peut etre annulee.",
+                ENTITY_NAME,
+                "suppression.instruite"
+            );
+        }
+    }
+
+    @Override
+    public DemandePriseEnChargeDTO soumettre(Long id) {
+        LOG.debug("Request to soumettre DemandePriseEnCharge : {}", id);
+        DemandePriseEnCharge demande = getDemandeOrThrow(id);
+        User currentUser = getCurrentUser();
+        requireAuteurOuAdmin(demande, currentUser);
+        if (demande.getStatut() != StatutDemande.EN_SAISIE) {
+            throw new BadRequestAlertException("Ce dossier n'est plus en saisie", ENTITY_NAME, "workflow.invalidstatus");
+        }
+        exigerBeneficiaireCouvert(demande);
+
+        demande.setStatut(StatutDemande.EN_VERIFICATION_RH);
+        demande.setDateModification(Instant.now());
+        demande = demandePriseEnChargeRepository.save(demande);
+        logHistorique(demande, currentUser, "SOUMISSION", "Dossier soumis au controle RH");
+        creerTachesValidation(demande, AuthoritiesConstants.VERIFICATEUR_RH, "Verification RH");
+        return demandePriseEnChargeMapper.toDto(demande);
+    }
+
+    @Override
+    public DemandePriseEnChargeDTO verifier(Long id, String commentaire) {
+        LOG.debug("Request to verifier DemandePriseEnCharge : {}", id);
+        DemandePriseEnCharge demande = getDemandeOrThrow(id);
+        if (demande.getStatut() != StatutDemande.EN_VERIFICATION_RH) {
+            throw new BadRequestAlertException("Ce dossier n'est pas en verification", ENTITY_NAME, "workflow.invalidstatus");
+        }
+        requireAuthority(AuthoritiesConstants.VERIFICATEUR_RH);
+        User currentUser = getCurrentUser();
+        // Le controleur ne valide pas son propre dossier : c'est le principe du double regard.
+        requireNotAuteur(demande, currentUser);
+
+        demande.setStatut(StatutDemande.EN_ATTENTE_VALIDATION_DRH);
+        demande.setDateModification(Instant.now());
+        demande = demandePriseEnChargeRepository.save(demande);
+        logHistorique(
+            demande,
+            currentUser,
+            "VERIFICATION_RH",
+            commentaire == null || commentaire.isBlank() ? "Dossier controle, conforme" : commentaire
+        );
+        cloturerTachesValidation(demande.getId());
+        creerTachesValidation(demande, AuthoritiesConstants.VALIDATEUR_DRH, "Validation DRH");
+        return demandePriseEnChargeMapper.toDto(demande);
     }
 
     @Override
@@ -258,10 +421,11 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         User currentUser = getCurrentUser();
         requireNotAuteur(demande, currentUser);
         switch (demande.getStatut()) {
+            case EN_VERIFICATION_RH -> requireAuthority(AuthoritiesConstants.VERIFICATEUR_RH);
             case EN_ATTENTE_VALIDATION_DRH -> requireAuthority(AuthoritiesConstants.VALIDATEUR_DRH);
             case EN_ATTENTE_VALIDATION_INFIRMERIE -> requireAuthority(AuthoritiesConstants.VALIDATEUR_INFIRMERIE);
             default -> throw new BadRequestAlertException(
-                "Cette demande n'est pas en attente de validation",
+                "Ce dossier n'est ni en verification ni en attente de validation",
                 ENTITY_NAME,
                 "workflow.invalidstatus"
             );
@@ -286,6 +450,49 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
     }
 
     @Override
+    public DemandePriseEnChargeDTO rejeterDefinitivement(Long id, String motif) {
+        LOG.debug("Request to rejeter definitivement DemandePriseEnCharge : {}", id);
+        if (motif == null || motif.isBlank()) {
+            throw new BadRequestAlertException("Le motif de rejet est obligatoire", ENTITY_NAME, "workflow.motifrequired");
+        }
+        DemandePriseEnCharge demande = getDemandeOrThrow(id);
+        User currentUser = getCurrentUser();
+        requireNotAuteur(demande, currentUser);
+        switch (demande.getStatut()) {
+            case EN_VERIFICATION_RH -> requireAuthority(AuthoritiesConstants.VERIFICATEUR_RH);
+            case EN_ATTENTE_VALIDATION_DRH -> requireAuthority(AuthoritiesConstants.VALIDATEUR_DRH);
+            case EN_ATTENTE_VALIDATION_INFIRMERIE -> requireAuthority(AuthoritiesConstants.VALIDATEUR_INFIRMERIE);
+            default -> throw new BadRequestAlertException(
+                "Ce dossier n'est pas en cours d'instruction",
+                ENTITY_NAME,
+                "workflow.invalidstatus"
+            );
+        }
+
+        demande.setStatut(StatutDemande.REJETEE);
+        demande.setMotifRejet(motif.trim());
+        demande.setDateModification(Instant.now());
+        demande = demandePriseEnChargeRepository.save(demande);
+        logHistorique(demande, currentUser, "REJET", motif.trim());
+        cloturerTachesValidation(demande.getId());
+        if (demande.getGestionnaireCreateur() != null) {
+            creerNotification(
+                demande.getGestionnaireCreateur(),
+                TypeNotification.DEMANDE_REJETEE,
+                "Demande rejetée - " + demande.getReference(),
+                "La demande de prise en charge " +
+                    demande.getReference() +
+                    " a été rejetée : " +
+                    motif.trim() +
+                    " La notification de décision est éditable depuis le dossier.",
+                demande,
+                null
+            );
+        }
+        return demandePriseEnChargeMapper.toDto(demande);
+    }
+
+    @Override
     public DemandePriseEnChargeDTO resoumettre(Long id) {
         LOG.debug("Request to resoumettre DemandePriseEnCharge : {}", id);
         DemandePriseEnCharge demande = getDemandeOrThrow(id);
@@ -300,12 +507,14 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         if (demande.getGestionnaireCreateur() == null || !currentUser.getId().equals(demande.getGestionnaireCreateur().getId())) {
             throw new AccessDeniedException("Seul l'auteur de la demande peut la resoumettre");
         }
-        demande.setStatut(StatutDemande.EN_ATTENTE_VALIDATION_DRH);
+        // Le dossier corrige repasse par le controle : sauter l'etape reviendrait a faire
+        // valider des pieces que personne n'a revues depuis la correction.
+        demande.setStatut(StatutDemande.EN_VERIFICATION_RH);
         demande.setMotifRejet(null);
         demande.setDateModification(Instant.now());
         demande = demandePriseEnChargeRepository.save(demande);
-        logHistorique(demande, currentUser, "RESOUMISSION", "Demande corrigee et resoumise pour validation DRH");
-        creerTachesValidation(demande, AuthoritiesConstants.VALIDATEUR_DRH, "Validation DRH");
+        logHistorique(demande, currentUser, "RESOUMISSION", "Dossier corrige et resoumis au controle RH");
+        creerTachesValidation(demande, AuthoritiesConstants.VERIFICATEUR_RH, "Verification RH");
         return demandePriseEnChargeMapper.toDto(demande);
     }
 
@@ -366,35 +575,50 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
      * Creates a Tache for every user holding the given authority, so that the demande shows up in
      * "Mes taches" for whoever is meant to validate it next.
      */
+    /**
+     * Cree la tache de l'etape : une seule, adressee au droit qui en donne la charge.
+     *
+     * <p>Auparavant une tache etait creee par titulaire du droit. Quatre validateurs DRH
+     * produisaient quatre taches pour un seul dossier : la boite du profil les affichait toutes
+     * les quatre, et personne ne savait laquelle lui revenait. Une tache par etape, que tous
+     * voient et que le premier disponible prend en charge.
+     *
+     * <p>Aucune notification n'accompagne la tache : elle en repeterait le titre et le texte, et
+     * ferait deux boites a relever pour un seul evenement. La tache est la file de travail, la
+     * notification signale ce qui ne cree pas de travail.
+     */
     private void creerTachesValidation(DemandePriseEnCharge demande, String authority, String titrePrefix) {
-        List<User> validateurs = userRepository.findAllByAuthoritiesNameAndActivatedIsTrue(authority);
-        for (User validateur : validateurs) {
-            creerTacheValidation(demande, validateur, titrePrefix);
+        // Idempotent : une reprise du circuit ne doit pas empiler deux fois la meme etape.
+        if (tacheRepository.existsByDemandeIdAndDroitRequisAndStatutNotIn(demande.getId(), authority, STATUTS_TACHE_CLOTURES)) {
+            return;
         }
-    }
-
-    private void creerTacheValidation(DemandePriseEnCharge demande, User validateur, String titrePrefix) {
         Instant now = Instant.now();
         Tache tache = new Tache();
         tache.setTitre(titrePrefix + " - " + demande.getReference());
-        tache.setDescription("Demande de prise en charge en attente de votre validation.");
+        tache.setDescription("Demande de prise en charge en attente de validation.");
         tache.setDateCreation(now);
-        tache.setDateAssignation(now);
         tache.setDateEcheance(demande.getDateEcheance());
         tache.setStatut(StatutTache.A_FAIRE);
         tache.setPriorite(PrioriteTache.valueOf(demande.getPriorite().name()));
         tache.setLu(false);
         tache.setDemande(demande);
-        tache.setUtilisateur(validateur);
-        tache = tacheRepository.save(tache);
-        creerNotification(
-            validateur,
-            TypeNotification.NOUVELLE_TACHE,
-            tache.getTitre(),
-            "Une demande de prise en charge (" + demande.getReference() + ") est en attente de votre validation.",
-            demande,
-            tache
-        );
+        tache.setDroitRequis(authority);
+        // Pas d'utilisateur : la tache attend que quelqu'un s'en saisisse.
+        tacheRepository.save(tache);
+    }
+
+    /**
+     * Clot les taches encore ouvertes du dossier : l'etape vient de changer, ce qui attendait
+     * n'attend plus.
+     */
+    private void cloturerTachesValidation(Long demandeId) {
+        List<Tache> taches = tacheRepository.findByDemandeIdAndStatutNotIn(demandeId, STATUTS_TACHE_CLOTURES);
+        Instant now = Instant.now();
+        for (Tache tache : taches) {
+            tache.setStatut(StatutTache.TERMINEE);
+            tache.setDateTerminaison(now);
+        }
+        tacheRepository.saveAll(taches);
     }
 
     private void creerNotification(
@@ -415,46 +639,6 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         notification.setDemande(demande);
         notification.setTache(tache);
         notificationRepository.save(notification);
-    }
-
-    @Override
-    public void rattraperTachesValidationPourNouveauValidateur(User validateur, String authority) {
-        StatutDemande statutCorrespondant;
-        String titrePrefix;
-        if (AuthoritiesConstants.VALIDATEUR_DRH.equals(authority)) {
-            statutCorrespondant = StatutDemande.EN_ATTENTE_VALIDATION_DRH;
-            titrePrefix = "Validation DRH";
-        } else if (AuthoritiesConstants.VALIDATEUR_INFIRMERIE.equals(authority)) {
-            statutCorrespondant = StatutDemande.EN_ATTENTE_VALIDATION_INFIRMERIE;
-            titrePrefix = "Validation infirmerie";
-        } else {
-            return;
-        }
-        List<DemandePriseEnCharge> demandesEnAttente = demandePriseEnChargeRepository.findByStatut(statutCorrespondant);
-        for (DemandePriseEnCharge demande : demandesEnAttente) {
-            boolean aDejaUneTacheOuverte = tacheRepository.existsByDemandeIdAndUtilisateurIdAndStatutNotIn(
-                demande.getId(),
-                validateur.getId(),
-                STATUTS_TACHE_CLOTURES
-            );
-            if (!aDejaUneTacheOuverte) {
-                creerTacheValidation(demande, validateur, titrePrefix);
-            }
-        }
-    }
-
-    /**
-     * Closes any still-open validation Tache for a demande (e.g. once one validator has acted on it,
-     * the same pending task on other validators' "Mes taches" no longer applies).
-     */
-    private void cloturerTachesValidation(Long demandeId) {
-        Instant now = Instant.now();
-        List<Tache> taches = tacheRepository.findByDemandeIdAndStatutNotIn(demandeId, STATUTS_TACHE_CLOTURES);
-        for (Tache tache : taches) {
-            tache.setStatut(StatutTache.TERMINEE);
-            tache.setDateTerminaison(now);
-        }
-        tacheRepository.saveAll(taches);
     }
 
     private void logHistorique(DemandePriseEnCharge demande, User utilisateur, String action, String description) {

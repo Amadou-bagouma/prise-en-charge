@@ -38,16 +38,40 @@ public class HistoriqueAction extends AbstractAuditingEntity<Long> implements Se
     @Column(name = "date_action", nullable = false)
     private Instant dateAction;
 
-    @ManyToOne(optional = false)
-    @NotNull
+    /**
+     * Le dossier concerne, quand l'action en vise un.
+     *
+     * <p>Facultatif depuis que l'historique enregistre aussi ce qui arrive a un agent ou a un
+     * ayant droit : une radiation ne porte sur aucune demande, et l'exiger revenait a ne jamais
+     * la tracer.
+     */
+    @ManyToOne
     @JsonIgnoreProperties(
         value = { "agent", "ayantDroit", "typeSoin", "etablissementSante", "gestionnaireCreateur", "assigneA" },
         allowSetters = true
     )
     private DemandePriseEnCharge demande;
 
-    @ManyToOne(optional = false)
-    @NotNull
+    /**
+     * Ce sur quoi porte l'action quand ce n'est pas une demande : {@code AGENT},
+     * {@code AYANT_DROIT}.
+     *
+     * <p>Un type et un identifiant plutot qu'une relation par cible : ajouter une relation par
+     * entite tracable ferait autant de colonnes vides sur chaque ligne, et il faudrait toucher la
+     * table a chaque nouvel objet suivi.
+     */
+    @Size(max = 50)
+    @Column(name = "cible_type", length = 50)
+    private String cibleType;
+
+    @Column(name = "cible_id")
+    private Long cibleId;
+
+    /**
+     * Qui a fait l'action. Facultatif : un traitement automatique n'a pas d'auteur, et savoir
+     * qu'une radiation a eu lieu sans savoir par qui vaut mieux que de ne pas le savoir.
+     */
+    @ManyToOne
     private User utilisateur;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -128,6 +152,22 @@ public class HistoriqueAction extends AbstractAuditingEntity<Long> implements Se
     public HistoriqueAction utilisateur(User user) {
         this.setUtilisateur(user);
         return this;
+    }
+
+    public String getCibleType() {
+        return this.cibleType;
+    }
+
+    public void setCibleType(String cibleType) {
+        this.cibleType = cibleType;
+    }
+
+    public Long getCibleId() {
+        return this.cibleId;
+    }
+
+    public void setCibleId(Long cibleId) {
+        this.cibleId = cibleId;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

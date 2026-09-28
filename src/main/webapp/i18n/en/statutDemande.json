@@ -2,6 +2,8 @@
   "peccnssApp": {
     "StatutDemande": {
       "null": "",
+      "EN_SAISIE": "Draft",
+      "EN_VERIFICATION_RH": "HR review",
       "NOUVELLE": "NOUVELLE",
       "EN_ATTENTE_PIECES": "EN_ATTENTE_PIECES",
       "A_TRAITER": "A_TRAITER",

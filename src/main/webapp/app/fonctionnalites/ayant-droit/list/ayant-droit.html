@@ -1,158 +1,131 @@
-<div>
-  <div class="jhi-page-header">
-    <h2 id="page-heading" data-cy="AyantDroitHeading">
-      <span jhiTranslate="peccnssApp.ayantDroit.home.title">Ayant Droits</span>
-    </h2>
+<div class="pec-ecran">
+  <div class="pec-titre-ecran">
+    <h1 id="page-heading" data-cy="AyantDroitHeading">Ayants droit</h1>
+    <span class="pec-muted">{{ totalItems() }} ayants droit</span>
+  </div>
 
-    <div class="jhi-page-actions">
-      <div class="jhi-search-bar">
-        <input
-          type="text"
-          class="form-control"
-          placeholder="Rechercher par nom..."
-          data-cy="searchInput"
-          [value]="searchTerm()"
-          (input)="searchTerm.set($any($event.target).value)"
-          (keyup.enter)="search()"
-        />
-        <button type="button" class="btn btn-outline-secondary" data-cy="searchButton" (click)="search()">
-          <fa-icon icon="search" />
-          <span>Rechercher</span>
-        </button>
-      </div>
+  <jhi-alert-error />
+  <jhi-alert />
 
-      <button class="btn btn-outline-secondary" (click)="load()" [disabled]="isLoading()">
-        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
-        <span jhiTranslate="peccnssApp.ayantDroit.home.refreshListLabel">Refresh list</span>
+  <div class="pec-filtres">
+    <jhi-filter [filters]="filters" />
+
+    <div class="pec-filtres__actions">
+      <button type="button" class="pec-btn pec-btn--discret pec-btn--sm" (click)="load()" [disabled]="isLoading()" data-cy="actualiser">
+        <fa-icon class="pec-btn__ico" icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Actualiser</span>
       </button>
-
       <button
+        type="button"
         id="jh-create-entity"
         data-cy="entityCreateButton"
-        class="btn btn-accent jh-create-entity create-ayant-droit ms-auto"
+        class="pec-btn pec-btn--primaire pec-btn--sm"
         [routerLink]="['/ayant-droit/new']"
       >
-        <fa-icon icon="plus" />
-        <span jhiTranslate="peccnssApp.ayantDroit.home.createLabel">Create a new Ayant Droit</span>
+        <fa-icon class="pec-btn__ico" icon="plus" />
+        <span>Créer un ayant droit</span>
       </button>
     </div>
   </div>
 
-  <jhi-alert-error />
-
-  <jhi-alert />
-
-  <jhi-filter [filters]="filters" />
-
-  @if (ayantDroits().length === 0) {
-    <div class="alert alert-warning" id="no-result">
-      <span jhiTranslate="peccnssApp.ayantDroit.home.notFound">No Ayant Droits found</span>
-    </div>
-  } @else {
-    <div class="jhi-table-panel table-responsive table-entities" id="entities">
-      <table class="table jhi-table" aria-describedby="page-heading">
+  <div class="pec-panneau">
+    <div class="pec-tbl-zone" id="entities">
+      <table class="pec-tbl" aria-describedby="page-heading">
         <thead>
           <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
-            <th scope="col"></th>
-            <th scope="col" jhiSortBy="nom">
+            <th scope="col" jhiSortBy="codeAyantDroit">
               <div class="d-flex">
-                <span jhiTranslate="peccnssApp.ayantDroit.nom">Nom</span>
+                <span>Code</span>
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
-            <th scope="col" jhiSortBy="prenom">
+            <th scope="col" jhiSortBy="nom">
               <div class="d-flex">
-                <span jhiTranslate="peccnssApp.ayantDroit.prenom">Prenom</span>
+                <span>Nom</span>
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
             <th scope="col" jhiSortBy="lien">
               <div class="d-flex">
-                <span jhiTranslate="peccnssApp.ayantDroit.lien">Lien</span>
+                <span>Lien de parenté</span>
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
             <th scope="col" jhiSortBy="dateNaissance">
               <div class="d-flex">
-                <span jhiTranslate="peccnssApp.ayantDroit.dateNaissance">Date Naissance</span>
+                <span>Date de naissance</span>
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
             <th scope="col" jhiSortBy="agent.matricule">
               <div class="d-flex">
-                <span jhiTranslate="peccnssApp.ayantDroit.agent">Agent</span>
+                <span>Agent</span>
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
-            <th scope="col"></th>
+            <th scope="col" class="pec-tbl__droite"><span class="visually-hidden">Actions</span></th>
           </tr>
         </thead>
         <tbody>
           @for (ayantDroit of ayantDroits(); track trackId(ayantDroit)) {
             <tr data-cy="entityTable">
               <td>
-                @if (ayantDroit.photo) {
-                  <img
-                    [src]="'data:' + ayantDroit.photoContentType + ';base64,' + ayantDroit.photo"
-                    class="jhi-table-thumbnail"
-                    alt="ayant droit photo"
-                  />
-                }
+                <span class="pec-num">{{ ayantDroit.codeAyantDroit }}</span>
               </td>
               <td>
-                <a [routerLink]="['/ayant-droit', ayantDroit.id, 'view']">{{ ayantDroit.nom }}</a>
-              </td>
-              <td>{{ ayantDroit.prenom }}</td>
-              <td>
-                <span
-                  class="jhi-badge"
-                  [ngClass]="'jhi-badge-lien-' + ayantDroit.lien"
-                  [jhiTranslate]="'peccnssApp.LienParente.' + (ayantDroit.lien ?? 'null')"
+                <a class="pec-strong" [routerLink]="['/ayant-droit', ayantDroit.id, 'view']"
+                  >{{ ayantDroit.nom }} {{ ayantDroit.prenom }}</a
                 >
-                  {{ { null: '', CONJOINT: 'CONJOINT', ENFANT: 'ENFANT', AUTRE: 'AUTRE' }[ayantDroit.lien ?? 'null'] }}
+              </td>
+              <td>
+                <span class="pec-badge pec-badge--info">
+                  <span class="pec-badge__pt"></span>
+                  <span [jhiTranslate]="'peccnssApp.LienParente.' + (ayantDroit.lien ?? 'null')">{{ ayantDroit.lien }}</span>
                 </span>
               </td>
-              <td>{{ ayantDroit.dateNaissance | formatMediumDate }}</td>
+              <td class="pec-num">{{ (ayantDroit.dateNaissance | formatMediumDate) || '—' }}</td>
               <td>
                 @if (ayantDroit.agent) {
-                  <a [routerLink]="['/agent', ayantDroit.agent.id, 'view']">{{ ayantDroit.agent.matricule }}</a>
+                  <a class="pec-num" [routerLink]="['/agent', ayantDroit.agent.id, 'view']">{{ ayantDroit.agent.matricule }}</a>
+                } @else {
+                  <span class="pec-muted">—</span>
                 }
               </td>
-              <td class="text-end">
-                <div ngbDropdown class="d-inline-block" container="body">
-                  <button type="button" class="btn btn-secondary btn-sm" ngbDropdownToggle data-cy="entityActionsButton">
-                    <fa-icon icon="ellipsis-vertical" />
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.actions">Actions</span>
+              <td class="pec-tbl__droite">
+                <div ngbDropdown container="body" class="d-inline-block">
+                  <button type="button" class="pec-btn pec-btn--discret pec-btn--sm" ngbDropdownToggle data-cy="entityActionsButton">
+                    <span jhiTranslate="entity.action.actions">Actions</span>
                   </button>
                   <div ngbDropdownMenu>
                     <a ngbDropdownItem [routerLink]="['/ayant-droit', ayantDroit.id, 'view']" data-cy="entityDetailsButton">
                       <fa-icon icon="eye" class="me-1" />
-                      <span jhiTranslate="entity.action.view">View</span>
+                      <span jhiTranslate="entity.action.view">Voir</span>
                     </a>
                     <a ngbDropdownItem [routerLink]="['/ayant-droit', ayantDroit.id, 'edit']" data-cy="entityEditButton">
                       <fa-icon icon="pencil-alt" class="me-1" />
-                      <span jhiTranslate="entity.action.edit">Edit</span>
+                      <span jhiTranslate="entity.action.edit">Editer</span>
                     </a>
                     <button ngbDropdownItem type="button" (click)="delete(ayantDroit)" data-cy="entityDeleteButton">
                       <fa-icon icon="times" class="me-1" />
-                      <span jhiTranslate="entity.action.delete">Delete</span>
+                      <span jhiTranslate="entity.action.delete">Supprimer</span>
                     </button>
                   </div>
                 </div>
               </td>
             </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="pec-tbl__vide">Aucun ayant droit</td>
+            </tr>
           }
         </tbody>
       </table>
     </div>
-  }
-  @if (ayantDroits().length > 0) {
-    <div>
-      <div class="d-flex justify-content-center">
-        <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
-      </div>
 
-      <div class="d-flex justify-content-center">
+    @if (ayantDroits().length > 0) {
+      <div class="pec-pied">
+        <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+
         <ngb-pagination
           [collectionSize]="totalItems()"
           [page]="page()"
@@ -163,6 +136,6 @@
           (pageChange)="navigateToPage($event)"
         />
       </div>
-    </div>
-  }
+    }
+  </div>
 </div>

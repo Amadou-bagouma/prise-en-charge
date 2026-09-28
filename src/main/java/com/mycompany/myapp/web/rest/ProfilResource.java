@@ -151,6 +151,7 @@ public class ProfilResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of Profils in body.
      */
     @GetMapping("")
+    @PreAuthorize("hasAuthority('" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<List<ProfilDTO>> getAllProfils(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
         LOG.debug("REST request to get a page of Profils");
         Page<ProfilDTO> page = profilService.findAll(pageable);
@@ -165,6 +166,7 @@ public class ProfilResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the profilDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<ProfilDTO> getProfil(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Profil : {}", id);
         Optional<ProfilDTO> profilDTO = profilService.findOne(id);

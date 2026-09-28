@@ -46,9 +46,9 @@ export class AyantDroitFormService {
           validators: [Validators.required],
         },
       ),
-      codeAyantDroit: new FormControl(ayantDroitRawValue.codeAyantDroit, {
-        validators: [Validators.required, Validators.maxLength(50)],
-      }),
+      // Le code est attribué par le serveur : le champ est désactivé, et `getRawValue()`
+      // le renvoie tout de même, ce qui préserve le code d'un ayant droit existant.
+      codeAyantDroit: new FormControl({ value: ayantDroitRawValue.codeAyantDroit, disabled: true }),
       nom: new FormControl(ayantDroitRawValue.nom, {
         validators: [Validators.required],
       }),
