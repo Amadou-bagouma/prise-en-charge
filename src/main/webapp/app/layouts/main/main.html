@@ -1,17 +1,13 @@
 <jhi-page-ribbon />
 
 @if (account()) {
-  <div class="app-shell">
+  <div class="app-shell" [class.app-shell--rail]="layoutService.rail()">
     <router-outlet name="navbar" />
 
     <div class="app-content">
-      <div class="container-fluid">
-        <div class="card jh-card">
-          <router-outlet />
-        </div>
+      <router-outlet />
 
-        <jhi-footer />
-      </div>
+      <jhi-footer />
     </div>
   </div>
 } @else {

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Remet TypeSoin en referentiel administrable.
+
+        En 20260916110000, l'entite TypeSoin avait ete remplacee par une enumeration figee dans
+        le code, pour coller aux 4 categories de l'imprime officiel CNSS. Le besoin a change :
+        l'administration doit pouvoir ajouter une categorie sans livraison. On revient donc a
+        une table, SANS perdre ce qui a ete saisi depuis.
+
+        1. Cree la table type_soin et y installe les 4 categories officielles. Leur `code` est
+           fige : c'est lui que le rapport PDF interroge pour cocher les cases de l'imprime.
+        2. Cree la table de liaison et y reporte, ligne pour ligne, les affectations portees
+           par l'ancienne table d'element-collection.
+        3. Ne supprime l'ancienne table qu'une fois le report fait.
+
+        L'ordre compte : le changeSet 3 ne doit jamais s'executer avant le 2.
+    -->
+
+    <changeSet id="20260922100000-1" author="manual">
+        <createTable tableName="type_soin">
+            <!-- Identifiants attribues par le sequence_generator partage, comme les autres
+                 entites. Les 4 categories livrees prennent les ids 1 a 4 : la sequence demarre
+                 a 1050 et ne fait que croitre, la collision est impossible. -->
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="code" type="varchar(50)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_type_soin__code"/>
+            </column>
+            <column name="libelle" type="varchar(100)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_type_soin__libelle"/>
+            </column>
+            <column name="description" type="varchar(500)"/>
+            <column name="ordre" type="integer" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="actif" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="timestamp"/>
+            <column name="last_modified_by" type="varchar(50)"/>
+            <column name="last_modified_date" type="timestamp"/>
+        </createTable>
+    </changeSet>
+
+    <!--
+        Les 4 categories de l'imprime officiel, livrees comme donnees de reference. Les
+        identifiants sont fixes pour que la reprise du changeSet -4 puisse s'y referer.
+    -->
+    <changeSet id="20260922100000-2" author="manual">
+        <insert tableName="type_soin">
+            <column name="id" valueNumeric="1"/>
+            <column name="code" value="CONSULTATIONS"/>
+            <column name="libelle" value="Consultations"/>
+            <column name="description" value="Consultations medicales chez un praticien."/>
+            <column name="ordre" valueNumeric="1"/>
+            <column name="actif" valueBoolean="true"/>
+            <column name="created_by" value="system"/>
+            <column name="created_date" valueDate="${now}"/>
+        </insert>
+        <insert tableName="type_soin">
+            <column name="id" valueNumeric="2"/>
+            <column name="code" value="EXAMENS_MEDICAUX"/>
+            <column name="libelle" value="Examens medicaux"/>
+            <column name="description" value="Analyses, imagerie et examens complementaires."/>
+            <column name="ordre" valueNumeric="2"/>
+            <column name="actif" valueBoolean="true"/>
+            <column name="created_by" value="system"/>
+            <column name="created_date" valueDate="${now}"/>
+        </insert>
+        <insert tableName="type_soin">
+            <column name="id" valueNumeric="3"/>
+            <column name="code" value="INTERVENTION_CHIRURGICALE"/>
+            <column name="libelle" value="Intervention chirurgicale"/>
+            <column name="description" value="Acte chirurgical, programme ou en urgence."/>
+            <column name="ordre" valueNumeric="3"/>
+            <column name="actif" valueBoolean="true"/>
+            <column name="created_by" value="system"/>
+            <column name="created_date" valueDate="${now}"/>
+        </insert>
+        <insert tableName="type_soin">
+            <column name="id" valueNumeric="4"/>
+            <column name="code" value="HOSPITALISATION"/>
+            <column name="libelle" value="Hospitalisation"/>
+            <column name="description" value="Sejour en etablissement de sante."/>
+            <column name="ordre" valueNumeric="4"/>
+            <column name="actif" valueBoolean="true"/>
+            <column name="created_by" value="system"/>
+            <column name="created_date" valueDate="${now}"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="20260922100000-3" author="manual">
+        <createTable tableName="rel_demande_prise_en_charge__type_soin">
+            <column name="demande_prise_en_charge_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type_soin_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="demande_prise_en_charge_id, type_soin_id"
+                       tableName="rel_demande_prise_en_charge__type_soin"/>
+
+        <addForeignKeyConstraint baseColumnNames="demande_prise_en_charge_id"
+                                 baseTableName="rel_demande_prise_en_charge__type_soin"
+                                 constraintName="fk_rel_dpec_type_soin__demande_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="demande_prise_en_charge"/>
+
+        <addForeignKeyConstraint baseColumnNames="type_soin_id"
+                                 baseTableName="rel_demande_prise_en_charge__type_soin"
+                                 constraintName="fk_rel_dpec_type_soin__type_soin_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="type_soin"/>
+    </changeSet>
+
+    <!--
+        Reprise des affectations existantes. La correspondance est exacte : l'ancienne colonne
+        contenait le nom de la constante d'enumeration, qui est exactement le code du
+        referentiel. Rien n'est perdu et rien n'est devine.
+    -->
+    <changeSet id="20260922100000-4" author="manual">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="demande_prise_en_charge_type_soin"/>
+        </preConditions>
+        <sql>
+            INSERT INTO rel_demande_prise_en_charge__type_soin (demande_prise_en_charge_id, type_soin_id)
+            SELECT DISTINCT ancien.demande_prise_en_charge_id, t.id
+            FROM demande_prise_en_charge_type_soin ancien
+            JOIN type_soin t ON t.code = ancien.type_soin
+        </sql>
+    </changeSet>
+
+    <changeSet id="20260922100000-5" author="manual">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="demande_prise_en_charge_type_soin"/>
+        </preConditions>
+        <dropTable tableName="demande_prise_en_charge_type_soin"/>
+    </changeSet>
+</databaseChangeLog>

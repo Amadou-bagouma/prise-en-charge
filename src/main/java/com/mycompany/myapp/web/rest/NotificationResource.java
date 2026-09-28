@@ -1,5 +1,6 @@
 package com.mycompany.myapp.web.rest;
 
+import com.mycompany.myapp.domain.Notification;
 import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.repository.NotificationRepository;
 import com.mycompany.myapp.repository.UserRepository;
@@ -25,6 +26,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -88,6 +91,53 @@ public class NotificationResource {
     }
 
     /**
+     * Restreint les criteres aux notifications adressees a l'agent authentifie, sans exception.
+     *
+     * <p>Contrairement a {@link #restrictToCurrentUser}, un administrateur n'y echappe pas :
+     * c'est ce que demande la boite de reception, qui est personnelle. Sans cela, un
+     * administrateur y verrait les notifications de tous les agents alors que « tout marquer
+     * comme lu » ne solde que les siennes, et l'ecran se contredirait.
+     */
+    private NotificationCriteria restrictToMine(NotificationCriteria criteria) {
+        NotificationCriteria restricted = criteria != null ? criteria.copy() : new NotificationCriteria();
+        LongFilter utilisateurIdFilter = new LongFilter();
+        utilisateurIdFilter.setEquals(currentUserId());
+        restricted.setUtilisateurId(utilisateurIdFilter);
+        return restricted;
+    }
+
+    private Long currentUserId() {
+        return SecurityUtils.getCurrentUserLogin()
+            .flatMap(userRepository::findOneByLogin)
+            .map(User::getId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Current user could not be found"));
+    }
+
+    /**
+     * Restricts write access to a notification to its recipient, or an admin. A missing notification
+     * is let through so the caller's own not-found / idempotent-delete handling still applies.
+     */
+    private void requireRecipientOrAdmin(Long notificationId) {
+        if (SecurityUtils.hasCurrentUserAnyOfAuthorities(AuthoritiesConstants.ADMIN)) {
+            return;
+        }
+        Long currentUserId = SecurityUtils.getCurrentUserLogin()
+            .flatMap(userRepository::findOneByLogin)
+            .map(User::getId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Current user could not be found"));
+        boolean allowed = notificationRepository
+            .findById(notificationId)
+            .map(
+                (Notification notification) ->
+                    notification.getUtilisateur() != null && currentUserId.equals(notification.getUtilisateur().getId())
+            )
+            .orElse(true);
+        if (!allowed) {
+            throw new AccessDeniedException("Seul le destinataire de cette notification (ou un administrateur) peut la modifier");
+        }
+    }
+
+    /**
      * {@code POST  /notifications} : Create a new notification.
      *
      * @param notificationDTO the notificationDTO to create.
@@ -95,6 +145,7 @@ public class NotificationResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
+    @PreAuthorize("hasAuthority('" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<NotificationDTO> createNotification(@Valid @RequestBody NotificationDTO notificationDTO)
         throws URISyntaxException {
         LOG.debug("REST request to save Notification : {}", notificationDTO);
@@ -133,6 +184,7 @@ public class NotificationResource {
         if (!notificationRepository.existsById(id)) {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
+        requireRecipientOrAdmin(id);
 
         notificationDTO = notificationService.update(notificationDTO);
         return ResponseEntity.ok()
@@ -167,6 +219,7 @@ public class NotificationResource {
         if (!notificationRepository.existsById(id)) {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
+        requireRecipientOrAdmin(id);
 
         Optional<NotificationDTO> result = notificationService.partialUpdate(notificationDTO);
 
@@ -183,14 +236,43 @@ public class NotificationResource {
      * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of Notifications in body.
      */
+    /**
+     * {@code PUT /notifications/:id/lue} : marque une notification comme lue.
+     *
+     * <p>Une operation a part, et non un PATCH generique : marquer lu n'est pas modifier le
+     * contenu d'une notification, et le client n'a pas a connaitre la forme de la donnee pour
+     * le faire. Reserve au destinataire, comme les autres ecritures.
+     */
+    @PutMapping("/{id}/lue")
+    public ResponseEntity<NotificationDTO> marquerLue(@PathVariable("id") Long id) {
+        LOG.debug("REST request to mark Notification as read : {}", id);
+        requireRecipientOrAdmin(id);
+        return ResponseUtil.wrapOrNotFound(notificationService.marquerLue(id));
+    }
+
+    /**
+     * {@code PUT /notifications/lire-tout} : marque lues toutes les notifications de l'agent.
+     *
+     * <p>Toujours celles de l'agent authentifie : l'identifiant vient du jeton, jamais du
+     * client, pour qu'on ne puisse pas solder la boite de quelqu'un d'autre.
+     *
+     * @return le nombre de notifications qui etaient encore non lues.
+     */
+    @PutMapping("/lire-tout")
+    public ResponseEntity<Integer> marquerToutLu() {
+        LOG.debug("REST request to mark all Notifications as read");
+        return ResponseEntity.ok().body(notificationService.marquerToutLu());
+    }
+
     @GetMapping("")
     public ResponseEntity<List<NotificationDTO>> getAllNotifications(
         NotificationCriteria criteria,
-        @org.springdoc.core.annotations.ParameterObject Pageable pageable
+        @org.springdoc.core.annotations.ParameterObject Pageable pageable,
+        @RequestParam(name = "mesNotifications", required = false) Boolean mesNotifications
     ) {
         LOG.debug("REST request to get Notifications by criteria: {}", criteria);
 
-        criteria = restrictToCurrentUser(criteria);
+        criteria = Boolean.TRUE.equals(mesNotifications) ? restrictToMine(criteria) : restrictToCurrentUser(criteria);
         Page<NotificationDTO> page = notificationQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
@@ -203,9 +285,12 @@ public class NotificationResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
      */
     @GetMapping("/count")
-    public ResponseEntity<Long> countNotifications(NotificationCriteria criteria) {
+    public ResponseEntity<Long> countNotifications(
+        NotificationCriteria criteria,
+        @RequestParam(name = "mesNotifications", required = false) Boolean mesNotifications
+    ) {
         LOG.debug("REST request to count Notifications by criteria: {}", criteria);
-        criteria = restrictToCurrentUser(criteria);
+        criteria = Boolean.TRUE.equals(mesNotifications) ? restrictToMine(criteria) : restrictToCurrentUser(criteria);
         return ResponseEntity.ok().body(notificationQueryService.countByCriteria(criteria));
     }
 
@@ -240,6 +325,7 @@ public class NotificationResource {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteNotification(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete Notification : {}", id);
+        requireRecipientOrAdmin(id);
         notificationService.delete(id);
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))

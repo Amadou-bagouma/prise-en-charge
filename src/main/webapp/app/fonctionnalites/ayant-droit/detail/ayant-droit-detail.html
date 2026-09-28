@@ -1,0 +1,124 @@
+@if (ayantDroit(); as ayantDroitRef) {
+  <div class="pec-ecran">
+    <div class="pec-titre-ecran">
+      <h1 data-cy="ayantDroitDetailsHeading">{{ identite() }}</h1>
+      <span class="pec-num">{{ ayantDroitRef.codeAyantDroit }}</span>
+    </div>
+
+    <jhi-alert-error />
+    <jhi-alert />
+
+    <div class="pec-dossier">
+      <!-- Colonne de gauche : l'identité de l'ayant droit. -->
+      <div class="pec-dossier__principal">
+        <section class="pec-panneau">
+          <div class="pec-panneau__tete">
+            <span class="pec-panneau__titre" jhiTranslate="peccnssApp.ayantDroit.detail.title">Ayant droit</span>
+          </div>
+          <div class="pec-panneau__corps">
+            <dl class="pec-defs">
+              <dt jhiTranslate="peccnssApp.ayantDroit.codeAyantDroit">Code</dt>
+              <dd class="pec-defs--mono">{{ ayantDroitRef.codeAyantDroit || '—' }}</dd>
+
+              <dt jhiTranslate="peccnssApp.ayantDroit.nom">Nom</dt>
+              <dd>{{ ayantDroitRef.nom || '—' }}</dd>
+
+              <dt jhiTranslate="peccnssApp.ayantDroit.prenom">Prenom</dt>
+              <dd>{{ ayantDroitRef.prenom || '—' }}</dd>
+
+              <dt jhiTranslate="peccnssApp.ayantDroit.dateNaissance">Date Naissance</dt>
+              <dd class="pec-defs--mono">
+                {{ (ayantDroitRef.dateNaissance | formatMediumDate) || '—' }}
+                <!-- L'âge décide de la couverture d'un enfant : il se lit, il ne se calcule pas. -->
+                @if (age() !== null) {
+                  <span class="pec-muted">· {{ age() }} ans</span>
+                }
+              </dd>
+
+              <dt jhiTranslate="peccnssApp.ayantDroit.lien">Lien</dt>
+              <dd>
+                <span [jhiTranslate]="'peccnssApp.LienParente.' + (ayantDroitRef.lien ?? 'null')">{{ ayantDroitRef.lien }}</span>
+              </dd>
+            </dl>
+          </div>
+        </section>
+
+        <div class="pec-dossier__actions">
+          <button type="button" [routerLink]="['/ayant-droit', ayantDroitRef.id, 'edit']" class="pec-btn pec-btn--secondaire">
+            <fa-icon class="pec-btn__ico" icon="pencil-alt" />
+            <span jhiTranslate="entity.action.edit">Edit</span>
+          </button>
+
+          <button
+            type="button"
+            (click)="previousState()"
+            class="pec-btn pec-btn--discret pec-dossier__actions--fin"
+            data-cy="entityDetailsBackButton"
+          >
+            <fa-icon class="pec-btn__ico" icon="arrow-left" />
+            <span jhiTranslate="entity.action.back">Back</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Colonne de droite : de qui cette personne tient ses droits. -->
+      <aside class="pec-dossier__contexte">
+        <section class="pec-panneau">
+          <div class="pec-panneau__corps">
+            <div class="pec-fiche">
+              @if (ayantDroitRef.photo) {
+                <img
+                  class="pec-fiche__photo"
+                  [src]="'data:' + ayantDroitRef.photoContentType + ';base64,' + ayantDroitRef.photo"
+                  alt=""
+                  (click)="openFile(ayantDroitRef.photo, ayantDroitRef.photoContentType)"
+                />
+              } @else {
+                <span class="pec-fiche__init">{{ initiales() }}</span>
+              }
+              <span class="pec-fiche__id">
+                <span class="pec-fiche__nom">{{ identite() }}</span>
+                <span class="pec-fiche__mat">{{ ayantDroitRef.codeAyantDroit }}</span>
+                <!-- Le lien se lit sur le fond blanc du panneau, où il contraste vraiment. -->
+                <span class="pec-badge pec-badge--info pec-fiche__badge">
+                  <span class="pec-badge__pt"></span>
+                  <span [jhiTranslate]="'peccnssApp.LienParente.' + (ayantDroitRef.lien ?? 'null')">{{ ayantDroitRef.lien }}</span>
+                </span>
+              </span>
+            </div>
+          </div>
+        </section>
+
+        <!--
+          L'ayant droit ne tient ses droits que de l'agent auquel il est rattaché : le lien
+          vers sa fiche est la navigation la plus utile depuis cet écran.
+        -->
+        <section class="pec-panneau">
+          <div class="pec-panneau__tete">
+            <span class="pec-panneau__titre" jhiTranslate="peccnssApp.ayantDroit.agent">Agent</span>
+          </div>
+          <div class="pec-panneau__corps">
+            @if (ayantDroitRef.agent; as agentRef) {
+              <dl class="pec-defs">
+                <dt jhiTranslate="peccnssApp.agent.matricule">Matricule</dt>
+                <dd>
+                  <a [routerLink]="['/agent', agentRef.id, 'view']" class="pec-num">{{ agentRef.matricule }}</a>
+                </dd>
+              </dl>
+              <a
+                [routerLink]="['/agent', agentRef.id, 'view']"
+                class="pec-btn pec-btn--discret pec-btn--sm"
+                style="margin-top: var(--space-3)"
+              >
+                <fa-icon class="pec-btn__ico" icon="id-card" />
+                <span>Ouvrir la fiche de l'agent</span>
+              </a>
+            } @else {
+              <span class="pec-muted">Cet ayant droit n'est rattaché à aucun agent.</span>
+            }
+          </div>
+        </section>
+      </aside>
+    </div>
+  </div>
+}

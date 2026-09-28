@@ -27,6 +27,8 @@
     "activated": "Activé",
     "deactivated": "Désactivé",
     "profiles": "Droits",
+    "profil": "Profil",
+    "profilHelp": "Détermine les authorities de cet utilisateur. Obligatoire.",
     "imageUrl": "Image",
     "signature": "Signature",
     "signatureHelp": "Imprimée sur le rapport PDF de la demande, pour les validateurs DRH/infirmerie uniquement.",

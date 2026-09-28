@@ -2,13 +2,16 @@ package com.mycompany.myapp.service;
 
 import com.mycompany.myapp.config.Constants;
 import com.mycompany.myapp.domain.Authority;
+import com.mycompany.myapp.domain.Profil;
 import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.repository.AuthorityRepository;
+import com.mycompany.myapp.repository.ProfilRepository;
 import com.mycompany.myapp.repository.UserRepository;
 import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.security.SecurityUtils;
 import com.mycompany.myapp.service.dto.AdminUserDTO;
 import com.mycompany.myapp.service.dto.UserDTO;
+import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -40,6 +43,8 @@ public class UserService {
 
     private final AuthorityRepository authorityRepository;
 
+    private final ProfilRepository profilRepository;
+
     private final CacheManager cacheManager;
 
     private final DemandePriseEnChargeService demandePriseEnChargeService;
@@ -48,12 +53,14 @@ public class UserService {
         UserRepository userRepository,
         PasswordEncoder passwordEncoder,
         AuthorityRepository authorityRepository,
+        ProfilRepository profilRepository,
         CacheManager cacheManager,
         DemandePriseEnChargeService demandePriseEnChargeService
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authorityRepository = authorityRepository;
+        this.profilRepository = profilRepository;
         this.cacheManager = cacheManager;
         this.demandePriseEnChargeService = demandePriseEnChargeService;
     }
@@ -126,9 +133,16 @@ public class UserService {
         newUser.setActivated(false);
         // new user gets registration key
         newUser.setActivationKey(RandomUtil.generateActivationKey());
-        Set<Authority> authorities = new HashSet<>();
-        authorityRepository.findById(AuthoritiesConstants.USER).ifPresent(authorities::add);
-        newUser.setAuthorities(authorities);
+        // A self-registering caller must never choose their own profil/authorities: whatever
+        // userDTO.getProfil()/getAuthorities() might contain (e.g. an attempt to self-grant
+        // ROLE_ADMIN) is ignored, and the default profil is force-assigned instead.
+        Profil profilParDefaut = profilRepository
+            .findOneWithAuthoritiesByNom(ProfilRepository.PROFIL_PAR_DEFAUT)
+            .orElseThrow(() ->
+                new IllegalStateException("Le profil par defaut '" + ProfilRepository.PROFIL_PAR_DEFAUT + "' est introuvable")
+            );
+        newUser.setProfil(profilParDefaut);
+        newUser.setAuthorities(new HashSet<>(profilParDefaut.getAuthorities()));
         userRepository.save(newUser);
         this.clearUserCaches(newUser);
         LOG.debug("Created Information for User: {}", newUser);
@@ -172,25 +186,28 @@ public class UserService {
             user.setResetDate(Instant.now());
         }
         user.setActivated(true);
-        if (userDTO.getAuthorities() != null) {
-            Set<Authority> authorities = userDTO
-                .getAuthorities()
-                .stream()
-                .map(authorityRepository::findById)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toSet());
-            user.setAuthorities(authorities);
-        }
+        Profil profil = resolveProfilOrThrow(userDTO);
+        user.setProfil(profil);
+        Set<String> nouvellesAutorites = profil.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet());
+        user.setAuthorities(new HashSet<>(profil.getAuthorities()));
         userRepository.save(user);
         this.clearUserCaches(user);
         LOG.debug("Created Information for User: {}", user);
-        rattraperTachesValidationSiNouvellesAutorites(
-            user,
-            Set.of(),
-            userDTO.getAuthorities() != null ? userDTO.getAuthorities() : Set.of()
-        );
+        rattraperTachesValidationSiNouvellesAutorites(user, Set.of(), nouvellesAutorites);
         return user;
+    }
+
+    /**
+     * Resolves the profil an admin selected when creating or updating a user, throwing a clean 400
+     * if none was given or it does not exist - a profil is mandatory for every user.
+     */
+    private Profil resolveProfilOrThrow(AdminUserDTO userDTO) {
+        if (userDTO.getProfil() == null || userDTO.getProfil().getId() == null) {
+            throw new BadRequestAlertException("Le profil est obligatoire", "userManagement", "profil.obligatoire");
+        }
+        return profilRepository
+            .findOneWithAuthoritiesById(userDTO.getProfil().getId())
+            .orElseThrow(() -> new BadRequestAlertException("Profil introuvable", "userManagement", "profil.introuvable"));
     }
 
     /**
@@ -216,20 +233,17 @@ public class UserService {
                 user.setSignatureContentType(userDTO.getSignatureContentType());
                 user.setActivated(userDTO.isActivated());
                 user.setLangKey(userDTO.getLangKey());
+                Set<String> authoritesAvant = user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet());
+                Profil profil = resolveProfilOrThrow(userDTO);
+                user.setProfil(profil);
                 Set<Authority> managedAuthorities = user.getAuthorities();
-                Set<String> authoritesAvant = managedAuthorities.stream().map(Authority::getName).collect(Collectors.toSet());
                 managedAuthorities.clear();
-                userDTO
-                    .getAuthorities()
-                    .stream()
-                    .map(authorityRepository::findById)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .forEach(managedAuthorities::add);
+                managedAuthorities.addAll(profil.getAuthorities());
+                Set<String> authoritesApres = managedAuthorities.stream().map(Authority::getName).collect(Collectors.toSet());
                 userRepository.save(user);
                 this.clearUserCaches(user);
                 LOG.debug("Changed Information for User: {}", user);
-                rattraperTachesValidationSiNouvellesAutorites(user, authoritesAvant, userDTO.getAuthorities());
+                rattraperTachesValidationSiNouvellesAutorites(user, authoritesAvant, authoritesApres);
                 return user;
             })
             .map(AdminUserDTO::new);

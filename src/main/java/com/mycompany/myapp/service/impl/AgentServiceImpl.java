@@ -78,4 +78,10 @@ public class AgentServiceImpl implements AgentService {
         LOG.debug("Request to delete Agent : {}", id);
         agentRepository.deleteById(id);
     }
+
+    @Override
+    public Optional<Agent> findByMatricule(String matricule) {
+        LOG.info("Service pour recherche un agent en fonction de son matricule {} a la date {} ", natricule, LocalDateTime.now());
+        return this.agentRepository.findByMatricule(matricule);
+    }
 }

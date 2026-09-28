@@ -2,15 +2,15 @@
   "peccnssApp": {
     "demandePriseEnCharge": {
       "home": {
-        "title": "DemandePriseEnCharges",
-        "refreshListLabel": "Actualiser la liste",
-        "createLabel": "Créer un nouveau Demande Prise En Charge",
-        "createOrEditLabel": "Créer un Demande Prise En Charge",
-        "notFound": "Aucun Demande Prise En Charge trouvé"
+        "title": "Demandes de prise en charge",
+        "refreshListLabel": "Actualiser",
+        "createLabel": "Nouvelle demande",
+        "createOrEditLabel": "Saisir une demande de prise en charge",
+        "notFound": "Aucune demande de prise en charge"
       },
-      "created": "Un nouveau Demande Prise En Charge a été créé avec l'identifiant {{ param }}",
-      "updated": "Le Demande Prise En Charge avec l'identifiant {{ param }} a été mis à jour",
-      "deleted": "Le Demande Prise En Charge avec l'identifiant {{ param }} a été supprimé",
+      "created": "La demande {{ param }} a été enregistrée",
+      "updated": "La demande {{ param }} a été mise à jour",
+      "deleted": "La demande {{ param }} a été supprimée",
       "delete": {
         "question": "Êtes-vous certain de vouloir supprimer le Demande Prise En Charge {{ id }} ?"
       },
@@ -46,7 +46,12 @@
       "typeSoins": "Types de soin",
       "etablissementSante": "Établissement de santé",
       "gestionnaireCreateur": "Gestionnaire créateur",
-      "assigneA": "Assigné à"
+      "assigneA": "Assigné à",
+      "pieces": {
+        "titre": "Pièces justificatives",
+        "ajouter": "Joindre une pièce",
+        "aucune": "Aucune pièce justificative n'est jointe à ce dossier."
+      }
     }
   }
 }

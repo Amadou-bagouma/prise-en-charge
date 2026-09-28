@@ -1,34 +1,79 @@
 <div class="login-page">
+  <!--
+    Deux panneaux : l'institution à gauche, l'accès à droite. Sur un écran étroit le panneau
+    institutionnel se réduit à son en-tête — il situe, il ne doit pas coûter un écran de
+    défilement avant d'atteindre le champ de saisie.
+  -->
   <div class="login-card">
-    <!-- Titre -->
-    <div class="login-header">
-      <h1 data-cy="loginTitle">Connexion à GPEC CNSS</h1>
+    <aside class="login-marque">
+      <img class="login-marque__logo" src="content/images/logo-cnss.png" alt="" />
+      <p class="login-marque__institution">Caisse Nationale de Sécurité Sociale</p>
+      <p class="login-marque__pays">République du Niger</p>
+      <p class="login-marque__service">Gestion de la prise en charge médicale</p>
+    </aside>
+
+    <div class="login-acces">
+      <div class="login-acces__tete">
+        <h1 data-cy="loginTitle">Connexion</h1>
+        <p class="login-acces__aide">Identifiez-vous avec votre matricule et votre mot de passe.</p>
+      </div>
+
+      @if (authenticationError()) {
+        <div class="login-erreur" role="alert" data-cy="loginError">
+          <span class="login-erreur__titre">Connexion refusée</span>
+          <span class="login-erreur__texte">Le matricule ou le mot de passe ne correspond pas. Vérifiez votre saisie.</span>
+        </div>
+      }
+
+      <form class="login-form" (ngSubmit)="login()" [formGroup]="loginForm">
+        <div class="login-champ">
+          <label class="login-champ__lib" for="username">Matricule</label>
+          <input
+            type="text"
+            #username
+            id="username"
+            name="username"
+            autocomplete="username"
+            placeholder="Votre matricule"
+            formControlName="username"
+            data-cy="username"
+          />
+        </div>
+
+        <div class="login-champ">
+          <label class="login-champ__lib" for="password">Mot de passe</label>
+          <div class="login-champ__wrap">
+            <input
+              [type]="motDePasseVisible() ? 'text' : 'password'"
+              id="password"
+              name="password"
+              autocomplete="current-password"
+              placeholder="Votre mot de passe"
+              formControlName="password"
+              data-cy="password"
+            />
+            <button
+              type="button"
+              class="login-champ__oeil"
+              (click)="basculerMotDePasse()"
+              [attr.aria-pressed]="motDePasseVisible()"
+              [attr.aria-label]="motDePasseVisible() ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+              data-cy="togglePassword"
+            >
+              {{ motDePasseVisible() ? 'Masquer' : 'Afficher' }}
+            </button>
+          </div>
+        </div>
+
+        <label class="login-memoire">
+          <input type="checkbox" name="rememberMe" formControlName="rememberMe" data-cy="rememberMe" />
+          <span>Rester connecté sur ce poste</span>
+        </label>
+
+        <button type="submit" class="login-button" [disabled]="loginForm.invalid" data-cy="submit">Se connecter</button>
+      </form>
+
+      <p class="login-pied">En cas d'oubli de mot de passe, contactez l'administrateur de l'application.</p>
     </div>
-
-    @if (authenticationError()) {
-      <div class="alert alert-danger login-error" data-cy="loginError">Identifiant ou mot de passe incorrect.</div>
-    }
-
-    <form class="login-form" (ngSubmit)="login()" [formGroup]="loginForm">
-      <!-- Matricule -->
-      <div class="input-box matricule-box">
-        <input type="text" #username id="username" name="username" placeholder="Matricule" formControlName="username" data-cy="username" />
-
-        <span class="user-icon">👤</span>
-      </div>
-
-      <!-- Mot de passe -->
-      <div class="input-box password-box">
-        <input type="password" id="password" name="password" placeholder="Mot de passe" formControlName="password" data-cy="password" />
-
-        <span class="password-icons">
-          <span class="eye-icon">◉</span>
-          <span class="lock-icon">🔒</span>
-        </span>
-      </div>
-
-      <!-- Bouton -->
-      <button type="submit" class="login-button" data-cy="submit">Se connecter</button>
-    </form>
   </div>
 </div>

@@ -1,0 +1,53 @@
+@if (typeSoin(); as typeSoinRef) {
+  <div class="pec-ecran">
+    <div class="pec-titre-ecran">
+      <h1 data-cy="typeSoinDetailsHeading">{{ typeSoinRef.libelle }}</h1>
+      @if (typeSoinRef.actif) {
+        <span class="pec-badge pec-badge--ok"><span class="pec-badge__pt"></span>En service</span>
+      } @else {
+        <span class="pec-badge pec-badge--neutre"><span class="pec-badge__pt"></span>Retiré du service</span>
+      }
+    </div>
+
+    <jhi-alert-error />
+    <jhi-alert />
+
+    <section class="pec-panneau">
+      <div class="pec-panneau__tete">
+        <span class="pec-panneau__titre" jhiTranslate="peccnssApp.typeSoin.detail.title">Type de soin</span>
+      </div>
+      <div class="pec-panneau__corps">
+        <dl class="pec-defs">
+          <dt jhiTranslate="peccnssApp.typeSoin.libelle">Libellé</dt>
+          <dd>{{ typeSoinRef.libelle }}</dd>
+
+          <dt jhiTranslate="peccnssApp.typeSoin.code">Code</dt>
+          <dd class="pec-defs--mono">{{ typeSoinRef.code }}</dd>
+
+          <dt jhiTranslate="peccnssApp.typeSoin.description">Description</dt>
+          <dd>{{ typeSoinRef.description || '—' }}</dd>
+
+          <dt jhiTranslate="peccnssApp.typeSoin.ordre">Ordre</dt>
+          <dd class="pec-defs--mono">{{ typeSoinRef.ordre }}</dd>
+        </dl>
+      </div>
+    </section>
+
+    <div class="pec-dossier__actions">
+      <button type="button" [routerLink]="['/type-soin', typeSoinRef.id, 'edit']" class="pec-btn pec-btn--secondaire">
+        <fa-icon class="pec-btn__ico" icon="pencil-alt" />
+        <span jhiTranslate="entity.action.edit">Edit</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="previousState()"
+        class="pec-btn pec-btn--discret pec-dossier__actions--fin"
+        data-cy="entityDetailsBackButton"
+      >
+        <fa-icon class="pec-btn__ico" icon="arrow-left" />
+        <span jhiTranslate="entity.action.back">Back</span>
+      </button>
+    </div>
+  </div>
+}

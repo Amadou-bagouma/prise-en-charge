@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Ajoute les colonnes d'audit aux tables dont l'entite etend AbstractAuditingEntity.
+
+        Ces entites ont recu l'audit (created_by, created_date, last_modified_by,
+        last_modified_date) sans migration correspondante : au premier redemarrage, toute
+        lecture echouait sur un « column a1_0.created_by does not exist ». Cette migration
+        rattrape le schema, table par table.
+
+        `created_by` est NOT NULL, comme sur jhi_user et profil. Les lignes deja en base n'ont
+        pas d'auteur connu : elles recoivent « system », qui dit exactement cela — la donnee
+        est anterieure a la tracabilite, elle n'a pas ete saisie par un agent identifie.
+
+        Chaque changeSet est garde par une precondition : la migration reste rejouable sur une
+        base ou la colonne aurait deja ete ajoutee a la main.
+    -->
+    <changeSet id="20260922120000-1" author="manual">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="agent" columnName="created_by"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="agent">
+            <column name="created_by" type="varchar(50)" defaultValue="system">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="timestamp"/>
+            <column name="last_modified_by" type="varchar(50)"/>
+            <column name="last_modified_date" type="timestamp"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20260922120000-2" author="manual">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="ayant_droit" columnName="created_by"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="ayant_droit">
+            <column name="created_by" type="varchar(50)" defaultValue="system">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="timestamp"/>
+            <column name="last_modified_by" type="varchar(50)"/>
+            <column name="last_modified_date" type="timestamp"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20260922120000-3" author="manual">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="boite_reception" columnName="created_by"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="boite_reception">
+            <column name="created_by" type="varchar(50)" defaultValue="system">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="timestamp"/>
+            <column name="last_modified_by" type="varchar(50)"/>
+            <column name="last_modified_date" type="timestamp"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20260922120000-4" author="manual">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="demande_prise_en_charge" columnName="created_by"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="demande_prise_en_charge">
+            <column name="created_by" type="varchar(50)" defaultValue="system">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="timestamp"/>
+            <column name="last_modified_by" type="varchar(50)"/>
+            <column name="last_modified_date" type="timestamp"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20260922120000-5" author="manual">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="direction" columnName="created_by"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="direction">
+            <column name="created_by" type="varchar(50)" defaultValue="system">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="timestamp"/>
+            <column name="last_modified_by" type="varchar(50)"/>
+            <column name="last_modified_date" type="timestamp"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20260922120000-6" author="manual">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="etablissement_sante" columnName="created_by"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="etablissement_sante">
+            <column name="created_by" type="varchar(50)" defaultValue="system">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="timestamp"/>
+            <column name="last_modified_by" type="varchar(50)"/>
+            <column name="last_modified_date" type="timestamp"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20260922120000-7" author="manual">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="gestion" columnName="created_by"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="gestion">
+            <column name="created_by" type="varchar(50)" defaultValue="system">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="timestamp"/>
+            <column name="last_modified_by" type="varchar(50)"/>
+            <column name="last_modified_date" type="timestamp"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20260922120000-8" author="manual">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="historique_action" columnName="created_by"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="historique_action">
+            <column name="created_by" type="varchar(50)" defaultValue="system">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="timestamp"/>
+            <column name="last_modified_by" type="varchar(50)"/>
+            <column name="last_modified_date" type="timestamp"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20260922120000-9" author="manual">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="notification" columnName="created_by"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="notification">
+            <column name="created_by" type="varchar(50)" defaultValue="system">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="timestamp"/>
+            <column name="last_modified_by" type="varchar(50)"/>
+            <column name="last_modified_date" type="timestamp"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20260922120000-10" author="manual">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="piece_justificative" columnName="created_by"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="piece_justificative">
+            <column name="created_by" type="varchar(50)" defaultValue="system">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="timestamp"/>
+            <column name="last_modified_by" type="varchar(50)"/>
+            <column name="last_modified_date" type="timestamp"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20260922120000-11" author="manual">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="region" columnName="created_by"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="region">
+            <column name="created_by" type="varchar(50)" defaultValue="system">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="timestamp"/>
+            <column name="last_modified_by" type="varchar(50)"/>
+            <column name="last_modified_date" type="timestamp"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20260922120000-12" author="manual">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="tache" columnName="created_by"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="tache">
+            <column name="created_by" type="varchar(50)" defaultValue="system">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="timestamp"/>
+            <column name="last_modified_by" type="varchar(50)"/>
+            <column name="last_modified_date" type="timestamp"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

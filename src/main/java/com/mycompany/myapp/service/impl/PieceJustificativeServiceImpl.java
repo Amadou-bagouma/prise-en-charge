@@ -78,6 +78,13 @@ public class PieceJustificativeServiceImpl implements PieceJustificativeService 
 
     @Override
     @Transactional(readOnly = true)
+    public Page<PieceJustificativeDTO> findAllByDemande(Long demandeId, Pageable pageable) {
+        LOG.debug("Request to get PieceJustificatives of demande : {}", demandeId);
+        return pieceJustificativeRepository.findAllByDemandeId(demandeId, pageable).map(pieceJustificativeMapper::toDto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<PieceJustificativeDTO> findOne(Long id) {
         LOG.debug("Request to get PieceJustificative : {}", id);
         return pieceJustificativeRepository.findOneWithEagerRelationships(id).map(pieceJustificativeMapper::toDto);

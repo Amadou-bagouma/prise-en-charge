@@ -28,7 +28,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findOneByLogin(String login);
 
-    @EntityGraph(attributePaths = "authorities")
+    /**
+     * {@code profil.authorities} (not just {@code profil}) has to be in the graph: AdminUserDTO
+     * reads the profil's own authorities to expose them, and it does so after this method returned,
+     * i.e. outside the transaction - a lazily-fetched collection would throw
+     * LazyInitializationException there.
+     */
+    @EntityGraph(attributePaths = { "authorities", "profil.authorities" })
     @Cacheable(cacheNames = USERS_BY_LOGIN_CACHE, unless = "#result == null")
     Optional<User> findOneWithAuthoritiesByLogin(String login);
 
@@ -39,4 +45,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Page<User> findAllByIdNotNullAndActivatedIsTrue(Pageable pageable);
 
     List<User> findAllByAuthoritiesNameAndActivatedIsTrue(String authorityName);
+
+    boolean existsByProfilId(Long profilId);
 }

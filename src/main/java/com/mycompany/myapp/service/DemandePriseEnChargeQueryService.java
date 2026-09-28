@@ -44,25 +44,45 @@ public class DemandePriseEnChargeQueryService extends QueryService<DemandePriseE
      * Return a {@link Page} of {@link DemandePriseEnChargeDTO} which matches the criteria from the database.
      * @param criteria The object which holds all the filters, which the entities should match.
      * @param page The page, which should be returned.
+     * @param restrictToUserId when not {@code null}, only demandes created by or assigned to this user are
+     *                         returned, regardless of the criteria. Callers pass {@code null} for users
+     *                         allowed to browse every demande (admins and validators).
      * @return the matching entities.
      */
     @Transactional(readOnly = true)
-    public Page<DemandePriseEnChargeDTO> findByCriteria(DemandePriseEnChargeCriteria criteria, Pageable page) {
+    public Page<DemandePriseEnChargeDTO> findByCriteria(DemandePriseEnChargeCriteria criteria, Pageable page, Long restrictToUserId) {
         LOG.debug("find by criteria : {}, page: {}", criteria, page);
-        final Specification<DemandePriseEnCharge> specification = createSpecification(criteria);
+        final Specification<DemandePriseEnCharge> specification = restrict(createSpecification(criteria), restrictToUserId);
         return demandePriseEnChargeRepository.findAll(specification, page).map(demandePriseEnChargeMapper::toDto);
     }
 
     /**
      * Return the number of matching entities in the database.
      * @param criteria The object which holds all the filters, which the entities should match.
+     * @param restrictToUserId see {@link #findByCriteria(DemandePriseEnChargeCriteria, Pageable, Long)}.
      * @return the number of matching entities.
      */
     @Transactional(readOnly = true)
-    public long countByCriteria(DemandePriseEnChargeCriteria criteria) {
+    public long countByCriteria(DemandePriseEnChargeCriteria criteria, Long restrictToUserId) {
         LOG.debug("count by criteria : {}", criteria);
-        final Specification<DemandePriseEnCharge> specification = createSpecification(criteria);
+        final Specification<DemandePriseEnCharge> specification = restrict(createSpecification(criteria), restrictToUserId);
         return demandePriseEnChargeRepository.count(specification);
+    }
+
+    /**
+     * Narrows a specification to only the demandes where the given user is either the author
+     * (gestionnaireCreateur) or the current assignee (assigneA).
+     */
+    private Specification<DemandePriseEnCharge> restrict(Specification<DemandePriseEnCharge> specification, Long restrictToUserId) {
+        if (restrictToUserId == null) {
+            return specification;
+        }
+        return specification.and((root, query, builder) ->
+            builder.or(
+                builder.equal(root.join(DemandePriseEnCharge_.gestionnaireCreateur, JoinType.LEFT).get(User_.id), restrictToUserId),
+                builder.equal(root.join(DemandePriseEnCharge_.assigneA, JoinType.LEFT).get(User_.id), restrictToUserId)
+            )
+        );
     }
 
     /**

@@ -6,7 +6,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.mycompany.myapp.IntegrationTest;
+import com.mycompany.myapp.domain.Profil;
 import com.mycompany.myapp.domain.User;
+import com.mycompany.myapp.repository.ProfilRepository;
 import com.mycompany.myapp.repository.UserRepository;
 import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.service.UserService;
@@ -64,6 +66,9 @@ class UserResourceIT {
     private UserRepository userRepository;
 
     @Autowired
+    private ProfilRepository profilRepository;
+
+    @Autowired
     private UserService userService;
 
     @Autowired
@@ -98,6 +103,12 @@ class UserResourceIT {
         persistUser.setLastName(DEFAULT_LASTNAME);
         persistUser.setImageUrl(DEFAULT_IMAGEURL);
         persistUser.setLangKey(DEFAULT_LANGKEY);
+        // A profil is mandatory. This throwaway one is never persisted independently - it rides
+        // along (cascade = PERSIST, see User#profil) whenever the caller saves this user.
+        Profil profil = new Profil();
+        profil.setNom("test-profil-" + RandomStringUtils.insecure().nextAlphanumeric(10));
+        profil.setAuthorities(new HashSet<>());
+        persistUser.setProfil(profil);
         return persistUser;
     }
 
@@ -109,6 +120,17 @@ class UserResourceIT {
         persistUser.setLogin(DEFAULT_LOGIN);
         persistUser.setEmail(DEFAULT_EMAIL);
         return persistUser;
+    }
+
+    /**
+     * A {@link com.mycompany.myapp.service.dto.ProfilDTO} referencing the "Gestionnaire" profil
+     * seeded in every environment (see {@code 20260920180000_add_profil.xml}), for REST calls that
+     * create or update a user through {@code AdminUserDTO} - a profil is now mandatory there.
+     */
+    private com.mycompany.myapp.service.dto.ProfilDTO defaultProfilDTO() {
+        com.mycompany.myapp.service.dto.ProfilDTO dto = new com.mycompany.myapp.service.dto.ProfilDTO();
+        dto.setId(profilRepository.findOneByNom(ProfilRepository.PROFIL_PAR_DEFAUT).orElseThrow().getId());
+        return dto;
     }
 
     @BeforeEach
@@ -146,6 +168,7 @@ class UserResourceIT {
         userDTO.setImageUrl(DEFAULT_IMAGEURL);
         userDTO.setLangKey(DEFAULT_LANGKEY);
         userDTO.setAuthorities(Set.of(AuthoritiesConstants.USER));
+        userDTO.setProfil(defaultProfilDTO());
 
         var returnedUserDTO = om.readValue(
             restUserMockMvc
@@ -182,6 +205,7 @@ class UserResourceIT {
         userDTO.setImageUrl(DEFAULT_IMAGEURL);
         userDTO.setLangKey(DEFAULT_LANGKEY);
         userDTO.setAuthorities(Set.of(AuthoritiesConstants.USER));
+        userDTO.setProfil(defaultProfilDTO());
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restUserMockMvc
@@ -208,6 +232,7 @@ class UserResourceIT {
         userDTO.setImageUrl(DEFAULT_IMAGEURL);
         userDTO.setLangKey(DEFAULT_LANGKEY);
         userDTO.setAuthorities(Set.of(AuthoritiesConstants.USER));
+        userDTO.setProfil(defaultProfilDTO());
 
         // Create the User
         restUserMockMvc
@@ -234,6 +259,7 @@ class UserResourceIT {
         userDTO.setImageUrl(DEFAULT_IMAGEURL);
         userDTO.setLangKey(DEFAULT_LANGKEY);
         userDTO.setAuthorities(Set.of(AuthoritiesConstants.USER));
+        userDTO.setProfil(defaultProfilDTO());
 
         // Create the User
         restUserMockMvc
@@ -316,6 +342,7 @@ class UserResourceIT {
         userDTO.setLastModifiedBy(updatedUser.getLastModifiedBy());
         userDTO.setLastModifiedDate(updatedUser.getLastModifiedDate());
         userDTO.setAuthorities(Set.of(AuthoritiesConstants.USER));
+        userDTO.setProfil(defaultProfilDTO());
 
         restUserMockMvc
             .perform(put("/api/admin/users").contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(userDTO)))
@@ -361,6 +388,7 @@ class UserResourceIT {
         userDTO.setLastModifiedBy(updatedUser.getLastModifiedBy());
         userDTO.setLastModifiedDate(updatedUser.getLastModifiedDate());
         userDTO.setAuthorities(Set.of(AuthoritiesConstants.USER));
+        userDTO.setProfil(defaultProfilDTO());
 
         restUserMockMvc
             .perform(put("/api/admin/users").contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(userDTO)))
@@ -417,6 +445,7 @@ class UserResourceIT {
         userDTO.setLastModifiedBy(updatedUser.getLastModifiedBy());
         userDTO.setLastModifiedDate(updatedUser.getLastModifiedDate());
         userDTO.setAuthorities(Set.of(AuthoritiesConstants.USER));
+        userDTO.setProfil(defaultProfilDTO());
 
         restUserMockMvc
             .perform(put("/api/admin/users").contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(userDTO)))
@@ -457,6 +486,7 @@ class UserResourceIT {
         userDTO.setLastModifiedBy(updatedUser.getLastModifiedBy());
         userDTO.setLastModifiedDate(updatedUser.getLastModifiedDate());
         userDTO.setAuthorities(Set.of(AuthoritiesConstants.USER));
+        userDTO.setProfil(defaultProfilDTO());
 
         restUserMockMvc
             .perform(put("/api/admin/users").contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(userDTO)))

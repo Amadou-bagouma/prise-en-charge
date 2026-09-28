@@ -30,6 +30,8 @@
     "activated": "Activated",
     "deactivated": "Deactivated",
     "profiles": "Profiles",
+    "profil": "Profil",
+    "profilHelp": "Determines this user's authorities. Required.",
     "langKey": "Language",
     "createdBy": "Created by",
     "createdDate": "Created date",

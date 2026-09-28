@@ -1,34 +1,30 @@
-@import 'bootstrap/scss/functions';
-@import 'bootstrap/scss/variables';
-
 /* ==========================================================================
-Topbar + vertical sidebar
+Coquille de l'application : navigation latérale + en-tête.
+
+Alignée sur la fiche CadreApplication du design system CNSS : navigation 216 px,
+en-tête 52 px, la navigation est le seul grand aplat sombre de l'interface (y
+compris en thème clair). Toute valeur vient de tokens.css — aucune couleur,
+taille ni rayon en dur.
 ========================================================================== */
-
-$sidebar-width: 260px;
-$sidebar-bg: #212529;
-$sidebar-color: rgba(255, 255, 255, 0.75);
-$sidebar-color-hover: #ffffff;
-
-$topbar-height: 56px;
-$topbar-bg: #0d6efd;
-$topbar-color: rgba(255, 255, 255, 0.85);
-$topbar-color-hover: #ffffff;
 
 :host {
   display: contents;
 }
 
-/* ---- Topbar ---- */
+/* ---- En-tête ------------------------------------------------------------
+   Fond clair bordé, et non plus un aplat bleu : la règle du système réserve
+   le grand aplat sombre à la navigation. */
 
 .app-topbar {
   grid-area: topbar;
   display: flex;
   align-items: center;
-  height: $topbar-height;
-  padding: 0 1rem;
-  background: $topbar-bg;
-  color: $topbar-color;
+  gap: var(--space-4);
+  height: 52px;
+  padding: 0 var(--space-6);
+  background: var(--surface-100);
+  color: var(--ink-700);
+  border-bottom: 1px solid var(--border-100);
   position: sticky;
   top: 0;
   z-index: 1032;
@@ -38,51 +34,130 @@ $topbar-color-hover: #ffffff;
   flex: 1 1 auto;
 }
 
+/* Repli de la navigation : un bouton discret, collé au bord de la coquille. */
+.topbar-rail-toggle {
+  width: 26px;
+  height: 26px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-100);
+  border-radius: var(--radius-sm);
+  background: var(--surface-100);
+  color: var(--ink-500);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--surface-200);
+    color: var(--ink-900);
+  }
+}
+
+/* Fil d'Ariane : il se termine en gras par ce qu'on regarde. */
+.topbar-fil {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: 12px;
+  color: var(--ink-500);
+  min-width: 0;
+
+  b {
+    font-weight: 600;
+    color: var(--ink-900);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.topbar-fil__sep {
+  font-size: 9px;
+  opacity: 0.6;
+}
+
+/* Agent connecté : pastille d'initiales, nom, et profil qui dit son périmètre. */
+.topbar-agent {
+  gap: var(--space-2);
+}
+
+.topbar-agent__pastille {
+  width: 26px;
+  height: 26px;
+  flex: none;
+  border-radius: var(--radius-pill);
+  background: var(--brand-100);
+  color: var(--brand-600);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: 600 11px/1 var(--font-sans);
+}
+
+.topbar-agent__ident {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.2;
+  min-width: 0;
+}
+
+.topbar-agent__nom {
+  font: 600 12px/16px var(--font-sans);
+  color: var(--ink-900);
+}
+
+.topbar-agent__role {
+  font: 400 11px/14px var(--font-sans);
+  color: var(--ink-500);
+}
+
 .topbar-right {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: var(--space-3);
   margin-left: auto;
 }
 
-.topbar-dropdown {
-  .dropdown-menu {
-    min-width: 200px;
-  }
+.topbar-dropdown .dropdown-menu {
+  min-width: 200px;
+  border: 1px solid var(--border-100);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  background: var(--surface-100);
 }
 
 .topbar-link {
   display: flex;
   align-items: center;
-  gap: 0.5em;
-  padding: 0.45rem 0.75rem;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   background: transparent;
-  color: $topbar-color;
-  font-weight: 400;
-  font-size: 0.92rem;
+  color: var(--ink-700);
+  font: 500 13px/19px var(--font-sans);
   cursor: pointer;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.15);
-    color: $topbar-color-hover;
+    background: var(--surface-200);
+    color: var(--ink-900);
   }
 }
 
 .sidebar-mobile-toggle {
   display: none;
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   background: transparent;
-  color: $topbar-color-hover;
+  color: var(--ink-700);
 
   &:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: var(--surface-200);
   }
 }
 
@@ -90,47 +165,39 @@ $topbar-color-hover: #ffffff;
   position: fixed;
   inset: 0;
   z-index: 1029;
-  background: rgba(0, 0, 0, 0.4);
+  background: color-mix(in srgb, var(--surface-inverse) 55%, transparent);
 }
 
-/* ---- Sidebar ---- */
+/* ---- Navigation latérale ------------------------------------------------ */
 
 .app-sidebar {
   grid-area: sidebar;
   display: flex;
   flex-direction: column;
-  width: $sidebar-width;
-  min-width: $sidebar-width;
-  height: calc(100vh - #{$topbar-height});
+  width: 216px;
+  min-width: 216px;
+  height: calc(100vh - 52px);
   position: sticky;
-  top: $topbar-height;
-  background: $sidebar-bg;
-  color: $sidebar-color;
+  top: 52px;
+  padding-bottom: var(--space-4);
+  background: var(--surface-inverse);
+  color: var(--ink-on-inverse);
+  font-family: var(--font-sans);
 }
 
+/* Le logo est posé tel quel : pas de plaque de fond, pas de filtre, pas de
+   recadrage, jamais sous 32 px. */
 .sidebar-brand {
   display: flex;
   align-items: center;
-  gap: 0.6em;
-  padding: 0.9rem 1rem;
+  gap: var(--space-2);
+  padding: var(--space-4);
   text-decoration: none;
-  color: $sidebar-color-hover;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: inherit;
 
   &:hover {
-    color: $sidebar-color-hover;
+    color: inherit;
   }
-}
-
-.sidebar-brand-text {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.2;
-}
-
-.navbar-version {
-  font-size: 0.65em;
-  color: rgba(255, 255, 255, 0.5);
 }
 
 .logo-img {
@@ -138,8 +205,24 @@ $topbar-color-hover: #ffffff;
   width: 40px;
   flex: none;
   display: inline-block;
-  background: url('/content/images/logo-jhipster.png') no-repeat center center;
+  background: url('/content/images/logo-cnss.png') no-repeat center center;
   background-size: contain;
+}
+
+.sidebar-brand-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.navbar-title {
+  font: 600 13px/16px var(--font-sans);
+}
+
+/* Sous le nom de l'application : le périmètre de travail, visible en permanence. */
+.navbar-version {
+  font: 400 11px/14px var(--font-sans);
+  opacity: 0.72;
 }
 
 .sidebar-scroll {
@@ -150,51 +233,52 @@ $topbar-color-hover: #ffffff;
 .sidebar-nav {
   list-style: none;
   margin: 0;
-  padding: 0.5rem 0;
+  padding: 0;
 }
 
 .sidebar-nav-title {
-  margin: 0.9rem 1rem 0.3rem;
-  font-size: 0.7rem;
-  font-weight: 700;
+  margin: 0;
+  padding: var(--space-4) var(--space-4) var(--space-1);
+  font: 600 11px/14px var(--font-sans);
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.4);
+  opacity: 0.6;
 }
 
 .sidebar-nav-item {
-  margin: 0 0.6rem;
+  margin: 0;
 }
 
 .sidebar-link {
   display: flex;
   align-items: center;
-  gap: 0.7em;
+  gap: var(--space-2);
   width: 100%;
-  padding: 0.55rem 0.75rem;
+  padding: var(--space-2) var(--space-4);
   border: none;
-  border-radius: 8px;
+  border-left: 2px solid transparent;
   background: transparent;
-  color: $sidebar-color;
+  color: inherit;
   text-decoration: none;
-  font-weight: 400;
-  font-size: 0.92rem;
+  font: 500 13px/19px var(--font-sans);
   text-align: left;
   cursor: pointer;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.08);
-    color: $sidebar-color-hover;
+    background: color-mix(in srgb, var(--surface-inverse) 88%, var(--ink-on-inverse));
   }
 
   fa-icon {
     opacity: 0.85;
+    flex: none;
   }
 }
 
+/* Écran courant : filet à gauche en brand-500, comme la fiche. */
 .sidebar-nav-item.active > .sidebar-link {
-  background: var(--jhi-accent, #61b577);
-  color: #ffffff;
+  border-left-color: var(--brand-500);
+  background: color-mix(in srgb, var(--surface-inverse) 82%, var(--brand-500));
+  font-weight: 600;
 
   fa-icon {
     opacity: 1;
@@ -207,13 +291,21 @@ $topbar-color-hover: #ffffff;
 
 .sidebar-link-text {
   flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Compteur de charge de travail, en chasse fixe et poussé à droite. */
+.sidebar-link-count {
+  margin-left: auto;
+  font: 500 11px/1 var(--font-mono);
+  opacity: 0.75;
 }
 
 .sidebar-link-caret {
   flex: none;
   font-size: 0.75em;
   opacity: 0.6;
-  transition: transform 0.15s ease-in-out;
+  transition: transform 120ms ease;
 }
 
 .sidebar-link-caret--open {
@@ -222,23 +314,56 @@ $topbar-color-hover: #ffffff;
 
 .sidebar-submenu {
   list-style: none;
-  margin: 0.15rem 0 0.35rem;
+  margin: 0;
   padding: 0;
 
   .sidebar-link {
-    padding-left: 2.2rem;
-    font-size: 0.88rem;
+    padding-left: var(--space-8);
+    font-size: 12px;
   }
 }
 
 .profile-image {
-  height: 1.6em;
-  width: 1.6em;
+  height: 26px;
+  width: 26px;
+  border-radius: var(--radius-pill);
 }
 
-/* ==========================================================================
-Responsive behaviour
-========================================================================== */
+/* ---- Mode rail : la navigation se réduit à ses icônes ------------------- */
+
+:host-context(.app-shell--rail) {
+  .app-sidebar {
+    width: 72px;
+    min-width: 72px;
+  }
+
+  /* Les libellés s'effacent ; l'icône et l'infobulle portent le sens. */
+  .sidebar-brand-text,
+  .sidebar-link-text,
+  .sidebar-link-caret,
+  .sidebar-nav-title,
+  .sidebar-link > span:not(.sidebar-link-count) {
+    display: none;
+  }
+
+  .sidebar-brand,
+  .sidebar-link {
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  /* Le sous-menu déplié n'a plus de place : on garde l'icône seule, alignée. */
+  .sidebar-submenu .sidebar-link {
+    padding-left: 0;
+  }
+
+  .sidebar-link-count {
+    display: none;
+  }
+}
+
+/* ---- Sous 1100 px : la navigation se réduit, elle ne disparaît pas ------- */
 
 @media (max-width: 767.98px) {
   .sidebar-mobile-toggle {
@@ -247,16 +372,23 @@ Responsive behaviour
 
   .app-sidebar {
     position: fixed;
-    top: $topbar-height;
+    top: 52px;
     left: 0;
-    height: calc(100vh - #{$topbar-height});
+    height: calc(100vh - 52px);
     z-index: 1030;
     transform: translateX(-100%);
-    transition: transform 0.2s ease-in-out;
-    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.25);
+    transition: transform 180ms ease;
+    box-shadow: var(--shadow-lg);
   }
 
   .app-sidebar--open {
     transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-sidebar,
+  .sidebar-link-caret {
+    transition: none;
   }
 }

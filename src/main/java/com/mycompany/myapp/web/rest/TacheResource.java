@@ -1,5 +1,6 @@
 package com.mycompany.myapp.web.rest;
 
+import com.mycompany.myapp.domain.Tache;
 import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.repository.TacheRepository;
 import com.mycompany.myapp.repository.UserRepository;
@@ -25,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -89,6 +91,27 @@ public class TacheResource {
     }
 
     /**
+     * Restricts write access to a tache to whoever it is assigned to, or an admin. A missing tache
+     * is let through so the caller's own not-found / idempotent-delete handling still applies.
+     */
+    private void requireOwnerOrAdmin(Long tacheId) {
+        if (SecurityUtils.hasCurrentUserAnyOfAuthorities(AuthoritiesConstants.ADMIN)) {
+            return;
+        }
+        Long currentUserId = SecurityUtils.getCurrentUserLogin()
+            .flatMap(userRepository::findOneByLogin)
+            .map(User::getId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Current user could not be found"));
+        boolean allowed = tacheRepository
+            .findById(tacheId)
+            .map((Tache tache) -> tache.getUtilisateur() != null && currentUserId.equals(tache.getUtilisateur().getId()))
+            .orElse(true);
+        if (!allowed) {
+            throw new AccessDeniedException("Seul l'utilisateur assigne a cette tache (ou un administrateur) peut la modifier");
+        }
+    }
+
+    /**
      * {@code POST  /taches} : Create a new tache.
      *
      * @param tacheDTO the tacheDTO to create.
@@ -119,7 +142,6 @@ public class TacheResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
-    @PreAuthorize("!hasAnyAuthority('" + AuthoritiesConstants.VALIDATEUR_DRH + "', '" + AuthoritiesConstants.VALIDATEUR_INFIRMERIE + "')")
     public ResponseEntity<TacheDTO> updateTache(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody TacheDTO tacheDTO
@@ -135,6 +157,7 @@ public class TacheResource {
         if (!tacheRepository.existsById(id)) {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
+        requireOwnerOrAdmin(id);
 
         tacheDTO = tacheService.update(tacheDTO);
         return ResponseEntity.ok()
@@ -154,7 +177,6 @@ public class TacheResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    @PreAuthorize("!hasAnyAuthority('" + AuthoritiesConstants.VALIDATEUR_DRH + "', '" + AuthoritiesConstants.VALIDATEUR_INFIRMERIE + "')")
     public ResponseEntity<TacheDTO> partialUpdateTache(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody TacheDTO tacheDTO
@@ -170,6 +192,7 @@ public class TacheResource {
         if (!tacheRepository.existsById(id)) {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
+        requireOwnerOrAdmin(id);
 
         Optional<TacheDTO> result = tacheService.partialUpdate(tacheDTO);
 
@@ -239,9 +262,9 @@ public class TacheResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("!hasAnyAuthority('" + AuthoritiesConstants.VALIDATEUR_DRH + "', '" + AuthoritiesConstants.VALIDATEUR_INFIRMERIE + "')")
     public ResponseEntity<Void> deleteTache(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete Tache : {}", id);
+        requireOwnerOrAdmin(id);
         tacheService.delete(id);
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))

@@ -15,6 +15,10 @@ public class AyantDroitDTO implements Serializable {
     private Long id;
 
     @NotNull
+    @Size(max = 50)
+    private String codeAyantDroit;
+
+    @NotNull
     private String nom;
 
     @NotNull
@@ -37,6 +41,14 @@ public class AyantDroitDTO implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getCodeAyantDroit() {
+        return codeAyantDroit;
+    }
+
+    public void setCodeAyantDroit(String codeAyantDroit) {
+        this.codeAyantDroit = codeAyantDroit;
     }
 
     public String getNom() {

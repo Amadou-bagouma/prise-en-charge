@@ -1,7 +1,10 @@
 package com.mycompany.myapp.web.rest;
 
+import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.repository.DemandePriseEnChargeRepository;
+import com.mycompany.myapp.repository.UserRepository;
 import com.mycompany.myapp.security.AuthoritiesConstants;
+import com.mycompany.myapp.security.SecurityUtils;
 import com.mycompany.myapp.service.DemandePriseEnChargeQueryService;
 import com.mycompany.myapp.service.DemandePriseEnChargeService;
 import com.mycompany.myapp.service.RapportDemandeService;
@@ -23,10 +26,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.PaginationUtil;
@@ -54,16 +60,58 @@ public class DemandePriseEnChargeResource {
 
     private final RapportDemandeService rapportDemandeService;
 
+    private final UserRepository userRepository;
+
     public DemandePriseEnChargeResource(
         DemandePriseEnChargeService demandePriseEnChargeService,
         DemandePriseEnChargeRepository demandePriseEnChargeRepository,
         DemandePriseEnChargeQueryService demandePriseEnChargeQueryService,
-        RapportDemandeService rapportDemandeService
+        RapportDemandeService rapportDemandeService,
+        UserRepository userRepository
     ) {
         this.demandePriseEnChargeService = demandePriseEnChargeService;
         this.demandePriseEnChargeRepository = demandePriseEnChargeRepository;
         this.demandePriseEnChargeQueryService = demandePriseEnChargeQueryService;
         this.rapportDemandeService = rapportDemandeService;
+        this.userRepository = userRepository;
+    }
+
+    /**
+     * Demandes carry sensitive health information, so a plain gestionnaire (ROLE_USER only) may only
+     * browse or open demandes they created or are assigned to. Admins and validators (who must review
+     * every pending demande) see everything - returning {@code null} here means "no restriction" to
+     * {@link DemandePriseEnChargeQueryService}.
+     */
+    private Long restrictToUserIdUnlessAdminOrValidateur() {
+        if (
+            SecurityUtils.hasCurrentUserAnyOfAuthorities(
+                AuthoritiesConstants.ADMIN,
+                AuthoritiesConstants.VALIDATEUR_DRH,
+                AuthoritiesConstants.VALIDATEUR_INFIRMERIE
+            )
+        ) {
+            return null;
+        }
+        return SecurityUtils.getCurrentUserLogin()
+            .flatMap(userRepository::findOneByLogin)
+            .map(User::getId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Current user could not be found"));
+    }
+
+    /**
+     * Throws if the current user may not see the given demande, applying the same rule as
+     * {@link #restrictToUserIdUnlessAdminOrValidateur()}.
+     */
+    private void checkCanViewDemande(DemandePriseEnChargeDTO demande) {
+        Long restrictToUserId = restrictToUserIdUnlessAdminOrValidateur();
+        if (restrictToUserId == null) {
+            return;
+        }
+        boolean estAuteur = demande.getGestionnaireCreateur() != null && restrictToUserId.equals(demande.getGestionnaireCreateur().getId());
+        boolean estAssigne = demande.getAssigneA() != null && restrictToUserId.equals(demande.getAssigneA().getId());
+        if (!estAuteur && !estAssigne) {
+            throw new AccessDeniedException("Cette demande n'est ni creee par, ni assignee a l'utilisateur courant");
+        }
     }
 
     /**
@@ -173,7 +221,11 @@ public class DemandePriseEnChargeResource {
     ) {
         LOG.debug("REST request to get DemandePriseEnCharges by criteria: {}", criteria);
 
-        Page<DemandePriseEnChargeDTO> page = demandePriseEnChargeQueryService.findByCriteria(criteria, pageable);
+        Page<DemandePriseEnChargeDTO> page = demandePriseEnChargeQueryService.findByCriteria(
+            criteria,
+            pageable,
+            restrictToUserIdUnlessAdminOrValidateur()
+        );
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
@@ -187,7 +239,9 @@ public class DemandePriseEnChargeResource {
     @GetMapping("/count")
     public ResponseEntity<Long> countDemandePriseEnCharges(DemandePriseEnChargeCriteria criteria) {
         LOG.debug("REST request to count DemandePriseEnCharges by criteria: {}", criteria);
-        return ResponseEntity.ok().body(demandePriseEnChargeQueryService.countByCriteria(criteria));
+        return ResponseEntity.ok().body(
+            demandePriseEnChargeQueryService.countByCriteria(criteria, restrictToUserIdUnlessAdminOrValidateur())
+        );
     }
 
     /**
@@ -200,6 +254,7 @@ public class DemandePriseEnChargeResource {
     public ResponseEntity<DemandePriseEnChargeDTO> getDemandePriseEnCharge(@PathVariable("id") Long id) {
         LOG.debug("REST request to get DemandePriseEnCharge : {}", id);
         Optional<DemandePriseEnChargeDTO> demandePriseEnChargeDTO = demandePriseEnChargeService.findOne(id);
+        demandePriseEnChargeDTO.ifPresent(this::checkCanViewDemande);
         return ResponseUtil.wrapOrNotFound(demandePriseEnChargeDTO);
     }
 
@@ -287,9 +342,9 @@ public class DemandePriseEnChargeResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the PDF file.
      */
     @GetMapping("/{id}/rapport")
-    @PreAuthorize("hasAuthority('" + AuthoritiesConstants.USER + "')")
     public ResponseEntity<byte[]> getRapportDemandePriseEnCharge(@PathVariable("id") Long id) {
         LOG.debug("REST request to get the PDF rapport for DemandePriseEnCharge : {}", id);
+        demandePriseEnChargeService.findOne(id).ifPresent(this::checkCanViewDemande);
         byte[] rapport = rapportDemandeService.genererRapport(id);
         return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_PDF)

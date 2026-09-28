@@ -29,6 +29,11 @@ public class Authority implements Serializable, Persistable<String> {
     @Column(name = "name", length = 50, nullable = false)
     private String name;
 
+    /** Ce que l'habilitation autorise, en clair, pour l'ecran d'administration des profils. */
+    @Size(max = 255)
+    @Column(name = "description", length = 255)
+    private String description;
+
     @org.springframework.data.annotation.Transient
     @Transient
     private boolean isPersisted;
@@ -37,6 +42,14 @@ public class Authority implements Serializable, Persistable<String> {
 
     public String getName() {
         return this.name;
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Authority name(String name) {

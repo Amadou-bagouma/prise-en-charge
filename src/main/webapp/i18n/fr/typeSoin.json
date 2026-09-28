@@ -1,11 +1,28 @@
 {
   "peccnssApp": {
-    "TypeSoin": {
-      "null": "",
-      "CONSULTATIONS": "Consultations",
-      "EXAMENS_MEDICAUX": "Examens médicaux",
-      "INTERVENTION_CHIRURGICALE": "Intervention chirurgicale",
-      "HOSPITALISATION": "Hospitalisation"
+    "typeSoin": {
+      "home": {
+        "title": "Types de soin",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un type de soin",
+        "createOrEditLabel": "Créer ou modifier un type de soin",
+        "notFound": "Aucun type de soin trouvé"
+      },
+      "created": "Le type de soin {{ param }} a été créé",
+      "updated": "Le type de soin {{ param }} a été mis à jour",
+      "deleted": "Le type de soin {{ param }} a été supprimé",
+      "delete": {
+        "question": "Voulez-vous vraiment supprimer ce type de soin ? Il ne disparaîtra pas des demandes où il figure déjà."
+      },
+      "detail": {
+        "title": "Type de soin"
+      },
+      "id": "ID",
+      "code": "Code",
+      "libelle": "Libellé",
+      "description": "Description",
+      "ordre": "Ordre",
+      "actif": "En service"
     }
   }
 }

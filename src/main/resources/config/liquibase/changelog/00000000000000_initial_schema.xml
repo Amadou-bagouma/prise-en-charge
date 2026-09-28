@@ -15,6 +15,8 @@
         The initial schema has the '00000000000001' id, so that it is over-written if we re-generate it.
     -->
     <changeSet id="00000000000001" author="jhipster">
+        <validCheckSum>9:c87a34bbaf4e07fed5cc40c8c04f45d0</validCheckSum>
+        <validCheckSum>9:6bf2dd39659c09e73845b2bdc9d8506d</validCheckSum>
         <createTable tableName="jhi_user">
             <column name="id" type="bigint">
                 <constraints primaryKey="true" nullable="false"/>
@@ -85,6 +87,22 @@
                   usePreparedStatements="true">
             <column name="name" type="string"/>
         </loadData>
+        <dropDefaultValue tableName="jhi_user" columnName="created_date" columnDataType="${datetimeType}"/>
+    </changeSet>
+
+    <!--
+        Demo accounts (admin/admin, user/user with the well-known JHipster bcrypt hashes). Loaded when
+        either the 'faker' or 'test' Liquibase context is active - i.e. in the dev profile (see
+        application-dev.yml) and in the test profile (several IT tests authenticate via @WithMockUser
+        and then look up that login, e.g. NotificationResourceIT#getNotification) - but never in
+        production (spring.liquibase.contexts: prod), where real accounts must be created explicitly
+        through the admin UI.
+    -->
+    <changeSet id="00000000000001-demo-users" author="jhipster" context="faker,test">
+        <!-- Databases created before this changeset was split out already contain these users. -->
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT COUNT(*) FROM jhi_user WHERE id IN (1, 2)</sqlCheck>
+        </preConditions>
         <loadData
                   file="config/liquibase/data/user.csv"
                   separator=";"
@@ -101,7 +119,6 @@
                   usePreparedStatements="true">
             <column name="user_id" type="numeric"/>
         </loadData>
-        <dropDefaultValue tableName="jhi_user" columnName="created_date" columnDataType="${datetimeType}"/>
     </changeSet>
 
     <changeSet author="jhipster" id="00000000000002" context="test">

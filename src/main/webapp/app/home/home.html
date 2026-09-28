@@ -21,9 +21,6 @@
         <div class="home-side-card">
           <div class="home-side-card-header">Espace personnel</div>
           <p class="home-side-welcome">Bienvenue, {{ acc.firstName || acc.login }}.</p>
-          <a class="btn btn-accent home-connect-button" routerLink="/demande-prise-en-charge/new">
-            <fa-icon icon="plus" />&nbsp;Nouvelle demande
-          </a>
         </div>
       } @else {
         <div class="home-side-card">
@@ -64,10 +61,10 @@
         <span>Agents</span>
       </a>
 
-      <a class="home-quick-link" routerLink="/ayant-droit">
+     <!-- <a class="home-quick-link" routerLink="/ayant-droit">
         <fa-icon icon="user-plus" />
         <span>Ayants droit</span>
-      </a>
+      </a>-->
 
       <a class="home-quick-link" routerLink="/etablissement-sante">
         <fa-icon icon="hospital" />

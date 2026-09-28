@@ -4,11 +4,15 @@
     "browsehappy": "Vous utilisez un <strong>ancien</strong> navigateur. Veuillez <a href=\"https://browsehappy.com/?locale=fr\">mettre à jour votre navigateur</a> pour une meilleure expérience.",
     "menu": {
       "home": "Accueil",
+      "referentiel": {
+        "main": "Référentiel"
+      },
       "jhipster-needle-menu-add-element": "JHipster will add additional menu entries here (do not translate!)",
       "entities": {
         "main": "Entités",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)",
         "adminAuthority": "Authority",
+        "profil": "Profil",
         "gestion": "Gestion",
         "region": "Region",
         "direction": "Direction",
@@ -20,7 +24,8 @@
         "tache": "Tache",
         "boiteReception": "Boite Reception",
         "notification": "Notification",
-        "historiqueAction": "Historique Action"
+        "historiqueAction": "Historique Action",
+        "typeSoin": "Type de soin"
       },
       "account": {
         "main": "Compte",
@@ -157,5 +162,5 @@
       "not.image": "Le fichier doit être une image et non du type \"{{ fileType }}\""
     }
   },
-  "footer": "Ceci est votre pied de page"
+  "footer": "Caisse Nationale de Sécurité Sociale — Niger"
 }

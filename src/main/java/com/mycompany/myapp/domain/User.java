@@ -17,12 +17,22 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.DynamicInsert;
 
 /**
  * A user.
+ *
+ * <p>{@code @DynamicInsert}: {@link #profil} is mandatory (NOT NULL), but a lot of existing test
+ * code builds a {@code User} without setting one. Rather than touching every call site, the
+ * {@code jhi_user.profil_id} column has a database default (the "Gestionnaire" profil, see
+ * {@code 20260920180100_add_user_profil.xml}) and {@code @DynamicInsert} makes Hibernate omit
+ * {@code null}-valued properties from the INSERT statement so that default actually applies -
+ * without it, Hibernate would always send an explicit {@code profil_id = null} and fail the NOT
+ * NULL constraint regardless of the column's default.
  */
 @Entity
 @Table(name = "jhi_user")
+@DynamicInsert
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class User extends AbstractAuditingEntity<Long> implements Serializable {
 
@@ -98,6 +108,17 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @NotNull
     @Column(name = "must_change_password", nullable = false)
     private boolean mustChangePassword = false;
+
+    /**
+     * The profil (bundle of authorities) this user was assigned. Mandatory: assigning a profil is
+     * the only way an admin grants authorities to a user (see {@link #authorities}, which is kept
+     * in sync with the profil's own authorities whenever it is set). {@code cascade = PERSIST} is
+     * never exercised by application code (a profil is always looked up already-persisted before
+     * being attached to a user) - it only lets tests attach a throwaway, not-yet-saved profil.
+     */
+    @NotNull
+    @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
+    private Profil profil;
 
     @JsonIgnore
     @ManyToMany
@@ -237,6 +258,14 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
 
     public void setAuthorities(Set<Authority> authorities) {
         this.authorities = authorities;
+    }
+
+    public Profil getProfil() {
+        return profil;
+    }
+
+    public void setProfil(Profil profil) {
+        this.profil = profil;
     }
 
     @Override

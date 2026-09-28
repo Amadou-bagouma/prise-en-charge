@@ -1179,8 +1179,25 @@ class TacheResourceIT {
             // Fetching another user's task directly by id is not found either
             restTacheMockMvc.perform(get(ENTITY_API_URL_ID, otherTache.getId())).andExpect(status().isNotFound());
 
-            // The current user's own task remains reachable by id
+            // Nor may it be updated or deleted
+            restTacheMockMvc
+                .perform(
+                    put(ENTITY_API_URL_ID, otherTache.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsBytes(tacheMapper.toDto(otherTache)))
+                )
+                .andExpect(status().isForbidden());
+            restTacheMockMvc.perform(delete(ENTITY_API_URL_ID, otherTache.getId())).andExpect(status().isForbidden());
+
+            // The current user's own task remains reachable by id, and may be updated
             restTacheMockMvc.perform(get(ENTITY_API_URL_ID, ownTache.getId())).andExpect(status().isOk());
+            restTacheMockMvc
+                .perform(
+                    put(ENTITY_API_URL_ID, ownTache.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsBytes(tacheMapper.toDto(ownTache)))
+                )
+                .andExpect(status().isOk());
         } finally {
             tacheRepository.delete(otherTache);
         }

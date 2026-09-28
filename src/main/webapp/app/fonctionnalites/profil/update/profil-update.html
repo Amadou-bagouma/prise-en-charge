@@ -1,0 +1,79 @@
+<div class="d-flex justify-content-center">
+  <div class="col-12 col-xl-5">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm" class="jhi-form-panel">
+      <h2 id="jhi-profil-heading" data-cy="ProfilCreateUpdateHeading" jhiTranslate="peccnssApp.profil.home.createOrEditLabel">
+        Create or edit a Profil
+      </h2>
+
+      <jhi-alert-error />
+
+      @if (editForm.controls.id.value !== null) {
+        <div class="jhi-field mb-3">
+          <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
+          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+        </div>
+      }
+
+      @let nomRef = editForm.get('nom')!;
+      <div class="jhi-field">
+        <label class="form-label" for="field_nom" jhiTranslate="peccnssApp.profil.nom">Nom</label>
+        <input type="text" class="form-control" name="nom" id="field_nom" data-cy="nom" formControlName="nom" />
+        @if (nomRef.invalid && (nomRef.dirty || nomRef.touched)) {
+          <div>
+            @if (nomRef.errors?.required) {
+              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="jhi-field">
+        <label class="form-label" for="field_description" jhiTranslate="peccnssApp.profil.description">Description</label>
+        <input
+          type="text"
+          class="form-control"
+          name="description"
+          id="field_description"
+          data-cy="description"
+          formControlName="description"
+        />
+      </div>
+
+      @let authoritiesRef = editForm.get('authorities')!;
+      <div class="jhi-field jhi-field-full">
+        <label class="form-label" for="field_authorities" jhiTranslate="peccnssApp.profil.authorities">Authorities</label>
+        <select class="form-control" id="field_authorities" multiple name="authorities" formControlName="authorities">
+          @for (authority of authorities(); track $index) {
+            <option [value]="authority">{{ authority }}</option>
+          }
+        </select>
+        <small class="form-text text-muted" jhiTranslate="peccnssApp.profil.authoritiesHelp"
+          >Every user assigned this profil gets exactly these authorities.</small
+        >
+        @if (authoritiesRef.invalid && (authoritiesRef.dirty || authoritiesRef.touched)) {
+          <div>
+            @if (authoritiesRef.errors?.required || authoritiesRef.errors?.minlength) {
+              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="jhi-form-actions">
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-accent"
+        >
+          <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

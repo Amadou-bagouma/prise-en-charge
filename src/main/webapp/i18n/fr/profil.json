@@ -1,0 +1,27 @@
+{
+  "peccnssApp": {
+    "profil": {
+      "home": {
+        "title": "Profils",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Profil",
+        "createOrEditLabel": "Créer un Profil",
+        "notFound": "Aucun Profil trouvé"
+      },
+      "created": "Un nouveau Profil a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Profil avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Profil avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Profil {{ id }} ?"
+      },
+      "detail": {
+        "title": "Profil"
+      },
+      "id": "ID",
+      "nom": "Nom",
+      "description": "Description",
+      "authorities": "Authorities",
+      "authoritiesHelp": "Chaque utilisateur affecté à ce profil reçoit exactement ces authorities."
+    }
+  }
+}

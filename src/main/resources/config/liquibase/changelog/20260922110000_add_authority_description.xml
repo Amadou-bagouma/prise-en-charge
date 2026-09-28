@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Ajoute la colonne description a jhi_authority.
+
+        Le champ `description` existait dans l'entite Authority sans colonne correspondante en
+        base : toute authentification echouait des le redemarrage suivant, sur un
+        « column a1_1.description does not exist » leve par la requete de chargement de
+        l'utilisateur. Cette migration rattrape le schema.
+
+        La colonne est nullable : les autorites deja en base n'ont pas de description, et une
+        habilitation sans texte explicatif reste parfaitement valide.
+    -->
+    <changeSet id="20260922110000-1" author="manual">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="jhi_authority" columnName="description"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="jhi_authority">
+            <column name="description" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

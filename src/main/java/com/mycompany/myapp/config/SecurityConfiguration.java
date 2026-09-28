@@ -2,7 +2,9 @@ package com.mycompany.myapp.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
+import com.mycompany.myapp.repository.UserRepository;
 import com.mycompany.myapp.security.*;
+import com.mycompany.myapp.web.filter.MustChangePasswordFilter;
 import com.mycompany.myapp.web.filter.SpaWebFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,8 +28,11 @@ public class SecurityConfiguration {
 
     private final JHipsterProperties jHipsterProperties;
 
-    public SecurityConfiguration(JHipsterProperties jHipsterProperties) {
+    private final UserRepository userRepository;
+
+    public SecurityConfiguration(JHipsterProperties jHipsterProperties, UserRepository userRepository) {
         this.jHipsterProperties = jHipsterProperties;
+        this.userRepository = userRepository;
     }
 
     @Bean
@@ -40,6 +45,7 @@ public class SecurityConfiguration {
         http.cors(withDefaults())
             .csrf(csrf -> csrf.disable())
             .addFilterAfter(new SpaWebFilter(), BasicAuthenticationFilter.class)
+            .addFilterAfter(new MustChangePasswordFilter(userRepository), SpaWebFilter.class)
             .headers(headers ->
                 headers
                     .contentSecurityPolicy(csp -> csp.policyDirectives(jHipsterProperties.getSecurity().getContentSecurityPolicy()))
@@ -66,32 +72,36 @@ public class SecurityConfiguration {
                     .requestMatchers("/api/account/reset-password/init").permitAll()
                     .requestMatchers("/api/account/reset-password/finish").permitAll()
                     .requestMatchers("/api/admin/**").hasAuthority(AuthoritiesConstants.ADMIN)
-                    // Gestion, Region and Direction are reference/master data: any authenticated
-                    // user may read them (e.g. to populate pickers on Agent/DemandePriseEnCharge forms),
-                    // but only admins may create, update or delete them.
+                    // Gestion, Region, Direction and Profil are reference/master data: any authenticated
+                    // user may read them (e.g. to populate pickers on Agent/DemandePriseEnCharge/User
+                    // forms), but only admins may create, update or delete them.
                     .requestMatchers(
                         HttpMethod.POST,
                         "/api/gestions/**",
                         "/api/regions/**",
-                        "/api/directions/**"
+                        "/api/directions/**",
+                        "/api/profils/**"
                     ).hasAuthority(AuthoritiesConstants.ADMIN)
                     .requestMatchers(
                         HttpMethod.PUT,
                         "/api/gestions/**",
                         "/api/regions/**",
-                        "/api/directions/**"
+                        "/api/directions/**",
+                        "/api/profils/**"
                     ).hasAuthority(AuthoritiesConstants.ADMIN)
                     .requestMatchers(
                         HttpMethod.PATCH,
                         "/api/gestions/**",
                         "/api/regions/**",
-                        "/api/directions/**"
+                        "/api/directions/**",
+                        "/api/profils/**"
                     ).hasAuthority(AuthoritiesConstants.ADMIN)
                     .requestMatchers(
                         HttpMethod.DELETE,
                         "/api/gestions/**",
                         "/api/regions/**",
-                        "/api/directions/**"
+                        "/api/directions/**",
+                        "/api/profils/**"
                     ).hasAuthority(AuthoritiesConstants.ADMIN)
                     .requestMatchers("/api/**").authenticated()
                     .requestMatchers("/v3/api-docs/**").hasAuthority(AuthoritiesConstants.ADMIN)

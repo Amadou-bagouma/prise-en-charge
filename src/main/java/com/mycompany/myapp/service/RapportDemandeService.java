@@ -3,10 +3,10 @@ package com.mycompany.myapp.service;
 import com.mycompany.myapp.domain.Agent;
 import com.mycompany.myapp.domain.DemandePriseEnCharge;
 import com.mycompany.myapp.domain.HistoriqueAction;
+import com.mycompany.myapp.domain.TypeSoin;
 import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.domain.enumeration.LienParente;
 import com.mycompany.myapp.domain.enumeration.StatutDemande;
-import com.mycompany.myapp.domain.enumeration.TypeSoin;
 import com.mycompany.myapp.repository.DemandePriseEnChargeRepository;
 import com.mycompany.myapp.repository.HistoriqueActionRepository;
 import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
@@ -14,8 +14,14 @@ import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.openpdf.text.BadElementException;
 import org.openpdf.text.Chunk;
 import org.openpdf.text.Document;
@@ -54,6 +60,20 @@ public class RapportDemandeService {
      */
     private static final String LOGO_CLASSPATH = "static/content/images/logo-cnss.png";
 
+    /**
+     * Les quatre categories imprimees sur l'imprime officiel, dans son ordre et avec ses
+     * libelles. Elles sont reperees par le code du referentiel, pas par le libelle : celui-ci
+     * peut etre reformule par l'administration sans que l'imprime change.
+     */
+    private static final Map<String, String> CATEGORIES_IMPRIME = new LinkedHashMap<>();
+
+    static {
+        CATEGORIES_IMPRIME.put(TypeSoin.CODE_CONSULTATIONS, "CONSULTATIONS");
+        CATEGORIES_IMPRIME.put(TypeSoin.CODE_EXAMENS_MEDICAUX, "EXAMENS MEDICAUX");
+        CATEGORIES_IMPRIME.put(TypeSoin.CODE_INTERVENTION_CHIRURGICALE, "INTERVENTION CHIRURGICALE");
+        CATEGORIES_IMPRIME.put(TypeSoin.CODE_HOSPITALISATION, "HOSPITALISATION");
+    }
+
     private final DemandePriseEnChargeRepository demandePriseEnChargeRepository;
 
     private final HistoriqueActionRepository historiqueActionRepository;
@@ -83,6 +103,7 @@ public class RapportDemandeService {
                 "rapport.notvalidated"
             );
         }
+        Agent agent = resolveAgent(demande);
 
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -110,7 +131,7 @@ public class RapportDemandeService {
             body.setFont(bodyFont);
             body.setAlignment(Element.ALIGN_JUSTIFIED);
             body.setLeading(18);
-            corpsAttestation(body, demande, bodyFont, bodyBoldFont);
+            corpsAttestation(body, demande, agent, bodyFont, bodyBoldFont);
             document.add(body);
 
             document.add(Chunk.NEWLINE);
@@ -207,9 +228,27 @@ public class RapportDemandeService {
         }
     }
 
-    private void corpsAttestation(Paragraph body, DemandePriseEnCharge demande, Font normal, Font bold) {
-        Agent agent = demande.getAgent() != null ? demande.getAgent() : demande.getAyantDroit().getAgent();
+    /**
+     * The agent this demande is ultimately about: the agent directly, or the agent of the ayant
+     * droit. Throws a clean 400 rather than letting a {@code NullPointerException} surface as a 500
+     * mid-way through building the PDF when neither is resolvable (e.g. an ayant droit whose own
+     * agent link was since removed).
+     */
+    private Agent resolveAgent(DemandePriseEnCharge demande) {
+        if (demande.getAgent() != null) {
+            return demande.getAgent();
+        }
+        if (demande.getAyantDroit() != null && demande.getAyantDroit().getAgent() != null) {
+            return demande.getAyantDroit().getAgent();
+        }
+        throw new BadRequestAlertException(
+            "Impossible de determiner l'agent beneficiaire de cette demande",
+            ENTITY_NAME,
+            "rapport.agentintrouvable"
+        );
+    }
 
+    private void corpsAttestation(Paragraph body, DemandePriseEnCharge demande, Agent agent, Font normal, Font bold) {
         body.add(
             new Chunk("Je Soussigne le Directeur des Ressources Humaines de la Caisse Nationale de Securite Sociale atteste que ", normal)
         );
@@ -252,6 +291,17 @@ public class RapportDemandeService {
         };
     }
 
+    /**
+     * Les cases a cocher de l'imprime officiel.
+     *
+     * <p>Les quatre categories de l'imprime sont toujours imprimees, dans l'ordre de l'imprime
+     * et avec son libelle a lui, cochees ou non : une attestation doit rester superposable au
+     * formulaire papier. Elles sont retrouvees par leur code, qui ne bouge pas quand
+     * l'administration reformule un libelle.
+     *
+     * <p>Un type ajoute au referentiel depuis n'est pas dans l'imprime : il est imprime a la
+     * suite, avec son libelle, plutot que passe sous silence.
+     */
     private PdfPTable casesTypeSoin(Set<TypeSoin> typeSoins, Font font) {
         PdfPTable table = new PdfPTable(2);
         table.setWidthPercentage(100);
@@ -259,10 +309,22 @@ public class RapportDemandeService {
         table.getDefaultCell().setBorder(PdfPCell.NO_BORDER);
         table.getDefaultCell().setPaddingBottom(12);
 
-        caseACocher(table, "CONSULTATIONS", typeSoins.contains(TypeSoin.CONSULTATIONS), font);
-        caseACocher(table, "EXAMENS MEDICAUX", typeSoins.contains(TypeSoin.EXAMENS_MEDICAUX), font);
-        caseACocher(table, "INTERVENTION CHIRURGICALE", typeSoins.contains(TypeSoin.INTERVENTION_CHIRURGICALE), font);
-        caseACocher(table, "HOSPITALISATION", typeSoins.contains(TypeSoin.HOSPITALISATION), font);
+        Set<String> codesDemandes = typeSoins.stream().map(TypeSoin::getCode).filter(Objects::nonNull).collect(Collectors.toSet());
+
+        for (Map.Entry<String, String> categorie : CATEGORIES_IMPRIME.entrySet()) {
+            caseACocher(table, categorie.getValue(), codesDemandes.contains(categorie.getKey()), font);
+        }
+
+        typeSoins
+            .stream()
+            .filter(typeSoin -> typeSoin.getCode() == null || !CATEGORIES_IMPRIME.containsKey(typeSoin.getCode()))
+            .sorted(
+                Comparator.comparing(TypeSoin::getOrdre, Comparator.nullsLast(Comparator.naturalOrder())).thenComparing(
+                    TypeSoin::getLibelle,
+                    Comparator.nullsLast(Comparator.naturalOrder())
+                )
+            )
+            .forEach(typeSoin -> caseACocher(table, String.valueOf(typeSoin.getLibelle()).toUpperCase(Locale.FRENCH), true, font));
 
         return table;
     }
