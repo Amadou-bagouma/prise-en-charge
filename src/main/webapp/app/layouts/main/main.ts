@@ -6,7 +6,6 @@ import dayjs from 'dayjs/esm';
 
 import { AppPageTitleStrategy } from 'app/app-page-title-strategy';
 import { AccountService } from 'app/core/auth';
-import Footer from '../footer/footer';
 import { LayoutService } from '../layout.service';
 import PageRibbon from '../profiles/page-ribbon';
 
@@ -14,7 +13,7 @@ import PageRibbon from '../profiles/page-ribbon';
   selector: 'jhi-main',
   templateUrl: './main.html',
   providers: [AppPageTitleStrategy],
-  imports: [RouterOutlet, Footer, PageRibbon],
+  imports: [RouterOutlet, PageRibbon],
 })
 export default class Main implements OnInit {
   private readonly renderer: Renderer2;

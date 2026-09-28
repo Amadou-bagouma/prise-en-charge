@@ -25,6 +25,7 @@
     <include file="config/liquibase/changelog/20260910080343_added_entity_BoiteReception.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260910080344_added_entity_Notification.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260910080345_added_entity_HistoriqueAction.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260923132049_added_entity_CarteBeneficiaire.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <include file="config/liquibase/changelog/20231225055847_added_entity_constraints_Direction.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20231225055947_added_entity_constraints_Agent.xml" relativeToChangelogFile="false"/>
@@ -35,6 +36,7 @@
     <include file="config/liquibase/changelog/20260910080343_added_entity_constraints_BoiteReception.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260910080344_added_entity_constraints_Notification.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260910080345_added_entity_constraints_HistoriqueAction.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260923132049_added_entity_constraints_CarteBeneficiaire.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
 
     <!--

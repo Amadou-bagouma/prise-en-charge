@@ -1,5 +1,6 @@
 package com.mycompany.myapp.service;
 
+import com.mycompany.myapp.domain.Agent;
 import com.mycompany.myapp.service.dto.AgentDTO;
 import java.util.Optional;
 import org.springframework.data.domain.Page;

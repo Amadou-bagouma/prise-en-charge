@@ -25,7 +25,8 @@
         "boiteReception": "Boite Reception",
         "notification": "Notification",
         "historiqueAction": "Historique Action",
-        "typeSoin": "Type de soin"
+        "typeSoin": "Type de soin",
+        "carteBeneficiaire": "Carte bénéficiaire"
       },
       "account": {
         "main": "Compte",

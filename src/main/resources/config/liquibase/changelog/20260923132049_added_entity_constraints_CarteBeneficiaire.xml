@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    <!--
+        Added the constraints for entity CarteBeneficiaire.
+    -->
+    <changeSet id="20260923132049-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="agent_id"
+                                 baseTableName="carte_beneficiaire"
+                                 constraintName="fk_carte_beneficiaire__agent_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="agent"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="ayant_droit_id"
+                                 baseTableName="carte_beneficiaire"
+                                 constraintName="fk_carte_beneficiaire__ayant_droit_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="ayant_droit"
+                                 />
+    </changeSet>
+</databaseChangeLog>

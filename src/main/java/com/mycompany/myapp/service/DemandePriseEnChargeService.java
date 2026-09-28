@@ -58,7 +58,7 @@ public interface DemandePriseEnChargeService {
     void delete(Long id);
 
     /**
-     * Validates the current workflow step of a demandePriseEnCharge (DRH then infirmerie du personnel).
+     * Validates the current workflow step of a demandePriseEnCharge (infirmerie du personnel then DRH).
      * Moves the demande to the next step, or to {@code VALIDEE} once both steps are done.
      *
      * @param id the id of the entity.
@@ -77,7 +77,7 @@ public interface DemandePriseEnChargeService {
     DemandePriseEnChargeDTO rejeter(Long id, String motif);
 
     /**
-     * Resubmits a {@code RETOURNEE} demandePriseEnCharge, sending it back to the 1st validation step (DRH).
+     * Resubmits a {@code RETOURNEE} demandePriseEnCharge, sending it back to the 1st validation step (infirmerie).
      * Only the original author (gestionnaireCreateur) may do this.
      *
      * @param id the id of the entity.

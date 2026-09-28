@@ -21,12 +21,13 @@
       "Tache",
       "BoiteReception",
       "Notification",
-      "HistoriqueAction"
+      "HistoriqueAction",
+      "CarteBeneficiaire"
     ],
     "jhipsterVersion": "9.3.0",
     "jwtSecretKey": "ZWM2Yzg0MjM2ODI2ZDJkM2E3YTU5NjNmZWQzMzNiMjg0OGIwOTlmNzgzZDU4YTg3MzRiNDgwYTE4MzRlMzc1ODI2ODJiZTA4MTc2M2IwMDc5Y2RmOGU0MTE2NDQzNzBkNDJhZWMzOGZkODA2NmIyNTNkNjgyZjYyYmZmYjhiNmU=",
     "languages": ["fr", "en"],
-    "lastLiquibaseTimestamp": 1789027425000,
+    "lastLiquibaseTimestamp": 1790169649000,
     "nativeLanguage": "fr",
     "prodDatabaseType": "postgresql"
   }

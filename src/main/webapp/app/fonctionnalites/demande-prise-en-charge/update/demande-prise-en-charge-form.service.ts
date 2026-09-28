@@ -142,9 +142,9 @@ export class DemandePriseEnChargeFormService {
       dateModification: currentTime,
       dateAssignation: currentTime,
       dateEcheance: currentTime,
-      // A newly created demande always starts at the 1st workflow step (DRH validation);
+      // A newly created demande always starts at the 1st workflow step (infirmerie validation);
       // the backend enforces this regardless of what is submitted (see DemandePriseEnChargeServiceImpl.save).
-      statut: StatutDemande.EN_ATTENTE_VALIDATION_DRH,
+      statut: StatutDemande.EN_ATTENTE_VALIDATION_INFIRMERIE,
     };
   }
 

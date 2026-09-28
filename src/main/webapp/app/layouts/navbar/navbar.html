@@ -250,6 +250,22 @@
                 <span jhiTranslate="global.menu.entities.profil">Profil</span>
               </a>
             </li>
+            <li
+              class="sidebar-nav-item"
+              *jhiHasAnyAuthority="'ROLE_ADMIN'"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+            >
+              <a
+                class="sidebar-link"
+                [title]="'global.menu.entities.carteBeneficiaire' | translate"
+                routerLink="/carte-beneficiaire"
+                (click)="collapseNavbar()"
+              >
+                <fa-icon icon="id-card" [fixedWidth]="true" />
+                <span jhiTranslate="global.menu.entities.carteBeneficiaire">Carte Beneficiaire</span>
+              </a>
+            </li>
           </ul>
         </li>
 

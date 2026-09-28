@@ -32,11 +32,11 @@ const ETAPES_CIRCUIT: { libelle: string; statuts: string[] }[] = [
     libelle: 'Saisie du dossier',
     statuts: ['NOUVELLE', 'EN_ATTENTE_PIECES', 'A_TRAITER', 'EN_COURS_TRAITEMENT', 'RETOURNEE'],
   },
-  { libelle: 'Validation DRH', statuts: ['EN_ATTENTE_VALIDATION_DRH'] },
   {
     libelle: 'Validation infirmerie',
     statuts: ['EN_ATTENTE_VALIDATION_INFIRMERIE', 'EN_ATTENTE_AVIS_MEDICAL', 'EN_ATTENTE_DECISION'],
   },
+  { libelle: 'Validation DRH', statuts: ['EN_ATTENTE_VALIDATION_DRH'] },
   { libelle: 'Décision', statuts: ['VALIDEE', 'REJETEE'] },
 ];
 
@@ -231,8 +231,8 @@ export class DemandePriseEnChargeDetail {
     }
     const etape = this.canValiderDrh() ? 'la validation DRH' : "la validation de l'infirmerie du personnel";
     const suite = this.canValiderDrh()
-      ? "La demande passera ensuite en attente de validation de l'infirmerie du personnel."
-      : 'La demande sera accordée et la prise en charge pourra être imprimée.';
+      ? 'La demande sera accordée et la prise en charge pourra être imprimée.'
+      : 'La demande passera ensuite en attente de validation DRH.';
     this.confirmer(
       {
         titre: 'Accorder la prise en charge',
@@ -286,7 +286,7 @@ export class DemandePriseEnChargeDetail {
     this.confirmer(
       {
         titre: 'Resoumettre la demande',
-        message: `La demande ${demande.reference ?? ''} repartira en validation DRH, au début du circuit. Le motif de retour sera effacé.`,
+        message: `La demande ${demande.reference ?? ''} repartira en validation de l'infirmerie du personnel, au début du circuit. Le motif de retour sera effacé.`,
         libelleConfirmer: 'Resoumettre la demande',
         ton: 'primaire',
       },
