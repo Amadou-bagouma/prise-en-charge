@@ -3,6 +3,7 @@ import { Component, computed, effect, inject, input, signal } from '@angular/cor
 import { RouterLink } from '@angular/router';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { NgbDropdown, NgbDropdownItem, NgbDropdownMenu, NgbDropdownToggle } from '@ng-bootstrap/ng-bootstrap/dropdown';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap/modal';
 import dayjs from 'dayjs/esm';
 import { catchError, filter, of, tap } from 'rxjs';
@@ -19,6 +20,9 @@ import { AyantDroitService } from 'app/fonctionnalites/ayant-droit/service/ayant
 import { Alert, AlertError } from 'app/shared/alert';
 import { FormatMediumDatePipe, FormatMediumDatetimePipe } from 'app/shared/date';
 import { TranslateDirective } from 'app/shared/language';
+import { enSaisie, libelleValidation, tonValidation } from 'app/fonctionnalites/ayant-droit/validation-rattachement';
+import { AccountService } from 'app/core/auth';
+import { Authority } from 'app/shared/jhipster/constants';
 import { IAgent } from '../agent.model';
 
 /**
@@ -38,7 +42,20 @@ function anneesRevolues(date?: dayjs.Dayjs | null): number | null {
 @Component({
   selector: 'jhi-agent-detail',
   templateUrl: './agent-detail.html',
-  imports: [NgClass, FontAwesomeModule, Alert, AlertError, TranslateDirective, RouterLink, FormatMediumDatePipe, FormatMediumDatetimePipe],
+  imports: [
+    NgClass,
+    FontAwesomeModule,
+    Alert,
+    AlertError,
+    TranslateDirective,
+    RouterLink,
+    FormatMediumDatePipe,
+    FormatMediumDatetimePipe,
+    NgbDropdown,
+    NgbDropdownItem,
+    NgbDropdownMenu,
+    NgbDropdownToggle,
+  ],
 })
 export class AgentDetail {
   readonly agent = input<IAgent | null>(null);
@@ -84,6 +101,12 @@ export class AgentDetail {
   readonly anciennete = computed(() => anneesRevolues(this.agent()?.dateEmbauche));
 
   protected dataUtils = inject(DataUtils);
+  protected readonly accountService = inject(AccountService);
+
+  /** Le controle RH prononce la verification d'un rattachement ; les autres la lisent. */
+  readonly peutVerifier = computed(() => this.accountService.hasAnyAuthority([Authority.VERIFICATEUR_RH, Authority.ADMIN]));
+
+  private readonly estAdmin = computed(() => this.accountService.hasAnyAuthority(Authority.ADMIN));
   protected readonly ayantDroitService = inject(AyantDroitService);
   protected readonly agentService = inject(AgentService);
   protected readonly modalService = inject(NgbModal);
@@ -174,6 +197,29 @@ export class AgentDetail {
    * l'attend. Quitter l'écran pour un formulaire plein puis y revenir ferait perdre la lecture
    * en cours pour cinq champs de saisie.
    */
+  libelleValidationAyantDroit = (ayantDroit: IAyantDroit): string => libelleValidation(ayantDroit.statutValidation);
+
+  tonValidationAyantDroit = (ayantDroit: IAyantDroit): string => tonValidation(ayantDroit.statutValidation);
+
+  /** Vrai tant que le rattachement est a verifier - l'action n'a plus de sens ensuite. */
+  estAVerifier = (ayantDroit: IAyantDroit): boolean => enSaisie(ayantDroit.statutValidation);
+
+  /**
+   * Vrai tant que la suppression reste un geste de correction de saisie.
+   *
+   * Une fois le rattachement verifie, des dossiers ont pu s'appuyer dessus : le supprimer les
+   * priverait de leur beneficiaire. Il se radie alors, depuis sa fiche.
+   */
+  estSupprimable = (ayantDroit: IAyantDroit): boolean => enSaisie(ayantDroit.statutValidation) || this.estAdmin();
+
+  /** Declare le rattachement verifie, puis recharge la liste : elle doit montrer ce qui a ete fait. */
+  validerAyantDroit(ayantDroit: IAyantDroit): void {
+    if (!ayantDroit.id) {
+      return;
+    }
+    this.ayantDroitService.valider(ayantDroit.id).subscribe(() => this.chargerAyantsDroit(this.agent()?.id, { discret: true }));
+  }
+
   ajouterAyantDroit(): void {
     const agent = this.agent();
     if (!agent?.id) {

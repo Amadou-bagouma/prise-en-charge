@@ -1,6 +1,8 @@
 package com.mycompany.myapp.web.rest;
 
 import com.mycompany.myapp.repository.RegionRepository;
+import com.mycompany.myapp.security.ActionsConstants;
+import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.service.RegionQueryService;
 import com.mycompany.myapp.service.RegionService;
 import com.mycompany.myapp.service.criteria.RegionCriteria;
@@ -20,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -60,6 +63,7 @@ public class RegionResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_CREER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<RegionDTO> createRegion(@Valid @RequestBody RegionDTO regionDTO) throws URISyntaxException {
         LOG.debug("REST request to save Region : {}", regionDTO);
         if (regionDTO.getId() != null) {
@@ -82,6 +86,7 @@ public class RegionResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_MODIFIER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<RegionDTO> updateRegion(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody RegionDTO regionDTO
@@ -116,6 +121,7 @@ public class RegionResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_MODIFIER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<RegionDTO> partialUpdateRegion(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody RegionDTO regionDTO
@@ -148,6 +154,7 @@ public class RegionResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of Regions in body.
      */
     @GetMapping("")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<List<RegionDTO>> getAllRegions(
         RegionCriteria criteria,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
@@ -166,6 +173,7 @@ public class RegionResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
      */
     @GetMapping("/count")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<Long> countRegions(RegionCriteria criteria) {
         LOG.debug("REST request to count Regions by criteria: {}", criteria);
         return ResponseEntity.ok().body(regionQueryService.countByCriteria(criteria));
@@ -178,6 +186,7 @@ public class RegionResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the regionDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<RegionDTO> getRegion(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Region : {}", id);
         Optional<RegionDTO> regionDTO = regionService.findOne(id);
@@ -191,6 +200,7 @@ public class RegionResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_SUPPRIMER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<Void> deleteRegion(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete Region : {}", id);
         regionService.delete(id);

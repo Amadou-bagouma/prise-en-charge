@@ -8,6 +8,21 @@
   <jhi-alert />
 
   <div class="pec-filtres">
+    <!-- Recherche à gauche, filtres au centre, actions à droite : même disposition partout. -->
+    <div class="pec-filtres__rech">
+      <span class="pec-filtres__loupe"><fa-icon icon="search" /></span>
+      <input
+        type="search"
+        class="pec-champ__ctrl"
+        placeholder="Nom"
+        aria-label="Rechercher un ayant droit par son nom"
+        data-cy="searchInput"
+        [value]="searchTerm()"
+        (input)="searchTerm.set($any($event.target).value)"
+        (keyup.enter)="search()"
+      />
+    </div>
+
     <jhi-filter [filters]="filters" />
 
     <div class="pec-filtres__actions">
@@ -63,6 +78,12 @@
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
+            <th scope="col" jhiSortBy="statutValidation">
+              <div class="d-flex">
+                <span>Rattachement</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
             <th scope="col" class="pec-tbl__droite"><span class="visually-hidden">Actions</span></th>
           </tr>
         </thead>
@@ -91,6 +112,12 @@
                   <span class="pec-muted">—</span>
                 }
               </td>
+              <td>
+                <span class="pec-badge" [ngClass]="'pec-badge--' + tonValidation(ayantDroit)" data-cy="validationAyantDroit">
+                  <span class="pec-badge__pt"></span>
+                  <span>{{ libelleValidation(ayantDroit) }}</span>
+                </span>
+              </td>
               <td class="pec-tbl__droite">
                 <div ngbDropdown container="body" class="d-inline-block">
                   <button type="button" class="pec-btn pec-btn--discret pec-btn--sm" ngbDropdownToggle data-cy="entityActionsButton">
@@ -105,17 +132,30 @@
                       <fa-icon icon="pencil-alt" class="me-1" />
                       <span jhiTranslate="entity.action.edit">Editer</span>
                     </a>
-                    <button ngbDropdownItem type="button" (click)="delete(ayantDroit)" data-cy="entityDeleteButton">
-                      <fa-icon icon="times" class="me-1" />
-                      <span jhiTranslate="entity.action.delete">Supprimer</span>
-                    </button>
+                    @if (peutVerifier() && estAVerifier(ayantDroit)) {
+                      <button ngbDropdownItem type="button" (click)="valider(ayantDroit)" data-cy="entityValiderButton">
+                        <fa-icon icon="check" class="me-1" />
+                        <span>Déclarer le rattachement vérifié</span>
+                      </button>
+                    }
+                    <!--
+                      La suppression disparaît une fois le rattachement vérifié : c'est un geste de
+                      correction de saisie, pas une sortie. Un ayant droit qui n'ouvre plus droit se
+                      radie depuis sa fiche, ce qui laisse une trace.
+                    -->
+                    @if (estSupprimable(ayantDroit)) {
+                      <button ngbDropdownItem type="button" (click)="delete(ayantDroit)" data-cy="entityDeleteButton">
+                        <fa-icon icon="times" class="me-1" />
+                        <span jhiTranslate="entity.action.delete">Supprimer</span>
+                      </button>
+                    }
                   </div>
                 </div>
               </td>
             </tr>
           } @empty {
             <tr>
-              <td colspan="6" class="pec-tbl__vide">Aucun ayant droit</td>
+              <td colspan="7" class="pec-tbl__vide">Aucun ayant droit</td>
             </tr>
           }
         </tbody>

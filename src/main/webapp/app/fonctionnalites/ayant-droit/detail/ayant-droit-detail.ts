@@ -12,7 +12,10 @@ import { FormatMediumDatePipe, FormatMediumDatetimePipe } from 'app/shared/date'
 import { ChangementStatutDialog, ResultatChangementStatut } from 'app/shared/statut/changement-statut-dialog';
 import { STATUTS_AYANT_DROIT, libelleStatut, tonStatut } from 'app/shared/statut/statuts';
 import { TranslateDirective } from 'app/shared/language';
+import { AccountService } from 'app/core/auth/account.service';
+import { Authority } from 'app/shared/jhipster/constants';
 import { IAyantDroit } from '../ayant-droit.model';
+import { enSaisie, libelleValidation, tonValidation } from '../validation-rattachement';
 import { AyantDroitService } from '../service/ayant-droit.service';
 
 @Component({
@@ -72,7 +75,24 @@ export class AyantDroitDetail {
     return annees >= 0 ? annees : null;
   });
 
+  readonly statutValidation = computed(() => this.ayantDroitAffiche()?.statutValidation ?? 'EN_SAISIE');
+
+  readonly libelleValidation = computed(() => libelleValidation(this.statutValidation()));
+
+  readonly tonValidation = computed(() => tonValidation(this.statutValidation()));
+
+  /**
+   * Qui peut déclarer le rattachement vérifié.
+   *
+   * C'est le même travail que le contrôle d'un dossier : lire les pièces qui établissent le lien
+   * de parenté. Le bouton disparaît une fois la vérification faite — elle ne se refait pas.
+   */
+  readonly peutValider = computed(
+    () => enSaisie(this.statutValidation()) && this.accountService.hasAnyAuthority([Authority.VERIFICATEUR_RH, Authority.ADMIN]),
+  );
+
   protected dataUtils = inject(DataUtils);
+  protected readonly accountService = inject(AccountService);
   protected readonly ayantDroitService = inject(AyantDroitService);
   protected readonly modalService = inject(NgbModal);
 
@@ -108,6 +128,20 @@ export class AyantDroitDetail {
         .changerStatut(ayantDroit.id, resultat.statut, resultat.motif)
         .subscribe(misAJour => this.ayantDroitRemplace.set(misAJour));
     });
+  }
+
+  /**
+   * Déclare le rattachement vérifié.
+   *
+   * L'écran est remplacé par ce que rend le serveur, et non par ce que l'on croit avoir fait :
+   * c'est lui qui pose la date de vérification.
+   */
+  validerRattachement(): void {
+    const ayantDroit = this.ayantDroitAffiche();
+    if (!ayantDroit?.id) {
+      return;
+    }
+    this.ayantDroitService.valider(ayantDroit.id).subscribe(misAJour => this.ayantDroitRemplace.set(misAJour));
   }
 
   previousState(): void {

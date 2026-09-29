@@ -1,6 +1,8 @@
 package com.mycompany.myapp.web.rest;
 
 import com.mycompany.myapp.repository.PieceJustificativeRepository;
+import com.mycompany.myapp.security.ActionsConstants;
+import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.service.PieceJustificativeService;
 import com.mycompany.myapp.service.dto.PieceJustificativeDTO;
 import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
@@ -18,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -58,6 +61,7 @@ public class PieceJustificativeResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.PIECE_AJOUTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<PieceJustificativeDTO> createPieceJustificative(@Valid @RequestBody PieceJustificativeDTO pieceJustificativeDTO)
         throws URISyntaxException {
         LOG.debug("REST request to save PieceJustificative : {}", pieceJustificativeDTO);
@@ -81,6 +85,7 @@ public class PieceJustificativeResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.PIECE_MODIFIER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<PieceJustificativeDTO> updatePieceJustificative(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody PieceJustificativeDTO pieceJustificativeDTO
@@ -115,6 +120,7 @@ public class PieceJustificativeResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.PIECE_MODIFIER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<PieceJustificativeDTO> partialUpdatePieceJustificative(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody PieceJustificativeDTO pieceJustificativeDTO
@@ -147,6 +153,7 @@ public class PieceJustificativeResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of Piece Justificatives in body.
      */
     @GetMapping("")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.PIECE_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<List<PieceJustificativeDTO>> getAllPieceJustificatives(
         @org.springdoc.core.annotations.ParameterObject Pageable pageable,
         @RequestParam(name = "eagerload", required = false, defaultValue = "true") boolean eagerload,
@@ -174,6 +181,7 @@ public class PieceJustificativeResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the pieceJustificativeDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.PIECE_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<PieceJustificativeDTO> getPieceJustificative(@PathVariable("id") Long id) {
         LOG.debug("REST request to get PieceJustificative : {}", id);
         Optional<PieceJustificativeDTO> pieceJustificativeDTO = pieceJustificativeService.findOne(id);
@@ -187,6 +195,7 @@ public class PieceJustificativeResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.PIECE_SUPPRIMER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<Void> deletePieceJustificative(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete PieceJustificative : {}", id);
         pieceJustificativeService.delete(id);

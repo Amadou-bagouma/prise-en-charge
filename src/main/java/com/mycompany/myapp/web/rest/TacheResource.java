@@ -5,6 +5,7 @@ import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.domain.enumeration.StatutTache;
 import com.mycompany.myapp.repository.TacheRepository;
 import com.mycompany.myapp.repository.UserRepository;
+import com.mycompany.myapp.security.ActionsConstants;
 import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.security.SecurityUtils;
 import com.mycompany.myapp.service.TacheQueryService;
@@ -152,6 +153,7 @@ public class TacheResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<TacheDTO> updateTache(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody TacheDTO tacheDTO
@@ -187,6 +189,7 @@ public class TacheResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PreAuthorize("hasAuthority('" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<TacheDTO> partialUpdateTache(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody TacheDTO tacheDTO
@@ -220,6 +223,7 @@ public class TacheResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of Taches in body.
      */
     @GetMapping("")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.TACHE_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<List<TacheDTO>> getAllTaches(
         TacheCriteria criteria,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
@@ -239,6 +243,7 @@ public class TacheResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
      */
     @GetMapping("/count")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.TACHE_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<Long> countTaches(TacheCriteria criteria) {
         LOG.debug("REST request to count Taches by criteria: {}", criteria);
         criteria = restrictToCurrentUser(criteria);
@@ -252,6 +257,7 @@ public class TacheResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the tacheDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.TACHE_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<TacheDTO> getTache(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Tache : {}", id);
         Optional<TacheDTO> tacheDTO = tacheService.findOne(id);
@@ -272,6 +278,7 @@ public class TacheResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<Void> deleteTache(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete Tache : {}", id);
         requireOwnerOrAdmin(id);

@@ -13,7 +13,7 @@ import { DEFAULT_SORT_DATA, ITEMS_PER_PAGE, ITEM_DELETED_EVENT, PAGE_HEADER, SOR
 import { Alert, AlertError } from 'app/shared/alert';
 import { AccountService } from 'app/core/auth';
 import { FormatMediumDatetimePipe } from 'app/shared/date';
-import { Filter, FilterOptions, IFilterOption, IFilterOptions } from 'app/shared/filter';
+import { Filter, FilterOption, FilterOptions, IFilterOption, IFilterOptions } from 'app/shared/filter';
 import { Authority } from 'app/shared/jhipster/constants';
 import { TranslateDirective } from 'app/shared/language';
 import { ItemCount } from 'app/shared/pagination';
@@ -55,6 +55,16 @@ export class Tache {
 
   sortState = sortStateSignal({});
   filters: IFilterOptions = new FilterOptions();
+
+  /**
+   * Le critère de recherche libre.
+   *
+   * Il est envoyé au serveur comme les autres filtres : chercher dans les lignes déjà reçues ne
+   * chercherait que dans la page affichée, et annoncerait « aucun résultat » pour une fiche qui
+   * se trouve à la page suivante.
+   */
+  readonly searchTerm = signal('');
+  private readonly searchFilterName = 'titre.contains';
 
   readonly itemsPerPage = signal(ITEMS_PER_PAGE);
   readonly totalItems = signal(0);
@@ -131,11 +141,20 @@ export class Tache {
     this.handleNavigation(page, this.sortState(), this.filters.filterOptions);
   }
 
+  /** Applique le critère de recherche, en repartant de la première page. */
+  search(): void {
+    const term = this.searchTerm().trim();
+    const otherFilters = this.filters.filterOptions.filter(option => option.name !== this.searchFilterName);
+    const filterOptions = term ? [...otherFilters, new FilterOption(this.searchFilterName, [term])] : otherFilters;
+    this.handleNavigation(1, this.sortState(), filterOptions);
+  }
+
   protected fillComponentAttributeFromRoute(params: ParamMap, data: Data): void {
     const page = params.get(PAGE_HEADER);
     this.page.set(+(page ?? 1));
     this.sortState.set(this.sortService.parseSortParam(params.get(SORT) ?? data[DEFAULT_SORT_DATA]));
     this.filters.initializeFromParams(params);
+    this.searchTerm.set(this.filters.filterOptions.find(option => option.name === this.searchFilterName)?.values[0] ?? '');
   }
 
   protected fillComponentAttributesFromResponseBody(data: ITache[]): ITache[] {

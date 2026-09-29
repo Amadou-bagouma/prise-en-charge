@@ -112,6 +112,36 @@
                     <button
                       ngbDropdownItem
                       type="button"
+                      (click)="reinitialiserMotDePasse(userManagement)"
+                      data-cy="reinitialiserMotDePasse"
+                    >
+                      <fa-icon icon="key" class="me-1" />
+                      <span>Réinitialiser le mot de passe</span>
+                    </button>
+                    <!--
+                      L'ouverture et la fermeture du compte sont aussi dans le menu : la pastille
+                      de la colonne « Accès » se clique, mais rien ne le dit.
+                    -->
+                    @if (userManagement.activated) {
+                      <button
+                        ngbDropdownItem
+                        type="button"
+                        (click)="setActive(userManagement, false)"
+                        [disabled]="!currentAccount() || currentAccount()?.login === userManagement.login"
+                        data-cy="fermerCompte"
+                      >
+                        <fa-icon icon="lock" class="me-1" />
+                        <span>Fermer le compte</span>
+                      </button>
+                    } @else {
+                      <button ngbDropdownItem type="button" (click)="setActive(userManagement, true)" data-cy="ouvrirCompte">
+                        <fa-icon icon="check" class="me-1" />
+                        <span>Ouvrir le compte</span>
+                      </button>
+                    }
+                    <button
+                      ngbDropdownItem
+                      type="button"
                       (click)="delete(userManagement)"
                       [disabled]="!currentAccount() || currentAccount()?.login === userManagement.login"
                       data-cy="entityDeleteButton"

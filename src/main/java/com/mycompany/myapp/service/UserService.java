@@ -245,6 +245,72 @@ public class UserService {
             .map(AdminUserDTO::new);
     }
 
+    /**
+     * Donne un mot de passe provisoire a un compte, et exige son changement a la connexion.
+     *
+     * <p>Le mot de passe est rendu en clair a l'appelant, une seule fois : il n'est stocke nulle
+     * part sous cette forme, et personne ne pourra le relire. C'est a l'administrateur de le
+     * remettre a l'interesse.
+     *
+     * <p>Le drapeau {@code mustChangePassword} est pose : sans lui, un mot de passe connu de
+     * deux personnes resterait valable indefiniment, et l'on ne saurait plus qui a agi sous ce
+     * compte. {@code MustChangePasswordFilter} bloque tout le reste de l'application tant que le
+     * changement n'est pas fait.
+     *
+     * @param login le compte a depanner.
+     * @return le mot de passe provisoire, en clair.
+     */
+    @Transactional
+    public String reinitialiserMotDePasse(String login) {
+        User user = userRepository
+            .findOneByLogin(login.toLowerCase())
+            .orElseThrow(() -> new BadRequestAlertException("Ce compte n'existe pas", "userManagement", "idnotfound"));
+        String provisoire = RandomUtil.generatePassword();
+        user.setPassword(passwordEncoder.encode(provisoire));
+        user.setMustChangePassword(true);
+        // Une demande de reinitialisation en cours n'a plus d'objet : la laisser ouverte
+        // permettrait de revenir sur ce que l'administration vient de decider.
+        user.setResetKey(null);
+        user.setResetDate(null);
+        userRepository.save(user);
+        this.clearUserCaches(user);
+        LOG.info("Mot de passe reinitialise pour le compte {}", login);
+        return provisoire;
+    }
+
+    /**
+     * Ouvre ou ferme un compte.
+     *
+     * <p>Fermer un compte ne le supprime pas : les dossiers qu'il a instruits gardent leur
+     * auteur, et l'historique reste lisible. C'est la difference avec la suppression, qui
+     * n'existe que pour un compte cree par erreur.
+     *
+     * @param login le compte vise.
+     * @param actif vrai pour ouvrir l'acces, faux pour le fermer.
+     * @return le compte mis a jour.
+     */
+    @Transactional
+    public AdminUserDTO changerActivation(String login, boolean actif) {
+        // Un administrateur qui se ferme son propre compte se met dehors, et personne d'autre ne
+        // peut forcement le rouvrir : le geste est refuse plutot que regrette.
+        if (
+            !actif &&
+            SecurityUtils.getCurrentUserLogin()
+                .filter(courant -> courant.equalsIgnoreCase(login))
+                .isPresent()
+        ) {
+            throw new BadRequestAlertException("Vous ne pouvez pas fermer votre propre compte", "userManagement", "activation.soi-meme");
+        }
+        User user = userRepository
+            .findOneByLogin(login.toLowerCase())
+            .orElseThrow(() -> new BadRequestAlertException("Ce compte n'existe pas", "userManagement", "idnotfound"));
+        user.setActivated(actif);
+        userRepository.save(user);
+        this.clearUserCaches(user);
+        LOG.info("Compte {} {}", login, actif ? "ouvert" : "ferme");
+        return new AdminUserDTO(user);
+    }
+
     public void deleteUser(String login) {
         userRepository.findOneByLogin(login).ifPresent(user -> {
             userRepository.delete(user);

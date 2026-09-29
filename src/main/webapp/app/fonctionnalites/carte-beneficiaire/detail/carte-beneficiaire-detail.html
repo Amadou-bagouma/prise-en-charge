@@ -1,76 +1,107 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    @if (carteBeneficiaire(); as carteBeneficiaireRef) {
-      <div>
-        <h2 data-cy="carteBeneficiaireDetailsHeading">
-          <span jhiTranslate="peccnssApp.carteBeneficiaire.detail.title">Carte Beneficiaire</span>
-        </h2>
+@if (carteBeneficiaire(); as carte) {
+  <div class="pec-ecran">
+    <div class="pec-titre-ecran">
+      <h1 data-cy="carteBeneficiaireDetailsHeading">Carte {{ carte.numeroCarte }}</h1>
+      <!-- La validité est au titre : c'est la seule chose qu'on vient vérifier sur une carte. -->
+      <span class="pec-badge" [ngClass]="'pec-badge--' + tonValidite(carte)" data-cy="validiteCarte">
+        <span class="pec-badge__pt"></span>
+        <span>{{ libelleValidite(carte) }}</span>
+      </span>
+    </div>
 
-        <hr />
+    <jhi-alert-error />
+    <jhi-alert />
 
-        <jhi-alert-error />
+    <section class="pec-panneau">
+      <div class="pec-panneau__tete">
+        <span class="pec-panneau__titre">Titulaire</span>
+      </div>
+      <div class="pec-panneau__corps">
+        <dl class="pec-defs">
+          <dt>Type de bénéficiaire</dt>
+          <dd>
+            <span [jhiTranslate]="'peccnssApp.TypeBeneficiaire.' + (carte.typeBeneficiaire ?? 'null')">
+              {{ carte.typeBeneficiaire }}
+            </span>
+          </dd>
 
-        <jhi-alert />
-
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dt>Personne</dt>
           <dd>
-            <span>{{ carteBeneficiaireRef.id }}</span>
-          </dd>
-          <dt><span jhiTranslate="peccnssApp.carteBeneficiaire.numeroCarte">Numero Carte</span></dt>
-          <dd>
-            <span>{{ carteBeneficiaireRef.numeroCarte }}</span>
-          </dd>
-          <dt><span jhiTranslate="peccnssApp.carteBeneficiaire.typeBeneficiaire">Type Beneficiaire</span></dt>
-          <dd>
-            <span [jhiTranslate]="'peccnssApp.TypeBeneficiaire.' + (carteBeneficiaireRef.typeBeneficiaire ?? 'null')">{{
-              { null: '', AGENT: 'AGENT', AYANT_DROIT: 'AYANT_DROIT' }[carteBeneficiaireRef.typeBeneficiaire ?? 'null']
-            }}</span>
-          </dd>
-          <dt><span jhiTranslate="peccnssApp.carteBeneficiaire.dateDebutValidite">Date Debut Validite</span></dt>
-          <dd>
-            <span>{{ carteBeneficiaireRef.dateDebutValidite | formatMediumDate }}</span>
-          </dd>
-          <dt><span jhiTranslate="peccnssApp.carteBeneficiaire.dateFinValidite">Date Fin Validite</span></dt>
-          <dd>
-            <span>{{ carteBeneficiaireRef.dateFinValidite | formatMediumDate }}</span>
-          </dd>
-          <dt><span jhiTranslate="peccnssApp.carteBeneficiaire.dateEmission">Date Emission</span></dt>
-          <dd>
-            <span>{{ carteBeneficiaireRef.dateEmission | formatMediumDate }}</span>
-          </dd>
-          <dt><span jhiTranslate="peccnssApp.carteBeneficiaire.agent">Agent</span></dt>
-          <dd>
-            @if (carteBeneficiaire()!.agent) {
-              <div>
-                <a [routerLink]="['/agent', carteBeneficiaire()!.agent?.id, 'view']">{{ carteBeneficiaireRef.agent?.matricule }}</a>
-              </div>
-            }
-          </dd>
-          <dt><span jhiTranslate="peccnssApp.carteBeneficiaire.ayantDroit">Ayant Droit</span></dt>
-          <dd>
-            @if (carteBeneficiaire()!.ayantDroit) {
-              <div>
-                <a [routerLink]="['/ayant-droit', carteBeneficiaire()!.ayantDroit?.id, 'view']">{{
-                  carteBeneficiaireRef.ayantDroit?.nom
-                }}</a>
-              </div>
+            @if (carte.ayantDroit) {
+              <a [routerLink]="['/ayant-droit', carte.ayantDroit.id, 'view']">{{ carte.ayantDroit.nom }}</a>
+            } @else if (carte.agent) {
+              <a class="pec-defs--mono" [routerLink]="['/agent', carte.agent.id, 'view']">{{ carte.agent.matricule }}</a>
+            } @else {
+              <span class="pec-muted">—</span>
             }
           </dd>
         </dl>
-
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Retour</span>
-        </button>
-
-        <button type="button" [routerLink]="['/carte-beneficiaire', carteBeneficiaireRef.id, 'edit']" class="btn btn-primary">
-          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Editer</span>
-        </button>
-
-        <button type="button" [routerLink]="['/carte-beneficiaire', carteBeneficiaireRef.id, 'print']" class="btn btn-secondary">
-          <fa-icon icon="print" />&nbsp;<span jhiTranslate="peccnssApp.carteBeneficiaire.print">Imprimer</span>
-        </button>
       </div>
-    }
+    </section>
+
+    <section class="pec-panneau">
+      <div class="pec-panneau__tete">
+        <span class="pec-panneau__titre">Validité</span>
+      </div>
+      <div class="pec-panneau__corps">
+        <dl class="pec-defs">
+          <dt>N° de carte</dt>
+          <dd class="pec-defs--mono">{{ carte.numeroCarte || '—' }}</dd>
+
+          <dt>Émise le</dt>
+          <dd class="pec-defs--mono">{{ (carte.dateEmission | formatMediumDate) || '—' }}</dd>
+
+          <dt>Valable du</dt>
+          <dd class="pec-defs--mono">{{ (carte.dateDebutValidite | formatMediumDate) || '—' }}</dd>
+
+          <dt>Jusqu'au</dt>
+          <dd class="pec-defs--mono">{{ (carte.dateFinValidite | formatMediumDate) || '—' }}</dd>
+        </dl>
+
+        @if (etat(carte) === 'expiree') {
+          <p class="pec-muted" data-cy="avertissementExpiree">
+            Cette carte n'est plus valable. Elle doit être renouvelée avant d'être présentée à un prestataire.
+          </p>
+        } @else if (etat(carte) === 'expire-bientot') {
+          <p class="pec-muted" data-cy="avertissementBientot">Cette carte arrive à échéance : son renouvellement est à préparer.</p>
+        } @else if (etat(carte) === 'a-venir') {
+          <p class="pec-muted" data-cy="avertissementAVenir">
+            Cette carte n'est pas encore entrée en vigueur. Elle ne peut pas être présentée avant sa date de début.
+          </p>
+        }
+      </div>
+    </section>
+
+    <div class="pec-dossier__actions">
+      <button
+        type="button"
+        [routerLink]="['/carte-beneficiaire', carte.id, 'print']"
+        class="pec-btn pec-btn--primaire"
+        data-cy="entityPrintButton"
+      >
+        <fa-icon class="pec-btn__ico" icon="print" />
+        <span>Imprimer la carte</span>
+      </button>
+
+      <button
+        type="button"
+        [routerLink]="['/carte-beneficiaire', carte.id, 'edit']"
+        class="pec-btn pec-btn--secondaire"
+        data-cy="entityEditButton"
+      >
+        <fa-icon class="pec-btn__ico" icon="pencil-alt" />
+        <span jhiTranslate="entity.action.edit">Editer</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="previousState()"
+        class="pec-btn pec-btn--discret pec-dossier__actions--fin"
+        data-cy="entityDetailsBackButton"
+      >
+        <fa-icon class="pec-btn__ico" icon="arrow-left" />
+        <span jhiTranslate="entity.action.back">Retour</span>
+      </button>
+    </div>
   </div>
-</div>
+}

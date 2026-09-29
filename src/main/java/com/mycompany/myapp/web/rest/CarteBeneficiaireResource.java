@@ -1,6 +1,8 @@
 package com.mycompany.myapp.web.rest;
 
 import com.mycompany.myapp.repository.CarteBeneficiaireRepository;
+import com.mycompany.myapp.security.ActionsConstants;
+import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.service.CarteBeneficiaireQueryService;
 import com.mycompany.myapp.service.CarteBeneficiaireService;
 import com.mycompany.myapp.service.criteria.CarteBeneficiaireCriteria;
@@ -20,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -64,6 +67,7 @@ public class CarteBeneficiaireResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.CARTE_CREER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<CarteBeneficiaireDTO> createCarteBeneficiaire(@Valid @RequestBody CarteBeneficiaireDTO carteBeneficiaireDTO)
         throws URISyntaxException {
         LOG.debug("REST request to save CarteBeneficiaire : {}", carteBeneficiaireDTO);
@@ -87,6 +91,7 @@ public class CarteBeneficiaireResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.CARTE_MODIFIER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<CarteBeneficiaireDTO> updateCarteBeneficiaire(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody CarteBeneficiaireDTO carteBeneficiaireDTO
@@ -121,6 +126,7 @@ public class CarteBeneficiaireResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.CARTE_MODIFIER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<CarteBeneficiaireDTO> partialUpdateCarteBeneficiaire(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody CarteBeneficiaireDTO carteBeneficiaireDTO
@@ -153,6 +159,7 @@ public class CarteBeneficiaireResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of Carte Beneficiaires in body.
      */
     @GetMapping("")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.CARTE_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<List<CarteBeneficiaireDTO>> getAllCarteBeneficiaires(
         CarteBeneficiaireCriteria criteria,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
@@ -171,6 +178,7 @@ public class CarteBeneficiaireResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
      */
     @GetMapping("/count")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.CARTE_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<Long> countCarteBeneficiaires(CarteBeneficiaireCriteria criteria) {
         LOG.debug("REST request to count CarteBeneficiaires by criteria: {}", criteria);
         return ResponseEntity.ok().body(carteBeneficiaireQueryService.countByCriteria(criteria));
@@ -183,6 +191,7 @@ public class CarteBeneficiaireResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the carteBeneficiaireDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.CARTE_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<CarteBeneficiaireDTO> getCarteBeneficiaire(@PathVariable("id") Long id) {
         LOG.debug("REST request to get CarteBeneficiaire : {}", id);
         Optional<CarteBeneficiaireDTO> carteBeneficiaireDTO = carteBeneficiaireService.findOne(id);
@@ -196,6 +205,7 @@ public class CarteBeneficiaireResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.CARTE_SUPPRIMER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<Void> deleteCarteBeneficiaire(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete CarteBeneficiaire : {}", id);
         carteBeneficiaireService.delete(id);

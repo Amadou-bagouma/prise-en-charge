@@ -10,6 +10,17 @@ import org.springframework.data.domain.Pageable;
  */
 public interface AyantDroitService {
     /**
+     * Declare le rattachement verifie : acte de naissance, acte de mariage, piece d'identite.
+     *
+     * <p>Tant qu'il ne l'est pas, l'ayant droit ne peut pas fonder une prise en charge, et son
+     * enregistrement reste supprimable - c'est l'etape ou l'on corrige une saisie.
+     *
+     * @param id l'ayant droit a valider.
+     * @return l'ayant droit mis a jour.
+     */
+    AyantDroitDTO valider(Long id);
+
+    /**
      * Change la situation d'un ayant droit.
      *
      * <p>Le changement est une decision prise sur l'ayant droit lui-meme : il efface la memoire

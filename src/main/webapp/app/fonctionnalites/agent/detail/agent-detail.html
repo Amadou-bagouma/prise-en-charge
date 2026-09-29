@@ -141,22 +141,64 @@
                           @if (ayantDroit.statutAvantCascade) {
                             <span class="pec-muted" data-cy="repercuteDepuisAgent"> · répercuté depuis l'agent</span>
                           }
+                          <!--
+                            Un rattachement non vérifié ne fonde aucune prise en charge : l'état se
+                            lit ici, et pas seulement sur la fiche de l'ayant droit.
+                          -->
+                          <div>
+                            <span
+                              class="pec-badge"
+                              [ngClass]="'pec-badge--' + tonValidationAyantDroit(ayantDroit)"
+                              data-cy="validationAyantDroit"
+                            >
+                              <span class="pec-badge__pt"></span>
+                              <span>{{ libelleValidationAyantDroit(ayantDroit) }}</span>
+                            </span>
+                          </div>
                         </td>
                         <td class="pec-tbl__num">{{ (ayantDroit.dateNaissance | formatMediumDate) || '—' }}</td>
                         <td class="pec-tbl__droite">
-                          <a [routerLink]="['/ayant-droit', ayantDroit.id, 'edit']" class="pec-btn pec-btn--discret pec-btn--sm">
-                            <fa-icon class="pec-btn__ico" icon="pencil-alt" />
-                            <span jhiTranslate="entity.action.edit">Edit</span>
-                          </a>
-                          <button
-                            type="button"
-                            (click)="supprimerAyantDroit(ayantDroit)"
-                            class="pec-btn pec-btn--discret pec-btn--sm"
-                            data-cy="supprimerAyantDroit"
-                          >
-                            <fa-icon class="pec-btn__ico" icon="times" />
-                            <span jhiTranslate="entity.action.delete">Delete</span>
-                          </button>
+                          <!--
+                            Les actions sont regroupees : alignees, elles occupaient plus de place
+                            que l'identite de la personne, et la ligne se lisait de droite a gauche.
+                          -->
+                          <div ngbDropdown container="body" class="d-inline-block">
+                            <button
+                              type="button"
+                              class="pec-btn pec-btn--discret pec-btn--sm"
+                              ngbDropdownToggle
+                              data-cy="actionsAyantDroit"
+                            >
+                              <span jhiTranslate="entity.action.actions">Actions</span>
+                            </button>
+                            <div ngbDropdownMenu>
+                              <a ngbDropdownItem [routerLink]="['/ayant-droit', ayantDroit.id, 'view']">
+                                <fa-icon icon="eye" class="me-1" />
+                                <span jhiTranslate="entity.action.view">Voir</span>
+                              </a>
+                              <a ngbDropdownItem [routerLink]="['/ayant-droit', ayantDroit.id, 'edit']">
+                                <fa-icon icon="pencil-alt" class="me-1" />
+                                <span jhiTranslate="entity.action.edit">Editer</span>
+                              </a>
+                              @if (peutVerifier() && estAVerifier(ayantDroit)) {
+                                <button ngbDropdownItem type="button" (click)="validerAyantDroit(ayantDroit)" data-cy="validerAyantDroit">
+                                  <fa-icon icon="check" class="me-1" />
+                                  <span>Declarer le rattachement verifie</span>
+                                </button>
+                              }
+                              @if (estSupprimable(ayantDroit)) {
+                                <button
+                                  ngbDropdownItem
+                                  type="button"
+                                  (click)="supprimerAyantDroit(ayantDroit)"
+                                  data-cy="supprimerAyantDroit"
+                                >
+                                  <fa-icon icon="times" class="me-1" />
+                                  <span jhiTranslate="entity.action.delete">Supprimer</span>
+                                </button>
+                              }
+                            </div>
+                          </div>
                         </td>
                       </tr>
                     }

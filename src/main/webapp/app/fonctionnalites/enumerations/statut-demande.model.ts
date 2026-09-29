@@ -27,6 +27,9 @@ export enum StatutDemande {
 
   REJETEE = 'REJETEE',
 
+  /** Délai de validité dépassé : le dossier ne progresse plus et ne s'imprime plus. */
+  EXPIREE = 'EXPIREE',
+
   ANNULEE = 'ANNULEE',
 
   CLOTUREE = 'CLOTUREE',

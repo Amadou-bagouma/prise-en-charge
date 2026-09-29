@@ -19,6 +19,7 @@ import { ItemCount } from 'app/shared/pagination';
 import { SortByDirective, SortDirective, SortService, type SortState, sortStateSignal } from 'app/shared/sort';
 import { UserManagementDeleteDialog } from '../delete/user-management-delete-dialog';
 import { UserManagementService } from '../service/user-management.service';
+import { MotDePasseProvisoireDialog } from '../mot-de-passe/mot-de-passe-provisoire-dialog';
 import { IUserManagement } from '../user-management.model';
 
 @Component({
@@ -111,7 +112,31 @@ export class UserManagement {
     });
     modalRef.closed
       .pipe(filter(reason => reason === CONFIRMED_EVENT))
-      .subscribe(() => this.userManagementService.update({ ...userManagement, activated: isActivated }).subscribe(() => this.load()));
+      .subscribe(() => this.userManagementService.changerActivation(userManagement.login, isActivated).subscribe(() => this.load()));
+  }
+
+  /**
+   * Donne un mot de passe provisoire au compte.
+   *
+   * La confirmation est demandée d'abord : l'ancien mot de passe est perdu au moment où celui-ci
+   * est posé, et l'intéressé se retrouvera dehors s'il n'était pas prévenu.
+   */
+  reinitialiserMotDePasse(userManagement: IUserManagement): void {
+    const modalRef = this.modalService.open(ConfirmDialog, { size: 'md', backdrop: 'static' });
+    Object.assign(modalRef.componentInstance, {
+      titre: 'Réinitialiser le mot de passe',
+      message: `Le mot de passe actuel de ${userManagement.login} cessera aussitôt de fonctionner. Un mot de passe provisoire vous sera remis, à lui transmettre ; il devra en choisir un autre à sa prochaine connexion.`,
+      libelleConfirmer: 'Réinitialiser',
+      ton: 'danger',
+    });
+    modalRef.closed.pipe(filter(reason => reason === CONFIRMED_EVENT)).subscribe(() => {
+      this.userManagementService.reinitialiserMotDePasse(userManagement.login).subscribe(resultat => {
+        const fenetre = this.modalService.open(MotDePasseProvisoireDialog, { size: 'md', backdrop: 'static' });
+        fenetre.componentInstance.login = resultat.login;
+        fenetre.componentInstance.motDePasse = resultat.motDePasseProvisoire;
+        fenetre.closed.subscribe(() => this.load());
+      });
+    });
   }
 
   load(): void {

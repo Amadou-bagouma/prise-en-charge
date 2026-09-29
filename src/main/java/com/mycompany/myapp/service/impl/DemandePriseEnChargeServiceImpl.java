@@ -12,6 +12,7 @@ import com.mycompany.myapp.domain.enumeration.StatutAgent;
 import com.mycompany.myapp.domain.enumeration.StatutAyantDroit;
 import com.mycompany.myapp.domain.enumeration.StatutDemande;
 import com.mycompany.myapp.domain.enumeration.StatutTache;
+import com.mycompany.myapp.domain.enumeration.StatutValidationAyantDroit;
 import com.mycompany.myapp.domain.enumeration.TypeNotification;
 import com.mycompany.myapp.repository.AgentRepository;
 import com.mycompany.myapp.repository.AyantDroitRepository;
@@ -24,6 +25,7 @@ import com.mycompany.myapp.repository.UserRepository;
 import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.security.SecurityUtils;
 import com.mycompany.myapp.service.DemandePriseEnChargeService;
+import com.mycompany.myapp.service.ExpirationDemande;
 import com.mycompany.myapp.service.dto.DemandePriseEnChargeDTO;
 import com.mycompany.myapp.service.dto.TypeSoinDTO;
 import com.mycompany.myapp.service.mapper.DemandePriseEnChargeMapper;
@@ -32,6 +34,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -77,6 +80,8 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
 
     private final AyantDroitRepository ayantDroitRepository;
 
+    private final ExpirationDemande expirationDemande;
+
     private static final List<StatutTache> STATUTS_TACHE_CLOTURES = List.of(StatutTache.TERMINEE, StatutTache.ANNULEE);
 
     private static final DateTimeFormatter REFERENCE_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyMMdd");
@@ -90,7 +95,8 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         NotificationRepository notificationRepository,
         TypeSoinRepository typeSoinRepository,
         AgentRepository agentRepository,
-        AyantDroitRepository ayantDroitRepository
+        AyantDroitRepository ayantDroitRepository,
+        ExpirationDemande expirationDemande
     ) {
         this.demandePriseEnChargeRepository = demandePriseEnChargeRepository;
         this.demandePriseEnChargeMapper = demandePriseEnChargeMapper;
@@ -101,6 +107,7 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         this.typeSoinRepository = typeSoinRepository;
         this.agentRepository = agentRepository;
         this.ayantDroitRepository = ayantDroitRepository;
+        this.expirationDemande = expirationDemande;
     }
 
     @Override
@@ -118,6 +125,10 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         demandePriseEnCharge.setGestionnaireCreateur(currentUser);
         demandePriseEnCharge.setDateCreation(now);
         demandePriseEnCharge.setDateModification(now);
+        // Le terme est pose des l'ouverture et n'est pas laisse au client : c'est lui qui decide
+        // si le dossier peut encore avancer, et une echeance choisie par l'appelant n'aurait
+        // aucune valeur.
+        demandePriseEnCharge.setDateEcheance(now.plus(VALIDITE_JOURS, ChronoUnit.DAYS));
         demandePriseEnCharge.setStatut(StatutDemande.EN_SAISIE);
         demandePriseEnCharge = demandePriseEnChargeRepository.save(demandePriseEnCharge);
         logHistorique(demandePriseEnCharge, currentUser, "CREATION", "Dossier ouvert, en cours de saisie");
@@ -131,6 +142,9 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         demandePriseEnCharge.setTypeSoins(resoudreTypeSoins(demandePriseEnChargeDTO));
         DemandePriseEnCharge existante = getDemandeOrThrow(demandePriseEnCharge.getId());
         requireAuteurOuAdmin(existante, getCurrentUser());
+        exigerModifiable(existante);
+        exigerNonExpiree(existante);
+        exigerBeneficiaireCouvert(demandePriseEnCharge);
         // The workflow status is only ever changed through valider/rejeter/resoumettre, never through the
         // generic update endpoint, so callers cannot bypass the DRH / infirmerie validation steps. The
         // reference, author, creation date and rejection reason are likewise fixed by the workflow and
@@ -154,6 +168,8 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
             .findById(demandePriseEnChargeDTO.getId())
             .map(existingDemandePriseEnCharge -> {
                 requireAuteurOuAdmin(existingDemandePriseEnCharge, currentUser);
+                exigerModifiable(existingDemandePriseEnCharge);
+                exigerNonExpiree(existingDemandePriseEnCharge);
                 StatutDemande statutPersiste = existingDemandePriseEnCharge.getStatut();
                 String referencePersistee = existingDemandePriseEnCharge.getReference();
                 User auteurPersiste = existingDemandePriseEnCharge.getGestionnaireCreateur();
@@ -179,6 +195,34 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
     }
 
     /**
+     * Refuse toute suite a donner a un dossier dont le delai de validite est passe.
+     *
+     * <p>Le dossier est bascule en {@code EXPIREE} au passage : constater l'expiration et ne pas
+     * l'enregistrer laisserait un dossier perime circuler dans les boites de reception, et
+     * chacun le reprendrait pour se faire refuser a son tour.
+     *
+     * <p>La consultation, elle, n'est jamais bloquee : un dossier expire reste lisible.
+     */
+    private void exigerNonExpiree(DemandePriseEnCharge demande) {
+        if (STATUTS_TERMINAUX.contains(demande.getStatut())) {
+            return;
+        }
+        Instant terme = demande.getDateEcheance();
+        if (terme == null || Instant.now().isBefore(terme)) {
+            return;
+        }
+        // Le constat est ecrit dans une transaction propre : celle-ci va etre annulee par le
+        // refus qui suit, et l'expiration doit lui survivre.
+        expirationDemande.constater(demande.getId());
+        LOG.info("Dossier {} expire : delai de {} jours depasse", demande.getReference(), VALIDITE_JOURS);
+        throw new BadRequestAlertException(
+            "Ce dossier a depasse son delai de validite de %d jours et ne peut plus etre traite.".formatted(VALIDITE_JOURS),
+            ENTITY_NAME,
+            "workflow.expiree"
+        );
+    }
+
+    /**
      * Refuse d'ouvrir une demande pour un beneficiaire qui n'est plus couvert.
      *
      * <p>Le statut est relu en base et non pris dans le corps de la requete : le client envoie
@@ -199,6 +243,16 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
             AyantDroit ayantDroit = ayantDroitRepository
                 .findById(demande.getAyantDroit().getId())
                 .orElseThrow(() -> new BadRequestAlertException("Ayant droit introuvable", ENTITY_NAME, "ayantdroit.introuvable"));
+            // Un rattachement non verifie ne fonde pas de prise en charge : c'est tout l'objet
+            // du circuit d'enregistrement. Le verifier ici plutot qu'a la validation evite
+            // d'engager le circuit sur un dossier qui sera ecarte au bout.
+            if (ayantDroit.getStatutValidation() != StatutValidationAyantDroit.VALIDE) {
+                throw new BadRequestAlertException(
+                    "Le rattachement de cet ayant droit n'a pas encore ete verifie : le dossier ne peut pas etre ouvert a son nom.",
+                    ENTITY_NAME,
+                    "ayantdroit.nonvalide"
+                );
+            }
             if (ayantDroit.getStatut() != StatutAyantDroit.ACTIF) {
                 throw new BadRequestAlertException(
                     "Cet ayant droit n'ouvre plus droit a la prise en charge (%s). Motif : %s".formatted(
@@ -273,13 +327,50 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
      */
     private static final List<StatutDemande> STATUTS_SUPPRIMABLES = List.of(StatutDemande.EN_SAISIE, StatutDemande.NOUVELLE);
 
+    /**
+     * Les etapes ou le contenu du dossier appartient encore a celui qui le saisit.
+     *
+     * <p>Une fois soumis, le dossier est sous le regard d'un autre : le modifier reviendrait a
+     * faire valider autre chose que ce qui a ete lu, et une validation deja donnee porterait sur
+     * un texte qui n'existe plus. Un dossier soumis a tort se retire par l'annulation.
+     *
+     * <p>{@code RETOURNEE} en fait partie : c'est l'etape ou le dossier revient a son auteur
+     * precisement pour etre corrige, et l'en exclure rendrait la resoumission impossible.
+     */
+    private static final List<StatutDemande> STATUTS_MODIFIABLES = List.of(
+        StatutDemande.EN_SAISIE,
+        StatutDemande.NOUVELLE,
+        StatutDemande.RETOURNEE
+    );
+
     /** La seule action que peut porter une demande encore supprimable. */
     private static final String ACTION_CREATION = "CREATION";
+
+    /**
+     * Duree de validite d'une prise en charge, en jours.
+     *
+     * <p>Le delai court a partir de l'ouverture du dossier. Passe ce terme, le dossier expire :
+     * il ne poursuit plus le circuit et ne s'imprime plus.
+     */
+    public static final int VALIDITE_JOURS = 14;
+
+    /** Les etats ou plus rien n'est attendu : l'expiration ne les concerne pas. */
+    private static final List<StatutDemande> STATUTS_TERMINAUX = List.of(
+        StatutDemande.VALIDEE,
+        StatutDemande.REJETEE,
+        StatutDemande.ANNULEE,
+        StatutDemande.CLOTUREE,
+        StatutDemande.EXPIREE
+    );
 
     @Override
     public void delete(Long id) {
         LOG.debug("Request to delete DemandePriseEnCharge : {}", id);
         DemandePriseEnCharge demande = getDemandeOrThrow(id);
+        // La suppression n'etait ouverte qu'a l'administration : elle l'est desormais a qui
+        // porte l'habilitation, donc a tout gestionnaire. Sans ce controle, chacun pourrait
+        // effacer le brouillon d'un autre.
+        requireAuteurOuAdmin(demande, getCurrentUser());
         exigerSuppressionPossible(demande);
 
         // Les objets rattaches partent avec le dossier : sans cela la suppression echouerait sur
@@ -288,6 +379,23 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         tacheRepository.deleteAll(tacheRepository.findByDemandeId(id));
         historiqueActionRepository.deleteAll(historiqueActionRepository.findByDemandeIdOrderByDateActionAsc(id));
         demandePriseEnChargeRepository.delete(demande);
+    }
+
+    /**
+     * Refuse la modification d'un dossier deja soumis.
+     *
+     * <p>Le controle porte sur le statut deja enregistre, jamais sur celui qu'envoie l'appelant :
+     * le client pourrait se declarer en saisie pour rouvrir un dossier valide.
+     */
+    private void exigerModifiable(DemandePriseEnCharge demande) {
+        if (STATUTS_MODIFIABLES.contains(demande.getStatut())) {
+            return;
+        }
+        throw new BadRequestAlertException(
+            "Ce dossier a ete soumis (%s) et ne peut plus etre modifie. Il peut etre annule.".formatted(demande.getStatut()),
+            ENTITY_NAME,
+            "modification.soumise"
+        );
     }
 
     /**
@@ -327,6 +435,7 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         DemandePriseEnCharge demande = getDemandeOrThrow(id);
         User currentUser = getCurrentUser();
         requireAuteurOuAdmin(demande, currentUser);
+        exigerNonExpiree(demande);
         if (demande.getStatut() != StatutDemande.EN_SAISIE) {
             throw new BadRequestAlertException("Ce dossier n'est plus en saisie", ENTITY_NAME, "workflow.invalidstatus");
         }
@@ -344,6 +453,7 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
     public DemandePriseEnChargeDTO verifier(Long id, String commentaire) {
         LOG.debug("Request to verifier DemandePriseEnCharge : {}", id);
         DemandePriseEnCharge demande = getDemandeOrThrow(id);
+        exigerNonExpiree(demande);
         if (demande.getStatut() != StatutDemande.EN_VERIFICATION_RH) {
             throw new BadRequestAlertException("Ce dossier n'est pas en verification", ENTITY_NAME, "workflow.invalidstatus");
         }
@@ -370,6 +480,7 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
     public DemandePriseEnChargeDTO valider(Long id, String commentaire) {
         LOG.debug("Request to valider DemandePriseEnCharge : {}", id);
         DemandePriseEnCharge demande = getDemandeOrThrow(id);
+        exigerNonExpiree(demande);
         User currentUser = getCurrentUser();
         requireNotAuteur(demande, currentUser);
         StatutDemande statutSuivant;
@@ -422,6 +533,7 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
             throw new BadRequestAlertException("Le motif de rejet est obligatoire", ENTITY_NAME, "workflow.motifrequired");
         }
         DemandePriseEnCharge demande = getDemandeOrThrow(id);
+        exigerNonExpiree(demande);
         User currentUser = getCurrentUser();
         requireNotAuteur(demande, currentUser);
         switch (demande.getStatut()) {
@@ -460,6 +572,7 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
             throw new BadRequestAlertException("Le motif de rejet est obligatoire", ENTITY_NAME, "workflow.motifrequired");
         }
         DemandePriseEnCharge demande = getDemandeOrThrow(id);
+        exigerNonExpiree(demande);
         User currentUser = getCurrentUser();
         requireNotAuteur(demande, currentUser);
         switch (demande.getStatut()) {
@@ -500,6 +613,7 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
     public DemandePriseEnChargeDTO resoumettre(Long id) {
         LOG.debug("Request to resoumettre DemandePriseEnCharge : {}", id);
         DemandePriseEnCharge demande = getDemandeOrThrow(id);
+        exigerNonExpiree(demande);
         if (demande.getStatut() != StatutDemande.RETOURNEE) {
             throw new BadRequestAlertException(
                 "Cette demande n'a pas ete retournee pour correction",

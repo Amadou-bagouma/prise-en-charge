@@ -51,4 +51,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
     /** Les comptes portant ce profil, pour leur repercuter un changement de droits. */
     @EntityGraph(attributePaths = "authorities")
     List<User> findAllByProfilId(Long profilId);
+
+    /**
+     * Combien d'agents portent ce profil.
+     *
+     * <p>Comptee plutot que deduite de {@link #findAllByProfilId} : afficher une liste de
+     * profils chargerait autrement tous les utilisateurs de chacun pour n'en montrer que le
+     * nombre.
+     */
+    long countByProfilId(Long profilId);
 }

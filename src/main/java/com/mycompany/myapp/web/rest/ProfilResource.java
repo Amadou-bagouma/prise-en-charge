@@ -152,9 +152,12 @@ public class ProfilResource {
      */
     @GetMapping("")
     @PreAuthorize("hasAuthority('" + AuthoritiesConstants.ADMIN + "')")
-    public ResponseEntity<List<ProfilDTO>> getAllProfils(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
+    public ResponseEntity<List<ProfilDTO>> getAllProfils(
+        @org.springdoc.core.annotations.ParameterObject Pageable pageable,
+        @RequestParam(name = "nom", required = false) String nom
+    ) {
         LOG.debug("REST request to get a page of Profils");
-        Page<ProfilDTO> page = profilService.findAll(pageable);
+        Page<ProfilDTO> page = profilService.rechercher(nom, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }

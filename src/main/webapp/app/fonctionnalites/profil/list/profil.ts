@@ -1,5 +1,5 @@
 import { HttpHeaders } from '@angular/common/http';
-import { Component, effect, inject, signal, untracked } from '@angular/core';
+import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Data, ParamMap, Router, RouterLink } from '@angular/router';
 
@@ -14,19 +14,58 @@ import { Alert, AlertError } from 'app/shared/alert';
 import { TranslateDirective } from 'app/shared/language';
 import { ItemCount } from 'app/shared/pagination';
 import { SortByDirective, SortDirective, SortService, type SortState, sortStateSignal } from 'app/shared/sort';
+import { AuthorityService } from 'app/fonctionnalites/admin/authority/service/authority.service';
 import { ProfilDeleteDialog } from '../delete/profil-delete-dialog';
 import { IProfil } from '../profil.model';
 import { ProfilService } from '../service/profil.service';
 
+/**
+ * Le nom d'un droit, en clair et en court.
+ *
+ * La description complète dit ce que le droit autorise, en une phrase : trois phrases sur une
+ * ligne de tableau la rendent illisible. Le tableau porte donc l'intitulé court, et la phrase
+ * est mise en infobulle — elle reste à portée sans occuper la place.
+ */
+function intituleCourt(droit: string): string {
+  const mots = droit
+    .replace(/^ROLE_/, '')
+    .toLowerCase()
+    .split('_')
+    .join(' ');
+  return mots.charAt(0).toUpperCase() + mots.slice(1);
+}
+
 @Component({
   selector: 'jhi-profil',
   templateUrl: './profil.html',
-  imports: [RouterLink, FontAwesomeModule, AlertError, Alert, SortDirective, SortByDirective, TranslateDirective, NgbPagination, ItemCount],
+  imports: [
+    RouterLink,
+    FontAwesomeModule,
+    AlertError,
+    Alert,
+    SortDirective,
+    SortByDirective,
+    TranslateDirective,
+    NgbDropdown,
+    NgbDropdownItem,
+    NgbDropdownMenu,
+    NgbDropdownToggle,
+    NgbPagination,
+    ItemCount,
+  ],
 })
 export class Profil {
   readonly profils = signal<IProfil[]>([]);
 
   sortState = sortStateSignal({});
+
+  /**
+   * Le nom cherché.
+   *
+   * Envoyé au serveur, pas appliqué aux lignes déjà reçues : chercher dans la page affichée
+   * annoncerait « aucun résultat » pour un profil qui se trouve à la page suivante.
+   */
+  readonly searchTerm = signal('');
 
   readonly itemsPerPage = signal(ITEMS_PER_PAGE);
   readonly totalItems = signal(0);
@@ -45,8 +84,35 @@ export class Profil {
   );
   protected readonly sortService = inject(SortService);
   protected modalService = inject(NgbModal);
+  protected readonly authorityService = inject(AuthorityService);
+
+  /**
+   * Les droits tels qu'ils se disent, indexés par leur nom technique.
+   *
+   * `ROLE_VALIDATEUR_DRH` n'apprend rien à qui vérifie une habilitation : c'est la description
+   * qui est affichée, et le nom ne sert plus que de clé.
+   */
+  private readonly descriptions = computed(() => {
+    const table = new Map<string, string>();
+    for (const droit of this.authorityService.authorities()) {
+      table.set(droit.name, droit.description ?? droit.name);
+    }
+    return table;
+  });
 
   constructor() {
+    // Les libellés des droits, chargés une fois : sans eux la colonne n'afficherait que des
+    // noms techniques.
+    this.authorityService.authoritiesParams.set({});
+    effect(() => {
+      // Le nom cherché repart au serveur, en revenant à la première page : rester à la page
+      // trois d'une recherche qui n'en compte qu'une afficherait un tableau vide.
+      this.searchTerm();
+      untracked(() => {
+        this.page.set(1);
+        this.queryBackend();
+      });
+    });
     effect(() => {
       const headers = this.profilService.profilsResource.headers();
       if (headers) {
@@ -64,6 +130,22 @@ export class Profil {
         this.load();
       });
     });
+  }
+
+  /**
+   * Les droits d'un profil, dits en clair, tronqués à trois.
+   *
+   * Dix badges sur une ligne la rendraient illisible : les trois premiers situent le profil, le
+   * reste se compte et se lit sur la fiche.
+   */
+  droitsResumes(profil: IProfil): { visibles: { libelle: string; description: string }[]; reste: number } | null {
+    const droits = profil.authorities ?? [];
+    if (droits.length === 0) {
+      return null;
+    }
+    const table = this.descriptions();
+    const lisibles = droits.map(droit => ({ libelle: intituleCourt(droit), description: table.get(droit) ?? droit }));
+    return { visibles: lisibles.slice(0, 3), reste: Math.max(0, lisibles.length - 3) };
   }
 
   trackId = (item: IProfil): number => this.profilService.getProfilIdentifier(item);
@@ -113,6 +195,10 @@ export class Profil {
       size: this.itemsPerPage(),
       sort: this.sortService.buildSortParam(this.sortState()),
     };
+    const nom = this.searchTerm().trim();
+    if (nom) {
+      queryObject.nom = nom;
+    }
     this.profilService.profilsParams.set(queryObject);
   }
 

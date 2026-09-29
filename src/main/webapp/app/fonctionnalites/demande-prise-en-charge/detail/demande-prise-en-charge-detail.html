@@ -116,7 +116,7 @@
         <section class="pec-panneau">
           <div class="pec-panneau__tete">
             <span class="pec-panneau__titre" jhiTranslate="peccnssApp.demandePriseEnCharge.pieces.titre">Pièces justificatives</span>
-            @if (canSaisir()) {
+            @if (canSaisir() && piecesModifiables()) {
               <button type="button" (click)="ajouterPiece()" class="pec-btn pec-btn--primaire pec-btn--sm" data-cy="ajouterPiece">
                 <fa-icon class="pec-btn__ico" icon="plus" />
                 <span jhiTranslate="peccnssApp.demandePriseEnCharge.pieces.ajouter">Joindre une pièce</span>
@@ -124,6 +124,15 @@
             }
           </div>
           <div class="pec-panneau__corps">
+            @if (!piecesModifiables()) {
+              <!--
+                Dire pourquoi les actions ont disparu : sans cela, l'agent cherche un bouton
+                qu'il a déjà utilisé sur un autre dossier et croit à un défaut de l'écran.
+              -->
+              <p class="pec-muted" data-cy="piecesVerrouillees">
+                Le dossier n'est plus en saisie : ses pièces ne peuvent plus être modifiées.
+              </p>
+            }
             @if (chargementPieces()) {
               <span class="pec-muted">Chargement…</span>
             } @else if (pieces().length === 0) {
@@ -148,7 +157,18 @@
                         </td>
                         <td class="pec-tbl__num">{{ (piece.dateAjout | formatMediumDatetime) || '—' }}</td>
                         <td class="pec-tbl__droite">
-                          @if (canSaisir()) {
+                          @if (piece.contenuContentType) {
+                            <button
+                              type="button"
+                              (click)="ouvrirPiece(piece)"
+                              class="pec-btn pec-btn--discret pec-btn--sm"
+                              data-cy="ouvrirPiece"
+                            >
+                              <fa-icon class="pec-btn__ico" icon="eye" />
+                              <span>Ouvrir</span>
+                            </button>
+                          }
+                          @if (canSaisir() && piecesModifiables()) {
                             <a [routerLink]="['/piece-justificative', piece.id, 'edit']" class="pec-btn pec-btn--discret pec-btn--sm">
                               <fa-icon class="pec-btn__ico" icon="pencil-alt" />
                               <span jhiTranslate="entity.action.edit">Edit</span>
@@ -246,8 +266,13 @@
             </button>
           }
 
-          @if (canSaisir()) {
-            <button type="button" [routerLink]="['/demande-prise-en-charge', demande.id, 'edit']" class="pec-btn pec-btn--secondaire">
+          @if (canModifier()) {
+            <button
+              type="button"
+              [routerLink]="['/demande-prise-en-charge', demande.id, 'edit']"
+              class="pec-btn pec-btn--secondaire"
+              data-cy="demandePriseEnChargeEditButton"
+            >
               <fa-icon class="pec-btn__ico" icon="pencil-alt" />
               <span jhiTranslate="entity.action.edit">Edit</span>
             </button>

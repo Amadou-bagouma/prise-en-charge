@@ -3,8 +3,11 @@ package com.mycompany.myapp.service.impl;
 import com.mycompany.myapp.domain.Agent;
 import com.mycompany.myapp.domain.AyantDroit;
 import com.mycompany.myapp.domain.enumeration.StatutAyantDroit;
+import com.mycompany.myapp.domain.enumeration.StatutValidationAyantDroit;
 import com.mycompany.myapp.repository.AgentRepository;
 import com.mycompany.myapp.repository.AyantDroitRepository;
+import com.mycompany.myapp.security.AuthoritiesConstants;
+import com.mycompany.myapp.security.SecurityUtils;
 import com.mycompany.myapp.service.AyantDroitService;
 import com.mycompany.myapp.service.GenerateurCodeAyantDroit;
 import com.mycompany.myapp.service.JournalActions;
@@ -19,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,6 +59,26 @@ public class AyantDroitServiceImpl implements AyantDroitService {
         this.ayantDroitRepository = ayantDroitRepository;
         this.ayantDroitMapper = ayantDroitMapper;
         this.journal = journal;
+    }
+
+    @Override
+    public AyantDroitDTO valider(Long id) {
+        AyantDroit ayantDroit = ayantDroitRepository
+            .findById(id)
+            .orElseThrow(() -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+        if (ayantDroit.getStatutValidation() == StatutValidationAyantDroit.VALIDE) {
+            throw new BadRequestAlertException("Ce rattachement est deja verifie", ENTITY_NAME, "validation.dejafaite");
+        }
+        ayantDroit.setStatutValidation(StatutValidationAyantDroit.VALIDE);
+        ayantDroit.setDateValidation(Instant.now());
+        journal.surBeneficiaire(
+            JournalActions.CIBLE_AYANT_DROIT,
+            id,
+            "VALIDATION_RATTACHEMENT",
+            "Rattachement verifie : l'ayant droit peut desormais fonder une prise en charge."
+        );
+        LOG.debug("Rattachement de l'ayant droit {} verifie", id);
+        return ayantDroitMapper.toDto(ayantDroitRepository.save(ayantDroit));
     }
 
     @Override
@@ -101,6 +125,10 @@ public class AyantDroitServiceImpl implements AyantDroitService {
         vers.setMotifStatut(depuis.getMotifStatut());
         vers.setStatutAvantCascade(depuis.getStatutAvantCascade());
         vers.setMotifAvantCascade(depuis.getMotifAvantCascade());
+        // Le circuit d'enregistrement ne passe que par valider() : sinon le formulaire de
+        // modification permettrait de se declarer verifie soi-meme.
+        vers.setStatutValidation(depuis.getStatutValidation());
+        vers.setDateValidation(depuis.getDateValidation());
     }
 
     /** Un libelle inconnu est refuse avec la liste des valeurs admises, pas par une 500. */
@@ -120,7 +148,10 @@ public class AyantDroitServiceImpl implements AyantDroitService {
     @Override
     public AyantDroitDTO save(AyantDroitDTO ayantDroitDTO) {
         LOG.debug("Request to save AyantDroit : {}", ayantDroitDTO);
+
         AyantDroit ayantDroit = ayantDroitMapper.toEntity(ayantDroitDTO);
+        ayantDroit.setStatut(StatutAyantDroit.ACTIF);
+        ayantDroit.setStatutValidation(StatutValidationAyantDroit.EN_SAISIE);
         attribuerCodeSiAbsent(ayantDroit);
         ayantDroit = ayantDroitRepository.save(ayantDroit);
         return ayantDroitMapper.toDto(ayantDroit);
@@ -177,12 +208,16 @@ public class AyantDroitServiceImpl implements AyantDroitService {
                 String motifPersiste = existingAyantDroit.getMotifStatut();
                 StatutAyantDroit avantCascadePersiste = existingAyantDroit.getStatutAvantCascade();
                 String motifAvantCascadePersiste = existingAyantDroit.getMotifAvantCascade();
+                StatutValidationAyantDroit validationPersistee = existingAyantDroit.getStatutValidation();
+                Instant dateValidationPersistee = existingAyantDroit.getDateValidation();
                 ayantDroitMapper.partialUpdate(existingAyantDroit, ayantDroitDTO);
                 existingAyantDroit.setStatut(statutPersiste);
                 existingAyantDroit.setDateStatut(datePersistee);
                 existingAyantDroit.setMotifStatut(motifPersiste);
                 existingAyantDroit.setStatutAvantCascade(avantCascadePersiste);
                 existingAyantDroit.setMotifAvantCascade(motifAvantCascadePersiste);
+                existingAyantDroit.setStatutValidation(validationPersistee);
+                existingAyantDroit.setDateValidation(dateValidationPersistee);
 
                 return existingAyantDroit;
             })
@@ -203,6 +238,18 @@ public class AyantDroitServiceImpl implements AyantDroitService {
 
     @Override
     public void delete(Long id) {
+        // Un rattachement verifie a servi de base a des dossiers : le supprimer les priverait de
+        // leur beneficiaire. La suppression reste possible, mais releve de l'administration.
+        ayantDroitRepository.findById(id).ifPresent(ayantDroit -> {
+            if (
+                ayantDroit.getStatutValidation() == StatutValidationAyantDroit.VALIDE &&
+                !SecurityUtils.hasCurrentUserAnyOfAuthorities(AuthoritiesConstants.ADMIN)
+            ) {
+                throw new AccessDeniedException(
+                    "Ce rattachement est verifie : sa suppression releve de l'administration. Il peut etre radie depuis sa fiche."
+                );
+            }
+        });
         LOG.debug("Request to delete AyantDroit : {}", id);
         ayantDroitRepository.deleteById(id);
     }

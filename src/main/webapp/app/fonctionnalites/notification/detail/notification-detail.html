@@ -1,95 +1,76 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    @if (notification(); as notificationRef) {
-      <div class="jhi-form-panel">
-        <h2 data-cy="notificationDetailsHeading"><span jhiTranslate="peccnssApp.notification.detail.title">Notification</span></h2>
+@if (notification(); as notificationRef) {
+  <div class="pec-ecran">
+    <div class="pec-titre-ecran">
+      <h1 data-cy="notificationDetailsHeading">{{ notificationRef.titre }}</h1>
+      <span class="pec-badge" [ngClass]="notificationRef.lu ? 'pec-badge--neutre' : 'pec-badge--info'">
+        <span class="pec-badge__pt"></span>
+        <span>{{ notificationRef.lu ? 'Lue' : 'Non lue' }}</span>
+      </span>
+    </div>
 
-        <hr />
+    <jhi-alert-error />
+    <jhi-alert />
 
-        <jhi-alert-error />
-
-        <jhi-alert />
-
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="global.field.id">ID</span></dt>
-          <dd>
-            <span>{{ notificationRef.id }}</span>
-          </dd>
-          <dt><span jhiTranslate="peccnssApp.notification.titre">Titre</span></dt>
-          <dd>
-            <span>{{ notificationRef.titre }}</span>
-          </dd>
-          <dt><span jhiTranslate="peccnssApp.notification.message">Message</span></dt>
-          <dd>
-            <span>{{ notificationRef.message }}</span>
-          </dd>
-          <dt><span jhiTranslate="peccnssApp.notification.dateCreation">Date Creation</span></dt>
-          <dd>
-            <span>{{ notificationRef.dateCreation | formatMediumDatetime }}</span>
-          </dd>
-          <dt><span jhiTranslate="peccnssApp.notification.dateLecture">Date Lecture</span></dt>
-          <dd>
-            <span>{{ notificationRef.dateLecture | formatMediumDatetime }}</span>
-          </dd>
-          <dt><span jhiTranslate="peccnssApp.notification.lu">Lu</span></dt>
-          <dd>
-            <span class="jhi-badge" [ngClass]="notificationRef.lu ? 'jhi-badge-actif-true' : 'jhi-badge-actif-false'">
-              {{ notificationRef.lu ? 'Lu' : 'Non lu' }}
-            </span>
-          </dd>
-          <dt><span jhiTranslate="peccnssApp.notification.type">Type</span></dt>
-          <dd>
-            <span
-              class="jhi-badge"
-              [ngClass]="'jhi-badge-notiftype-' + notificationRef.type"
-              [jhiTranslate]="'peccnssApp.TypeNotification.' + (notificationRef.type ?? 'null')"
-              >{{
-                {
-                  null: '',
-                  NOUVELLE_TACHE: 'NOUVELLE_TACHE',
-                  NOUVELLE_DEMANDE: 'NOUVELLE_DEMANDE',
-                  DEMANDE_ASSIGNEE: 'DEMANDE_ASSIGNEE',
-                  DEMANDE_MODIFIEE: 'DEMANDE_MODIFIEE',
-                  ECHEANCE_PROCHE: 'ECHEANCE_PROCHE',
-                  DEMANDE_VALIDEE: 'DEMANDE_VALIDEE',
-                  DEMANDE_REJETEE: 'DEMANDE_REJETEE',
-                  INFORMATION: 'INFORMATION',
-                }[notificationRef.type ?? 'null']
-              }}</span
-            >
-          </dd>
-          <dt><span jhiTranslate="peccnssApp.notification.utilisateur">Utilisateur</span></dt>
-          <dd>
-            <span>{{ notificationRef.utilisateur?.login }}</span>
-          </dd>
-          <dt><span jhiTranslate="peccnssApp.notification.demande">Demande</span></dt>
-          <dd>
-            @if (notification()!.demande) {
-              <div>
-                <a [routerLink]="['/demande-prise-en-charge', notification()!.demande?.id, 'view']">{{
-                  notificationRef.demande?.reference
-                }}</a>
-              </div>
-            }
-          </dd>
-          <dt><span jhiTranslate="peccnssApp.notification.tache">Tache</span></dt>
-          <dd>
-            @if (notification()!.tache) {
-              <div>
-                <a [routerLink]="['/tache', notification()!.tache?.id, 'view']">{{ notificationRef.tache?.titre }}</a>
-              </div>
-            }
-          </dd>
-        </dl>
-
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
-        </button>
-
-        <button type="button" [routerLink]="['/notification', notificationRef.id, 'edit']" class="btn btn-accent">
-          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
-        </button>
+    <section class="pec-panneau">
+      <div class="pec-panneau__tete">
+        <span class="pec-panneau__titre">Notification</span>
       </div>
-    }
+      <div class="pec-panneau__corps">
+        <dl class="pec-defs">
+          <dt>Titre</dt>
+          <dd>{{ notificationRef.titre || '—' }}</dd>
+
+          <dt>Message</dt>
+          <dd>{{ notificationRef.message || '—' }}</dd>
+
+          <dt>Type</dt>
+          <dd>
+            <span [jhiTranslate]="'peccnssApp.TypeNotification.' + (notificationRef.type ?? 'null')">{{ notificationRef.type }}</span>
+          </dd>
+
+          <dt>Destinataire</dt>
+          <dd>{{ notificationRef.utilisateur?.login || '—' }}</dd>
+
+          <dt>Dossier</dt>
+          <dd>
+            @if (notificationRef.demande) {
+              <a class="pec-num" [routerLink]="['/demande-prise-en-charge', notificationRef.demande.id, 'view']">{{
+                notificationRef.demande.reference
+              }}</a>
+            } @else {
+              <span class="pec-muted">—</span>
+            }
+          </dd>
+
+          <dt>Reçue le</dt>
+          <dd class="pec-defs--mono">{{ (notificationRef.dateCreation | formatMediumDatetime) || '—' }}</dd>
+
+          <dt>Lue le</dt>
+          <dd class="pec-defs--mono">{{ (notificationRef.dateLecture | formatMediumDatetime) || '—' }}</dd>
+        </dl>
+      </div>
+    </section>
+
+    <div class="pec-dossier__actions">
+      <button
+        type="button"
+        [routerLink]="['/notification', notificationRef.id, 'edit']"
+        class="pec-btn pec-btn--primaire"
+        data-cy="entityEditButton"
+      >
+        <fa-icon class="pec-btn__ico" icon="pencil-alt" />
+        <span jhiTranslate="entity.action.edit">Editer</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="previousState()"
+        class="pec-btn pec-btn--discret pec-dossier__actions--fin"
+        data-cy="entityDetailsBackButton"
+      >
+        <fa-icon class="pec-btn__ico" icon="arrow-left" />
+        <span jhiTranslate="entity.action.back">Retour</span>
+      </button>
+    </div>
   </div>
-</div>
+}

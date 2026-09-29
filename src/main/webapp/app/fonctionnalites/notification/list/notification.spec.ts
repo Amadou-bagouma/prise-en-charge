@@ -4,7 +4,18 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
 
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
-import { faCheck, faEye, faPencilAlt, faPlus, faSort, faSortDown, faSortUp, faSync, faTimes } from '@fortawesome/free-solid-svg-icons';
+import {
+  faCheck,
+  faEye,
+  faPencilAlt,
+  faPlus,
+  faSearch,
+  faSort,
+  faSortDown,
+  faSortUp,
+  faSync,
+  faTimes,
+} from '@fortawesome/free-solid-svg-icons';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap/modal';
 import { provideTranslateService } from '@ngx-translate/core';
 import { Subject, of } from 'rxjs';
@@ -63,7 +74,7 @@ describe('Notification Management Component', () => {
 
     const library = TestBed.inject(FaIconLibrary);
     // La boite de reception porte ses propres actions : « marquer comme lue » a son icone.
-    library.addIcons(faCheck, faEye, faPencilAlt, faPlus, faSort, faSortDown, faSortUp, faSync, faTimes);
+    library.addIcons(faCheck, faEye, faPencilAlt, faPlus, faSearch, faSort, faSortDown, faSortUp, faSync, faTimes);
     httpMock = TestBed.inject(HttpTestingController);
   });
 

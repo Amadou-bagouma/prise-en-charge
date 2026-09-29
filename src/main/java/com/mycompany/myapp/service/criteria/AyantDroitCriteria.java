@@ -2,6 +2,7 @@ package com.mycompany.myapp.service.criteria;
 
 import com.mycompany.myapp.domain.enumeration.LienParente;
 import com.mycompany.myapp.domain.enumeration.StatutAyantDroit;
+import com.mycompany.myapp.domain.enumeration.StatutValidationAyantDroit;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
@@ -60,9 +61,28 @@ public class AyantDroitCriteria implements Serializable, Criteria {
         }
     }
 
+    /**
+     * Class for filtering StatutValidationAyantDroit
+     */
+    public static class StatutValidationAyantDroitFilter extends Filter<StatutValidationAyantDroit> {
+
+        public StatutValidationAyantDroitFilter() {}
+
+        public StatutValidationAyantDroitFilter(StatutValidationAyantDroitFilter filter) {
+            super(filter);
+        }
+
+        @Override
+        public StatutValidationAyantDroitFilter copy() {
+            return new StatutValidationAyantDroitFilter(this);
+        }
+    }
+
     private LongFilter id;
 
     private StatutAyantDroitFilter statut;
+
+    private StatutValidationAyantDroitFilter statutValidation;
 
     private StringFilter nom;
 
@@ -81,6 +101,7 @@ public class AyantDroitCriteria implements Serializable, Criteria {
     public AyantDroitCriteria(AyantDroitCriteria other) {
         this.id = other.optionalId().map(LongFilter::copy).orElse(null);
         this.statut = other.optionalStatut().map(StatutAyantDroitFilter::copy).orElse(null);
+        this.statutValidation = other.optionalStatutValidation().map(StatutValidationAyantDroitFilter::copy).orElse(null);
         this.nom = other.optionalNom().map(StringFilter::copy).orElse(null);
         this.prenom = other.optionalPrenom().map(StringFilter::copy).orElse(null);
         this.dateNaissance = other.optionalDateNaissance().map(LocalDateFilter::copy).orElse(null);
@@ -92,6 +113,25 @@ public class AyantDroitCriteria implements Serializable, Criteria {
     @Override
     public AyantDroitCriteria copy() {
         return new AyantDroitCriteria(this);
+    }
+
+    public StatutValidationAyantDroitFilter getStatutValidation() {
+        return statutValidation;
+    }
+
+    public Optional<StatutValidationAyantDroitFilter> optionalStatutValidation() {
+        return Optional.ofNullable(statutValidation);
+    }
+
+    public StatutValidationAyantDroitFilter statutValidation() {
+        if (statutValidation == null) {
+            setStatutValidation(new StatutValidationAyantDroitFilter());
+        }
+        return statutValidation;
+    }
+
+    public void setStatutValidation(StatutValidationAyantDroitFilter statutValidation) {
+        this.statutValidation = statutValidation;
     }
 
     public StatutAyantDroitFilter getStatut() {
@@ -258,6 +298,7 @@ public class AyantDroitCriteria implements Serializable, Criteria {
         return (
             Objects.equals(id, that.id) &&
             Objects.equals(statut, that.statut) &&
+            Objects.equals(statutValidation, that.statutValidation) &&
             Objects.equals(nom, that.nom) &&
             Objects.equals(prenom, that.prenom) &&
             Objects.equals(dateNaissance, that.dateNaissance) &&
@@ -278,6 +319,7 @@ public class AyantDroitCriteria implements Serializable, Criteria {
         return "AyantDroitCriteria{" +
             optionalId().map(f -> "id=" + f + ", ").orElse("") +
             optionalStatut().map(f -> "statut=" + f + ", ").orElse("") +
+            optionalStatutValidation().map(f -> "statutValidation=" + f + ", ").orElse("") +
             optionalNom().map(f -> "nom=" + f + ", ").orElse("") +
             optionalPrenom().map(f -> "prenom=" + f + ", ").orElse("") +
             optionalDateNaissance().map(f -> "dateNaissance=" + f + ", ").orElse("") +

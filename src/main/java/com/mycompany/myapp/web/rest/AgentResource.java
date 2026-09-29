@@ -1,6 +1,8 @@
 package com.mycompany.myapp.web.rest;
 
 import com.mycompany.myapp.repository.AgentRepository;
+import com.mycompany.myapp.security.ActionsConstants;
+import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.service.AgentQueryService;
 import com.mycompany.myapp.service.AgentService;
 import com.mycompany.myapp.service.criteria.AgentCriteria;
@@ -21,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -61,6 +64,7 @@ public class AgentResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.AGENT_CREER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<AgentDTO> createAgent(@Valid @RequestBody AgentDTO agentDTO) throws URISyntaxException {
         LOG.debug("REST request to save Agent : {}", agentDTO);
         if (agentDTO.getId() != null) {
@@ -83,6 +87,7 @@ public class AgentResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.AGENT_MODIFIER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<AgentDTO> updateAgent(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody AgentDTO agentDTO
@@ -116,6 +121,7 @@ public class AgentResource {
      * @return {@link ResponseEntity} avec le statut {@code 200 (OK)} et l'entite mise a jour.
      */
     @PutMapping("/{id}/statut")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.AGENT_CHANGER_STATUT + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<AgentDTO> changerStatut(@PathVariable("id") Long id, @Valid @RequestBody ChangementStatutDTO changement) {
         LOG.debug("REST request to change the status of Agent {} to {}", id, changement.statut());
         AgentDTO misAJour = agentService.changerStatut(id, changement.statut(), changement.motif());
@@ -136,6 +142,7 @@ public class AgentResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.AGENT_MODIFIER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<AgentDTO> partialUpdateAgent(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody AgentDTO agentDTO
@@ -168,6 +175,7 @@ public class AgentResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of Agents in body.
      */
     @GetMapping("")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.AGENT_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<List<AgentDTO>> getAllAgents(
         AgentCriteria criteria,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
@@ -186,6 +194,7 @@ public class AgentResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
      */
     @GetMapping("/count")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.AGENT_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<Long> countAgents(AgentCriteria criteria) {
         LOG.debug("REST request to count Agents by criteria: {}", criteria);
         return ResponseEntity.ok().body(agentQueryService.countByCriteria(criteria));
@@ -198,6 +207,7 @@ public class AgentResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the agentDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.AGENT_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<AgentDTO> getAgent(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Agent : {}", id);
         Optional<AgentDTO> agentDTO = agentService.findOne(id);
@@ -211,6 +221,7 @@ public class AgentResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.AGENT_SUPPRIMER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<Void> deleteAgent(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete Agent : {}", id);
         agentService.delete(id);

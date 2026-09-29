@@ -4,6 +4,7 @@ import com.mycompany.myapp.domain.Notification;
 import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.repository.NotificationRepository;
 import com.mycompany.myapp.repository.UserRepository;
+import com.mycompany.myapp.security.ActionsConstants;
 import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.security.SecurityUtils;
 import com.mycompany.myapp.service.NotificationQueryService;
@@ -169,6 +170,7 @@ public class NotificationResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<NotificationDTO> updateNotification(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody NotificationDTO notificationDTO
@@ -204,6 +206,7 @@ public class NotificationResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PreAuthorize("hasAuthority('" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<NotificationDTO> partialUpdateNotification(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody NotificationDTO notificationDTO
@@ -244,6 +247,7 @@ public class NotificationResource {
      * le faire. Reserve au destinataire, comme les autres ecritures.
      */
     @PutMapping("/{id}/lue")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.NOTIFICATION_MARQUER_LUE + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<NotificationDTO> marquerLue(@PathVariable("id") Long id) {
         LOG.debug("REST request to mark Notification as read : {}", id);
         requireRecipientOrAdmin(id);
@@ -259,12 +263,14 @@ public class NotificationResource {
      * @return le nombre de notifications qui etaient encore non lues.
      */
     @PutMapping("/lire-tout")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.NOTIFICATION_MARQUER_LUE + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<Integer> marquerToutLu() {
         LOG.debug("REST request to mark all Notifications as read");
         return ResponseEntity.ok().body(notificationService.marquerToutLu());
     }
 
     @GetMapping("")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.NOTIFICATION_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<List<NotificationDTO>> getAllNotifications(
         NotificationCriteria criteria,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable,
@@ -285,6 +291,7 @@ public class NotificationResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
      */
     @GetMapping("/count")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.NOTIFICATION_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<Long> countNotifications(
         NotificationCriteria criteria,
         @RequestParam(name = "mesNotifications", required = false) Boolean mesNotifications
@@ -301,6 +308,7 @@ public class NotificationResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the notificationDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.NOTIFICATION_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<NotificationDTO> getNotification(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Notification : {}", id);
         Optional<NotificationDTO> notificationDTO = notificationService.findOne(id);
@@ -323,6 +331,7 @@ public class NotificationResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<Void> deleteNotification(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete Notification : {}", id);
         requireRecipientOrAdmin(id);

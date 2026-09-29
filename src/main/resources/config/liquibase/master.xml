@@ -25,6 +25,7 @@
     <include file="config/liquibase/changelog/20260910080343_added_entity_BoiteReception.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260910080344_added_entity_Notification.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260910080345_added_entity_HistoriqueAction.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260923132049_added_entity_CarteBeneficiaire.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <include file="config/liquibase/changelog/20231225055847_added_entity_constraints_Direction.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20231225055947_added_entity_constraints_Agent.xml" relativeToChangelogFile="false"/>
@@ -67,5 +68,7 @@
     <include file="config/liquibase/changelog/20260925140000_add_statut_agent_ayant_droit.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260925160000_tache_par_droit.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260925180000_historique_action_cible.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260929100000_piece_justificative_fichier.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260929120000_ayant_droit_validation.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>

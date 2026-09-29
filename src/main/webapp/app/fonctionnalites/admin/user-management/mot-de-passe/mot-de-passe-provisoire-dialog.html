@@ -1,0 +1,31 @@
+<div class="modal-header">
+  <h2 class="modal-title">Mot de passe provisoire</h2>
+  <button type="button" class="btn-close" aria-label="Fermer" (click)="fermer()"></button>
+</div>
+
+<div class="modal-body">
+  <p>
+    Le compte <strong>{{ login }}</strong> a reçu un nouveau mot de passe. Remettez-le à l'intéressé : il devra en choisir un autre dès sa
+    prochaine connexion.
+  </p>
+
+  <div class="pec-motdepasse" data-cy="motDePasseProvisoire">
+    <code>{{ motDePasse }}</code>
+    <button type="button" class="pec-btn pec-btn--discret pec-btn--sm" (click)="copier()" data-cy="copierMotDePasse">
+      <fa-icon class="pec-btn__ico" icon="paperclip" />
+      <span>{{ copie() ? 'Copié' : 'Copier' }}</span>
+    </button>
+  </div>
+
+  <!--
+    Dit avant la fermeture, pas après : le serveur ne conserve le mot de passe que chiffré, et
+    rouvrir cet écran ne le retrouverait pas.
+  -->
+  <p class="pec-muted">Il ne sera plus affiché. S'il est perdu, il faudra recommencer la réinitialisation.</p>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="pec-btn pec-btn--primaire" (click)="fermer()" data-cy="fermerMotDePasse">
+    <span>J'ai noté le mot de passe</span>
+  </button>
+</div>

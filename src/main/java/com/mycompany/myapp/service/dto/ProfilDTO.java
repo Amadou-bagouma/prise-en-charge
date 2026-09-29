@@ -26,6 +26,15 @@ public class ProfilDTO implements Serializable {
     @NotEmpty
     private Set<String> authorities;
 
+    /**
+     * Combien d'agents portent ce profil.
+     *
+     * <p>Pose par le service et non par le mapper : c'est un decompte, pas un champ de
+     * l'entite. Il dit ce qu'une modification du profil va toucher, et si sa suppression est
+     * seulement envisageable.
+     */
+    private Long nombreTitulaires;
+
     public Long getId() {
         return id;
     }
@@ -56,6 +65,14 @@ public class ProfilDTO implements Serializable {
 
     public void setAuthorities(Set<String> authorities) {
         this.authorities = authorities;
+    }
+
+    public Long getNombreTitulaires() {
+        return nombreTitulaires;
+    }
+
+    public void setNombreTitulaires(Long nombreTitulaires) {
+        this.nombreTitulaires = nombreTitulaires;
     }
 
     @Override

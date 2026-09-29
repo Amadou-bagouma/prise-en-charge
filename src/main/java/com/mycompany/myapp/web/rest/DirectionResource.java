@@ -1,6 +1,8 @@
 package com.mycompany.myapp.web.rest;
 
 import com.mycompany.myapp.repository.DirectionRepository;
+import com.mycompany.myapp.security.ActionsConstants;
+import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.service.DirectionQueryService;
 import com.mycompany.myapp.service.DirectionService;
 import com.mycompany.myapp.service.criteria.DirectionCriteria;
@@ -20,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -64,6 +67,7 @@ public class DirectionResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_CREER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<DirectionDTO> createDirection(@Valid @RequestBody DirectionDTO directionDTO) throws URISyntaxException {
         LOG.debug("REST request to save Direction : {}", directionDTO);
         if (directionDTO.getId() != null) {
@@ -86,6 +90,7 @@ public class DirectionResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_MODIFIER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<DirectionDTO> updateDirection(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody DirectionDTO directionDTO
@@ -120,6 +125,7 @@ public class DirectionResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_MODIFIER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<DirectionDTO> partialUpdateDirection(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody DirectionDTO directionDTO
@@ -152,6 +158,7 @@ public class DirectionResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of Directions in body.
      */
     @GetMapping("")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<List<DirectionDTO>> getAllDirections(
         DirectionCriteria criteria,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
@@ -170,6 +177,7 @@ public class DirectionResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
      */
     @GetMapping("/count")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<Long> countDirections(DirectionCriteria criteria) {
         LOG.debug("REST request to count Directions by criteria: {}", criteria);
         return ResponseEntity.ok().body(directionQueryService.countByCriteria(criteria));
@@ -182,6 +190,7 @@ public class DirectionResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the directionDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<DirectionDTO> getDirection(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Direction : {}", id);
         Optional<DirectionDTO> directionDTO = directionService.findOne(id);
@@ -195,6 +204,7 @@ public class DirectionResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_SUPPRIMER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<Void> deleteDirection(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete Direction : {}", id);
         directionService.delete(id);

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Une piece justificative porte desormais le fichier lui-meme.
+
+        Jusqu'ici elle ne portait qu'un nom et un « chemin » saisis a la main : rien ne
+        garantissait qu'un document existe, ni qu'il soit consultable par qui instruit le
+        dossier. Le contenu est stocke en base, et non sur le disque du serveur : celui-ci peut
+        etre remplace ou duplique sans que les pieces suivent, et une sauvegarde de la base qui
+        ne les contiendrait pas ne permettrait pas de reconstituer un dossier.
+    -->
+    <changeSet id="20260929100000-1" author="cnss">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="piece_justificative" columnName="contenu"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="piece_justificative">
+            <column name="contenu" type="${blobType}"/>
+            <column name="contenu_content_type" type="varchar(255)"/>
+            <column name="taille_fichier" type="bigint"/>
+        </addColumn>
+    </changeSet>
+
+    <!--
+        Le chemin devient facultatif : une piece numerisee se suffit, et l'exiger obligerait a
+        inventer une reference de classement pour un document qui n'existe qu'ici.
+
+        Les lignes deja enregistrees le conservent : c'est la seule trace qu'elles portent.
+    -->
+    <changeSet id="20260929100000-2" author="cnss">
+        <dropNotNullConstraint tableName="piece_justificative" columnName="chemin_fichier" columnDataType="varchar(255)"/>
+    </changeSet>
+</databaseChangeLog>

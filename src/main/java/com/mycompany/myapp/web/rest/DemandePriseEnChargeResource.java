@@ -3,6 +3,7 @@ package com.mycompany.myapp.web.rest;
 import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.repository.DemandePriseEnChargeRepository;
 import com.mycompany.myapp.repository.UserRepository;
+import com.mycompany.myapp.security.ActionsConstants;
 import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.security.SecurityUtils;
 import com.mycompany.myapp.service.DemandePriseEnChargeQueryService;
@@ -133,7 +134,7 @@ public class DemandePriseEnChargeResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.USER + "', '" + AuthoritiesConstants.VALIDATEUR_DRH + "')")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.DEMANDE_CREER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<DemandePriseEnChargeDTO> createDemandePriseEnCharge(
         @Valid @RequestBody DemandePriseEnChargeDTO demandePriseEnChargeDTO
     ) throws URISyntaxException {
@@ -158,7 +159,7 @@ public class DemandePriseEnChargeResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.USER + "', '" + AuthoritiesConstants.VALIDATEUR_DRH + "')")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.DEMANDE_MODIFIER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<DemandePriseEnChargeDTO> updateDemandePriseEnCharge(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody DemandePriseEnChargeDTO demandePriseEnChargeDTO
@@ -193,7 +194,7 @@ public class DemandePriseEnChargeResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.USER + "', '" + AuthoritiesConstants.VALIDATEUR_DRH + "')")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.DEMANDE_MODIFIER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<DemandePriseEnChargeDTO> partialUpdateDemandePriseEnCharge(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody DemandePriseEnChargeDTO demandePriseEnChargeDTO
@@ -226,6 +227,7 @@ public class DemandePriseEnChargeResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of Demande Prise En Charges in body.
      */
     @GetMapping("")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.DEMANDE_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<List<DemandePriseEnChargeDTO>> getAllDemandePriseEnCharges(
         DemandePriseEnChargeCriteria criteria,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
@@ -248,6 +250,7 @@ public class DemandePriseEnChargeResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
      */
     @GetMapping("/count")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.DEMANDE_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<Long> countDemandePriseEnCharges(DemandePriseEnChargeCriteria criteria) {
         LOG.debug("REST request to count DemandePriseEnCharges by criteria: {}", criteria);
         return ResponseEntity.ok().body(
@@ -262,6 +265,7 @@ public class DemandePriseEnChargeResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the demandePriseEnChargeDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.DEMANDE_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<DemandePriseEnChargeDTO> getDemandePriseEnCharge(@PathVariable("id") Long id) {
         LOG.debug("REST request to get DemandePriseEnCharge : {}", id);
         Optional<DemandePriseEnChargeDTO> demandePriseEnChargeDTO = demandePriseEnChargeService.findOne(id);
@@ -276,7 +280,7 @@ public class DemandePriseEnChargeResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('" + AuthoritiesConstants.ADMIN + "')")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.DEMANDE_SUPPRIMER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<Void> deleteDemandePriseEnCharge(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete DemandePriseEnCharge : {}", id);
         demandePriseEnChargeService.delete(id);
@@ -293,6 +297,7 @@ public class DemandePriseEnChargeResource {
      * @return {@link ResponseEntity} avec le statut {@code 200 (OK)} et le dossier mis a jour.
      */
     @PostMapping("/{id}/soumettre")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.DEMANDE_SOUMETTRE + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<DemandePriseEnChargeDTO> soumettreDemandePriseEnCharge(@PathVariable("id") Long id) {
         LOG.debug("REST request to soumettre DemandePriseEnCharge : {}", id);
         DemandePriseEnChargeDTO result = demandePriseEnChargeService.soumettre(id);
@@ -309,7 +314,15 @@ public class DemandePriseEnChargeResource {
      * @return {@link ResponseEntity} avec le statut {@code 200 (OK)} et le dossier mis a jour.
      */
     @PostMapping("/{id}/verifier")
-    @PreAuthorize("hasAuthority('" + AuthoritiesConstants.VERIFICATEUR_RH + "')")
+    @PreAuthorize(
+        "hasAnyAuthority('" +
+            ActionsConstants.DEMANDE_VERIFIER +
+            "', '" +
+            AuthoritiesConstants.VERIFICATEUR_RH +
+            "', '" +
+            AuthoritiesConstants.ADMIN +
+            "')"
+    )
     public ResponseEntity<DemandePriseEnChargeDTO> verifierDemandePriseEnCharge(
         @PathVariable("id") Long id,
         @RequestBody(required = false) DemandeWorkflowActionVM actionVM
@@ -331,7 +344,19 @@ public class DemandePriseEnChargeResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated demandePriseEnChargeDTO.
      */
     @PostMapping("/{id}/valider")
-    @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.VALIDATEUR_DRH + "', '" + AuthoritiesConstants.VALIDATEUR_INFIRMERIE + "')")
+    @PreAuthorize(
+        "hasAnyAuthority('" +
+            ActionsConstants.DEMANDE_VALIDER_DRH +
+            "', '" +
+            ActionsConstants.DEMANDE_VALIDER_INFIRMERIE +
+            "', '" +
+            AuthoritiesConstants.VALIDATEUR_DRH +
+            "', '" +
+            AuthoritiesConstants.VALIDATEUR_INFIRMERIE +
+            "', '" +
+            AuthoritiesConstants.ADMIN +
+            "')"
+    )
     public ResponseEntity<DemandePriseEnChargeDTO> validerDemandePriseEnCharge(
         @PathVariable("id") Long id,
         @RequestBody(required = false) DemandeWorkflowActionVM actionVM
@@ -355,11 +380,15 @@ public class DemandePriseEnChargeResource {
     @PostMapping("/{id}/rejeter")
     @PreAuthorize(
         "hasAnyAuthority('" +
+            ActionsConstants.DEMANDE_RETOURNER +
+            "', '" +
             AuthoritiesConstants.VERIFICATEUR_RH +
             "', '" +
             AuthoritiesConstants.VALIDATEUR_DRH +
             "', '" +
             AuthoritiesConstants.VALIDATEUR_INFIRMERIE +
+            "', '" +
+            AuthoritiesConstants.ADMIN +
             "')"
     )
     public ResponseEntity<DemandePriseEnChargeDTO> rejeterDemandePriseEnCharge(
@@ -386,11 +415,15 @@ public class DemandePriseEnChargeResource {
     @PostMapping("/{id}/rejeter-definitivement")
     @PreAuthorize(
         "hasAnyAuthority('" +
+            ActionsConstants.DEMANDE_REJETER +
+            "', '" +
             AuthoritiesConstants.VERIFICATEUR_RH +
             "', '" +
             AuthoritiesConstants.VALIDATEUR_DRH +
             "', '" +
             AuthoritiesConstants.VALIDATEUR_INFIRMERIE +
+            "', '" +
+            AuthoritiesConstants.ADMIN +
             "')"
     )
     public ResponseEntity<DemandePriseEnChargeDTO> rejeterDefinitivementDemandePriseEnCharge(
@@ -412,7 +445,7 @@ public class DemandePriseEnChargeResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated demandePriseEnChargeDTO.
      */
     @PostMapping("/{id}/resoumettre")
-    @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.USER + "', '" + AuthoritiesConstants.VALIDATEUR_DRH + "')")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.DEMANDE_RESOUMETTRE + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<DemandePriseEnChargeDTO> resoumettreDemandePriseEnCharge(@PathVariable("id") Long id) {
         LOG.debug("REST request to resoumettre DemandePriseEnCharge : {}", id);
         DemandePriseEnChargeDTO result = demandePriseEnChargeService.resoumettre(id);
@@ -429,6 +462,7 @@ public class DemandePriseEnChargeResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the PDF file.
      */
     @GetMapping("/{id}/rapport")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.DEMANDE_IMPRIMER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<byte[]> getRapportDemandePriseEnCharge(@PathVariable("id") Long id) {
         LOG.debug("REST request to get the PDF rapport for DemandePriseEnCharge : {}", id);
         demandePriseEnChargeService.findOne(id).ifPresent(this::checkCanViewDemande);
@@ -457,6 +491,7 @@ public class DemandePriseEnChargeResource {
      * @return le PDF de la notification.
      */
     @GetMapping("/{id}/notification")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.DEMANDE_NOTIFIER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<byte[]> getNotificationDecision(@PathVariable("id") Long id) {
         LOG.debug("REST request to get the decision notice for DemandePriseEnCharge : {}", id);
         demandePriseEnChargeService.findOne(id).ifPresent(this::checkCanViewDemande);

@@ -42,6 +42,15 @@ public interface ProfilService {
     Page<ProfilDTO> findAll(Pageable pageable);
 
     /**
+     * Les profils dont le nom contient {@code fragment}.
+     *
+     * @param fragment le fragment cherche ; vide ou nul, tous les profils sont rendus.
+     * @param pageable la pagination.
+     * @return la page de profils.
+     */
+    Page<ProfilDTO> rechercher(String fragment, Pageable pageable);
+
+    /**
      * Get the "id" profil.
      *
      * @param id the id of the entity.

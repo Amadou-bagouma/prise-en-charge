@@ -1,43 +1,47 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    @if (gestion(); as gestionRef) {
-      <div class="jhi-form-panel">
-        <h2 data-cy="gestionDetailsHeading"><span jhiTranslate="peccnssApp.gestion.detail.title">Gestion</span></h2>
+@if (gestion(); as gestionRef) {
+  <div class="pec-ecran">
+    <div class="pec-titre-ecran">
+      <h1 data-cy="gestionDetailsHeading">{{ gestionRef.nom }}</h1>
+    </div>
 
-        <hr />
+    <jhi-alert-error />
+    <jhi-alert />
 
-        <jhi-alert-error />
+    <section class="pec-panneau">
+      <div class="pec-panneau__tete">
+        <span class="pec-panneau__titre">Gestion</span>
+      </div>
+      <div class="pec-panneau__corps">
+        <dl class="pec-defs">
+          <dt>Nom</dt>
+          <dd>{{ gestionRef.nom || '—' }}</dd>
 
-        <jhi-alert />
-
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dt>Type</dt>
           <dd>
-            <span>{{ gestionRef.id }}</span>
-          </dd>
-          <dt><span jhiTranslate="peccnssApp.gestion.nom">Nom</span></dt>
-          <dd>
-            <span>{{ gestionRef.nom }}</span>
-          </dd>
-          <dt><span jhiTranslate="peccnssApp.gestion.type">Type</span></dt>
-          <dd>
-            <span
-              class="jhi-badge"
-              [ngClass]="'jhi-badge-type-' + gestionRef.type"
-              [jhiTranslate]="'peccnssApp.TypeGestion.' + (gestionRef.type ?? 'null')"
-              >{{ { null: '', AS: 'AS', OA: 'OA' }[gestionRef.type ?? 'null'] }}</span
-            >
+            <span class="pec-badge pec-badge--info">
+              <span class="pec-badge__pt"></span>
+              <span [jhiTranslate]="'peccnssApp.TypeGestion.' + (gestionRef.type ?? 'null')">{{ gestionRef.type }}</span>
+            </span>
           </dd>
         </dl>
-
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
-        </button>
-
-        <button type="button" [routerLink]="['/gestion', gestionRef.id, 'edit']" class="btn btn-accent">
-          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
-        </button>
       </div>
-    }
+    </section>
+
+    <div class="pec-dossier__actions">
+      <button type="button" [routerLink]="['/gestion', gestionRef.id, 'edit']" class="pec-btn pec-btn--primaire" data-cy="entityEditButton">
+        <fa-icon class="pec-btn__ico" icon="pencil-alt" />
+        <span jhiTranslate="entity.action.edit">Editer</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="previousState()"
+        class="pec-btn pec-btn--discret pec-dossier__actions--fin"
+        data-cy="entityDetailsBackButton"
+      >
+        <fa-icon class="pec-btn__ico" icon="arrow-left" />
+        <span jhiTranslate="entity.action.back">Retour</span>
+      </button>
+    </div>
   </div>
-</div>
+}

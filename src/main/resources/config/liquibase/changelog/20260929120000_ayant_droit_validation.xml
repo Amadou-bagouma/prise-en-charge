@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Le rattachement d'un ayant droit passe par un circuit en deux temps : saisi, puis
+        verifie. Un rattachement non verifie ne doit pas fonder une prise en charge, et il reste
+        supprimable tant qu'il ne l'est pas.
+
+        Les lignes existantes sont declarees VALIDE : elles sont deja en service, et les
+        remettre en saisie rendrait d'un coup non couverts des ayants droit qui le sont.
+    -->
+    <changeSet id="20260929120000-1" author="cnss">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="ayant_droit" columnName="statut_validation"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="ayant_droit">
+            <column name="statut_validation" type="varchar(20)" defaultValue="VALIDE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_validation" type="${datetimeType}"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

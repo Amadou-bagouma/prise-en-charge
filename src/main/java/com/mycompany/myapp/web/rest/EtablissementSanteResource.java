@@ -1,6 +1,8 @@
 package com.mycompany.myapp.web.rest;
 
 import com.mycompany.myapp.repository.EtablissementSanteRepository;
+import com.mycompany.myapp.security.ActionsConstants;
+import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.service.EtablissementSanteQueryService;
 import com.mycompany.myapp.service.EtablissementSanteService;
 import com.mycompany.myapp.service.criteria.EtablissementSanteCriteria;
@@ -20,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -64,6 +67,7 @@ public class EtablissementSanteResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_CREER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<EtablissementSanteDTO> createEtablissementSante(@Valid @RequestBody EtablissementSanteDTO etablissementSanteDTO)
         throws URISyntaxException {
         LOG.debug("REST request to save EtablissementSante : {}", etablissementSanteDTO);
@@ -87,6 +91,7 @@ public class EtablissementSanteResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_MODIFIER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<EtablissementSanteDTO> updateEtablissementSante(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody EtablissementSanteDTO etablissementSanteDTO
@@ -121,6 +126,7 @@ public class EtablissementSanteResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_MODIFIER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<EtablissementSanteDTO> partialUpdateEtablissementSante(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody EtablissementSanteDTO etablissementSanteDTO
@@ -153,6 +159,7 @@ public class EtablissementSanteResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of Etablissement Santes in body.
      */
     @GetMapping("")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<List<EtablissementSanteDTO>> getAllEtablissementSantes(
         EtablissementSanteCriteria criteria,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
@@ -171,6 +178,7 @@ public class EtablissementSanteResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
      */
     @GetMapping("/count")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<Long> countEtablissementSantes(EtablissementSanteCriteria criteria) {
         LOG.debug("REST request to count EtablissementSantes by criteria: {}", criteria);
         return ResponseEntity.ok().body(etablissementSanteQueryService.countByCriteria(criteria));
@@ -183,6 +191,7 @@ public class EtablissementSanteResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the etablissementSanteDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<EtablissementSanteDTO> getEtablissementSante(@PathVariable("id") Long id) {
         LOG.debug("REST request to get EtablissementSante : {}", id);
         Optional<EtablissementSanteDTO> etablissementSanteDTO = etablissementSanteService.findOne(id);
@@ -196,6 +205,7 @@ public class EtablissementSanteResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_SUPPRIMER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<Void> deleteEtablissementSante(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete EtablissementSante : {}", id);
         etablissementSanteService.delete(id);

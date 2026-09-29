@@ -146,14 +146,30 @@ public class ProfilServiceImpl implements ProfilService {
     @Transactional(readOnly = true)
     public Page<ProfilDTO> findAll(Pageable pageable) {
         LOG.debug("Request to get all Profils");
-        return profilRepository.findAll(pageable).map(profilMapper::toDto);
+        return profilRepository.findAll(pageable).map(profilMapper::toDto).map(this::avecTitulaires);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ProfilDTO> rechercher(String fragment, Pageable pageable) {
+        if (fragment == null || fragment.isBlank()) {
+            return findAll(pageable);
+        }
+        LOG.debug("Request to search Profils on {}", fragment);
+        return profilRepository.findByNomContainingIgnoreCase(fragment.trim(), pageable).map(profilMapper::toDto).map(this::avecTitulaires);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<ProfilDTO> findOne(Long id) {
         LOG.debug("Request to get Profil : {}", id);
-        return profilRepository.findById(id).map(profilMapper::toDto);
+        return profilRepository.findById(id).map(profilMapper::toDto).map(this::avecTitulaires);
+    }
+
+    /** Complete un profil par le nombre d'agents qui le portent. */
+    private ProfilDTO avecTitulaires(ProfilDTO profil) {
+        profil.setNombreTitulaires(userRepository.countByProfilId(profil.getId()));
+        return profil;
     }
 
     @Override

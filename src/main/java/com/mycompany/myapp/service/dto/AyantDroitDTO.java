@@ -2,6 +2,7 @@ package com.mycompany.myapp.service.dto;
 
 import com.mycompany.myapp.domain.enumeration.LienParente;
 import com.mycompany.myapp.domain.enumeration.StatutAyantDroit;
+import com.mycompany.myapp.domain.enumeration.StatutValidationAyantDroit;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.Instant;
@@ -41,7 +42,6 @@ public class AyantDroitDTO implements Serializable {
     private AgentDTO agent;
 
     /** Situation au regard de la couverture medicale. Toujours renseignee. */
-    @NotNull
     private StatutAyantDroit statut;
 
     private Instant dateStatut;
@@ -54,6 +54,11 @@ public class AyantDroitDTO implements Serializable {
      * peut alors le dire, au lieu de laisser croire a une decision prise sur l'ayant droit.
      */
     private StatutAyantDroit statutAvantCascade;
+
+    /** Etat du rattachement dans le circuit d'enregistrement : saisi, puis verifie. */
+    private StatutValidationAyantDroit statutValidation;
+
+    private Instant dateValidation;
 
     public Long getId() {
         return id;
@@ -149,6 +154,22 @@ public class AyantDroitDTO implements Serializable {
 
     public void setStatutAvantCascade(StatutAyantDroit statutAvantCascade) {
         this.statutAvantCascade = statutAvantCascade;
+    }
+
+    public StatutValidationAyantDroit getStatutValidation() {
+        return statutValidation;
+    }
+
+    public void setStatutValidation(StatutValidationAyantDroit statutValidation) {
+        this.statutValidation = statutValidation;
+    }
+
+    public Instant getDateValidation() {
+        return dateValidation;
+    }
+
+    public void setDateValidation(Instant dateValidation) {
+        this.dateValidation = dateValidation;
     }
 
     public String getMotifStatut() {

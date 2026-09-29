@@ -21,7 +21,7 @@ import { FindLanguageFromKeyPipe, TranslateDirective } from 'app/shared/language
 import ActiveMenuDirective from './active-menu.directive';
 
 /** Les écrans des bénéficiaires : les personnes couvertes. */
-const SEGMENTS_BENEFICIAIRES = ['agent', 'ayant-droit'];
+const SEGMENTS_BENEFICIAIRES = ['agent', 'ayant-droit', 'carte-beneficiaire'];
 
 /** Les écrans d'administration : comptes, habilitations, profils. */
 const SEGMENTS_ADMINISTRATION = ['user-management', 'authority', 'profil'];

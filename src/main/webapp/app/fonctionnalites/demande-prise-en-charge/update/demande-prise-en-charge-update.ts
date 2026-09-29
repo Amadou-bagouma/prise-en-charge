@@ -28,6 +28,14 @@ import { DemandePriseEnChargeService } from '../service/demande-prise-en-charge.
 
 import { DemandePriseEnChargeFormGroup, DemandePriseEnChargeFormService } from './demande-prise-en-charge-form.service';
 
+/**
+ * Nombre d'entrees demandees pour alimenter une liste deroulante.
+ *
+ * Suffisamment large pour couvrir les referentiels de l'institution, tout en restant une page :
+ * au-dela, c'est une recherche qu'il faudra, pas une liste.
+ */
+const OPTIONS_PAR_LISTE = 500;
+
 @Component({
   selector: 'jhi-demande-prise-en-charge-update',
   templateUrl: './demande-prise-en-charge-update.html',
@@ -46,6 +54,14 @@ export class DemandePriseEnChargeUpdate implements OnInit {
 
   agentsSharedCollection = signal<IAgent[]>([]);
   ayantDroitsSharedCollection = signal<IAyantDroit[]>([]);
+
+  /**
+   * Vrai quand le bénéficiaire est un ayant droit : c'est le seul cas où le champ a un objet.
+   *
+   * L'agent, lui, reste demandé dans les deux cas — c'est lui qui porte le droit, et c'est de
+   * lui que dépendent les ayants droit proposés.
+   */
+  readonly beneficiaireEstAyantDroit = signal(false);
   etablissementSantesSharedCollection = signal<IEtablissementSante[]>([]);
   usersSharedCollection = signal<IUser[]>([]);
 
@@ -80,6 +96,7 @@ export class DemandePriseEnChargeUpdate implements OnInit {
       }
 
       this.loadRelationshipsOptions();
+      this.surveillerBeneficiaire();
     });
   }
 
@@ -155,26 +172,17 @@ export class DemandePriseEnChargeUpdate implements OnInit {
       this.typeSoinValues.set([...actifs, ...manquants]);
     });
 
+    // Les listes deroulantes demandent explicitement une grande page : `query()` sans parametre
+    // ne rend que la premiere page du serveur, et les agents au-dela n'apparaissaient nulle part
+    // — impossible d'ouvrir un dossier a leur nom, sans que rien ne le signale.
     this.agentService
-      .query()
+      .query({ size: OPTIONS_PAR_LISTE, sort: ['nom,asc', 'prenom,asc'] })
       .pipe(map((res: HttpResponse<IAgent[]>) => res.body ?? []))
       .pipe(map((agents: IAgent[]) => this.agentService.addAgentToCollectionIfMissing<IAgent>(agents, this.demandePriseEnCharge?.agent)))
       .subscribe((agents: IAgent[]) => this.agentsSharedCollection.set(agents));
 
-    this.ayantDroitService
-      .query()
-      .pipe(map((res: HttpResponse<IAyantDroit[]>) => res.body ?? []))
-      .pipe(
-        map((ayantDroits: IAyantDroit[]) =>
-          this.sortAyantDroitsDescending(
-            this.ayantDroitService.addAyantDroitToCollectionIfMissing<IAyantDroit>(ayantDroits, this.demandePriseEnCharge?.ayantDroit),
-          ),
-        ),
-      )
-      .subscribe((ayantDroits: IAyantDroit[]) => this.ayantDroitsSharedCollection.set(ayantDroits));
-
     this.etablissementSanteService
-      .query()
+      .query({ size: OPTIONS_PAR_LISTE, sort: ['nom,asc'] })
       .pipe(map((res: HttpResponse<IEtablissementSante[]>) => res.body ?? []))
       .pipe(
         map((etablissementSantes: IEtablissementSante[]) =>
@@ -187,7 +195,7 @@ export class DemandePriseEnChargeUpdate implements OnInit {
       .subscribe((etablissementSantes: IEtablissementSante[]) => this.etablissementSantesSharedCollection.set(etablissementSantes));
 
     this.userService
-      .query()
+      .query({ size: OPTIONS_PAR_LISTE, sort: ['login,asc'] })
       .pipe(map((res: HttpResponse<IUser[]>) => res.body ?? []))
       .pipe(
         map((users: IUser[]) =>
@@ -228,5 +236,60 @@ export class DemandePriseEnChargeUpdate implements OnInit {
     const next = checked ? [...current, typeSoin] : current.filter(choisi => choisi.id !== typeSoin.id);
     this.editForm.controls.typeSoins.setValue(next);
     this.editForm.controls.typeSoins.markAsDirty();
+  }
+
+  /**
+   * Tient le champ « ayant droit » en accord avec le type de bénéficiaire et l'agent retenu.
+   *
+   * Le champ est vidé dès qu'il perd son objet : le laisser rempli ferait enregistrer un
+   * rattachement que l'écran n'affiche plus, et que personne ne pourrait donc corriger.
+   */
+  private surveillerBeneficiaire(): void {
+    const typeCtrl = this.editForm.controls.typeBeneficiaire;
+    const agentCtrl = this.editForm.controls.agent;
+
+    const reagir = (): void => {
+      const estAyantDroit = typeCtrl.value === 'AYANT_DROIT';
+      this.beneficiaireEstAyantDroit.set(estAyantDroit);
+      if (!estAyantDroit) {
+        this.editForm.controls.ayantDroit.setValue(null);
+        this.ayantDroitsSharedCollection.set([]);
+        return;
+      }
+      this.chargerAyantsDroitDeLAgent(agentCtrl.value?.id);
+    };
+
+    typeCtrl.valueChanges.subscribe(reagir);
+    agentCtrl.valueChanges.subscribe(() => {
+      // Changer d'agent invalide l'ayant droit déjà choisi : il appartient à l'agent précédent.
+      if (this.beneficiaireEstAyantDroit()) {
+        this.editForm.controls.ayantDroit.setValue(null);
+      }
+      reagir();
+    });
+    reagir();
+  }
+
+  /**
+   * Ne propose que les ayants droit de l'agent retenu.
+   *
+   * Sans agent, la liste reste vide plutôt que de montrer tout le monde : proposer les ayants
+   * droit de l'institution entière permettrait d'ouvrir un dossier au nom d'un enfant rattaché
+   * à quelqu'un d'autre.
+   */
+  private chargerAyantsDroitDeLAgent(agentId?: number): void {
+    if (!agentId) {
+      this.ayantDroitsSharedCollection.set([]);
+      return;
+    }
+    this.ayantDroitService
+      .query({ 'agentId.equals': agentId, size: 100, sort: ['nom,asc', 'prenom,asc'] })
+      .pipe(map((res: HttpResponse<IAyantDroit[]>) => res.body ?? []))
+      .pipe(
+        map((ayantDroits: IAyantDroit[]) =>
+          this.ayantDroitService.addAyantDroitToCollectionIfMissing<IAyantDroit>(ayantDroits, this.demandePriseEnCharge?.ayantDroit),
+        ),
+      )
+      .subscribe((ayantDroits: IAyantDroit[]) => this.ayantDroitsSharedCollection.set(ayantDroits));
   }
 }

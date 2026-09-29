@@ -1,6 +1,8 @@
 package com.mycompany.myapp.web.rest;
 
 import com.mycompany.myapp.repository.HistoriqueActionRepository;
+import com.mycompany.myapp.security.ActionsConstants;
+import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.service.HistoriqueActionQueryService;
 import com.mycompany.myapp.service.HistoriqueActionService;
 import com.mycompany.myapp.service.criteria.HistoriqueActionCriteria;
@@ -20,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -64,6 +67,7 @@ public class HistoriqueActionResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
+    @PreAuthorize("hasAuthority('" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<HistoriqueActionDTO> createHistoriqueAction(@Valid @RequestBody HistoriqueActionDTO historiqueActionDTO)
         throws URISyntaxException {
         LOG.debug("REST request to save HistoriqueAction : {}", historiqueActionDTO);
@@ -87,6 +91,7 @@ public class HistoriqueActionResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<HistoriqueActionDTO> updateHistoriqueAction(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody HistoriqueActionDTO historiqueActionDTO
@@ -121,6 +126,7 @@ public class HistoriqueActionResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PreAuthorize("hasAuthority('" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<HistoriqueActionDTO> partialUpdateHistoriqueAction(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody HistoriqueActionDTO historiqueActionDTO
@@ -153,6 +159,7 @@ public class HistoriqueActionResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of Historique Actions in body.
      */
     @GetMapping("")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.HISTORIQUE_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<List<HistoriqueActionDTO>> getAllHistoriqueActions(
         HistoriqueActionCriteria criteria,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
@@ -171,6 +178,7 @@ public class HistoriqueActionResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
      */
     @GetMapping("/count")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.HISTORIQUE_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<Long> countHistoriqueActions(HistoriqueActionCriteria criteria) {
         LOG.debug("REST request to count HistoriqueActions by criteria: {}", criteria);
         return ResponseEntity.ok().body(historiqueActionQueryService.countByCriteria(criteria));
@@ -183,6 +191,7 @@ public class HistoriqueActionResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the historiqueActionDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.HISTORIQUE_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<HistoriqueActionDTO> getHistoriqueAction(@PathVariable("id") Long id) {
         LOG.debug("REST request to get HistoriqueAction : {}", id);
         Optional<HistoriqueActionDTO> historiqueActionDTO = historiqueActionService.findOne(id);
@@ -196,6 +205,7 @@ public class HistoriqueActionResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<Void> deleteHistoriqueAction(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete HistoriqueAction : {}", id);
         historiqueActionService.delete(id);

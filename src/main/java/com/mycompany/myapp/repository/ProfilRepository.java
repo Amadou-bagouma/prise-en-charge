@@ -2,6 +2,8 @@ package com.mycompany.myapp.repository;
 
 import com.mycompany.myapp.domain.Profil;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -28,4 +30,7 @@ public interface ProfilRepository extends JpaRepository<Profil, Long> {
     @EntityGraph(attributePaths = "authorities")
     @Query("select p from Profil p where p.nom = :nom")
     Optional<Profil> findOneWithAuthoritiesByNom(@org.springframework.data.repository.query.Param("nom") String nom);
+
+    /** Les profils dont le nom contient le fragment cherche, sans egard a la casse. */
+    Page<Profil> findByNomContainingIgnoreCase(String fragment, Pageable pageable);
 }

@@ -9,6 +9,21 @@
   <jhi-alert />
 
   <div class="pec-filtres">
+    <!-- Recherche à gauche, filtres au centre, actions à droite : même disposition partout. -->
+    <div class="pec-filtres__rech">
+      <span class="pec-filtres__loupe"><fa-icon icon="search" /></span>
+      <input
+        type="search"
+        class="pec-champ__ctrl"
+        placeholder="Nom de la région"
+        aria-label="Rechercher une région par son nom"
+        data-cy="searchInput"
+        [value]="searchTerm()"
+        (input)="searchTerm.set($any($event.target).value)"
+        (keyup.enter)="search()"
+      />
+    </div>
+
     <jhi-filter [filters]="filters" />
 
     <div class="pec-filtres__actions">

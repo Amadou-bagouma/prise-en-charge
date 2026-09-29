@@ -1,46 +1,57 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    @if (direction(); as directionRef) {
-      <div class="jhi-form-panel">
-        <h2 data-cy="directionDetailsHeading"><span jhiTranslate="peccnssApp.direction.detail.title">Direction</span></h2>
+@if (direction(); as directionRef) {
+  <div class="pec-ecran">
+    <div class="pec-titre-ecran">
+      <h1 data-cy="directionDetailsHeading">{{ directionRef.nom }}</h1>
+      <span class="pec-num">{{ directionRef.code }}</span>
+    </div>
 
-        <hr />
+    <jhi-alert-error />
+    <jhi-alert />
 
-        <jhi-alert-error />
+    <section class="pec-panneau">
+      <div class="pec-panneau__tete">
+        <span class="pec-panneau__titre">Direction</span>
+      </div>
+      <div class="pec-panneau__corps">
+        <dl class="pec-defs">
+          <dt>Code</dt>
+          <dd class="pec-defs--mono">{{ directionRef.code || '—' }}</dd>
 
-        <jhi-alert />
+          <dt>Nom</dt>
+          <dd>{{ directionRef.nom || '—' }}</dd>
 
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dt>Région</dt>
           <dd>
-            <span>{{ directionRef.id }}</span>
-          </dd>
-          <dt><span jhiTranslate="peccnssApp.direction.code">Code</span></dt>
-          <dd>
-            <span>{{ directionRef.code }}</span>
-          </dd>
-          <dt><span jhiTranslate="peccnssApp.direction.nom">Nom</span></dt>
-          <dd>
-            <span>{{ directionRef.nom }}</span>
-          </dd>
-          <dt><span jhiTranslate="peccnssApp.direction.region">Region</span></dt>
-          <dd>
-            @if (direction()!.region) {
-              <div>
-                <a [routerLink]="['/region', direction()!.region?.id, 'view']">{{ directionRef.region?.nom }}</a>
-              </div>
+            @if (directionRef.region) {
+              <a [routerLink]="['/region', directionRef.region.id, 'view']">{{ directionRef.region.nom }}</a>
+            } @else {
+              <span class="pec-muted">—</span>
             }
           </dd>
         </dl>
-
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
-        </button>
-
-        <button type="button" [routerLink]="['/direction', directionRef.id, 'edit']" class="btn btn-accent">
-          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
-        </button>
       </div>
-    }
+    </section>
+
+    <div class="pec-dossier__actions">
+      <button
+        type="button"
+        [routerLink]="['/direction', directionRef.id, 'edit']"
+        class="pec-btn pec-btn--primaire"
+        data-cy="entityEditButton"
+      >
+        <fa-icon class="pec-btn__ico" icon="pencil-alt" />
+        <span jhiTranslate="entity.action.edit">Editer</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="previousState()"
+        class="pec-btn pec-btn--discret pec-dossier__actions--fin"
+        data-cy="entityDetailsBackButton"
+      >
+        <fa-icon class="pec-btn__ico" icon="arrow-left" />
+        <span jhiTranslate="entity.action.back">Retour</span>
+      </button>
+    </div>
   </div>
-</div>
+}

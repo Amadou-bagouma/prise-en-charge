@@ -8,10 +8,26 @@
   <jhi-alert />
 
   <!--
-    Deux vues seulement : ce qui reste à voir, et tout. Pas de menu de filtres : une boîte de
-    réception se consulte, elle ne s'interroge pas.
+    Deux vues seulement : ce qui reste à voir, et tout. Pas de menu de filtres, mais une
+    recherche sur l'objet : une boîte de réception se parcourt, et retrouver un avis reçu il y a
+    trois semaines en tournant les pages n'est pas la parcourir.
   -->
   <div class="pec-filtres">
+    <!-- Recherche à gauche, filtres au centre, actions à droite : même disposition partout. -->
+    <div class="pec-filtres__rech">
+      <span class="pec-filtres__loupe"><fa-icon icon="search" /></span>
+      <input
+        type="search"
+        class="pec-champ__ctrl"
+        placeholder="Objet"
+        aria-label="Rechercher une notification par son objet"
+        data-cy="searchInput"
+        [value]="searchTerm()"
+        (input)="searchTerm.set($any($event.target).value)"
+        (keyup.enter)="search()"
+      />
+    </div>
+
     @for (puce of puces; track puce.cle) {
       <button
         type="button"

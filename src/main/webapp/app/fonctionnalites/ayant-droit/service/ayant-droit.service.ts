@@ -10,9 +10,10 @@ import { IAyantDroit, NewAyantDroit } from '../ayant-droit.model';
 
 export type PartialUpdateAyantDroit = Partial<IAyantDroit> & Pick<IAyantDroit, 'id'>;
 
-type RestOf<T extends IAyantDroit | NewAyantDroit> = Omit<T, 'dateNaissance' | 'dateStatut'> & {
+type RestOf<T extends IAyantDroit | NewAyantDroit> = Omit<T, 'dateNaissance' | 'dateStatut' | 'dateValidation'> & {
   dateNaissance?: string | null;
   dateStatut?: string | null;
+  dateValidation?: string | null;
 };
 
 export type RestAyantDroit = RestOf<IAyantDroit>;
@@ -47,6 +48,7 @@ export class AyantDroitsService {
       ...restAyantDroit,
       dateNaissance: restAyantDroit.dateNaissance ? dayjs(restAyantDroit.dateNaissance) : undefined,
       dateStatut: restAyantDroit.dateStatut ? dayjs(restAyantDroit.dateStatut) : undefined,
+      dateValidation: restAyantDroit.dateValidation ? dayjs(restAyantDroit.dateValidation) : undefined,
     };
   }
 }
@@ -71,6 +73,18 @@ export class AyantDroitService extends AyantDroitsService {
     const copy = this.convertValueFromClient(ayantDroit);
     return this.http
       .patch<RestAyantDroit>(`${this.resourceUrl}/${encodeURIComponent(this.getAyantDroitIdentifier(ayantDroit))}`, copy)
+      .pipe(map(res => this.convertResponseFromServer(res)));
+  }
+
+  /**
+   * Déclare le rattachement vérifié.
+   *
+   * Tant qu'il ne l'est pas, l'ayant droit ne peut pas fonder une prise en charge et son
+   * enregistrement reste supprimable.
+   */
+  valider(id: number): Observable<IAyantDroit> {
+    return this.http
+      .put<RestAyantDroit>(`${this.resourceUrl}/${encodeURIComponent(id)}/valider`, {})
       .pipe(map(res => this.convertResponseFromServer(res)));
   }
 
@@ -145,6 +159,7 @@ export class AyantDroitService extends AyantDroitsService {
       ...ayantDroit,
       dateNaissance: ayantDroit.dateNaissance?.format(DATE_FORMAT) ?? null,
       dateStatut: ayantDroit.dateStatut?.toJSON() ?? null,
+      dateValidation: ayantDroit.dateValidation?.toJSON() ?? null,
     };
   }
 

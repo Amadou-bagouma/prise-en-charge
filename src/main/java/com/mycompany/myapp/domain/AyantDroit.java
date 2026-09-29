@@ -3,6 +3,7 @@ package com.mycompany.myapp.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.mycompany.myapp.domain.enumeration.LienParente;
 import com.mycompany.myapp.domain.enumeration.StatutAyantDroit;
+import com.mycompany.myapp.domain.enumeration.StatutValidationAyantDroit;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serial;
@@ -104,6 +105,22 @@ public class AyantDroit extends AbstractAuditingEntity<Long> implements Serializ
      */
     @Column(name = "motif_avant_cascade", length = 500)
     private String motifAvantCascade;
+
+    /**
+     * Etat du rattachement dans le circuit d'enregistrement : saisi, puis verifie.
+     *
+     * <p>Distinct de {@code statut}, qui dit si la couverture joue. Un ayant droit peut etre
+     * actif au sens de la couverture et pourtant non verifie : c'est precisement l'etat qu'il
+     * faut pouvoir distinguer avant d'ouvrir un dossier a son nom.
+     */
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "statut_validation", nullable = false)
+    private StatutValidationAyantDroit statutValidation = StatutValidationAyantDroit.EN_SAISIE;
+
+    /** Date a laquelle le rattachement a ete verifie. */
+    @Column(name = "date_validation")
+    private Instant dateValidation;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -277,6 +294,27 @@ public class AyantDroit extends AbstractAuditingEntity<Long> implements Serializ
 
     public void setMotifAvantCascade(String motifAvantCascade) {
         this.motifAvantCascade = motifAvantCascade;
+    }
+
+    public StatutValidationAyantDroit getStatutValidation() {
+        return this.statutValidation;
+    }
+
+    public void setStatutValidation(StatutValidationAyantDroit statutValidation) {
+        this.statutValidation = statutValidation;
+    }
+
+    public AyantDroit statutValidation(StatutValidationAyantDroit statutValidation) {
+        this.setStatutValidation(statutValidation);
+        return this;
+    }
+
+    public Instant getDateValidation() {
+        return this.dateValidation;
+    }
+
+    public void setDateValidation(Instant dateValidation) {
+        this.dateValidation = dateValidation;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

@@ -87,26 +87,35 @@ describe('DemandePriseEnCharge Management Update Component', () => {
       expect(comp.agentsSharedCollection()).toEqual(expectedCollection);
     });
 
-    it('should call AyantDroit query and add missing value', () => {
-      const demandePriseEnCharge: IDemandePriseEnCharge = { id: 19327 };
-      const ayantDroit: IAyantDroit = { id: 17970 };
-      demandePriseEnCharge.ayantDroit = ayantDroit;
-
-      const ayantDroitCollection: IAyantDroit[] = [{ id: 17970 }];
-      vi.spyOn(ayantDroitService, 'query').mockReturnValue(of(new HttpResponse({ body: ayantDroitCollection })));
-      const additionalAyantDroits = [ayantDroit];
-      const expectedCollection: IAyantDroit[] = [...additionalAyantDroits, ...ayantDroitCollection];
-      vi.spyOn(ayantDroitService, 'addAyantDroitToCollectionIfMissing').mockReturnValue(expectedCollection);
+    it("ne propose aucun ayant droit tant que le beneficiaire est l'agent lui-meme", () => {
+      const demandePriseEnCharge: IDemandePriseEnCharge = { id: 19327, typeBeneficiaire: 'AGENT', agent: { id: 25235 } };
+      vi.spyOn(ayantDroitService, 'query').mockReturnValue(of(new HttpResponse({ body: [] })));
 
       activatedRoute.data = of({ demandePriseEnCharge });
       comp.ngOnInit();
 
-      expect(ayantDroitService.query).toHaveBeenCalled();
-      expect(ayantDroitService.addAyantDroitToCollectionIfMissing).toHaveBeenCalledWith(
-        ayantDroitCollection,
-        ...additionalAyantDroits.map(i => expect.objectContaining(i) as typeof i),
-      );
-      expect(comp.ayantDroitsSharedCollection()).toEqual(expectedCollection);
+      expect(comp.beneficiaireEstAyantDroit()).toBe(false);
+      expect(comp.ayantDroitsSharedCollection()).toEqual([]);
+      expect(ayantDroitService.query).not.toHaveBeenCalled();
+    });
+
+    it("ne propose que les ayants droit de l'agent retenu", () => {
+      const agent: IAgent = { id: 25235 };
+      const ayantDroit: IAyantDroit = { id: 17970 };
+      const demandePriseEnCharge: IDemandePriseEnCharge = { id: 19327, typeBeneficiaire: 'AYANT_DROIT', agent, ayantDroit };
+
+      const ayantDroitCollection: IAyantDroit[] = [ayantDroit];
+      vi.spyOn(ayantDroitService, 'query').mockReturnValue(of(new HttpResponse({ body: ayantDroitCollection })));
+      vi.spyOn(ayantDroitService, 'addAyantDroitToCollectionIfMissing').mockReturnValue(ayantDroitCollection);
+
+      activatedRoute.data = of({ demandePriseEnCharge });
+      comp.ngOnInit();
+
+      expect(comp.beneficiaireEstAyantDroit()).toBe(true);
+      // La requete est bornee a l'agent : proposer tous les ayants droit de l'institution
+      // permettrait d'ouvrir un dossier au nom d'un enfant rattache a quelqu'un d'autre.
+      expect(ayantDroitService.query).toHaveBeenCalledWith(expect.objectContaining({ 'agentId.equals': agent.id }));
+      expect(comp.ayantDroitsSharedCollection()).toEqual(ayantDroitCollection);
     });
 
     it('should call EtablissementSante query and add missing value', () => {
@@ -174,7 +183,6 @@ describe('DemandePriseEnCharge Management Update Component', () => {
       comp.ngOnInit();
 
       expect(comp.agentsSharedCollection()).toContainEqual(agent);
-      expect(comp.ayantDroitsSharedCollection()).toContainEqual(ayantDroit);
       expect(comp.etablissementSantesSharedCollection()).toContainEqual(etablissementSante);
       expect(comp.usersSharedCollection()).toContainEqual(gestionnaireCreateur);
       expect(comp.usersSharedCollection()).toContainEqual(assigneA);

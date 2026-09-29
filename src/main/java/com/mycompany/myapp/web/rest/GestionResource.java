@@ -1,6 +1,8 @@
 package com.mycompany.myapp.web.rest;
 
 import com.mycompany.myapp.repository.GestionRepository;
+import com.mycompany.myapp.security.ActionsConstants;
+import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.service.GestionService;
 import com.mycompany.myapp.service.dto.GestionDTO;
 import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
@@ -18,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -55,6 +58,7 @@ public class GestionResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_CREER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<GestionDTO> createGestion(@Valid @RequestBody GestionDTO gestionDTO) throws URISyntaxException {
         LOG.debug("REST request to save Gestion : {}", gestionDTO);
         if (gestionDTO.getId() != null) {
@@ -77,6 +81,7 @@ public class GestionResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_MODIFIER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<GestionDTO> updateGestion(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody GestionDTO gestionDTO
@@ -111,6 +116,7 @@ public class GestionResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_MODIFIER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<GestionDTO> partialUpdateGestion(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody GestionDTO gestionDTO
@@ -142,6 +148,7 @@ public class GestionResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of Gestions in body.
      */
     @GetMapping("")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<List<GestionDTO>> getAllGestions(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
         LOG.debug("REST request to get a page of Gestions");
         Page<GestionDTO> page = gestionService.findAll(pageable);
@@ -156,6 +163,7 @@ public class GestionResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the gestionDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<GestionDTO> getGestion(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Gestion : {}", id);
         Optional<GestionDTO> gestionDTO = gestionService.findOne(id);
@@ -169,6 +177,7 @@ public class GestionResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_SUPPRIMER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<Void> deleteGestion(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete Gestion : {}", id);
         gestionService.delete(id);

@@ -1,5 +1,6 @@
+import { NgClass } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
-import { Component, effect, inject, signal, untracked } from '@angular/core';
+import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Data, ParamMap, Router, RouterLink } from '@angular/router';
 
@@ -16,7 +17,10 @@ import { Filter, FilterOption, FilterOptions, IFilterOption, IFilterOptions } fr
 import { TranslateDirective } from 'app/shared/language';
 import { ItemCount } from 'app/shared/pagination';
 import { SortByDirective, SortDirective, SortService, type SortState, sortStateSignal } from 'app/shared/sort';
+import { AccountService } from 'app/core/auth/account.service';
+import { Authority } from 'app/shared/jhipster/constants';
 import { IAyantDroit } from '../ayant-droit.model';
+import { enSaisie, libelleValidation, tonValidation } from '../validation-rattachement';
 import { AyantDroitDeleteDialog } from '../delete/ayant-droit-delete-dialog';
 import { AyantDroitService } from '../service/ayant-droit.service';
 
@@ -24,6 +28,7 @@ import { AyantDroitService } from '../service/ayant-droit.service';
   selector: 'jhi-ayant-droit',
   templateUrl: './ayant-droit.html',
   imports: [
+    NgClass,
     RouterLink,
     FontAwesomeModule,
     AlertError,
@@ -67,6 +72,13 @@ export class AyantDroit {
   protected readonly sortService = inject(SortService);
   protected readonly filterOptions = toSignal(this.filters.filterChanges);
   protected modalService = inject(NgbModal);
+  protected readonly accountService = inject(AccountService);
+
+  /** Le contrôle RH prononce la vérification ; les autres la lisent. */
+  readonly peutVerifier = computed(() => this.accountService.hasAnyAuthority([Authority.VERIFICATEUR_RH, Authority.ADMIN]));
+
+  /** L'administration seule supprime un rattachement déjà vérifié : voir `estSupprimable`. */
+  private readonly estAdmin = computed(() => this.accountService.hasAnyAuthority(Authority.ADMIN));
 
   constructor() {
     effect(() => {
@@ -99,6 +111,30 @@ export class AyantDroit {
   }
 
   trackId = (item: IAyantDroit): number => this.ayantDroitService.getAyantDroitIdentifier(item);
+
+  libelleValidation = (ayantDroit: IAyantDroit): string => libelleValidation(ayantDroit.statutValidation);
+
+  tonValidation = (ayantDroit: IAyantDroit): string => tonValidation(ayantDroit.statutValidation);
+
+  /** Vrai tant que le rattachement est à vérifier — l'action n'a plus de sens ensuite. */
+  estAVerifier = (ayantDroit: IAyantDroit): boolean => enSaisie(ayantDroit.statutValidation);
+
+  /**
+   * Vrai tant que la suppression reste un geste de correction de saisie.
+   *
+   * Une fois le rattachement vérifié, des dossiers ont pu s'appuyer dessus : le supprimer les
+   * priverait de leur bénéficiaire. Il se radie depuis sa fiche. Le serveur refuse de la même
+   * manière — ce test ne fait qu'éviter de proposer ce qui sera refusé.
+   */
+  estSupprimable = (ayantDroit: IAyantDroit): boolean => enSaisie(ayantDroit.statutValidation) || this.estAdmin();
+
+  /** Déclare le rattachement vérifié, puis recharge : la liste doit montrer ce qui a été fait. */
+  valider(ayantDroit: IAyantDroit): void {
+    if (!ayantDroit.id) {
+      return;
+    }
+    this.ayantDroitService.valider(ayantDroit.id).subscribe(() => this.load());
+  }
 
   delete(ayantDroit: IAyantDroit): void {
     const modalRef = this.modalService.open(AyantDroitDeleteDialog, { size: 'lg', backdrop: 'static' });

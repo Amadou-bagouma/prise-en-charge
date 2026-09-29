@@ -191,6 +191,51 @@ public class UserResource {
     }
 
     /**
+     * {@code POST /admin/users/:login/reinitialiser-mot-de-passe} : donne un mot de passe
+     * provisoire a un compte.
+     *
+     * <p>Le mot de passe est rendu en clair dans la reponse, une seule fois : il n'existe nulle
+     * part ailleurs sous cette forme. L'interesse devra le changer a sa prochaine connexion.
+     *
+     * @param login le compte a depanner.
+     * @return {@link ResponseEntity} avec le statut {@code 200 (OK)} et le mot de passe provisoire.
+     */
+    @PostMapping("/users/{login}/reinitialiser-mot-de-passe")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    public ResponseEntity<MotDePasseProvisoire> reinitialiserMotDePasse(
+        @PathVariable("login") @Pattern(regexp = Constants.LOGIN_REGEX) String login
+    ) {
+        LOG.debug("REST request to reset password for User: {}", login);
+        String provisoire = userService.reinitialiserMotDePasse(login);
+        return ResponseEntity.ok(new MotDePasseProvisoire(login, provisoire));
+    }
+
+    /**
+     * {@code PUT /admin/users/:login/activation} : ouvre ou ferme un compte.
+     *
+     * @param login le compte vise.
+     * @param actif vrai pour ouvrir l'acces, faux pour le fermer.
+     * @return {@link ResponseEntity} avec le statut {@code 200 (OK)} et le compte mis a jour.
+     */
+    @PutMapping("/users/{login}/activation")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    public ResponseEntity<AdminUserDTO> changerActivation(
+        @PathVariable("login") @Pattern(regexp = Constants.LOGIN_REGEX) String login,
+        @RequestParam("actif") boolean actif
+    ) {
+        LOG.debug("REST request to set activation of User {} to {}", login, actif);
+        return ResponseEntity.ok(userService.changerActivation(login, actif));
+    }
+
+    /**
+     * Le mot de passe provisoire rendu a l'administrateur.
+     *
+     * <p>Un type a part plutot qu'une chaine nue : la reponse dit de quel compte il s'agit, ce
+     * qui evite de recopier le mot de passe d'un agent dans le dossier d'un autre.
+     */
+    public record MotDePasseProvisoire(String login, String motDePasseProvisoire) {}
+
+    /**
      * {@code DELETE /admin/users/:login} : delete the "login" User.
      *
      * @param login the login of the user to delete.

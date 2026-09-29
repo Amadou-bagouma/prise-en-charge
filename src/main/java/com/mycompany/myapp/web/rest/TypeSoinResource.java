@@ -1,6 +1,7 @@
 package com.mycompany.myapp.web.rest;
 
 import com.mycompany.myapp.repository.TypeSoinRepository;
+import com.mycompany.myapp.security.ActionsConstants;
 import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.service.TypeSoinQueryService;
 import com.mycompany.myapp.service.TypeSoinService;
@@ -107,6 +108,7 @@ public class TypeSoinResource {
     }
 
     @GetMapping("")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<List<TypeSoinDTO>> getAllTypeSoins(
         TypeSoinCriteria criteria,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
@@ -119,6 +121,7 @@ public class TypeSoinResource {
     }
 
     @GetMapping("/count")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<Long> countTypeSoins(TypeSoinCriteria criteria) {
         LOG.debug("REST request to count TypeSoins by criteria: {}", criteria);
         return ResponseEntity.ok().body(typeSoinQueryService.countByCriteria(criteria));
@@ -131,12 +134,14 @@ public class TypeSoinResource {
      * de la liste entiere pour afficher ses cases a cocher.
      */
     @GetMapping("/actifs")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<List<TypeSoinDTO>> getTypeSoinsActifs() {
         LOG.debug("REST request to get actifs TypeSoins");
         return ResponseEntity.ok().body(typeSoinService.findAllActifs());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<TypeSoinDTO> getTypeSoin(@PathVariable("id") Long id) {
         LOG.debug("REST request to get TypeSoin : {}", id);
         return ResponseUtil.wrapOrNotFound(typeSoinService.findOne(id));

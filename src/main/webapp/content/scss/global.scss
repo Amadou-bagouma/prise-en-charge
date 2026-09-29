@@ -1759,3 +1759,157 @@ Formulaires : lecture en deux colonnes, champs groupés, barre d'actions collant
 }
 
 /* jhipster-needle-scss-add-main JHipster will add new css style */
+
+/* ------------------------------------------------------------------------- *
+   Visionneuse de document
+
+   Une pièce ou un imprimé se vérifie à l'écran, pas dans le dossier des
+   téléchargements. Le cadre occupe donc la hauteur disponible : un A4 réduit à
+   un timbre ne se lit pas, et ce qu'on ne lit pas, on le suppose.
+ * ------------------------------------------------------------------------- */
+.pec-visionneuse .modal-content {
+  height: 92vh;
+}
+
+/*
+  Angular interpose l'element hote du composant entre la fenetre et son contenu. Sans cette
+  regle il reste en flux normal, la colonne flexible s'arrete a lui, et le cadre du document
+  garde la hauteur par defaut d'un iframe : 150 px, quelle que soit la taille de la fenetre.
+*/
+.pec-visionneuse jhi-visionneuse-document {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.pec-visionneuse__corps {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+  background: var(--pec-fond-2, #f1f3f5);
+}
+
+.pec-visionneuse__cadre {
+  flex: 1 1 auto;
+  width: 100%;
+  border: 0;
+}
+
+.pec-visionneuse__image {
+  flex: 1 1 auto;
+  overflow: auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.pec-visionneuse__image img {
+  max-width: 100%;
+  height: auto;
+}
+
+.pec-visionneuse__vide {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  text-align: center;
+  padding: 2rem;
+}
+
+/* Le mot de passe provisoire : lu caractère par caractère, donc en chasse fixe et espacé. */
+.pec-motdepasse {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--pec-bord, #ced4da);
+  border-radius: 0.5rem;
+  background: var(--pec-fond-2, #f1f3f5);
+}
+
+.pec-motdepasse code {
+  font-size: 1.25rem;
+  letter-spacing: 0.08em;
+  color: var(--pec-texte, #212529);
+  word-break: break-all;
+}
+
+/* ------------------------------------------------------------------------- *
+   Changement de mot de passe
+
+   Le formulaire à gauche, les règles à droite : les règles se lisent pendant
+   la saisie, et non en reproche après un refus qui ne dit pas ce qui manquait.
+ * ------------------------------------------------------------------------- */
+.pec-motdepasse-ecran {
+  max-width: 62rem;
+}
+
+.pec-motdepasse-grille {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+@media (max-width: 62rem) {
+  .pec-motdepasse-grille {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pec-motdepasse-actions {
+  margin-top: 1.25rem;
+}
+
+/* Le bouton qui dévoile la saisie, posé dans le champ plutôt qu'à côté. */
+.pec-champ__oeil {
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  transform: translateY(-50%);
+  border: 0;
+  background: none;
+  padding: 0.25rem 0.4rem;
+  color: var(--pec-texte-2, #6c757d);
+  cursor: pointer;
+}
+
+.pec-champ__oeil:hover {
+  color: var(--pec-texte, #212529);
+}
+
+.pec-champ__wrap {
+  position: relative;
+}
+
+.pec-regles {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pec-regles li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--pec-texte-2, #6c757d);
+}
+
+/* La règle satisfaite change de couleur ET d'icône : la couleur seule ne se lit pas. */
+.pec-regles--ok {
+  color: var(--pec-ok, #198754);
+  font-weight: 600;
+}

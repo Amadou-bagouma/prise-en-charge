@@ -43,7 +43,6 @@ public class AgentDTO implements Serializable {
     private GestionDTO gestion;
 
     /** Situation au regard de la couverture medicale. Toujours renseignee. */
-    @NotNull
     private StatutAgent statut;
 
     private Instant dateStatut;

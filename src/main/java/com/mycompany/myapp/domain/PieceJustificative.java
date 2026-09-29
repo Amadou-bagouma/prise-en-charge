@@ -31,9 +31,31 @@ public class PieceJustificative extends AbstractAuditingEntity<Long> implements 
     @Column(name = "nom_fichier", nullable = false)
     private String nomFichier;
 
-    @NotNull
-    @Column(name = "chemin_fichier", nullable = false)
+    /**
+     * Reference de classement du document d'origine, si le dossier papier existe encore.
+     *
+     * <p>N'est plus obligatoire depuis que le fichier lui-meme est depose : une piece numerisee
+     * se suffit.
+     */
+    @Column(name = "chemin_fichier")
     private String cheminFichier;
+
+    /** Le fichier depose : image, PDF ou document bureautique. */
+    @Lob
+    @Column(name = "contenu")
+    private byte[] contenu;
+
+    @Column(name = "contenu_content_type")
+    private String contenuContentType;
+
+    /**
+     * Taille du fichier en octets.
+     *
+     * <p>Conservee a part pour afficher une liste sans charger les contenus : un tableau de dix
+     * pieces rapatrierait autrement plusieurs mega-octets pour n'en montrer que les noms.
+     */
+    @Column(name = "taille_fichier")
+    private Long tailleFichier;
 
     @NotNull
     @Column(name = "date_ajout", nullable = false)
@@ -111,6 +133,45 @@ public class PieceJustificative extends AbstractAuditingEntity<Long> implements 
 
     public PieceJustificative demande(DemandePriseEnCharge demandePriseEnCharge) {
         this.setDemande(demandePriseEnCharge);
+        return this;
+    }
+
+    public byte[] getContenu() {
+        return this.contenu;
+    }
+
+    public void setContenu(byte[] contenu) {
+        this.contenu = contenu;
+    }
+
+    public PieceJustificative contenu(byte[] contenu) {
+        this.setContenu(contenu);
+        return this;
+    }
+
+    public String getContenuContentType() {
+        return this.contenuContentType;
+    }
+
+    public void setContenuContentType(String contenuContentType) {
+        this.contenuContentType = contenuContentType;
+    }
+
+    public PieceJustificative contenuContentType(String contenuContentType) {
+        this.setContenuContentType(contenuContentType);
+        return this;
+    }
+
+    public Long getTailleFichier() {
+        return this.tailleFichier;
+    }
+
+    public void setTailleFichier(Long tailleFichier) {
+        this.tailleFichier = tailleFichier;
+    }
+
+    public PieceJustificative tailleFichier(Long tailleFichier) {
+        this.setTailleFichier(tailleFichier);
         return this;
     }
 

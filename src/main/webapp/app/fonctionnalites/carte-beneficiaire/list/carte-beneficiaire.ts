@@ -1,3 +1,4 @@
+import { NgClass } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
 import { Component, effect, inject, signal, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -5,17 +6,19 @@ import { ActivatedRoute, Data, ParamMap, Router, RouterLink } from '@angular/rou
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap/modal';
+import { NgbDropdown, NgbDropdownItem, NgbDropdownMenu, NgbDropdownToggle } from '@ng-bootstrap/ng-bootstrap/dropdown';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap/pagination';
 import { combineLatest, filter, map, tap } from 'rxjs';
 
 import { DEFAULT_SORT_DATA, ITEMS_PER_PAGE, ITEM_DELETED_EVENT, PAGE_HEADER, SORT, TOTAL_COUNT_RESPONSE_HEADER } from 'app/config';
 import { Alert, AlertError } from 'app/shared/alert';
 import { FormatMediumDatePipe } from 'app/shared/date';
-import { Filter, FilterOptions, IFilterOption, IFilterOptions } from 'app/shared/filter';
+import { Filter, FilterOption, FilterOptions, IFilterOption, IFilterOptions } from 'app/shared/filter';
 import { TranslateDirective } from 'app/shared/language';
 import { ItemCount } from 'app/shared/pagination';
 import { SortByDirective, SortDirective, SortService, type SortState, sortStateSignal } from 'app/shared/sort';
 import { ICarteBeneficiaire } from '../carte-beneficiaire.model';
+import { libelleValidite, tonValidite } from '../validite';
 import { CarteBeneficiaireDeleteDialog } from '../delete/carte-beneficiaire-delete-dialog';
 import { CarteBeneficiaireService } from '../service/carte-beneficiaire.service';
 
@@ -23,6 +26,7 @@ import { CarteBeneficiaireService } from '../service/carte-beneficiaire.service'
   selector: 'jhi-carte-beneficiaire',
   templateUrl: './carte-beneficiaire.html',
   imports: [
+    NgClass,
     RouterLink,
     FontAwesomeModule,
     AlertError,
@@ -32,6 +36,10 @@ import { CarteBeneficiaireService } from '../service/carte-beneficiaire.service'
     TranslateDirective,
     FormatMediumDatePipe,
     Filter,
+    NgbDropdown,
+    NgbDropdownItem,
+    NgbDropdownMenu,
+    NgbDropdownToggle,
     NgbPagination,
     ItemCount,
   ],
@@ -41,6 +49,16 @@ export class CarteBeneficiaire {
 
   sortState = sortStateSignal({});
   filters: IFilterOptions = new FilterOptions();
+
+  /**
+   * Le critère de recherche libre.
+   *
+   * Il est envoyé au serveur comme les autres filtres : chercher dans les lignes déjà reçues ne
+   * chercherait que dans la page affichée, et annoncerait « aucun résultat » pour une fiche qui
+   * se trouve à la page suivante.
+   */
+  readonly searchTerm = signal('');
+  private readonly searchFilterName = 'numeroCarte.contains';
 
   readonly itemsPerPage = signal(ITEMS_PER_PAGE);
   readonly totalItems = signal(0);
@@ -93,6 +111,12 @@ export class CarteBeneficiaire {
 
   trackId = (item: ICarteBeneficiaire): number => this.carteBeneficiaireService.getCarteBeneficiaireIdentifier(item);
 
+  /** Le mot qui dit si la carte est utilisable aujourd'hui. */
+  libelleValidite = libelleValidite;
+
+  /** Le ton correspondant, du système de design. */
+  tonValidite = tonValidite;
+
   delete(carteBeneficiaire: ICarteBeneficiaire): void {
     const modalRef = this.modalService.open(CarteBeneficiaireDeleteDialog, { size: 'lg', backdrop: 'static' });
     modalRef.componentInstance.carteBeneficiaire = carteBeneficiaire;
@@ -117,11 +141,20 @@ export class CarteBeneficiaire {
     this.handleNavigation(page, this.sortState(), this.filters.filterOptions);
   }
 
+  /** Applique le critère de recherche, en repartant de la première page. */
+  search(): void {
+    const term = this.searchTerm().trim();
+    const otherFilters = this.filters.filterOptions.filter(option => option.name !== this.searchFilterName);
+    const filterOptions = term ? [...otherFilters, new FilterOption(this.searchFilterName, [term])] : otherFilters;
+    this.handleNavigation(1, this.sortState(), filterOptions);
+  }
+
   protected fillComponentAttributeFromRoute(params: ParamMap, data: Data): void {
     const page = params.get(PAGE_HEADER);
     this.page.set(+(page ?? 1));
     this.sortState.set(this.sortService.parseSortParam(params.get(SORT) ?? data[DEFAULT_SORT_DATA]));
     this.filters.initializeFromParams(params);
+    this.searchTerm.set(this.filters.filterOptions.find(option => option.name === this.searchFilterName)?.values[0] ?? '');
   }
 
   protected fillComponentAttributesFromResponseBody(data: ICarteBeneficiaire[]): ICarteBeneficiaire[] {

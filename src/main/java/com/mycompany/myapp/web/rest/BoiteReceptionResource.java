@@ -1,5 +1,6 @@
 package com.mycompany.myapp.web.rest;
 
+import com.mycompany.myapp.security.ActionsConstants;
 import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.service.BoiteReceptionService;
 import com.mycompany.myapp.service.dto.BoiteReceptionDTO;
@@ -47,6 +48,7 @@ public class BoiteReceptionResource {
      * {@code GET  /boite-receptions/mienne} : la boite du profil de l'utilisateur courant.
      */
     @GetMapping("/mienne")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.BOITE_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<BoiteReceptionDTO> getMaBoite() {
         LOG.debug("REST request to get the current user's BoiteReception");
         return ResponseEntity.ok(boiteReceptionService.maBoite());
@@ -57,6 +59,7 @@ public class BoiteReceptionResource {
      * courant lui donnent a traiter.
      */
     @GetMapping("/mienne/taches")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.TACHE_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<List<TacheDTO>> getMesTaches(
         @RequestParam(name = "ouvertes", required = false, defaultValue = "false") boolean ouvertes,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
@@ -71,6 +74,7 @@ public class BoiteReceptionResource {
      * {@code PUT  /boite-receptions/mienne/consultee} : enregistre que la boite vient d'etre ouverte.
      */
     @PutMapping("/mienne/consultee")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.BOITE_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<BoiteReceptionDTO> marquerConsultee() {
         LOG.debug("REST request to mark the current user's BoiteReception as consulted");
         return ResponseEntity.ok(boiteReceptionService.marquerConsultee());
@@ -80,6 +84,7 @@ public class BoiteReceptionResource {
      * {@code PUT  /boite-receptions/mienne/taches/:id/lue} : marque une tache de sa boite comme lue.
      */
     @PutMapping("/mienne/taches/{id}/lue")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.TACHE_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<TacheDTO> marquerTacheLue(@PathVariable("id") Long id) {
         LOG.debug("REST request to mark Tache {} as read in the current user's BoiteReception", id);
         return ResponseUtil.wrapOrNotFound(boiteReceptionService.marquerTacheLue(id));
@@ -89,6 +94,7 @@ public class BoiteReceptionResource {
      * {@code PUT  /boite-receptions/mienne/taches/:id/prendre} : s'attribuer une tache de sa boite.
      */
     @PutMapping("/mienne/taches/{id}/prendre")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.TACHE_PRENDRE_EN_CHARGE + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<TacheDTO> prendreEnCharge(@PathVariable("id") Long id) {
         LOG.debug("REST request to take charge of Tache {}", id);
         return ResponseUtil.wrapOrNotFound(boiteReceptionService.prendreEnCharge(id));
@@ -98,6 +104,7 @@ public class BoiteReceptionResource {
      * {@code PUT  /boite-receptions/mienne/taches/:id/relacher} : rendre une tache a la file.
      */
     @PutMapping("/mienne/taches/{id}/relacher")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.TACHE_RELACHER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<TacheDTO> relacher(@PathVariable("id") Long id) {
         LOG.debug("REST request to release Tache {}", id);
         return ResponseUtil.wrapOrNotFound(boiteReceptionService.relacher(id));

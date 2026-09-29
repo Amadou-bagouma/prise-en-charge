@@ -10,6 +10,12 @@ import { IUserManagement, NewUserManagement } from '../user-management.model';
 
 export type PartialUpdateUserManagement = Partial<IUserManagement> & Pick<IUserManagement, 'login'>;
 
+/** Ce que rend le serveur après une réinitialisation : le compte visé, et le mot de passe en clair. */
+export interface MotDePasseProvisoire {
+  login: string;
+  motDePasseProvisoire: string;
+}
+
 type RestOf<T extends IUserManagement | NewUserManagement> = Omit<T, 'createdDate' | 'lastModifiedDate'> & {
   createdDate?: string | null;
   lastModifiedDate?: string | null;
@@ -89,6 +95,28 @@ export class UserManagementService extends UserManagementsService {
 
   delete(login: string): Observable<undefined> {
     return this.http.delete<undefined>(`${this.resourceUrl}/${encodeURIComponent(login)}`);
+  }
+
+  /**
+   * Donne un mot de passe provisoire au compte, et exige son changement à la connexion.
+   *
+   * Le mot de passe rendu ici est la seule occasion de le lire : le serveur ne le conserve que
+   * chiffré.
+   */
+  reinitialiserMotDePasse(login: string): Observable<MotDePasseProvisoire> {
+    return this.http.post<MotDePasseProvisoire>(`${this.resourceUrl}/${encodeURIComponent(login)}/reinitialiser-mot-de-passe`, {});
+  }
+
+  /**
+   * Ouvre ou ferme un compte.
+   *
+   * Passe par un point d'entrée dédié plutôt que par `update()` : renvoyer tout l'utilisateur
+   * pour changer un seul indicateur écraserait au passage ce qu'un autre écran vient de modifier.
+   */
+  changerActivation(login: string, actif: boolean): Observable<IUserManagement> {
+    return this.http
+      .put<RestUserManagement>(`${this.resourceUrl}/${encodeURIComponent(login)}/activation`, null, { params: { actif } })
+      .pipe(map(res => this.convertResponseFromServer(res)));
   }
 
   getUserManagementIdentifier(userManagement: Pick<IUserManagement, 'login'>): string {

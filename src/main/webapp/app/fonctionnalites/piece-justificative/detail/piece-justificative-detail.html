@@ -1,54 +1,81 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    @if (pieceJustificative(); as pieceJustificativeRef) {
-      <div class="jhi-form-panel">
-        <h2 data-cy="pieceJustificativeDetailsHeading">
-          <span jhiTranslate="peccnssApp.pieceJustificative.detail.title">Piece Justificative</span>
-        </h2>
+@if (pieceJustificative(); as pieceJustificativeRef) {
+  <div class="pec-ecran">
+    <div class="pec-titre-ecran">
+      <h1 data-cy="pieceJustificativeDetailsHeading">{{ pieceJustificativeRef.nomFichier }}</h1>
+    </div>
 
-        <hr />
+    <jhi-alert-error />
+    <jhi-alert />
 
-        <jhi-alert-error />
+    <section class="pec-panneau">
+      <div class="pec-panneau__tete">
+        <span class="pec-panneau__titre">Pièce justificative</span>
+      </div>
+      <div class="pec-panneau__corps">
+        <dl class="pec-defs">
+          <dt>Nom du fichier</dt>
+          <dd>{{ pieceJustificativeRef.nomFichier || '—' }}</dd>
 
-        <jhi-alert />
+          <dt>Emplacement</dt>
+          <dd class="pec-defs--mono">{{ pieceJustificativeRef.cheminFichier || '—' }}</dd>
 
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dt>Dossier</dt>
           <dd>
-            <span>{{ pieceJustificativeRef.id }}</span>
-          </dd>
-          <dt><span jhiTranslate="peccnssApp.pieceJustificative.nomFichier">Nom Fichier</span></dt>
-          <dd>
-            <span>{{ pieceJustificativeRef.nomFichier }}</span>
-          </dd>
-          <dt><span jhiTranslate="peccnssApp.pieceJustificative.cheminFichier">Chemin Fichier</span></dt>
-          <dd>
-            <span>{{ pieceJustificativeRef.cheminFichier }}</span>
-          </dd>
-          <dt><span jhiTranslate="peccnssApp.pieceJustificative.dateAjout">Date Ajout</span></dt>
-          <dd>
-            <span>{{ pieceJustificativeRef.dateAjout | formatMediumDatetime }}</span>
-          </dd>
-          <dt><span jhiTranslate="peccnssApp.pieceJustificative.demande">Demande</span></dt>
-          <dd>
-            @if (pieceJustificative()!.demande) {
-              <div>
-                <a [routerLink]="['/demande-prise-en-charge', pieceJustificative()!.demande?.id, 'view']">{{
-                  pieceJustificativeRef.demande?.reference
-                }}</a>
-              </div>
+            @if (pieceJustificativeRef.demande) {
+              <a class="pec-num" [routerLink]="['/demande-prise-en-charge', pieceJustificativeRef.demande.id, 'view']">{{
+                pieceJustificativeRef.demande.reference
+              }}</a>
+            } @else {
+              <span class="pec-muted">—</span>
             }
           </dd>
+
+          <dt>Document</dt>
+          <dd>
+            @if (aUnDocument()) {
+              {{ pieceJustificativeRef.contenuContentType }}
+              @if (tailleLisible()) {
+                <span class="pec-muted">· {{ tailleLisible() }}</span>
+              }
+            } @else {
+              <!-- Les pièces déposées avant les fichiers ne portent qu'une référence de classement. -->
+              <span class="pec-muted">Aucun fichier joint</span>
+            }
+          </dd>
+
+          <dt>Date d'ajout</dt>
+          <dd class="pec-defs--mono">{{ (pieceJustificativeRef.dateAjout | formatMediumDatetime) || '—' }}</dd>
         </dl>
-
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
-        </button>
-
-        <button type="button" [routerLink]="['/piece-justificative', pieceJustificativeRef.id, 'edit']" class="btn btn-accent">
-          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
-        </button>
       </div>
-    }
+    </section>
+
+    <div class="pec-dossier__actions">
+      @if (aUnDocument()) {
+        <button type="button" (click)="consulter()" class="pec-btn pec-btn--primaire" data-cy="consulterPiece">
+          <fa-icon class="pec-btn__ico" icon="eye" />
+          <span>Consulter le document</span>
+        </button>
+      }
+
+      <button
+        type="button"
+        [routerLink]="['/piece-justificative', pieceJustificativeRef.id, 'edit']"
+        class="pec-btn pec-btn--secondaire"
+        data-cy="entityEditButton"
+      >
+        <fa-icon class="pec-btn__ico" icon="pencil-alt" />
+        <span jhiTranslate="entity.action.edit">Editer</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="previousState()"
+        class="pec-btn pec-btn--discret pec-dossier__actions--fin"
+        data-cy="entityDetailsBackButton"
+      >
+        <fa-icon class="pec-btn__ico" icon="arrow-left" />
+        <span jhiTranslate="entity.action.back">Retour</span>
+      </button>
+    </div>
   </div>
-</div>
+}

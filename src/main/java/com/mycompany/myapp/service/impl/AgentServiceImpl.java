@@ -134,6 +134,7 @@ public class AgentServiceImpl implements AgentService {
     public AgentDTO save(AgentDTO agentDTO) {
         LOG.debug("Request to save Agent : {}", agentDTO);
         Agent agent = agentMapper.toEntity(agentDTO);
+        agent.setStatut(StatutAgent.ACTIF);
         agent = agentRepository.save(agent);
         return agentMapper.toDto(agent);
     }

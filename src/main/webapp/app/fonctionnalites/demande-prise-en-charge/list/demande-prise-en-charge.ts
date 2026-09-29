@@ -166,6 +166,8 @@ export class DemandePriseEnCharge {
         return 'neutre';
       case 'ANNULEE':
       case 'CLOTUREE':
+      // Un dossier expiré est clos, pas en alerte : il n'appelle plus aucune action.
+      case 'EXPIREE':
         return 'neutre';
       default:
         return 'info';

@@ -4,6 +4,8 @@ import com.mycompany.myapp.domain.Agent;
 import com.mycompany.myapp.domain.enumeration.LienParente;
 import com.mycompany.myapp.repository.AgentRepository;
 import com.mycompany.myapp.repository.AyantDroitRepository;
+import com.mycompany.myapp.security.ActionsConstants;
+import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.service.AyantDroitQueryService;
 import com.mycompany.myapp.service.AyantDroitService;
 import com.mycompany.myapp.service.GenerateurCodeAyantDroit;
@@ -25,6 +27,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -77,6 +80,7 @@ public class AyantDroitResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.AYANT_DROIT_CREER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<AyantDroitDTO> createAyantDroit(@Valid @RequestBody AyantDroitDTO ayantDroitDTO) throws URISyntaxException {
         LOG.debug("REST request to save AyantDroit : {}", ayantDroitDTO);
         if (ayantDroitDTO.getId() != null) {
@@ -99,6 +103,7 @@ public class AyantDroitResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.AYANT_DROIT_MODIFIER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<AyantDroitDTO> updateAyantDroit(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody AyantDroitDTO ayantDroitDTO
@@ -122,6 +127,25 @@ public class AyantDroitResource {
     }
 
     /**
+     * {@code PUT  /ayant-droits/:id/valider} : declare le rattachement verifie.
+     *
+     * <p>Reserve au controle RH : c'est le meme travail que la verification d'un dossier, sur
+     * les pieces qui etablissent le lien de parente.
+     *
+     * @param id l'ayant droit a valider.
+     * @return {@link ResponseEntity} avec le statut {@code 200 (OK)} et l'ayant droit mis a jour.
+     */
+    @PutMapping("/{id}/valider")
+    @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.VERIFICATEUR_RH + "', '" + AuthoritiesConstants.ADMIN + "')")
+    public ResponseEntity<AyantDroitDTO> validerAyantDroit(@PathVariable("id") Long id) {
+        LOG.debug("REST request to validate AyantDroit : {}", id);
+        AyantDroitDTO misAJour = ayantDroitService.valider(id);
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, id.toString()))
+            .body(misAJour);
+    }
+
+    /**
      * {@code PUT  /ayant-droits/:id/statut} : change la situation d'un ayant droit.
      *
      * <p>Seul point d'entree pour cela : les formulaires de modification ne touchent pas a la
@@ -132,6 +156,7 @@ public class AyantDroitResource {
      * @return {@link ResponseEntity} avec le statut {@code 200 (OK)} et l'entite mise a jour.
      */
     @PutMapping("/{id}/statut")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.AYANT_DROIT_CHANGER_STATUT + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<AyantDroitDTO> changerStatut(@PathVariable("id") Long id, @Valid @RequestBody ChangementStatutDTO changement) {
         LOG.debug("REST request to change the status of AyantDroit {} to {}", id, changement.statut());
         AyantDroitDTO misAJour = ayantDroitService.changerStatut(id, changement.statut(), changement.motif());
@@ -152,6 +177,7 @@ public class AyantDroitResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.AYANT_DROIT_MODIFIER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<AyantDroitDTO> partialUpdateAyantDroit(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody AyantDroitDTO ayantDroitDTO
@@ -184,6 +210,7 @@ public class AyantDroitResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of Ayant Droits in body.
      */
     @GetMapping("")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.AYANT_DROIT_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<List<AyantDroitDTO>> getAllAyantDroits(
         AyantDroitCriteria criteria,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
@@ -202,6 +229,7 @@ public class AyantDroitResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
      */
     @GetMapping("/count")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.AYANT_DROIT_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<Long> countAyantDroits(AyantDroitCriteria criteria) {
         LOG.debug("REST request to count AyantDroits by criteria: {}", criteria);
         return ResponseEntity.ok().body(ayantDroitQueryService.countByCriteria(criteria));
@@ -221,6 +249,7 @@ public class AyantDroitResource {
      * autre agent a pu creer un ayant droit pour le meme titulaire.
      */
     @GetMapping("/code-suggere")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.AYANT_DROIT_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<String> codeSuggere(@RequestParam("agentId") Long agentId, @RequestParam("lien") LienParente lien) {
         LOG.debug("REST request to preview AyantDroit code for agent {} and lien {}", agentId, lien);
         String matricule = agentRepository
@@ -231,6 +260,7 @@ public class AyantDroitResource {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.AYANT_DROIT_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<AyantDroitDTO> getAyantDroit(@PathVariable("id") Long id) {
         LOG.debug("REST request to get AyantDroit : {}", id);
         Optional<AyantDroitDTO> ayantDroitDTO = ayantDroitService.findOne(id);
@@ -244,6 +274,7 @@ public class AyantDroitResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.AYANT_DROIT_SUPPRIMER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<Void> deleteAyantDroit(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete AyantDroit : {}", id);
         ayantDroitService.delete(id);

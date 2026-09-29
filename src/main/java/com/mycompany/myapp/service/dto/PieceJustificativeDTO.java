@@ -16,8 +16,14 @@ public class PieceJustificativeDTO implements Serializable {
     @NotNull
     private String nomFichier;
 
-    @NotNull
     private String cheminFichier;
+
+    /** Le fichier deposé. Absent des listes : seule la consultation d'une pièce le rapatrie. */
+    private byte[] contenu;
+
+    private String contenuContentType;
+
+    private Long tailleFichier;
 
     @NotNull
     private Instant dateAjout;
@@ -63,6 +69,30 @@ public class PieceJustificativeDTO implements Serializable {
 
     public void setDemande(DemandePriseEnChargeDTO demande) {
         this.demande = demande;
+    }
+
+    public byte[] getContenu() {
+        return contenu;
+    }
+
+    public void setContenu(byte[] contenu) {
+        this.contenu = contenu;
+    }
+
+    public String getContenuContentType() {
+        return contenuContentType;
+    }
+
+    public void setContenuContentType(String contenuContentType) {
+        this.contenuContentType = contenuContentType;
+    }
+
+    public Long getTailleFichier() {
+        return tailleFichier;
+    }
+
+    public void setTailleFichier(Long tailleFichier) {
+        this.tailleFichier = tailleFichier;
     }
 
     @Override

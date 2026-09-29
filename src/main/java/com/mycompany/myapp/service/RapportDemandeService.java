@@ -14,6 +14,7 @@ import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -101,6 +102,17 @@ public class RapportDemandeService {
                 "Le rapport n'est disponible que pour une demande validee",
                 ENTITY_NAME,
                 "rapport.notvalidated"
+            );
+        }
+        // Une prise en charge accordee reste valable un temps limite : passe ce terme, l'imprime
+        // ne doit plus pouvoir etre produit. L'editer quand meme reviendrait a remettre a
+        // l'interesse un document que le prestataire refusera, sans qu'il sache pourquoi.
+        Instant terme = demande.getDateEcheance();
+        if (terme != null && Instant.now().isAfter(terme)) {
+            throw new BadRequestAlertException(
+                "Cette prise en charge a depasse son delai de validite et ne peut plus etre imprimee.",
+                ENTITY_NAME,
+                "rapport.expiree"
             );
         }
         Agent agent = resolveAgent(demande);

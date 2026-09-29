@@ -28,6 +28,13 @@ public enum StatutDemande {
     RETOURNEE,
     VALIDEE,
     REJETEE,
+    /**
+     * Le delai de validite est passe sans que le circuit aboutisse.
+     *
+     * <p>Etat terminal : le dossier ne progresse plus et ne s'imprime plus. Il reste consultable,
+     * parce qu'il temoigne de ce qui a ete demande et de la date a laquelle le delai a couru.
+     */
+    EXPIREE,
     ANNULEE,
     CLOTUREE,
 }

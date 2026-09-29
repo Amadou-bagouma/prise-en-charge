@@ -1,58 +1,55 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    @if (historiqueAction(); as historiqueActionRef) {
-      <div class="jhi-form-panel">
-        <h2 data-cy="historiqueActionDetailsHeading">
-          <span jhiTranslate="peccnssApp.historiqueAction.detail.title">Historique Action</span>
-        </h2>
+@if (historiqueAction(); as historiqueActionRef) {
+  <div class="pec-ecran">
+    <div class="pec-titre-ecran">
+      <h1 data-cy="historiqueActionDetailsHeading">{{ historiqueActionRef.action }}</h1>
+      <span class="pec-muted">{{ historiqueActionRef.dateAction | formatMediumDatetime }}</span>
+    </div>
 
-        <hr />
+    <jhi-alert-error />
+    <jhi-alert />
 
-        <jhi-alert-error />
+    <section class="pec-panneau">
+      <div class="pec-panneau__tete">
+        <span class="pec-panneau__titre">Action enregistrée</span>
+      </div>
+      <div class="pec-panneau__corps">
+        <dl class="pec-defs">
+          <dt>Action</dt>
+          <dd>{{ historiqueActionRef.action || '—' }}</dd>
 
-        <jhi-alert />
+          <dt>Description</dt>
+          <dd>{{ historiqueActionRef.description || '—' }}</dd>
 
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dt>Auteur</dt>
+          <dd>{{ historiqueActionRef.utilisateur?.login || '— traitement automatique' }}</dd>
+
+          <dt>Dossier</dt>
           <dd>
-            <span>{{ historiqueActionRef.id }}</span>
-          </dd>
-          <dt><span jhiTranslate="peccnssApp.historiqueAction.action">Action</span></dt>
-          <dd>
-            <span>{{ historiqueActionRef.action }}</span>
-          </dd>
-          <dt><span jhiTranslate="peccnssApp.historiqueAction.description">Description</span></dt>
-          <dd>
-            <span>{{ historiqueActionRef.description }}</span>
-          </dd>
-          <dt><span jhiTranslate="peccnssApp.historiqueAction.dateAction">Date Action</span></dt>
-          <dd>
-            <span>{{ historiqueActionRef.dateAction | formatMediumDatetime }}</span>
-          </dd>
-          <dt><span jhiTranslate="peccnssApp.historiqueAction.demande">Demande</span></dt>
-          <dd>
-            @if (historiqueAction()!.demande) {
-              <div>
-                <a [routerLink]="['/demande-prise-en-charge', historiqueAction()!.demande?.id, 'view']">{{
-                  historiqueActionRef.demande?.reference
-                }}</a>
-              </div>
+            @if (historiqueActionRef.demande) {
+              <a class="pec-num" [routerLink]="['/demande-prise-en-charge', historiqueActionRef.demande.id, 'view']">{{
+                historiqueActionRef.demande.reference
+              }}</a>
+            } @else {
+              <span class="pec-muted">—</span>
             }
           </dd>
-          <dt><span jhiTranslate="peccnssApp.historiqueAction.utilisateur">Utilisateur</span></dt>
-          <dd>
-            <span>{{ historiqueActionRef.utilisateur?.login }}</span>
-          </dd>
+
+          <dt>Date</dt>
+          <dd class="pec-defs--mono">{{ (historiqueActionRef.dateAction | formatMediumDatetime) || '—' }}</dd>
         </dl>
-
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
-        </button>
-
-        <button type="button" [routerLink]="['/historique-action', historiqueActionRef.id, 'edit']" class="btn btn-accent">
-          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
-        </button>
       </div>
-    }
+    </section>
+
+    <div class="pec-dossier__actions">
+      <button
+        type="button"
+        (click)="previousState()"
+        class="pec-btn pec-btn--discret pec-dossier__actions--fin"
+        data-cy="entityDetailsBackButton"
+      >
+        <fa-icon class="pec-btn__ico" icon="arrow-left" />
+        <span jhiTranslate="entity.action.back">Retour</span>
+      </button>
+    </div>
   </div>
-</div>
+}

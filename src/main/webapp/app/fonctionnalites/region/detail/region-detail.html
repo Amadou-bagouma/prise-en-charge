@@ -1,34 +1,39 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    @if (region(); as regionRef) {
-      <div class="jhi-form-panel">
-        <h2 data-cy="regionDetailsHeading"><span jhiTranslate="peccnssApp.region.detail.title">Region</span></h2>
+@if (region(); as regionRef) {
+  <div class="pec-ecran">
+    <div class="pec-titre-ecran">
+      <h1 data-cy="regionDetailsHeading">{{ regionRef.nom }}</h1>
+    </div>
 
-        <hr />
+    <jhi-alert-error />
+    <jhi-alert />
 
-        <jhi-alert-error />
-
-        <jhi-alert />
-
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="global.field.id">ID</span></dt>
-          <dd>
-            <span>{{ regionRef.id }}</span>
-          </dd>
-          <dt><span jhiTranslate="peccnssApp.region.nom">Nom</span></dt>
-          <dd>
-            <span>{{ regionRef.nom }}</span>
-          </dd>
-        </dl>
-
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
-        </button>
-
-        <button type="button" [routerLink]="['/region', regionRef.id, 'edit']" class="btn btn-accent">
-          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
-        </button>
+    <section class="pec-panneau">
+      <div class="pec-panneau__tete">
+        <span class="pec-panneau__titre">Région</span>
       </div>
-    }
+      <div class="pec-panneau__corps">
+        <dl class="pec-defs">
+          <dt>Nom</dt>
+          <dd>{{ regionRef.nom || '—' }}</dd>
+        </dl>
+      </div>
+    </section>
+
+    <div class="pec-dossier__actions">
+      <button type="button" [routerLink]="['/region', regionRef.id, 'edit']" class="pec-btn pec-btn--primaire" data-cy="entityEditButton">
+        <fa-icon class="pec-btn__ico" icon="pencil-alt" />
+        <span jhiTranslate="entity.action.edit">Editer</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="previousState()"
+        class="pec-btn pec-btn--discret pec-dossier__actions--fin"
+        data-cy="entityDetailsBackButton"
+      >
+        <fa-icon class="pec-btn__ico" icon="arrow-left" />
+        <span jhiTranslate="entity.action.back">Retour</span>
+      </button>
+    </div>
   </div>
-</div>
+}

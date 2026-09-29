@@ -16,6 +16,7 @@ import {
   faCloud,
   faCogs,
   faDatabase,
+  faDownload,
   faEllipsisVertical,
   faEye,
   faFile,
@@ -58,6 +59,7 @@ import {
   faUserPlus,
   faUsers,
   faUsersCog,
+  faUpRightFromSquare,
   faWrench,
   // jhipster-needle-add-icon-import
 } from '@fortawesome/free-solid-svg-icons';
@@ -80,6 +82,7 @@ export const fontAwesomeIcons = [
   faCloud,
   faCogs,
   faDatabase,
+  faDownload,
   faEllipsisVertical,
   faEye,
   faFile,
@@ -122,6 +125,7 @@ export const fontAwesomeIcons = [
   faUserPlus,
   faUsers,
   faUsersCog,
+  faUpRightFromSquare,
   faWrench,
   // jhipster-needle-add-icon-import
 ];

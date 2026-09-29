@@ -10,8 +10,10 @@ import { ITEM_DELETED_EVENT } from 'app/config';
 import { Alert, AlertError } from 'app/shared/alert';
 import { CONFIRMED_EVENT, ConfirmDialog } from 'app/shared/confirm';
 import { FormatMediumDatetimePipe } from 'app/shared/date';
+import { VisionneuseDocument, blobDepuisBase64 } from 'app/shared/document/visionneuse-document';
 import { TranslateDirective } from 'app/shared/language';
 import { AccountService } from 'app/core/auth';
+import { DataUtils } from 'app/core/util/data-util.service';
 import { Authority } from 'app/shared/jhipster/constants';
 import { IHistoriqueAction } from 'app/fonctionnalites/historique-action/historique-action.model';
 import { HistoriqueActionService } from 'app/fonctionnalites/historique-action/service/historique-action.service';
@@ -62,6 +64,7 @@ export class DemandePriseEnChargeDetail {
   protected readonly router = inject(Router);
   protected readonly historiqueActionService = inject(HistoriqueActionService);
   protected readonly pieceJustificativeService = inject(PieceJustificativeService);
+  protected readonly dataUtils = inject(DataUtils);
 
   /**
    * Le dossier est encore en saisie et m'appartient : je peux le soumettre au contrôle.
@@ -112,6 +115,38 @@ export class DemandePriseEnChargeDetail {
    * C'est ce qui la distingue de l'imprimé de prise en charge : un refus sans document
    * opposable ne se conteste pas — l'agent n'a aucune trace de ce qu'on lui a dit, ni du motif.
    */
+  /**
+   * Les pièces ne se modifient que tant que le dossier est en saisie.
+   *
+   * Le serveur le refuse déjà ; l'écran retire les boutons plutôt que de les laisser échouer,
+   * parce qu'un bouton qui échoue toujours apprend à se méfier de tout l'écran.
+   */
+  readonly piecesModifiables = computed(() => {
+    const statut = this.current()?.statut;
+    return statut === 'EN_SAISIE' || statut === 'NOUVELLE';
+  });
+
+  /**
+   * Un dossier ne se modifie que tant qu'il n'a été soumis au jugement de personne.
+   *
+   * Une fois soumis, le modifier ferait valider autre chose que ce qui a été lu, et une
+   * validation déjà donnée porterait sur un texte qui n'existe plus. `RETOURNEE` en fait partie :
+   * c'est l'étape où le dossier revient à son auteur précisément pour être corrigé.
+   *
+   * Le serveur refuse de la même manière ; l'écran retire le bouton plutôt que de le laisser
+   * échouer.
+   */
+  readonly canModifier = computed(() => {
+    const demande = this.current();
+    const account = this.accountService.account();
+    const statut = demande?.statut;
+    const modifiable = statut === 'EN_SAISIE' || statut === 'NOUVELLE' || statut === 'RETOURNEE';
+    if (!demande || !modifiable || !account) {
+      return false;
+    }
+    return demande.gestionnaireCreateur?.login === account.login || this.accountService.hasAnyAuthority(Authority.ADMIN);
+  });
+
   readonly canEditerNotification = computed(() => {
     const statut = this.current()?.statut;
     return statut === 'VALIDEE' || statut === 'REJETEE' || statut === 'RETOURNEE';
@@ -280,6 +315,8 @@ export class DemandePriseEnChargeDetail {
         return 'neutre';
       case 'ANNULEE':
       case 'CLOTUREE':
+      // Un dossier expiré est clos, pas en alerte : il n'appelle plus aucune action.
+      case 'EXPIREE':
         return 'neutre';
       default:
         return 'info';
@@ -385,6 +422,48 @@ export class DemandePriseEnChargeDetail {
     );
   }
 
+  /**
+   * Ouvre la pièce dans un nouvel onglet.
+   *
+   * La liste ne rapatrie pas les contenus — dix pièces feraient plusieurs méga-octets pour
+   * n'afficher que des noms — donc la pièce est relue à la demande.
+   */
+  /**
+   * Affiche la piece sans quitter le dossier.
+   *
+   * La liste ne porte pas les contenus - dix pieces rapatrieraient plusieurs mega-octets pour
+   * n'afficher que des noms - donc la piece complete est demandee au moment de l'ouvrir.
+   */
+  ouvrirPiece(piece: IPieceJustificative): void {
+    this.pieceJustificativeService.find(piece.id).subscribe(complete => {
+      if (!complete.contenu) {
+        return;
+      }
+      this.afficherDocument(
+        blobDepuisBase64(complete.contenu, complete.contenuContentType),
+        complete.nomFichier ?? 'Piece justificative',
+        complete.nomFichier ?? `piece-${complete.id}`,
+      );
+    });
+  }
+
+  /**
+   * Ouvre la visionneuse sur un document deja en memoire.
+   *
+   * Le document reste consultable a l'ecran : le telechargement est propose dans la visionneuse
+   * pour qui veut le garder, mais il n'est plus le seul moyen de le voir.
+   */
+  private afficherDocument(document: Blob, titre: string, nomFichier: string): void {
+    const modalRef = this.modalService.open(VisionneuseDocument, {
+      size: 'xl',
+      backdrop: 'static',
+      windowClass: 'pec-visionneuse',
+    });
+    modalRef.componentInstance.blob = document;
+    modalRef.componentInstance.titre = titre;
+    modalRef.componentInstance.nomFichier = nomFichier;
+  }
+
   /** Édite la notification de décision et la remet à l'agent. */
   editerNotification(): void {
     const demande = this.current();
@@ -395,12 +474,11 @@ export class DemandePriseEnChargeDetail {
     this.demandePriseEnChargeService.telechargerNotification(demande.id).subscribe({
       next: blob => {
         this.isDownloading.set(false);
-        const url = URL.createObjectURL(blob);
-        const lien = document.createElement('a');
-        lien.href = url;
-        lien.download = `notification-${demande.reference ?? demande.id}.pdf`;
-        lien.click();
-        URL.revokeObjectURL(url);
+        this.afficherDocument(
+          blob,
+          `Notification de decision ${demande.reference ?? ''}`.trim(),
+          `notification-${demande.reference ?? demande.id}.pdf`,
+        );
       },
       error: () => this.isDownloading.set(false),
     });
@@ -465,12 +543,11 @@ export class DemandePriseEnChargeDetail {
     this.demandePriseEnChargeService.telechargerRapport(demande.id).subscribe({
       next: blob => {
         this.isDownloading.set(false);
-        const objectUrl = URL.createObjectURL(blob);
-        const anchor = document.createElement('a');
-        anchor.href = objectUrl;
-        anchor.download = `rapport-${demande.reference ?? demande.id}.pdf`;
-        anchor.click();
-        URL.revokeObjectURL(objectUrl);
+        this.afficherDocument(
+          blob,
+          `Prise en charge ${demande.reference ?? ''}`.trim(),
+          `prise-en-charge-${demande.reference ?? demande.id}.pdf`,
+        );
       },
       error: () => this.isDownloading.set(false),
     });

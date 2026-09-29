@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { DESC } from 'app/config';
+import { ASC } from 'app/config';
 import { userRouteAccessService } from 'app/core/auth';
 import { Authority } from 'app/shared/jhipster/constants';
 
@@ -11,7 +11,8 @@ const profilRoute: Routes = [
     path: '',
     loadComponent: () => import('./list/profil').then(m => m.Profil),
     data: {
-      defaultSort: `id,${DESC}`,
+      // Un référentiel se parcourt par ordre alphabétique, pas par ordre de création.
+      defaultSort: `nom,${ASC}`,
       authorities: [Authority.ADMIN],
     },
     canActivate: [userRouteAccessService],

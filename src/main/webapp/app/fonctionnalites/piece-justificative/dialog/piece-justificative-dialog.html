@@ -12,34 +12,42 @@
       Dossier <strong>{{ demande.reference }}</strong>
     </p>
 
-    <div class="jhi-form-grid">
-      <div class="jhi-field">
-        <label class="form-label" for="piece_nomFichier" jhiTranslate="peccnssApp.pieceJustificative.nomFichier">Nom du fichier</label>
-        <input
-          type="text"
-          class="form-control"
-          id="piece_nomFichier"
-          name="nomFichier"
-          data-cy="nomFichier"
-          [ngModel]="nomFichier()"
-          (ngModelChange)="nomFichier.set($event)"
-        />
-        <small class="form-text text-muted">Le nom sous lequel la pièce sera retrouvée dans le dossier.</small>
-      </div>
+    <div class="jhi-field">
+      <label class="form-label" for="piece_fichier">Fichier</label>
+      <input
+        type="file"
+        class="form-control"
+        id="piece_fichier"
+        name="fichier"
+        data-cy="fichier"
+        [attr.accept]="accept"
+        (change)="choisirFichier($event)"
+      />
+      <!--
+        Les formats admis sont écrits : `accept` filtre le sélecteur de fichiers sur certains
+        systèmes seulement, et ne dit rien à qui glisse un fichier refusé.
+      -->
+      <small class="form-text text-muted">Image, PDF ou document Word, 10 Mo au maximum.</small>
 
-      <div class="jhi-field">
-        <label class="form-label" for="piece_cheminFichier" jhiTranslate="peccnssApp.pieceJustificative.cheminFichier"> Emplacement </label>
-        <input
-          type="text"
-          class="form-control"
-          id="piece_cheminFichier"
-          name="cheminFichier"
-          data-cy="cheminFichier"
-          [ngModel]="cheminFichier()"
-          (ngModelChange)="cheminFichier.set($event)"
-        />
-        <small class="form-text text-muted">Où la pièce est conservée : référence de classement ou chemin du document.</small>
-      </div>
+      @if (refus(); as message) {
+        <small class="form-text text-danger" data-cy="refusFichier">{{ message }}</small>
+      } @else if (nomOriginal(); as nom) {
+        <small class="form-text text-muted" data-cy="fichierChoisi">{{ nom }} · {{ tailleLisible() }}</small>
+      }
+    </div>
+
+    <div class="jhi-field">
+      <label class="form-label" for="piece_nomFichier" jhiTranslate="peccnssApp.pieceJustificative.nomFichier">Intitulé</label>
+      <input
+        type="text"
+        class="form-control"
+        id="piece_nomFichier"
+        name="nomFichier"
+        data-cy="nomFichier"
+        [ngModel]="nomFichier()"
+        (ngModelChange)="nomFichier.set($event)"
+      />
+      <small class="form-text text-muted">Sous quel nom la pièce sera retrouvée dans le dossier.</small>
     </div>
 
     <!--

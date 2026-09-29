@@ -180,6 +180,17 @@
                 <span jhiTranslate="global.menu.entities.ayantDroit">Ayant Droit</span>
               </a>
             </li>
+            <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+              <a
+                class="sidebar-link"
+                [title]="'global.menu.entities.carteBeneficiaire' | translate"
+                routerLink="/carte-beneficiaire"
+                (click)="collapseNavbar()"
+              >
+                <fa-icon icon="id-card" [fixedWidth]="true" />
+                <span jhiTranslate="global.menu.entities.carteBeneficiaire">Carte bénéficiaire</span>
+              </a>
+            </li>
           </ul>
         </li>
 

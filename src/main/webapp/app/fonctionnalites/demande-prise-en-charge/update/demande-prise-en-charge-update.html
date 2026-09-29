@@ -71,22 +71,36 @@
           </select>
         </div>
 
-        <div class="jhi-field">
-          <label class="form-label" for="field_ayantDroit" jhiTranslate="peccnssApp.demandePriseEnCharge.ayantDroit">Ayant Droit</label>
-          <select
-            class="form-control"
-            id="field_ayantDroit"
-            data-cy="ayantDroit"
-            name="ayantDroit"
-            formControlName="ayantDroit"
-            [compareWith]="compareAyantDroit"
-          >
-            <option [ngValue]="null"></option>
-            @for (ayantDroitOption of ayantDroitsSharedCollection(); track $index) {
-              <option [ngValue]="ayantDroitOption">{{ ayantDroitOption.nom }} {{ ayantDroitOption.prenom }}</option>
+        <!--
+          Le champ n'apparaît que lorsqu'il a un objet : pour un dossier ouvert au nom de l'agent
+          lui-même, un ayant droit n'a pas de sens, et le proposer invite à le renseigner par
+          erreur.
+        -->
+        @if (beneficiaireEstAyantDroit()) {
+          <div class="jhi-field">
+            <label class="form-label" for="field_ayantDroit" jhiTranslate="peccnssApp.demandePriseEnCharge.ayantDroit">Ayant droit</label>
+            <select
+              class="form-control"
+              id="field_ayantDroit"
+              data-cy="ayantDroit"
+              name="ayantDroit"
+              formControlName="ayantDroit"
+              [compareWith]="compareAyantDroit"
+            >
+              <option [ngValue]="null"></option>
+              @for (ayantDroitOption of ayantDroitsSharedCollection(); track $index) {
+                <option [ngValue]="ayantDroitOption">{{ ayantDroitOption.nom }} {{ ayantDroitOption.prenom }}</option>
+              }
+            </select>
+            @if (!editForm.controls.agent.value) {
+              <small class="form-text text-muted">Choisissez d'abord l'agent : seuls ses ayants droit sont proposés.</small>
+            } @else if (ayantDroitsSharedCollection().length === 0) {
+              <small class="form-text text-muted" data-cy="aucunAyantDroit">
+                Cet agent n'a aucun ayant droit enregistré. Ajoutez-le depuis sa fiche avant d'ouvrir le dossier.
+              </small>
             }
-          </select>
-        </div>
+          </div>
+        }
 
         <div class="jhi-field jhi-field-full">
           <label class="form-label" for="field_description" jhiTranslate="peccnssApp.demandePriseEnCharge.description">Description</label>

@@ -9,6 +9,20 @@
   <jhi-alert />
 
   <div class="pec-filtres">
+    <!-- Recherche à gauche, actions à droite : même disposition que les autres référentiels. -->
+    <div class="pec-filtres__rech">
+      <span class="pec-filtres__loupe"><fa-icon icon="search" /></span>
+      <input
+        type="search"
+        class="pec-champ__ctrl"
+        placeholder="Nom du profil"
+        aria-label="Rechercher un profil par son nom"
+        data-cy="searchInput"
+        [value]="searchTerm()"
+        (input)="searchTerm.set($any($event.target).value)"
+      />
+    </div>
+
     <div class="pec-filtres__actions">
       <button type="button" class="pec-btn pec-btn--discret pec-btn--sm" (click)="load()" [disabled]="isLoading()" data-cy="actualiser">
         <fa-icon class="pec-btn__ico" icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
@@ -45,6 +59,13 @@
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
+            <!--
+              Les deux colonnes qui manquaient : un profil se lit par ce qu'il ouvre et par qui
+              le porte. Sans elles il fallait ouvrir chaque fiche pour vérifier une habilitation,
+              et rien ne disait ce qu'une modification allait toucher.
+            -->
+            <th scope="col">Droits accordés</th>
+            <th scope="col" class="pec-tbl__num">Titulaires</th>
             <th scope="col" class="pec-tbl__droite"><span class="visually-hidden">Actions</span></th>
           </tr>
         </thead>
@@ -55,6 +76,29 @@
                 <a class="pec-strong" [routerLink]="['/profil', profil.id, 'view']">{{ profil.nom }}</a>
               </td>
               <td class="pec-tbl__libre">{{ profil.description || '—' }}</td>
+              <td class="pec-tbl__libre">
+                @if (droitsResumes(profil); as droits) {
+                  @for (droit of droits.visibles; track droit.libelle) {
+                    <!-- L'intitulé court tient dans la ligne ; la phrase complète est en infobulle. -->
+                    <span class="pec-badge pec-badge--neutre" [title]="droit.description">
+                      <span class="pec-badge__pt"></span>{{ droit.libelle }}
+                    </span>
+                  }
+                  <!-- Le reste est compté, non listé : dix badges rendraient la ligne illisible. -->
+                  @if (droits.reste > 0) {
+                    <span class="pec-muted">+ {{ droits.reste }} autre{{ droits.reste > 1 ? 's' : '' }}</span>
+                  }
+                } @else {
+                  <span class="pec-muted">Aucun droit — ce profil ne donne accès à rien</span>
+                }
+              </td>
+              <td class="pec-tbl__num">
+                @if (profil.nombreTitulaires) {
+                  <a [routerLink]="['/user-management']" [queryParams]="{ profil: profil.nom }">{{ profil.nombreTitulaires }}</a>
+                } @else {
+                  <span class="pec-muted">0</span>
+                }
+              </td>
               <td class="pec-tbl__droite">
                 <div ngbDropdown container="body" class="d-inline-block">
                   <button type="button" class="pec-btn pec-btn--discret pec-btn--sm" ngbDropdownToggle data-cy="entityActionsButton">
@@ -69,18 +113,36 @@
                       <fa-icon icon="pencil-alt" class="me-1" />
                       <span jhiTranslate="entity.action.edit">Editer</span>
                     </a>
-                    <button ngbDropdownItem type="button" (click)="delete(profil)" data-cy="entityDeleteButton">
-                      <fa-icon icon="times" class="me-1" />
-                      <span jhiTranslate="entity.action.delete">Supprimer</span>
-                    </button>
+                    <!--
+                      Un profil attribué ne se supprime pas : le serveur le refuse, et laisser le
+                      bouton n'offrirait qu'un échec. Ce qui manque, c'est la raison : elle est dite.
+                    -->
+                    @if (profil.nombreTitulaires) {
+                      <span ngbDropdownItem class="pec-muted" aria-disabled="true">
+                        <fa-icon icon="lock" class="me-1" />
+                        <span
+                          >Attribué à {{ profil.nombreTitulaires }} agent{{ profil.nombreTitulaires > 1 ? 's' : '' }} — non
+                          supprimable</span
+                        >
+                      </span>
+                    } @else {
+                      <button ngbDropdownItem type="button" (click)="delete(profil)" data-cy="entityDeleteButton">
+                        <fa-icon icon="times" class="me-1" />
+                        <span jhiTranslate="entity.action.delete">Supprimer</span>
+                      </button>
+                    }
                   </div>
                 </div>
               </td>
             </tr>
           } @empty {
             <tr>
-              <td colspan="3" class="pec-tbl__vide">
-                <span jhiTranslate="peccnssApp.profil.home.notFound">Aucun profil</span>
+              <td colspan="5" class="pec-tbl__vide">
+                @if (searchTerm().trim()) {
+                  Aucun profil ne porte ce nom.
+                } @else {
+                  <span jhiTranslate="peccnssApp.profil.home.notFound">Aucun profil</span>
+                }
               </td>
             </tr>
           }

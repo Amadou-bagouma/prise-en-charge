@@ -1,0 +1,46 @@
+<div class="modal-header pec-visionneuse__tete">
+  <h2 class="modal-title" data-cy="visionneuseTitre">{{ titre }}</h2>
+  <button type="button" class="btn-close" aria-label="Fermer" (click)="fermer()" data-cy="fermerVisionneuse"></button>
+</div>
+
+<div class="modal-body pec-visionneuse__corps">
+  @if (url(); as source) {
+    @if (estPdf()) {
+      <iframe class="pec-visionneuse__cadre" [src]="source" [title]="titre" data-cy="visionneusePdf"></iframe>
+    } @else if (estImage()) {
+      <div class="pec-visionneuse__image">
+        <img [src]="source" [alt]="titre" data-cy="visionneuseImage" />
+      </div>
+    } @else {
+      <!--
+        Un cadre vide laisserait croire que la pièce est absente : ce qui ne s'affiche pas le dit.
+      -->
+      <div class="pec-visionneuse__vide" data-cy="visionneuseNonAffichable">
+        <fa-icon icon="file" size="2x" />
+        <p>Ce format ne s'affiche pas dans le navigateur.</p>
+        <p class="pec-muted">{{ nomFichier }} · {{ typeMime() }}</p>
+        <button type="button" class="pec-btn pec-btn--primaire" (click)="telecharger()">
+          <fa-icon class="pec-btn__ico" icon="download" />
+          <span>Télécharger le document</span>
+        </button>
+      </div>
+    }
+  }
+</div>
+
+<div class="modal-footer">
+  <span class="pec-muted me-auto">{{ nomFichier }}</span>
+  @if (estAffichable()) {
+    <button type="button" class="pec-btn pec-btn--discret" (click)="ouvrirDansUnOnglet()" data-cy="ouvrirOnglet">
+      <fa-icon class="pec-btn__ico" icon="up-right-from-square" />
+      <span>Ouvrir en pleine page</span>
+    </button>
+    <button type="button" class="pec-btn pec-btn--secondaire" (click)="telecharger()" data-cy="telechargerDocument">
+      <fa-icon class="pec-btn__ico" icon="download" />
+      <span>Télécharger</span>
+    </button>
+  }
+  <button type="button" class="pec-btn pec-btn--primaire" (click)="fermer()">
+    <span>Fermer</span>
+  </button>
+</div>

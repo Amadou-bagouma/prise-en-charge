@@ -7,11 +7,25 @@
         <span class="pec-badge__pt"></span>
         <span>{{ libelleStatut() }}</span>
       </span>
+      <!--
+        L'état du rattachement est à côté de la situation, et non dans le corps de la fiche : il
+        décide si un dossier peut être ouvert, au même titre qu'elle.
+      -->
+      <span class="pec-badge" [ngClass]="'pec-badge--' + tonValidation()" data-cy="validationAyantDroit">
+        <span class="pec-badge__pt"></span>
+        <span>{{ libelleValidation() }}</span>
+      </span>
       <span class="pec-num">{{ ayantDroitRef.codeAyantDroit }}</span>
       <button type="button" class="pec-btn pec-btn--discret pec-btn--sm" (click)="changerStatut()" data-cy="changerStatutAyantDroit">
         <fa-icon class="pec-btn__ico" icon="pencil-alt" />
         <span>Changer la situation</span>
       </button>
+      @if (peutValider()) {
+        <button type="button" class="pec-btn pec-btn--primaire pec-btn--sm" (click)="validerRattachement()" data-cy="validerRattachement">
+          <fa-icon class="pec-btn__ico" icon="check" />
+          <span>Déclarer le rattachement vérifié</span>
+        </button>
+      }
     </div>
 
     @if (statutAffiche() !== 'ACTIF' && motifStatut()) {
@@ -61,6 +75,16 @@
                 <!-- L'âge décide de la couverture d'un enfant : il se lit, il ne se calcule pas. -->
                 @if (age() !== null) {
                   <span class="pec-muted">· {{ age() }} ans</span>
+                }
+              </dd>
+
+              <dt>Rattachement</dt>
+              <dd>
+                {{ libelleValidation() }}
+                @if (ayantDroitRef.dateValidation) {
+                  <span class="pec-muted">· vérifié le {{ ayantDroitRef.dateValidation | formatMediumDatetime }}</span>
+                } @else {
+                  <span class="pec-muted">· n'ouvre pas encore droit à une prise en charge</span>
                 }
               </dd>
 
