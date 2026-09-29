@@ -13,6 +13,7 @@ import { LANGUAGES } from 'app/config';
 import { AccountService, StateStorageService } from 'app/core/auth';
 import { ChargeTravailService } from 'app/layouts/charge-travail.service';
 import { LayoutService } from 'app/layouts/layout.service';
+import { ClocheNotifications } from 'app/layouts/notifications/cloche-notifications';
 import { ProfileService } from 'app/layouts/profiles/profile.service';
 import { LoginService } from 'app/login/login.service';
 import { HasAnyAuthorityDirective } from 'app/shared/auth';
@@ -34,6 +35,7 @@ const SEGMENTS_REFERENTIEL = ['etablissement-sante', 'type-soin', 'direction', '
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss',
   imports: [
+    ClocheNotifications,
     RouterLink,
     RouterLinkActive,
     FontAwesomeModule,

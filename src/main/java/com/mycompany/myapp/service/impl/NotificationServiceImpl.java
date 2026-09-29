@@ -5,6 +5,7 @@ import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.repository.NotificationRepository;
 import com.mycompany.myapp.repository.UserRepository;
 import com.mycompany.myapp.security.SecurityUtils;
+import com.mycompany.myapp.service.AvisTempsReel;
 import com.mycompany.myapp.service.NotificationService;
 import com.mycompany.myapp.service.dto.NotificationDTO;
 import com.mycompany.myapp.service.mapper.NotificationMapper;
@@ -34,14 +35,18 @@ public class NotificationServiceImpl implements NotificationService {
 
     private final UserRepository userRepository;
 
+    private final AvisTempsReel avisTempsReel;
+
     public NotificationServiceImpl(
         NotificationRepository notificationRepository,
         NotificationMapper notificationMapper,
-        UserRepository userRepository
+        UserRepository userRepository,
+        AvisTempsReel avisTempsReel
     ) {
         this.userRepository = userRepository;
         this.notificationRepository = notificationRepository;
         this.notificationMapper = notificationMapper;
+        this.avisTempsReel = avisTempsReel;
     }
 
     @Override
@@ -49,6 +54,8 @@ public class NotificationServiceImpl implements NotificationService {
         LOG.debug("Request to save Notification : {}", notificationDTO);
         Notification notification = notificationMapper.toEntity(notificationDTO);
         notification = notificationRepository.save(notification);
+        // Un avis cree a la main - par l'administration - se remet comme les autres.
+        avisTempsReel.diffuser(notification);
         return notificationMapper.toDto(notification);
     }
 

@@ -33,6 +33,13 @@
   <div class="topbar-spacer"></div>
 
   <div class="topbar-right">
+    <!--
+      Les avis sont a cote de la langue et du compte : ce qui releve de la personne, et non du
+      travail en cours. Ils etaient dans la navigation laterale, ou on ne les voyait qu'en
+      allant les chercher.
+    -->
+    <jhi-cloche-notifications />
+
     @if (languages.length > 1) {
       <div ngbDropdown class="topbar-dropdown" display="static" placement="bottom-end">
         <button type="button" class="topbar-link" ngbDropdownToggle id="languagesnavBarDropdown">
@@ -148,7 +155,10 @@
           l'institution et ne s'alimente que rarement. Les mêler faisait chercher un agent
           parmi des régions et des directions.
         -->
-        <li class="sidebar-nav-item">
+        <li
+          class="sidebar-nav-item"
+          *jhiHasAnyAuthority="['ROLE_AGENT_CONSULTER', 'ROLE_CARTE_CONSULTER', 'ROLE_AYANT_DROIT_CONSULTER', 'ROLE_ADMIN']"
+        >
           <button
             type="button"
             class="sidebar-link sidebar-link-toggle"
@@ -163,13 +173,23 @@
           </button>
 
           <ul id="beneficiairesSubmenu" class="sidebar-submenu" [ngbCollapse]="beneficiairesCollapsed()">
-            <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <li
+              class="sidebar-nav-item"
+              *jhiHasAnyAuthority="['ROLE_AGENT_CONSULTER', 'ROLE_ADMIN']"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+            >
               <a class="sidebar-link" [title]="'global.menu.entities.agent' | translate" routerLink="/agent" (click)="collapseNavbar()">
                 <fa-icon icon="id-card" [fixedWidth]="true" />
                 <span jhiTranslate="global.menu.entities.agent">Agent</span>
               </a>
             </li>
-            <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <li
+              class="sidebar-nav-item"
+              *jhiHasAnyAuthority="['ROLE_AYANT_DROIT_CONSULTER', 'ROLE_ADMIN']"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+            >
               <a
                 class="sidebar-link"
                 [title]="'global.menu.entities.ayantDroit' | translate"
@@ -180,7 +200,12 @@
                 <span jhiTranslate="global.menu.entities.ayantDroit">Ayant Droit</span>
               </a>
             </li>
-            <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <li
+              class="sidebar-nav-item"
+              *jhiHasAnyAuthority="['ROLE_CARTE_CONSULTER', 'ROLE_ADMIN']"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+            >
               <a
                 class="sidebar-link"
                 [title]="'global.menu.entities.carteBeneficiaire' | translate"
@@ -194,7 +219,7 @@
           </ul>
         </li>
 
-        <li class="sidebar-nav-item">
+        <li class="sidebar-nav-item" *jhiHasAnyAuthority="['ROLE_REFERENTIEL_CONSULTER', 'ROLE_ADMIN']">
           <button
             type="button"
             class="sidebar-link sidebar-link-toggle"
@@ -209,7 +234,12 @@
           </button>
 
           <ul id="referentielSubmenu" class="sidebar-submenu" [ngbCollapse]="referentielCollapsed()">
-            <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <li
+              class="sidebar-nav-item"
+              *jhiHasAnyAuthority="['ROLE_REFERENTIEL_CONSULTER', 'ROLE_ADMIN']"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+            >
               <a
                 class="sidebar-link"
                 [title]="'global.menu.entities.etablissementSante' | translate"
@@ -222,7 +252,7 @@
             </li>
             <li
               class="sidebar-nav-item"
-              *jhiHasAnyAuthority="'ROLE_ADMIN'"
+              *jhiHasAnyAuthority="['ROLE_REFERENTIEL_CONSULTER', 'ROLE_ADMIN']"
               routerLinkActive="active"
               [routerLinkActiveOptions]="{ exact: true }"
             >
@@ -238,7 +268,7 @@
             </li>
             <li
               class="sidebar-nav-item"
-              *jhiHasAnyAuthority="'ROLE_ADMIN'"
+              *jhiHasAnyAuthority="['ROLE_REFERENTIEL_CONSULTER', 'ROLE_ADMIN']"
               routerLinkActive="active"
               [routerLinkActiveOptions]="{ exact: true }"
             >
@@ -254,7 +284,7 @@
             </li>
             <li
               class="sidebar-nav-item"
-              *jhiHasAnyAuthority="'ROLE_ADMIN'"
+              *jhiHasAnyAuthority="['ROLE_REFERENTIEL_CONSULTER', 'ROLE_ADMIN']"
               routerLinkActive="active"
               [routerLinkActiveOptions]="{ exact: true }"
             >
@@ -265,7 +295,7 @@
             </li>
             <li
               class="sidebar-nav-item"
-              *jhiHasAnyAuthority="'ROLE_ADMIN'"
+              *jhiHasAnyAuthority="['ROLE_REFERENTIEL_CONSULTER', 'ROLE_ADMIN']"
               routerLinkActive="active"
               [routerLinkActiveOptions]="{ exact: true }"
             >
@@ -277,7 +307,12 @@
           </ul>
         </li>
 
-        <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <li
+          class="sidebar-nav-item"
+          *jhiHasAnyAuthority="['ROLE_DEMANDE_CONSULTER', 'ROLE_ADMIN']"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
           <a
             class="sidebar-link"
             [title]="'global.menu.entities.demandePriseEnCharge' | translate"
@@ -291,7 +326,12 @@
             }
           </a>
         </li>
-        <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <li
+          class="sidebar-nav-item"
+          *jhiHasAnyAuthority="['ROLE_PIECE_CONSULTER', 'ROLE_ADMIN']"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
           <a
             class="sidebar-link"
             [title]="'global.menu.entities.pieceJustificative' | translate"
@@ -302,7 +342,12 @@
             <span jhiTranslate="global.menu.entities.pieceJustificative">Piece Justificative</span>
           </a>
         </li>
-        <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <li
+          class="sidebar-nav-item"
+          *jhiHasAnyAuthority="['ROLE_TACHE_CONSULTER', 'ROLE_ADMIN']"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
           <a class="sidebar-link" [title]="'global.menu.entities.tache' | translate" routerLink="/tache" (click)="collapseNavbar()">
             <fa-icon icon="tasks" [fixedWidth]="true" />
             <span jhiTranslate="global.menu.entities.tache">Tache</span>
@@ -311,7 +356,12 @@
             }
           </a>
         </li>
-        <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <li
+          class="sidebar-nav-item"
+          *jhiHasAnyAuthority="['ROLE_BOITE_CONSULTER', 'ROLE_ADMIN']"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
           <a
             class="sidebar-link"
             [title]="'global.menu.entities.boiteReception' | translate"
@@ -322,21 +372,12 @@
             <span jhiTranslate="global.menu.entities.boiteReception">Boite Reception</span>
           </a>
         </li>
-        <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-          <a
-            class="sidebar-link"
-            [title]="'global.menu.entities.notification' | translate"
-            routerLink="/notification"
-            (click)="collapseNavbar()"
-          >
-            <fa-icon icon="bell" [fixedWidth]="true" />
-            <span jhiTranslate="global.menu.entities.notification">Notification</span>
-            @if (chargeTravail.notifications(); as nombre) {
-              <span class="sidebar-link-count">{{ nombre }}</span>
-            }
-          </a>
-        </li>
-        <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <li
+          class="sidebar-nav-item"
+          *jhiHasAnyAuthority="['ROLE_HISTORIQUE_CONSULTER', 'ROLE_ADMIN']"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
           <a
             class="sidebar-link"
             [title]="'global.menu.entities.historiqueAction' | translate"
@@ -364,7 +405,12 @@
         </button>
 
         <ul id="adminSubmenu" class="sidebar-submenu" [ngbCollapse]="adminCollapsed()">
-          <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+          <li
+            class="sidebar-nav-item"
+            *jhiHasAnyAuthority="['ROLE_UTILISATEUR_CONSULTER', 'ROLE_ADMIN']"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+          >
             <a
               class="sidebar-link"
               [title]="'userManagement.home.title' | translate"
@@ -377,7 +423,7 @@
           </li>
           <li
             class="sidebar-nav-item"
-            *jhiHasAnyAuthority="'ROLE_ADMIN'"
+            *jhiHasAnyAuthority="['ROLE_PROFIL_CONSULTER', 'ROLE_ADMIN']"
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true }"
           >
@@ -386,7 +432,12 @@
               <span jhiTranslate="global.menu.entities.profil">Profils</span>
             </a>
           </li>
-          <li class="sidebar-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+          <li
+            class="sidebar-nav-item"
+            *jhiHasAnyAuthority="['ROLE_HABILITATION_CONSULTER', 'ROLE_ADMIN']"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+          >
             <a
               class="sidebar-link"
               [title]="'global.menu.entities.adminAuthority' | translate"

@@ -1,6 +1,8 @@
 import { Routes } from '@angular/router';
 
 import { userRouteAccessService } from 'app/core/auth';
+import { Action } from 'app/shared/jhipster/actions.constants';
+import { Authority } from 'app/shared/jhipster/constants';
 
 /**
  * Une seule route : la boite de reception de son propre profil.
@@ -13,6 +15,9 @@ const boiteReceptionRoute: Routes = [
   {
     path: '',
     loadComponent: () => import('./list/boite-reception').then(m => m.BoiteReception),
+    data: {
+      authorities: [Action.BOITE_CONSULTER, Authority.ADMIN],
+    },
     canActivate: [userRouteAccessService],
   },
 ];

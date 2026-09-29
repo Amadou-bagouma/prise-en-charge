@@ -16,6 +16,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
+import org.springframework.security.oauth2.server.resource.web.DefaultBearerTokenResolver;
 import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
@@ -117,7 +119,29 @@ public class SecurityConfiguration {
                     .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
                     .accessDeniedHandler(new BearerTokenAccessDeniedHandler())
             )
-            .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()));
+            .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()).bearerTokenResolver(resolveurJeton()));
         return http.build();
+    }
+
+    /**
+     * Accepte le jeton en parametre d'adresse, en plus de l'en-tete {@code Authorization}.
+     *
+     * <p>C'est la seule facon d'authentifier l'ouverture du canal d'avis : le navigateur ne
+     * laisse poser aucun en-tete sur une poignee de main SockJS ou WebSocket. Le jeton n'y est
+     * accepte que pour ce point d'entree - partout ailleurs, un jeton dans l'adresse finirait
+     * dans les journaux du serveur, dans l'historique du navigateur et dans le referent envoye
+     * aux sites tiers.
+     */
+    private BearerTokenResolver resolveurJeton() {
+        DefaultBearerTokenResolver parEnTete = new DefaultBearerTokenResolver();
+        DefaultBearerTokenResolver parAdresse = new DefaultBearerTokenResolver();
+        parAdresse.setAllowUriQueryParameter(true);
+        return requete -> {
+            String chemin = requete.getRequestURI();
+            if (chemin != null && chemin.startsWith(WebsocketConfiguration.POINT_ENTREE)) {
+                return parAdresse.resolve(requete);
+            }
+            return parEnTete.resolve(requete);
+        };
     }
 }

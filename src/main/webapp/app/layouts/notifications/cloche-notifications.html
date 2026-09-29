@@ -1,0 +1,78 @@
+<!--
+  L'avis qui vient d'arriver est dit a l'ecran, et pas seulement compte sur la cloche : un
+  chiffre qui change ne se remarque pas quand on a les yeux sur un dossier.
+
+  Le bandeau ne se referme pas tout seul : un avis qui disparait pendant qu'on lit autre chose
+  n'a pas ete lu, il a ete manque.
+-->
+@if (alerte(); as avis) {
+  <div class="avis-bandeau" role="status" data-cy="alerteAvis">
+    <fa-icon class="avis-bandeau__ico" icon="bell" />
+    <div class="avis-bandeau__corps">
+      <span class="avis-bandeau__titre">{{ avis.titre || 'Nouvel avis' }}</span>
+      <span class="avis-bandeau__texte">{{ avis.message }}</span>
+    </div>
+    <button type="button" class="pec-btn pec-btn--primaire pec-btn--sm" (click)="ouvrirAlerte()" data-cy="ouvrirAlerte">
+      <span>{{ avis.reference ? 'Ouvrir le dossier' : 'Voir' }}</span>
+    </button>
+    <button type="button" class="avis-bandeau__fermer" (click)="fermerAlerte()" aria-label="Fermer" data-cy="fermerAlerte">
+      <fa-icon icon="times" />
+    </button>
+  </div>
+}
+
+<div ngbDropdown class="topbar-dropdown" display="static" placement="bottom-end" data-cy="clocheNotifications">
+  <button
+    type="button"
+    class="topbar-link cloche"
+    ngbDropdownToggle
+    id="clocheNotifications"
+    [attr.aria-label]="nonLus() ? nonLus() + ' avis non lus' : 'Aucun avis non lu'"
+  >
+    <fa-icon icon="bell" [fixedWidth]="true" />
+    <!--
+      Le nombre est écrit, pas seulement signalé par une pastille : « trois avis » se traite,
+      « il y a quelque chose » se remet à plus tard.
+    -->
+    @if (nonLus()) {
+      <span class="cloche__n" data-cy="clocheCompteur">{{ nonLus() }}</span>
+    }
+  </button>
+
+  <div class="dropdown-menu dropdown-menu-end cloche__menu" ngbDropdownMenu aria-labelledby="clocheNotifications">
+    <div class="cloche__tete">
+      <span class="cloche__titre">Avis</span>
+      @if (nonLus()) {
+        <button type="button" class="cloche__tout" (click)="toutMarquerLu()" data-cy="toutMarquerLu">Tout marquer comme lu</button>
+      }
+    </div>
+
+    @for (unAvis of avis(); track unAvis.id) {
+      <button type="button" class="cloche__item" (click)="ouvrir(unAvis)" data-cy="avisNonLu">
+        <span class="cloche__objet">{{ unAvis.titre || 'Avis' }}</span>
+        <span class="cloche__texte">{{ unAvis.message }}</span>
+        <span class="cloche__date">
+          {{ unAvis.dateCreation | formatMediumDatetime }}
+          @if (unAvis.demande?.reference) {
+            · dossier {{ unAvis.demande!.reference }}
+          }
+        </span>
+      </button>
+    } @empty {
+      <!-- Dire qu'il n'y a rien vaut mieux qu'un menu vide, qui se lit comme une panne. -->
+      <p class="cloche__vide" data-cy="aucunAvis">
+        @if (enCours()) {
+          Chargement…
+        } @else {
+          Aucun avis en attente.
+        }
+      </p>
+    }
+
+    @if (reste()) {
+      <p class="cloche__reste">et {{ reste() }} autre{{ reste() > 1 ? 's' : '' }}</p>
+    }
+
+    <a class="cloche__pied" routerLink="/notification" data-cy="tousLesAvis">Voir tous les avis</a>
+  </div>
+</div>

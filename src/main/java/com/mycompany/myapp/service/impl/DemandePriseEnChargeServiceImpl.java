@@ -24,6 +24,7 @@ import com.mycompany.myapp.repository.TypeSoinRepository;
 import com.mycompany.myapp.repository.UserRepository;
 import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.security.SecurityUtils;
+import com.mycompany.myapp.service.AvisTempsReel;
 import com.mycompany.myapp.service.DemandePriseEnChargeService;
 import com.mycompany.myapp.service.ExpirationDemande;
 import com.mycompany.myapp.service.dto.DemandePriseEnChargeDTO;
@@ -82,6 +83,8 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
 
     private final ExpirationDemande expirationDemande;
 
+    private final AvisTempsReel avisTempsReel;
+
     private static final List<StatutTache> STATUTS_TACHE_CLOTURES = List.of(StatutTache.TERMINEE, StatutTache.ANNULEE);
 
     private static final DateTimeFormatter REFERENCE_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyMMdd");
@@ -96,7 +99,8 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         TypeSoinRepository typeSoinRepository,
         AgentRepository agentRepository,
         AyantDroitRepository ayantDroitRepository,
-        ExpirationDemande expirationDemande
+        ExpirationDemande expirationDemande,
+        AvisTempsReel avisTempsReel
     ) {
         this.demandePriseEnChargeRepository = demandePriseEnChargeRepository;
         this.demandePriseEnChargeMapper = demandePriseEnChargeMapper;
@@ -108,6 +112,7 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         this.agentRepository = agentRepository;
         this.ayantDroitRepository = ayantDroitRepository;
         this.expirationDemande = expirationDemande;
+        this.avisTempsReel = avisTempsReel;
     }
 
     @Override
@@ -758,6 +763,9 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         notification.setDemande(demande);
         notification.setTache(tache);
         notificationRepository.save(notification);
+        // Prevenir sans attendre le prochain changement d'ecran : l'envoi part une fois la
+        // transaction validee, et son echec n'interrompt rien.
+        avisTempsReel.diffuser(notification);
     }
 
     private void logHistorique(DemandePriseEnCharge demande, User utilisateur, String action, String description) {

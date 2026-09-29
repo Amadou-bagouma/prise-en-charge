@@ -1913,3 +1913,167 @@ Formulaires : lecture en deux colonnes, champs groupés, barre d'actions collant
   color: var(--pec-ok, #198754);
   font-weight: 600;
 }
+
+/* ------------------------------------------------------------------------- *
+   Cloche des avis
+
+   Dans l'en-tête, à côté de la langue et du compte : ce qui relève de la
+   personne, et non du travail en cours.
+ * ------------------------------------------------------------------------- */
+.cloche {
+  position: relative;
+}
+
+/* Le nombre est écrit, pas seulement signalé : « trois avis » se traite. */
+.cloche__n {
+  position: absolute;
+  top: 0.15rem;
+  right: 0.1rem;
+  min-width: 1.05rem;
+  padding: 0 0.25rem;
+  border-radius: 0.6rem;
+  background: var(--pec-danger, #dc3545);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1.05rem;
+  text-align: center;
+}
+
+.cloche__menu {
+  width: min(26rem, calc(100vw - 2rem));
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: 0;
+}
+
+.cloche__tete {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--pec-bord, #dee2e6);
+}
+
+.cloche__titre {
+  font-weight: 700;
+}
+
+.cloche__tout {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: var(--pec-accent, #0d6efd);
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.cloche__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--pec-bord, #dee2e6);
+  background: none;
+  padding: 0.7rem 1rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cloche__item:hover {
+  background: var(--pec-fond-2, #f1f3f5);
+}
+
+.cloche__objet {
+  font-weight: 600;
+}
+
+.cloche__texte {
+  color: var(--pec-texte-2, #6c757d);
+  font-size: 0.85rem;
+  /* Deux lignes au plus : un avis long ne doit pas repousser les suivants hors de vue. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cloche__date {
+  color: var(--pec-texte-2, #6c757d);
+  font-size: 0.75rem;
+}
+
+.cloche__vide,
+.cloche__reste {
+  margin: 0;
+  padding: 1rem;
+  color: var(--pec-texte-2, #6c757d);
+  font-size: 0.85rem;
+}
+
+.cloche__pied {
+  display: block;
+  padding: 0.7rem 1rem;
+  border-top: 1px solid var(--pec-bord, #dee2e6);
+  text-align: center;
+  font-size: 0.85rem;
+}
+
+/* ------------------------------------------------------------------------- *
+   Bandeau d'avis
+
+   Un avis qui arrive pendant qu'on instruit un dossier est dit à l'écran : un
+   chiffre qui change sur la cloche ne se remarque pas. Le bandeau ne se referme
+   pas tout seul — un avis qui disparaît n'a pas été lu, il a été manqué.
+ * ------------------------------------------------------------------------- */
+.avis-bandeau {
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0px) + 4.5rem);
+  right: 1rem;
+  z-index: 1080;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: min(30rem, calc(100vw - 2rem));
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--pec-bord, #dee2e6);
+  border-left: 4px solid var(--pec-accent, #0d6efd);
+  border-radius: 0.5rem;
+  background: #fff;
+  box-shadow: 0 0.5rem 1.5rem rgb(0 0 0 / 15%);
+}
+
+.avis-bandeau__ico {
+  color: var(--pec-accent, #0d6efd);
+}
+
+.avis-bandeau__corps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.avis-bandeau__titre {
+  font-weight: 600;
+}
+
+.avis-bandeau__texte {
+  color: var(--pec-texte-2, #6c757d);
+  font-size: 0.85rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.avis-bandeau__fermer {
+  border: 0;
+  background: none;
+  padding: 0.25rem;
+  color: var(--pec-texte-2, #6c757d);
+  cursor: pointer;
+}

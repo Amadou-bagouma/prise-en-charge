@@ -158,6 +158,15 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+        <!--
+            Les avis doivent atteindre l'agent pendant qu'il travaille, et non au prochain
+            changement d'ecran : un dossier retourne pour correction attendait jusque-la que
+            son auteur pense a regarder.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webmvc-test</artifactId>
