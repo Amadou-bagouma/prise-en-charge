@@ -7,12 +7,12 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Observable, finalize, map } from 'rxjs';
 
-import { IDemandePriseEnCharge } from 'app/entities/demande-prise-en-charge/demande-prise-en-charge.model';
-import { DemandePriseEnChargeService } from 'app/entities/demande-prise-en-charge/service/demande-prise-en-charge.service';
-import { TacheService } from 'app/entities/tache/service/tache.service';
-import { ITache } from 'app/entities/tache/tache.model';
-import { UserService } from 'app/entities/user/service/user.service';
-import { IUser } from 'app/entities/user/user.model';
+import { IDemandePriseEnCharge } from 'app/fonctionnalites/demande-prise-en-charge/demande-prise-en-charge.model';
+import { DemandePriseEnChargeService } from 'app/fonctionnalites/demande-prise-en-charge/service/demande-prise-en-charge.service';
+import { TacheService } from 'app/fonctionnalites/tache/service/tache.service';
+import { ITache } from 'app/fonctionnalites/tache/tache.model';
+import { UserService } from 'app/fonctionnalites/user/service/user.service';
+import { IUser } from 'app/fonctionnalites/user/user.model';
 import { AlertError } from 'app/shared/alert';
 import { ConfirmService } from 'app/shared/confirm';
 import { TranslateDirective } from 'app/shared/language';
@@ -21,7 +21,7 @@ import { INotification } from '../notification.model';
 import { NotificationService } from '../service/notification.service';
 
 import { NotificationFormGroup, NotificationFormService } from './notification-form.service';
-import { TypeNotification } from 'app/entities/enumerations/type-notification.model';
+import { TypeNotification } from 'app/fonctionnalites/enumerations/type-notification.model';
 
 @Component({
   selector: 'jhi-notification-update',

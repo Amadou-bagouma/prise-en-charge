@@ -10,9 +10,9 @@ import { Observable, catchError, finalize, map, of } from 'rxjs';
 
 import { AlertService } from 'app/core/util/alert.service';
 import { DataUtils, FileLoadError } from 'app/core/util/data-util.service';
-import { IAgent } from 'app/entities/agent/agent.model';
-import { AgentService } from 'app/entities/agent/service/agent.service';
-import { LienParente } from 'app/entities/enumerations/lien-parente.model';
+import { IAgent } from 'app/fonctionnalites/agent/agent.model';
+import { AgentService } from 'app/fonctionnalites/agent/service/agent.service';
+import { LienParente } from 'app/fonctionnalites/enumerations/lien-parente.model';
 import { AlertError } from 'app/shared/alert';
 import { ConfirmService } from 'app/shared/confirm';
 import { TranslateDirective } from 'app/shared/language';

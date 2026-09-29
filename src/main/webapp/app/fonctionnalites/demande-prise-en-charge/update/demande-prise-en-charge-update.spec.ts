@@ -7,14 +7,14 @@ import { ActivatedRoute, provideRouter } from '@angular/router';
 import { provideTranslateService } from '@ngx-translate/core';
 import { Subject, from, of } from 'rxjs';
 
-import { IAgent } from 'app/entities/agent/agent.model';
-import { AgentService } from 'app/entities/agent/service/agent.service';
-import { IAyantDroit } from 'app/entities/ayant-droit/ayant-droit.model';
-import { AyantDroitService } from 'app/entities/ayant-droit/service/ayant-droit.service';
-import { IEtablissementSante } from 'app/entities/etablissement-sante/etablissement-sante.model';
-import { EtablissementSanteService } from 'app/entities/etablissement-sante/service/etablissement-sante.service';
-import { UserService } from 'app/entities/user/service/user.service';
-import { IUser } from 'app/entities/user/user.model';
+import { IAgent } from 'app/fonctionnalites/agent/agent.model';
+import { AgentService } from 'app/fonctionnalites/agent/service/agent.service';
+import { IAyantDroit } from 'app/fonctionnalites/ayant-droit/ayant-droit.model';
+import { AyantDroitService } from 'app/fonctionnalites/ayant-droit/service/ayant-droit.service';
+import { IEtablissementSante } from 'app/fonctionnalites/etablissement-sante/etablissement-sante.model';
+import { EtablissementSanteService } from 'app/fonctionnalites/etablissement-sante/service/etablissement-sante.service';
+import { UserService } from 'app/fonctionnalites/user/service/user.service';
+import { IUser } from 'app/fonctionnalites/user/user.model';
 import { ConfirmService } from 'app/shared/confirm';
 
 import { IDemandePriseEnCharge } from '../demande-prise-en-charge.model';

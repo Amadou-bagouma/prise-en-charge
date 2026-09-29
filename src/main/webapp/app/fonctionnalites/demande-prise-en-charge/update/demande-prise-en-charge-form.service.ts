@@ -4,7 +4,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import dayjs from 'dayjs/esm';
 
 import { DATE_TIME_FORMAT } from 'app/config';
-import { StatutDemande } from 'app/entities/enumerations/statut-demande.model';
+import { StatutDemande } from 'app/fonctionnalites/enumerations/statut-demande.model';
 import { IDemandePriseEnCharge, NewDemandePriseEnCharge } from '../demande-prise-en-charge.model';
 
 /**

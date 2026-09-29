@@ -1,13 +1,13 @@
 import dayjs from 'dayjs/esm';
 
-import { IAgent } from 'app/entities/agent/agent.model';
-import { IAyantDroit } from 'app/entities/ayant-droit/ayant-droit.model';
-import { PrioriteDemande } from 'app/entities/enumerations/priorite-demande.model';
-import { StatutDemande } from 'app/entities/enumerations/statut-demande.model';
-import { TypeBeneficiaire } from 'app/entities/enumerations/type-beneficiaire.model';
+import { IAgent } from 'app/fonctionnalites/agent/agent.model';
+import { IAyantDroit } from 'app/fonctionnalites/ayant-droit/ayant-droit.model';
+import { PrioriteDemande } from 'app/fonctionnalites/enumerations/priorite-demande.model';
+import { StatutDemande } from 'app/fonctionnalites/enumerations/statut-demande.model';
+import { TypeBeneficiaire } from 'app/fonctionnalites/enumerations/type-beneficiaire.model';
 import { ITypeSoin } from 'app/fonctionnalites/type-soin/type-soin.model';
-import { IEtablissementSante } from 'app/entities/etablissement-sante/etablissement-sante.model';
-import { IUser } from 'app/entities/user/user.model';
+import { IEtablissementSante } from 'app/fonctionnalites/etablissement-sante/etablissement-sante.model';
+import { IUser } from 'app/fonctionnalites/user/user.model';
 
 export interface IDemandePriseEnCharge {
   id: number;

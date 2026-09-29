@@ -1,9 +1,9 @@
 import dayjs from 'dayjs/esm';
 
-import { IDemandePriseEnCharge } from 'app/entities/demande-prise-en-charge/demande-prise-en-charge.model';
-import { PrioriteTache } from 'app/entities/enumerations/priorite-tache.model';
-import { StatutTache } from 'app/entities/enumerations/statut-tache.model';
-import { IUser } from 'app/entities/user/user.model';
+import { IDemandePriseEnCharge } from 'app/fonctionnalites/demande-prise-en-charge/demande-prise-en-charge.model';
+import { PrioriteTache } from 'app/fonctionnalites/enumerations/priorite-tache.model';
+import { StatutTache } from 'app/fonctionnalites/enumerations/statut-tache.model';
+import { IUser } from 'app/fonctionnalites/user/user.model';
 
 export interface ITache {
   id: number;

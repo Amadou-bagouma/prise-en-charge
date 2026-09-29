@@ -1,9 +1,9 @@
 import dayjs from 'dayjs/esm';
 
-import { IDemandePriseEnCharge } from 'app/entities/demande-prise-en-charge/demande-prise-en-charge.model';
-import { TypeNotification } from 'app/entities/enumerations/type-notification.model';
-import { ITache } from 'app/entities/tache/tache.model';
-import { IUser } from 'app/entities/user/user.model';
+import { IDemandePriseEnCharge } from 'app/fonctionnalites/demande-prise-en-charge/demande-prise-en-charge.model';
+import { TypeNotification } from 'app/fonctionnalites/enumerations/type-notification.model';
+import { ITache } from 'app/fonctionnalites/tache/tache.model';
+import { IUser } from 'app/fonctionnalites/user/user.model';
 
 export interface INotification {
   id: number;

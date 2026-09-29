@@ -1,6 +1,6 @@
 import dayjs from 'dayjs/esm';
 
-import { IDemandePriseEnCharge } from 'app/entities/demande-prise-en-charge/demande-prise-en-charge.model';
+import { IDemandePriseEnCharge } from 'app/fonctionnalites/demande-prise-en-charge/demande-prise-en-charge.model';
 
 export interface IPieceJustificative {
   id: number;

@@ -1,4 +1,4 @@
-import { IRegion } from 'app/entities/region/region.model';
+import { IRegion } from 'app/fonctionnalites/region/region.model';
 
 export interface IDirection {
   id: number;
