@@ -11,6 +11,7 @@ import { combineLatest, filter, map, tap } from 'rxjs';
 
 import { DEFAULT_SORT_DATA, ITEMS_PER_PAGE, ITEM_DELETED_EVENT, PAGE_HEADER, SORT, TOTAL_COUNT_RESPONSE_HEADER } from 'app/config';
 import { Alert, AlertError } from 'app/shared/alert';
+import { HasAnyAuthorityDirective } from 'app/shared/auth';
 import { TranslateDirective } from 'app/shared/language';
 import { ItemCount } from 'app/shared/pagination';
 import { SortByDirective, SortDirective, SortService, type SortState, sortStateSignal } from 'app/shared/sort';
@@ -21,7 +22,18 @@ import { GestionService } from '../service/gestion.service';
 @Component({
   selector: 'jhi-gestion',
   templateUrl: './gestion.html',
-  imports: [RouterLink, FontAwesomeModule, AlertError, Alert, SortDirective, SortByDirective, TranslateDirective, NgbPagination, ItemCount],
+  imports: [
+    HasAnyAuthorityDirective,
+    RouterLink,
+    FontAwesomeModule,
+    AlertError,
+    Alert,
+    SortDirective,
+    SortByDirective,
+    TranslateDirective,
+    NgbPagination,
+    ItemCount,
+  ],
 })
 export class Gestion {
   readonly gestions = signal<IGestion[]>([]);

@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 
 import { ASC } from 'app/config';
 import { userRouteAccessService } from 'app/core/auth';
+import { Action } from 'app/shared/jhipster/actions.constants';
 import { Authority } from 'app/shared/jhipster/constants';
 
 import CarteBeneficiaireResolve from './route/carte-beneficiaire-routing-resolve.service';
@@ -12,7 +13,7 @@ const carteBeneficiaireRoute: Routes = [
     loadComponent: () => import('./list/carte-beneficiaire').then(m => m.CarteBeneficiaire),
     data: {
       defaultSort: `id,${ASC}`,
-      authorities: [Authority.ADMIN],
+      authorities: [Action.CARTE_CONSULTER, Authority.ADMIN],
     },
     canActivate: [userRouteAccessService],
   },
@@ -23,7 +24,7 @@ const carteBeneficiaireRoute: Routes = [
       carteBeneficiaire: CarteBeneficiaireResolve,
     },
     data: {
-      authorities: [Authority.ADMIN],
+      authorities: [Action.CARTE_CONSULTER, Authority.ADMIN],
     },
     canActivate: [userRouteAccessService],
   },
@@ -34,7 +35,7 @@ const carteBeneficiaireRoute: Routes = [
       carteBeneficiaire: CarteBeneficiaireResolve,
     },
     data: {
-      authorities: [Authority.ADMIN],
+      authorities: [Action.CARTE_IMPRIMER, Authority.ADMIN],
     },
     canActivate: [userRouteAccessService],
   },
@@ -45,7 +46,7 @@ const carteBeneficiaireRoute: Routes = [
       carteBeneficiaire: CarteBeneficiaireResolve,
     },
     data: {
-      authorities: [Authority.ADMIN],
+      authorities: [Action.CARTE_CREER, Authority.ADMIN],
     },
     canActivate: [userRouteAccessService],
   },
@@ -56,7 +57,7 @@ const carteBeneficiaireRoute: Routes = [
       carteBeneficiaire: CarteBeneficiaireResolve,
     },
     data: {
-      authorities: [Authority.ADMIN],
+      authorities: [Action.CARTE_MODIFIER, Authority.ADMIN],
     },
     canActivate: [userRouteAccessService],
   },

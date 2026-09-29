@@ -34,6 +34,7 @@
       <button
         type="button"
         id="jh-create-entity"
+        *jhiHasAnyAuthority="['ROLE_CARTE_CREER', 'ROLE_ADMIN']"
         data-cy="entityCreateButton"
         class="pec-btn pec-btn--primaire pec-btn--sm"
         [routerLink]="['/carte-beneficiaire/new']"
@@ -112,11 +113,22 @@
                       <fa-icon icon="print" class="me-1" />
                       <span>Imprimer</span>
                     </a>
-                    <a ngbDropdownItem [routerLink]="['/carte-beneficiaire', carteBeneficiaire.id, 'edit']" data-cy="entityEditButton">
+                    <a
+                      ngbDropdownItem
+                      [routerLink]="['/carte-beneficiaire', carteBeneficiaire.id, 'edit']"
+                      *jhiHasAnyAuthority="['ROLE_CARTE_MODIFIER', 'ROLE_ADMIN']"
+                      data-cy="entityEditButton"
+                    >
                       <fa-icon icon="pencil-alt" class="me-1" />
                       <span jhiTranslate="entity.action.edit">Editer</span>
                     </a>
-                    <button ngbDropdownItem type="button" (click)="delete(carteBeneficiaire)" data-cy="entityDeleteButton">
+                    <button
+                      ngbDropdownItem
+                      type="button"
+                      (click)="delete(carteBeneficiaire)"
+                      *jhiHasAnyAuthority="['ROLE_CARTE_SUPPRIMER', 'ROLE_ADMIN']"
+                      data-cy="entityDeleteButton"
+                    >
                       <fa-icon icon="times" class="me-1" />
                       <span jhiTranslate="entity.action.delete">Supprimer</span>
                     </button>

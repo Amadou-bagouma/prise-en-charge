@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 
 import { DESC } from 'app/config';
 import { userRouteAccessService } from 'app/core/auth';
+import { Action } from 'app/shared/jhipster/actions.constants';
 import { Authority } from 'app/shared/jhipster/constants';
 
 import GestionResolve from './route/gestion-routing-resolve.service';
@@ -12,7 +13,7 @@ const gestionRoute: Routes = [
     loadComponent: () => import('./list/gestion').then(m => m.Gestion),
     data: {
       defaultSort: `id,${DESC}`,
-      authorities: [Authority.ADMIN],
+      authorities: [Action.REFERENTIEL_CONSULTER, Authority.ADMIN],
     },
     canActivate: [userRouteAccessService],
   },
@@ -23,7 +24,7 @@ const gestionRoute: Routes = [
       gestion: GestionResolve,
     },
     data: {
-      authorities: [Authority.ADMIN],
+      authorities: [Action.REFERENTIEL_CONSULTER, Authority.ADMIN],
     },
     canActivate: [userRouteAccessService],
   },
@@ -34,7 +35,7 @@ const gestionRoute: Routes = [
       gestion: GestionResolve,
     },
     data: {
-      authorities: [Authority.ADMIN],
+      authorities: [Action.REFERENTIEL_CREER, Authority.ADMIN],
     },
     canActivate: [userRouteAccessService],
   },
@@ -45,7 +46,7 @@ const gestionRoute: Routes = [
       gestion: GestionResolve,
     },
     data: {
-      authorities: [Authority.ADMIN],
+      authorities: [Action.REFERENTIEL_MODIFIER, Authority.ADMIN],
     },
     canActivate: [userRouteAccessService],
   },

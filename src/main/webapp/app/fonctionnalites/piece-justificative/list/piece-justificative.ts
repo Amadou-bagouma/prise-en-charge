@@ -11,6 +11,7 @@ import { combineLatest, filter, map, tap } from 'rxjs';
 
 import { DEFAULT_SORT_DATA, ITEMS_PER_PAGE, ITEM_DELETED_EVENT, PAGE_HEADER, SORT, TOTAL_COUNT_RESPONSE_HEADER } from 'app/config';
 import { Alert, AlertError } from 'app/shared/alert';
+import { HasAnyAuthorityDirective } from 'app/shared/auth';
 import { FormatMediumDatetimePipe } from 'app/shared/date';
 import { TranslateDirective } from 'app/shared/language';
 import { ItemCount } from 'app/shared/pagination';
@@ -23,6 +24,7 @@ import { PieceJustificativeService } from '../service/piece-justificative.servic
   selector: 'jhi-piece-justificative',
   templateUrl: './piece-justificative.html',
   imports: [
+    HasAnyAuthorityDirective,
     RouterLink,
     FontAwesomeModule,
     AlertError,

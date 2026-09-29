@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { userRouteAccessService } from 'app/core/auth';
+import { Action } from 'app/shared/jhipster/actions.constants';
 import { Authority } from 'app/shared/jhipster/constants';
 
 import TypeSoinResolve from './route/type-soin-routing-resolve.service';
@@ -12,7 +13,7 @@ const typeSoinRoute: Routes = [
     data: {
       // Le referentiel se lit dans l'ordre de l'imprime officiel, pas par ordre alphabetique.
       defaultSort: 'ordre,asc',
-      authorities: [Authority.ADMIN],
+      authorities: [Action.REFERENTIEL_CONSULTER, Authority.ADMIN],
     },
     canActivate: [userRouteAccessService],
   },
@@ -23,7 +24,7 @@ const typeSoinRoute: Routes = [
       typeSoin: TypeSoinResolve,
     },
     data: {
-      authorities: [Authority.ADMIN],
+      authorities: [Action.REFERENTIEL_CONSULTER, Authority.ADMIN],
     },
     canActivate: [userRouteAccessService],
   },
@@ -34,7 +35,7 @@ const typeSoinRoute: Routes = [
       typeSoin: TypeSoinResolve,
     },
     data: {
-      authorities: [Authority.ADMIN],
+      authorities: [Action.REFERENTIEL_CREER, Authority.ADMIN],
     },
     canActivate: [userRouteAccessService],
   },
@@ -45,7 +46,7 @@ const typeSoinRoute: Routes = [
       typeSoin: TypeSoinResolve,
     },
     data: {
-      authorities: [Authority.ADMIN],
+      authorities: [Action.REFERENTIEL_MODIFIER, Authority.ADMIN],
     },
     canActivate: [userRouteAccessService],
   },

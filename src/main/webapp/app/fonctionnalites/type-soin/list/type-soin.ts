@@ -11,6 +11,7 @@ import { combineLatest, filter, map, tap } from 'rxjs';
 
 import { DEFAULT_SORT_DATA, ITEMS_PER_PAGE, ITEM_DELETED_EVENT, PAGE_HEADER, SORT, TOTAL_COUNT_RESPONSE_HEADER } from 'app/config';
 import { Alert, AlertError } from 'app/shared/alert';
+import { HasAnyAuthorityDirective } from 'app/shared/auth';
 import { Filter, FilterOption, FilterOptions, IFilterOption, IFilterOptions } from 'app/shared/filter';
 import { TranslateDirective } from 'app/shared/language';
 import { ItemCount } from 'app/shared/pagination';
@@ -23,6 +24,7 @@ import { TypeSoinService } from '../service/type-soin.service';
   selector: 'jhi-type-soin',
   templateUrl: './type-soin.html',
   imports: [
+    HasAnyAuthorityDirective,
     RouterLink,
     FontAwesomeModule,
     AlertError,

@@ -33,6 +33,7 @@
       <button
         type="button"
         id="jh-create-entity"
+        *jhiHasAnyAuthority="['ROLE_AYANT_DROIT_CREER', 'ROLE_ADMIN']"
         data-cy="entityCreateButton"
         class="pec-btn pec-btn--primaire pec-btn--sm"
         [routerLink]="['/ayant-droit/new']"
@@ -128,7 +129,12 @@
                       <fa-icon icon="eye" class="me-1" />
                       <span jhiTranslate="entity.action.view">Voir</span>
                     </a>
-                    <a ngbDropdownItem [routerLink]="['/ayant-droit', ayantDroit.id, 'edit']" data-cy="entityEditButton">
+                    <a
+                      ngbDropdownItem
+                      [routerLink]="['/ayant-droit', ayantDroit.id, 'edit']"
+                      *jhiHasAnyAuthority="['ROLE_AYANT_DROIT_MODIFIER', 'ROLE_ADMIN']"
+                      data-cy="entityEditButton"
+                    >
                       <fa-icon icon="pencil-alt" class="me-1" />
                       <span jhiTranslate="entity.action.edit">Editer</span>
                     </a>
@@ -144,7 +150,13 @@
                       radie depuis sa fiche, ce qui laisse une trace.
                     -->
                     @if (estSupprimable(ayantDroit)) {
-                      <button ngbDropdownItem type="button" (click)="delete(ayantDroit)" data-cy="entityDeleteButton">
+                      <button
+                        ngbDropdownItem
+                        type="button"
+                        (click)="delete(ayantDroit)"
+                        *jhiHasAnyAuthority="['ROLE_AYANT_DROIT_SUPPRIMER', 'ROLE_ADMIN']"
+                        data-cy="entityDeleteButton"
+                      >
                         <fa-icon icon="times" class="me-1" />
                         <span jhiTranslate="entity.action.delete">Supprimer</span>
                       </button>

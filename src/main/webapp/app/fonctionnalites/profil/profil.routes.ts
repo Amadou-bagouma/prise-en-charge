@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 
 import { ASC } from 'app/config';
 import { userRouteAccessService } from 'app/core/auth';
+import { Action } from 'app/shared/jhipster/actions.constants';
 import { Authority } from 'app/shared/jhipster/constants';
 
 import ProfilResolve from './route/profil-routing-resolve.service';
@@ -13,7 +14,7 @@ const profilRoute: Routes = [
     data: {
       // Un référentiel se parcourt par ordre alphabétique, pas par ordre de création.
       defaultSort: `nom,${ASC}`,
-      authorities: [Authority.ADMIN],
+      authorities: [Action.PROFIL_CONSULTER, Authority.ADMIN],
     },
     canActivate: [userRouteAccessService],
   },
@@ -24,7 +25,7 @@ const profilRoute: Routes = [
       profil: ProfilResolve,
     },
     data: {
-      authorities: [Authority.ADMIN],
+      authorities: [Action.PROFIL_CONSULTER, Authority.ADMIN],
     },
     canActivate: [userRouteAccessService],
   },
@@ -35,7 +36,7 @@ const profilRoute: Routes = [
       profil: ProfilResolve,
     },
     data: {
-      authorities: [Authority.ADMIN],
+      authorities: [Action.PROFIL_CREER, Authority.ADMIN],
     },
     canActivate: [userRouteAccessService],
   },
@@ -46,7 +47,7 @@ const profilRoute: Routes = [
       profil: ProfilResolve,
     },
     data: {
-      authorities: [Authority.ADMIN],
+      authorities: [Action.PROFIL_MODIFIER, Authority.ADMIN],
     },
     canActivate: [userRouteAccessService],
   },

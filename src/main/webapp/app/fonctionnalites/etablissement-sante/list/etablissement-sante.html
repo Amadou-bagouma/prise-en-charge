@@ -37,6 +37,7 @@
       <button
         type="button"
         id="jh-create-entity"
+        *jhiHasAnyAuthority="['ROLE_REFERENTIEL_CREER', 'ROLE_ADMIN']"
         data-cy="entityCreateButton"
         class="pec-btn pec-btn--primaire pec-btn--sm"
         [routerLink]="['/etablissement-sante/new']"
@@ -113,11 +114,22 @@
                       <fa-icon icon="eye" class="me-1" />
                       <span jhiTranslate="entity.action.view">Voir</span>
                     </a>
-                    <a ngbDropdownItem [routerLink]="['/etablissement-sante', etablissementSante.id, 'edit']" data-cy="entityEditButton">
+                    <a
+                      ngbDropdownItem
+                      [routerLink]="['/etablissement-sante', etablissementSante.id, 'edit']"
+                      *jhiHasAnyAuthority="['ROLE_REFERENTIEL_MODIFIER', 'ROLE_ADMIN']"
+                      data-cy="entityEditButton"
+                    >
                       <fa-icon icon="pencil-alt" class="me-1" />
                       <span jhiTranslate="entity.action.edit">Editer</span>
                     </a>
-                    <button ngbDropdownItem type="button" (click)="delete(etablissementSante)" data-cy="entityDeleteButton">
+                    <button
+                      ngbDropdownItem
+                      type="button"
+                      (click)="delete(etablissementSante)"
+                      *jhiHasAnyAuthority="['ROLE_REFERENTIEL_SUPPRIMER', 'ROLE_ADMIN']"
+                      data-cy="entityDeleteButton"
+                    >
                       <fa-icon icon="times" class="me-1" />
                       <span jhiTranslate="entity.action.delete">Supprimer</span>
                     </button>

@@ -12,6 +12,7 @@ import { combineLatest, filter, map, tap } from 'rxjs';
 
 import { DEFAULT_SORT_DATA, ITEMS_PER_PAGE, ITEM_DELETED_EVENT, PAGE_HEADER, SORT, TOTAL_COUNT_RESPONSE_HEADER } from 'app/config';
 import { Alert, AlertError } from 'app/shared/alert';
+import { HasAnyAuthorityDirective } from 'app/shared/auth';
 import { FormatMediumDatePipe } from 'app/shared/date';
 import { Filter, FilterOption, FilterOptions, IFilterOption, IFilterOptions } from 'app/shared/filter';
 import { TranslateDirective } from 'app/shared/language';
@@ -28,6 +29,7 @@ import { AyantDroitService } from '../service/ayant-droit.service';
   selector: 'jhi-ayant-droit',
   templateUrl: './ayant-droit.html',
   imports: [
+    HasAnyAuthorityDirective,
     NgClass,
     RouterLink,
     FontAwesomeModule,
