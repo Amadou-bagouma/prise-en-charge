@@ -73,26 +73,33 @@ describe('CarteBeneficiaire Management Update Component', () => {
       expect(comp.agentsSharedCollection()).toEqual(expectedCollection);
     });
 
-    it('should call AyantDroit query and add missing value', () => {
-      const carteBeneficiaire: ICarteBeneficiaire = { id: 29825 };
-      const ayantDroit: IAyantDroit = { id: 17970 };
-      carteBeneficiaire.ayantDroit = ayantDroit;
+    it("ne propose que les ayants droit de l'agent choisi", () => {
+      // Proposer tous les ayants droit de l'institution ferait etablir une carte a l'enfant
+      // d'un autre agent sur une simple homonymie : ils ne sont demandes qu'une fois l'agent
+      // designe, et filtres sur lui.
+      const agent: IAgent = { id: 25235 };
+      const sesAyantsDroit: IAyantDroit[] = [{ id: 17970 }];
+      vi.spyOn(ayantDroitService, 'query').mockReturnValue(of(new HttpResponse({ body: sesAyantsDroit })));
 
-      const ayantDroitCollection: IAyantDroit[] = [{ id: 17970 }];
-      vi.spyOn(ayantDroitService, 'query').mockReturnValue(of(new HttpResponse({ body: ayantDroitCollection })));
-      const additionalAyantDroits = [ayantDroit];
-      const expectedCollection: IAyantDroit[] = [...additionalAyantDroits, ...ayantDroitCollection];
-      vi.spyOn(ayantDroitService, 'addAyantDroitToCollectionIfMissing').mockReturnValue(expectedCollection);
-
-      activatedRoute.data = of({ carteBeneficiaire });
+      activatedRoute.data = of({ carteBeneficiaire: null });
       comp.ngOnInit();
+      expect(ayantDroitService.query).not.toHaveBeenCalled();
 
-      expect(ayantDroitService.query).toHaveBeenCalled();
-      expect(ayantDroitService.addAyantDroitToCollectionIfMissing).toHaveBeenCalledWith(
-        ayantDroitCollection,
-        ...additionalAyantDroits.map(i => expect.objectContaining(i) as typeof i),
-      );
-      expect(comp.ayantDroitsSharedCollection()).toEqual(expectedCollection);
+      comp.choisirAgent(agent);
+
+      expect(ayantDroitService.query).toHaveBeenCalledWith(expect.objectContaining({ 'agentId.equals': agent.id }));
+      expect(comp.ayantsDroitDeLAgent()).toEqual(sesAyantsDroit);
+    });
+
+    it("oublie l'ayant droit choisi quand on change d'agent", () => {
+      // Sans cela, changer d'agent laisserait selectionne l'ayant droit du precedent, et la
+      // carte s'etablirait au nom de quelqu'un qui n'a rien a voir.
+      vi.spyOn(ayantDroitService, 'query').mockReturnValue(of(new HttpResponse({ body: [] })));
+      comp.ayantDroitChoisi.set({ id: 17970 } as IAyantDroit);
+
+      comp.choisirAgent({ id: 25235 } as IAgent);
+
+      expect(comp.ayantDroitChoisi()).toBeNull();
     });
 
     it('should update editForm', () => {

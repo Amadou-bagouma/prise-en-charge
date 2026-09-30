@@ -67,10 +67,26 @@
       </div>
 
       <div class="carte__pied">
-        <span class="carte__numero">{{ carte.numeroCarte }}</span>
-        <span>
-          <span jhiTranslate="peccnssApp.carteBeneficiaire.printView.issuedOn">Émise le</span>
-          {{ carte.dateEmission | formatMediumDate }}
+        <span class="carte__emission">
+          <span class="carte__numero">{{ carte.numeroCarte }}</span>
+          <span>
+            <span jhiTranslate="peccnssApp.carteBeneficiaire.printView.issuedOn">Émise le</span>
+            {{ carte.dateEmission | formatMediumDate }}
+          </span>
+        </span>
+        <!--
+          La signature fait de l'imprimé une pièce de l'institution. Le nom l'accompagne : une
+          signature seule ne se lit pas. L'emplacement reste vide si rien n'a été déposé au
+          référentiel — bloquer l'impression pour cela priverait l'agent de sa carte.
+        -->
+        <span class="carte__signature">
+          @if (signature(); as image) {
+            <img [src]="image" alt="" />
+          }
+          @if (nomDirecteur(); as nom) {
+            <span class="carte__signataire">{{ nom }}</span>
+          }
+          <span class="carte__qualite">Le Directeur général</span>
         </span>
       </div>
     </div>

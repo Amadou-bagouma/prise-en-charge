@@ -164,6 +164,37 @@
   letter-spacing: 0.08em;
 }
 
+/* Le numéro et la date d'émission, empilés à gauche du pied. */
+.carte__emission {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+/* La signature, à droite du pied : elle se lit à côté du numéro, pas dessus. */
+.carte__signature {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.1;
+}
+
+.carte__signature img {
+  max-width: 22mm;
+  max-height: 7mm;
+  object-fit: contain;
+}
+
+.carte__signataire {
+  font-weight: 700;
+  font-size: 2.2mm;
+}
+
+.carte__qualite {
+  font-size: 2mm;
+  color: #5a6b7d;
+}
+
 /* ------------------------------------------------------------------- verso */
 .carte--verso {
   padding: 3mm;
