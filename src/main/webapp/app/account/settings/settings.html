@@ -1,155 +1,143 @@
-<div>
-  <div class="d-flex justify-content-center">
-    <div class="col-md-8">
-      @if (settingsForm.value.login) {
-        <h2 jhiTranslate="settings.title" [translateValues]="{ username: settingsForm.value.login }">
-          User settings for [<strong>{{ settingsForm.value.login }}</strong
-          >]
-        </h2>
-      }
+@if (settingsForm.value.login) {
+  <div class="pec-ecran pec-compte">
+    <div class="pec-titre-ecran">
+      <h1>Mon compte</h1>
+      <span class="pec-badge" [ngClass]="actif() ? 'pec-badge--ok' : 'pec-badge--danger'" data-cy="etatCompte">
+        <span class="pec-badge__pt"></span>
+        <span>{{ actif() ? 'Compte ouvert' : 'Compte fermé' }}</span>
+      </span>
+      <span class="pec-num">{{ settingsForm.value.login }}</span>
+    </div>
 
-      @if (success()) {
-        <div class="alert alert-success" jhiTranslate="settings.messages.success"><strong>Settings saved!</strong></div>
-      }
+    @if (success()) {
+      <div class="pec-alerte pec-alerte--ok" role="status" data-cy="settingsSuccess">
+        <fa-icon class="pec-alerte__ico" icon="check" />
+        <div class="pec-alerte__corps">
+          <span class="pec-alerte__titre">Vos informations sont enregistrées</span>
+          <span class="pec-alerte__txt">Elles apparaîtront sous cette forme sur les dossiers que vous instruisez.</span>
+        </div>
+      </div>
+    }
 
-      <jhi-alert-error />
+    <jhi-alert-error />
 
-      @if (settingsForm.value.login) {
-        <form name="form" (ngSubmit)="save()" [formGroup]="settingsForm" novalidate>
-          <div class="mb-3">
-            <label class="form-label" for="firstName" jhiTranslate="settings.form.firstname">First Name</label>
-            <input
-              type="text"
-              class="form-control"
-              id="firstName"
-              name="firstName"
-              placeholder="{{ 'settings.form.firstname.placeholder' | translate }}"
-              formControlName="firstName"
-              data-cy="firstname"
-            />
-
-            @let firstNameRef = settingsForm.get('firstName')!;
-            @if (firstNameRef.invalid && (firstNameRef.dirty || firstNameRef.touched)) {
-              <div>
-                @if (firstNameRef?.errors?.required) {
-                  <small class="form-text text-danger" jhiTranslate="settings.messages.validate.firstname.required"
-                    >Your first name is required.</small
-                  >
-                }
-
-                @if (firstNameRef?.errors?.minlength) {
-                  <small class="form-text text-danger" jhiTranslate="settings.messages.validate.firstname.minlength"
-                    >Your first name is required to be at least 1 character</small
-                  >
-                }
-
-                @if (firstNameRef?.errors?.maxlength) {
-                  <small class="form-text text-danger" jhiTranslate="settings.messages.validate.firstname.maxlength"
-                    >Your first name cannot be longer than 50 characters</small
-                  >
-                }
-              </div>
-            }
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label" for="lastName" jhiTranslate="settings.form.lastname">Last Name</label>
-            <input
-              type="text"
-              class="form-control"
-              id="lastName"
-              name="lastName"
-              placeholder="{{ 'settings.form.lastname.placeholder' | translate }}"
-              formControlName="lastName"
-              data-cy="lastname"
-            />
-
-            @let lastNameRef = settingsForm.get('lastName')!;
-            @if (lastNameRef.invalid && (lastNameRef.dirty || lastNameRef.touched)) {
-              <div>
-                @if (lastNameRef?.errors?.required) {
-                  <small class="form-text text-danger" jhiTranslate="settings.messages.validate.lastname.required"
-                    >Your last name is required.</small
-                  >
-                }
-
-                @if (lastNameRef?.errors?.minlength) {
-                  <small class="form-text text-danger" jhiTranslate="settings.messages.validate.lastname.minlength"
-                    >Your last name is required to be at least 1 character</small
-                  >
-                }
-
-                @if (lastNameRef?.errors?.maxlength) {
-                  <small class="form-text text-danger" jhiTranslate="settings.messages.validate.lastname.maxlength"
-                    >Your last name cannot be longer than 50 characters</small
-                  >
-                }
-              </div>
-            }
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label" for="email" jhiTranslate="global.form.email.label">Email</label>
-            <input
-              type="email"
-              class="form-control"
-              id="email"
-              name="email"
-              placeholder="{{ 'global.form.email.placeholder' | translate }}"
-              formControlName="email"
-              data-cy="email"
-            />
-
-            @let emailRef = settingsForm.get('email')!;
-            @if (emailRef.invalid && (emailRef.dirty || emailRef.touched)) {
-              <div>
-                @if (emailRef?.errors?.required) {
-                  <small class="form-text text-danger" jhiTranslate="global.messages.validate.email.required"
-                    >Your email is required.</small
-                  >
-                }
-
-                @if (emailRef?.errors?.email) {
-                  <small class="form-text text-danger" jhiTranslate="global.messages.validate.email.invalid">Your email is invalid.</small>
-                }
-
-                @if (emailRef?.errors?.minlength) {
-                  <small class="form-text text-danger" jhiTranslate="global.messages.validate.email.minlength"
-                    >Your email is required to be at least 5 characters.</small
-                  >
-                }
-
-                @if (emailRef?.errors?.maxlength) {
-                  <small class="form-text text-danger" jhiTranslate="global.messages.validate.email.maxlength"
-                    >Your email cannot be longer than 50 characters.</small
-                  >
-                }
-              </div>
-            }
-          </div>
-
-          @if (languages.length > 0) {
-            <div class="mb-3">
-              <label for="langKey" jhiTranslate="settings.form.language">Language</label>
-              <select class="form-control" id="langKey" name="langKey" formControlName="langKey" data-cy="langKey">
-                @for (language of languages; track $index) {
-                  <option [value]="language">{{ language | findLanguageFromKey }}</option>
-                }
-              </select>
+    <div class="pec-compte__grille">
+      <!-- Colonne de gauche : ce que l'agent peut changer lui-même. -->
+      <section class="pec-panneau">
+        <div class="pec-panneau__tete">
+          <span class="pec-panneau__titre">Mes informations</span>
+        </div>
+        <div class="pec-panneau__corps">
+          <form name="form" (ngSubmit)="save()" [formGroup]="settingsForm" novalidate>
+            <div class="pec-champ" [class.pec-champ--erreur]="enErreur('lastName')">
+              <label class="pec-champ__lib" for="lastName">Nom <span class="pec-champ__req" aria-hidden="true">*</span></label>
+              <input type="text" class="pec-champ__ctrl" id="lastName" name="lastName" formControlName="lastName" data-cy="lastname" />
+              @if (enErreur('lastName')) {
+                <span class="pec-champ__err">Le nom est obligatoire, et ne dépasse pas 50 caractères.</span>
+              }
             </div>
-          }
 
-          <button
-            type="submit"
-            [disabled]="settingsForm.invalid"
-            class="btn btn-primary"
-            data-cy="submit"
-            jhiTranslate="settings.form.button"
-          >
-            Save
-          </button>
-        </form>
-      }
+            <div class="pec-champ" [class.pec-champ--erreur]="enErreur('firstName')">
+              <label class="pec-champ__lib" for="firstName">Prénom <span class="pec-champ__req" aria-hidden="true">*</span></label>
+              <input type="text" class="pec-champ__ctrl" id="firstName" name="firstName" formControlName="firstName" data-cy="firstname" />
+              @if (enErreur('firstName')) {
+                <span class="pec-champ__err">Le prénom est obligatoire, et ne dépasse pas 50 caractères.</span>
+              }
+            </div>
+
+            <div class="pec-champ" [class.pec-champ--erreur]="enErreur('email')">
+              <label class="pec-champ__lib" for="email"
+                >Adresse électronique <span class="pec-champ__req" aria-hidden="true">*</span></label
+              >
+              <input type="email" class="pec-champ__ctrl" id="email" name="email" formControlName="email" data-cy="email" />
+              <!--
+                Dire à quoi sert l'adresse : autrement on y met n'importe quoi, et la
+                réinitialisation du mot de passe n'atteint plus personne.
+              -->
+              <span class="pec-champ__aide">C'est à cette adresse que sera envoyée toute demande de réinitialisation.</span>
+              @if (enErreur('email')) {
+                <span class="pec-champ__err">L'adresse est obligatoire et doit être valide.</span>
+              }
+            </div>
+
+            @if (languages.length > 1) {
+              <div class="pec-champ">
+                <label class="pec-champ__lib" for="langKey">Langue de l'interface</label>
+                <select class="pec-champ__ctrl" id="langKey" name="langKey" formControlName="langKey" data-cy="langKey">
+                  @for (language of languages; track $index) {
+                    <option [value]="language">{{ language | findLanguageFromKey }}</option>
+                  }
+                </select>
+              </div>
+            }
+
+            <div class="pec-compte__actions">
+              <button type="submit" [disabled]="settingsForm.invalid" class="pec-btn pec-btn--primaire" data-cy="submit">
+                <fa-icon class="pec-btn__ico" icon="save" />
+                <span>Enregistrer</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- Colonne de droite : ce qui est décidé ailleurs, et se lit seulement. -->
+      <div class="pec-compte__contexte">
+        <section class="pec-panneau">
+          <div class="pec-panneau__tete">
+            <span class="pec-panneau__titre">Mon accès</span>
+          </div>
+          <div class="pec-panneau__corps">
+            <dl class="pec-defs">
+              <dt>Identifiant</dt>
+              <dd class="pec-defs--mono">{{ settingsForm.value.login }}</dd>
+
+              <dt>Profil</dt>
+              <dd>
+                @if (profil(); as nom) {
+                  {{ nom }}
+                } @else {
+                  <!--
+                    Un compte sans profil se connecte et ne voit rien. Le dire évite de chercher
+                    la panne du côté de l'application.
+                  -->
+                  <span class="pec-muted">Aucun profil — cet accès n'ouvre aucun écran</span>
+                }
+              </dd>
+            </dl>
+
+            <!--
+              Les droits sont dits en clair : « ROLE_DEMANDE_VALIDER_DRH » n'apprend rien à qui
+              cherche pourquoi un bouton lui manque.
+            -->
+            <p class="pec-compte__intro">Ce que votre profil vous autorise :</p>
+            <ul class="pec-compte__droits">
+              @for (droit of droits(); track droit) {
+                <li>{{ droit }}</li>
+              } @empty {
+                <li class="pec-muted">Aucun droit accordé</li>
+              }
+            </ul>
+            @if (resteDroits()) {
+              <p class="pec-muted">et {{ resteDroits() }} autre{{ resteDroits() > 1 ? 's' : '' }}</p>
+            }
+            <p class="pec-muted">Les droits sont attribués par l'administration : ils ne se modifient pas ici.</p>
+          </div>
+        </section>
+
+        <section class="pec-panneau">
+          <div class="pec-panneau__tete">
+            <span class="pec-panneau__titre">Sécurité</span>
+          </div>
+          <div class="pec-panneau__corps">
+            <p class="pec-muted">Un mot de passe que vous êtes seul à connaître, et que vous changez si vous doutez qu'il le reste.</p>
+            <a class="pec-btn pec-btn--secondaire" routerLink="/account/password" data-cy="changerMotDePasse">
+              <fa-icon class="pec-btn__ico" icon="key" />
+              <span>Changer mon mot de passe</span>
+            </a>
+          </div>
+        </section>
+      </div>
     </div>
   </div>
-</div>
+}

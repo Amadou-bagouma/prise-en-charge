@@ -2077,3 +2077,52 @@ Formulaires : lecture en deux colonnes, champs groupés, barre d'actions collant
   color: var(--pec-texte-2, #6c757d);
   cursor: pointer;
 }
+
+/* ------------------------------------------------------------------------- *
+   Mon compte
+
+   Ce que l'agent change lui-même à gauche, ce qui est décidé pour lui à
+   droite. Les mêler ferait chercher un bouton d'enregistrement pour un profil
+   qui n'en a pas, et laisserait croire qu'on s'accorde un droit soi-même.
+ * ------------------------------------------------------------------------- */
+.pec-compte {
+  max-width: 66rem;
+}
+
+.pec-compte__grille {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+@media (max-width: 62rem) {
+  .pec-compte__grille {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pec-compte__contexte {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.pec-compte__actions {
+  margin-top: 1.25rem;
+}
+
+.pec-compte__intro {
+  margin: 1rem 0 0.4rem;
+  font-weight: 600;
+}
+
+.pec-compte__droits {
+  margin: 0 0 0.5rem;
+  padding-left: 1.1rem;
+  color: var(--pec-texte-2, #6c757d);
+}
+
+.pec-compte__droits li {
+  margin-bottom: 0.2rem;
+}
