@@ -1918,25 +1918,61 @@ Formulaires : lecture en deux colonnes, champs groupés, barre d'actions collant
    Cloche des avis
 
    Dans l'en-tête, à côté de la langue et du compte : ce qui relève de la
-   personne, et non du travail en cours.
+   personne, et non du travail en cours. Carrée comme ses voisines, pour que la
+   rangée de l'en-tête se lise comme une rangée.
  * ------------------------------------------------------------------------- */
 .cloche {
   position: relative;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  justify-content: center;
+  border-radius: var(--radius-sm, 0.375rem);
+  color: var(--ink-700, #495057);
 }
 
-/* Le nombre est écrit, pas seulement signalé : « trois avis » se traite. */
+.cloche:hover {
+  background: var(--surface-200, #e9ecef);
+  color: var(--ink-900, #212529);
+}
+
+/* L'état ouvert se voit : sans cela on reclique en croyant n'avoir rien fait. */
+.cloche[aria-expanded='true'] {
+  background: var(--surface-200, #e9ecef);
+  color: var(--ink-900, #212529);
+}
+
+.cloche:focus-visible {
+  outline: 2px solid var(--pec-accent, #0d6efd);
+  outline-offset: 2px;
+}
+
+/* ng-bootstrap ajoute un chevron aux boutons de menu : une cloche n'en a pas besoin. */
+.cloche::after {
+  display: none !important;
+}
+
+/*
+  Le nombre est écrit, pas seulement signalé par un point : « trois avis » se
+  traite, « il y a quelque chose » se remet à plus tard.
+
+  Au-delà de neuf, « 9+ » : le compte exact n'apprend plus rien, et trois
+  chiffres débordent de la pastille.
+*/
 .cloche__n {
   position: absolute;
-  top: 0.15rem;
-  right: 0.1rem;
-  min-width: 1.05rem;
-  padding: 0 0.25rem;
-  border-radius: 0.6rem;
+  top: 1px;
+  right: 1px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border: 2px solid var(--surface-100, #fff);
+  border-radius: 999px;
   background: var(--pec-danger, #dc3545);
   color: #fff;
-  font-size: 0.7rem;
+  font-size: 10px;
   font-weight: 700;
-  line-height: 1.05rem;
+  line-height: 12px;
   text-align: center;
 }
 
@@ -1969,6 +2005,10 @@ Formulaires : lecture en deux colonnes, champs groupés, barre d'actions collant
   cursor: pointer;
 }
 
+.cloche__tout:hover {
+  text-decoration: underline;
+}
+
 .cloche__item {
   display: flex;
   flex-direction: column;
@@ -1976,6 +2016,8 @@ Formulaires : lecture en deux colonnes, champs groupés, barre d'actions collant
   width: 100%;
   border: 0;
   border-bottom: 1px solid var(--pec-bord, #dee2e6);
+  /* Un liseré à gauche : l'avis est non lu, et la liste ne contient que ceux-là. */
+  border-left: 3px solid var(--pec-accent, #0d6efd);
   background: none;
   padding: 0.7rem 1rem;
   text-align: left;
@@ -2011,6 +2053,7 @@ Formulaires : lecture en deux colonnes, champs groupés, barre d'actions collant
   padding: 1rem;
   color: var(--pec-texte-2, #6c757d);
   font-size: 0.85rem;
+  text-align: center;
 }
 
 .cloche__pied {
@@ -2148,4 +2191,100 @@ Formulaires : lecture en deux colonnes, champs groupés, barre d'actions collant
   .pec-espace {
     grid-template-columns: 1fr;
   }
+}
+
+/* ------------------------------------------------------------------------- *
+   Établissement d'une carte
+
+   Un écran court : on n'y choisit qu'un bénéficiaire. Le reste — numéro,
+   période, émission — est posé par le serveur.
+ * ------------------------------------------------------------------------- */
+.pec-carte-ecran {
+  max-width: 46rem;
+}
+
+.pec-carte-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+/* ------------------------------------------------------------------------- *
+   Impression
+
+   À l'impression, seul l'imprimé sort : la navigation, l'en-tête et les
+   boutons n'ont rien à faire sur une carte ou une attestation. Sans cette
+   règle, la page imprimée reproduisait l'écran entier — menu compris — et la
+   carte se retrouvait réduite dans un coin.
+ * ------------------------------------------------------------------------- */
+@media print {
+  .app-sidebar,
+  .app-topbar,
+  .sidebar-backdrop,
+  .avis-bandeau,
+  .no-print {
+    display: none !important;
+  }
+
+  /* La zone de contenu reprend toute la page, sans la gouttière du menu. */
+  .app-shell,
+  .app-content,
+  .pec-app,
+  .pec-main {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: auto !important;
+    max-width: none !important;
+  }
+
+  body {
+    background: #fff !important;
+  }
+}
+
+/* ------------------------------------------------------------------------- *
+   Paramètres
+
+   Une ligne par réglage, modifiable sur place : ouvrir un formulaire pour
+   changer un nombre ferait trois écrans là où il en faut zéro.
+ * ------------------------------------------------------------------------- */
+.pec-param__code {
+  font-size: 0.72rem;
+  color: var(--pec-texte-2, #6c757d);
+}
+
+.pec-param__valeur {
+  width: 22rem;
+  vertical-align: top;
+}
+
+.pec-param__nombre {
+  max-width: 8rem;
+}
+
+.pec-param__image {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Le damier montre la transparence : une signature sur fond blanc se verrait mal ici. */
+.pec-param__image img {
+  max-width: 14rem;
+  max-height: 5rem;
+  object-fit: contain;
+  padding: 0.25rem;
+  border: 1px solid var(--pec-bord, #dee2e6);
+  border-radius: 0.25rem;
+  background-image:
+    linear-gradient(45deg, #eee 25%, transparent 25%), linear-gradient(-45deg, #eee 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #eee 75%), linear-gradient(-45deg, transparent 75%, #eee 75%);
+  background-size: 12px 12px;
+  background-position:
+    0 0,
+    0 6px,
+    6px -6px,
+    -6px 0;
 }

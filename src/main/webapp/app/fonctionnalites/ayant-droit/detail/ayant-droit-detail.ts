@@ -1,6 +1,6 @@
 import { NgClass } from '@angular/common';
-import { Component, computed, inject, input, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, computed, effect, inject, input, signal } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap/modal';
@@ -13,9 +13,12 @@ import { ChangementStatutDialog, ResultatChangementStatut } from 'app/shared/sta
 import { STATUTS_AYANT_DROIT, libelleStatut, tonStatut } from 'app/shared/statut/statuts';
 import { TranslateDirective } from 'app/shared/language';
 import { AccountService } from 'app/core/auth/account.service';
+import { Action } from 'app/shared/jhipster/actions.constants';
 import { Authority } from 'app/shared/jhipster/constants';
 import { IAyantDroit } from '../ayant-droit.model';
 import { enSaisie, libelleValidation, tonValidation } from '../validation-rattachement';
+import { ICarteBeneficiaire } from 'app/fonctionnalites/carte-beneficiaire/carte-beneficiaire.model';
+import { CarteBeneficiaireService } from 'app/fonctionnalites/carte-beneficiaire/service/carte-beneficiaire.service';
 import { AyantDroitService } from '../service/ayant-droit.service';
 
 @Component({
@@ -93,10 +96,40 @@ export class AyantDroitDetail {
 
   protected dataUtils = inject(DataUtils);
   protected readonly accountService = inject(AccountService);
+  protected readonly carteService = inject(CarteBeneficiaireService);
+  protected readonly routeur = inject(Router);
+
+  /**
+   * Établir une carte suppose le droit, et un rattachement vérifié.
+   *
+   * Le serveur refuse de la même manière : une carte atteste d'une couverture, et l'établir sur
+   * un rattachement que personne n'a contrôlé reviendrait à attester de ce qu'on ignore.
+   */
+  readonly peutEtablirCarte = computed(
+    () => this.statutValidation() === 'VALIDE' && this.accountService.hasAnyAuthority([Action.CARTE_CREER, Authority.ADMIN]),
+  );
+
+  readonly carteEnCours = signal(false);
+
+  /**
+   * La carte en cours de validite, s'il y en a une.
+   *
+   * Chargee a l'ouverture de la fiche : sans elle, l'ecran proposerait d'etablir une carte a qui
+   * en a deja une, et le refus n'arriverait qu'apres le geste.
+   */
+  readonly carteValide = signal<ICarteBeneficiaire | null>(null);
   protected readonly ayantDroitService = inject(AyantDroitService);
   protected readonly modalService = inject(NgbModal);
 
   private readonly ayantDroitRemplace = signal<IAyantDroit | null>(null);
+
+  constructor() {
+    // La carte en cours, pour ne pas proposer d'en etablir une a qui en a deja une.
+    effect(() => {
+      this.ayantDroitAffiche();
+      this.chargerCarte();
+    });
+  }
 
   libelleStatut(): string {
     return libelleStatut(STATUTS_AYANT_DROIT, this.statutAffiche());
@@ -142,6 +175,41 @@ export class AyantDroitDetail {
       return;
     }
     this.ayantDroitService.valider(ayantDroit.id).subscribe(misAJour => this.ayantDroitRemplace.set(misAJour));
+  }
+
+  /** Établit la carte de l'ayant droit, puis l'ouvre pour impression. */
+  /** Recherche la carte en cours de validite du titulaire. */
+  private chargerCarte(): void {
+    const id = this.ayantDroitAffiche()?.id;
+    if (!id) {
+      this.carteValide.set(null);
+      return;
+    }
+    this.carteService.query({ 'ayantDroitId.equals': id, size: 20, sort: ['dateFinValidite,desc'] }).subscribe({
+      next: reponse => {
+        const aujourdhui = dayjs();
+        this.carteValide.set(
+          (reponse.body ?? []).find(carte => !!carte.dateFinValidite && !carte.dateFinValidite.isBefore(aujourdhui, 'day')) ?? null,
+        );
+      },
+      error: () => this.carteValide.set(null),
+    });
+  }
+
+  etablirCarte(): void {
+    const ayantDroit = this.ayantDroitAffiche();
+    if (!ayantDroit?.id || this.carteEnCours()) {
+      return;
+    }
+    this.carteEnCours.set(true);
+    this.carteService.generer('AYANT_DROIT', ayantDroit.id).subscribe({
+      next: carte => {
+        this.carteEnCours.set(false);
+        this.carteValide.set(carte);
+        void this.routeur.navigate(['/carte-beneficiaire', carte.id, 'print']);
+      },
+      error: () => this.carteEnCours.set(false),
+    });
   }
 
   previousState(): void {

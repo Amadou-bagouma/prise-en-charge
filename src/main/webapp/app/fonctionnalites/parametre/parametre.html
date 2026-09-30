@@ -1,0 +1,129 @@
+<div class="pec-ecran">
+  <div class="pec-titre-ecran">
+    <h1 id="page-heading" data-cy="ParametreHeading">Paramètres</h1>
+    <span class="pec-muted">{{ parametres().length }} réglage{{ parametres().length > 1 ? 's' : '' }}</span>
+  </div>
+
+  <jhi-alert-error />
+  <jhi-alert />
+
+  <!--
+    Ni création ni suppression : le programme interroge des codes qu'il connaît. En ajouter un
+    donnerait un réglage que personne ne lit ; en retirer un ferait retomber le code sur une
+    valeur que personne n'a choisie. Seules les valeurs se modifient.
+  -->
+  <p class="pec-muted">
+    Ces réglages commandent le comportement de l'application : durées de validité, mentions imprimées, signature. Ils prennent effet
+    aussitôt, pour les dossiers et les cartes établis ensuite.
+  </p>
+
+  @if (refus(); as message) {
+    <div class="pec-alerte pec-alerte--danger" role="alert" data-cy="refusImage">
+      <fa-icon class="pec-alerte__ico" icon="ban" />
+      <div class="pec-alerte__corps">
+        <span class="pec-alerte__txt">{{ message }}</span>
+      </div>
+    </div>
+  }
+
+  <div class="pec-panneau">
+    <div class="pec-tbl-zone">
+      <table class="pec-tbl" aria-describedby="page-heading">
+        <thead>
+          <tr>
+            <th scope="col">Réglage</th>
+            <th scope="col">Valeur</th>
+            <th scope="col" class="pec-tbl__droite"><span class="visually-hidden">Actions</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (parametre of parametres(); track parametre.id) {
+            <tr data-cy="ligneParametre">
+              <td class="pec-tbl__libre">
+                <div class="pec-strong">{{ parametre.libelle }}</div>
+                <!-- Le code est ce qu'on cite en demandant de l'aide : il est affiché, en petit. -->
+                <div class="pec-num pec-param__code">{{ parametre.code }}</div>
+                @if (parametre.description) {
+                  <div class="pec-muted">{{ parametre.description }}</div>
+                }
+              </td>
+
+              <td class="pec-param__valeur">
+                @switch (parametre.type) {
+                  @case ('IMAGE') {
+                    <div class="pec-param__image">
+                      @if (parametre.valeurBinaireContentType) {
+                        <img [src]="urlImage(parametre)" [alt]="parametre.libelle" />
+                      } @else {
+                        <span class="pec-muted">Aucune image déposée</span>
+                      }
+                      <input
+                        type="file"
+                        class="pec-champ__ctrl"
+                        [attr.accept]="accept"
+                        [id]="'image_' + parametre.id"
+                        [attr.data-cy]="'image-' + parametre.code"
+                        (change)="choisirImage(parametre, $event)"
+                      />
+                      <span class="pec-champ__aide">PNG à fond transparent de préférence : il se pose proprement sur la carte.</span>
+                    </div>
+                  }
+                  @case ('BOOLEEN') {
+                    <select class="pec-champ__ctrl" [(ngModel)]="parametre.valeur" [attr.data-cy]="'valeur-' + parametre.code">
+                      <option value="true">Oui</option>
+                      <option value="false">Non</option>
+                    </select>
+                  }
+                  @case ('ENTIER') {
+                    <input
+                      type="number"
+                      min="1"
+                      class="pec-champ__ctrl pec-param__nombre"
+                      [(ngModel)]="parametre.valeur"
+                      [attr.data-cy]="'valeur-' + parametre.code"
+                    />
+                  }
+                  @default {
+                    <input type="text" class="pec-champ__ctrl" [(ngModel)]="parametre.valeur" [attr.data-cy]="'valeur-' + parametre.code" />
+                  }
+                }
+              </td>
+
+              <td class="pec-tbl__droite">
+                @if (parametre.type !== 'IMAGE') {
+                  <button
+                    type="button"
+                    class="pec-btn pec-btn--secondaire pec-btn--sm"
+                    (click)="enregistrer(parametre)"
+                    [disabled]="enregistrement() === parametre.id"
+                    [attr.data-cy]="'enregistrer-' + parametre.code"
+                  >
+                    <fa-icon class="pec-btn__ico" icon="save" />
+                    <span>Enregistrer</span>
+                  </button>
+                }
+                <!-- La confirmation se lit sur la ligne : une alerte en haut d'écran ne dit pas laquelle. -->
+                @if (enregistre() === parametre.id) {
+                  <span class="pec-badge pec-badge--ok" [attr.data-cy]="'enregistre-' + parametre.code">
+                    <span class="pec-badge__pt"></span>
+                    <span>Enregistré</span>
+                  </span>
+                }
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="3" class="pec-tbl__vide">
+                @if (chargement()) {
+                  Chargement…
+                } @else {
+                  Aucun réglage.
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

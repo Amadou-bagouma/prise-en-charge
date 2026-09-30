@@ -5,6 +5,7 @@ import com.mycompany.myapp.domain.PieceJustificative;
 import com.mycompany.myapp.domain.enumeration.StatutDemande;
 import com.mycompany.myapp.repository.DemandePriseEnChargeRepository;
 import com.mycompany.myapp.repository.PieceJustificativeRepository;
+import com.mycompany.myapp.service.Parametres;
 import com.mycompany.myapp.service.PieceJustificativeService;
 import com.mycompany.myapp.service.dto.PieceJustificativeDTO;
 import com.mycompany.myapp.service.mapper.PieceJustificativeMapper;
@@ -35,6 +36,8 @@ public class PieceJustificativeServiceImpl implements PieceJustificativeService 
 
     private final DemandePriseEnChargeRepository demandePriseEnChargeRepository;
 
+    private final Parametres parametres;
+
     private static final String ENTITY_NAME = "pieceJustificative";
 
     /**
@@ -64,7 +67,12 @@ public class PieceJustificativeServiceImpl implements PieceJustificativeService 
     );
 
     /** Taille maximale d'une piece. Au-dela, c'est un scan a reprendre, pas une piece a joindre. */
-    private static final long TAILLE_MAX_OCTETS = 10L * 1024 * 1024;
+    private static final long TAILLE_MAX_MO_PAR_DEFAUT = 10L;
+
+    /** La taille maximale en vigueur, lue au referentiel. */
+    private long tailleMaxOctets() {
+        return parametres.entier(Parametres.TAILLE_MAX_PIECE_MO, (int) TAILLE_MAX_MO_PAR_DEFAUT) * 1024L * 1024L;
+    }
 
     /**
      * Refuse un fichier dont le type n'est pas prevu, ou trop lourd.
@@ -86,9 +94,9 @@ public class PieceJustificativeServiceImpl implements PieceJustificativeService 
                 "piece.typerefuse"
             );
         }
-        if (piece.getContenu().length > TAILLE_MAX_OCTETS) {
+        if (piece.getContenu().length > tailleMaxOctets()) {
             throw new BadRequestAlertException(
-                "Ce fichier depasse la taille maximale de %d Mo.".formatted(TAILLE_MAX_OCTETS / (1024 * 1024)),
+                "Ce fichier depasse la taille maximale de %d Mo.".formatted(tailleMaxOctets() / (1024 * 1024)),
                 ENTITY_NAME,
                 "piece.troplourd"
             );
@@ -101,8 +109,10 @@ public class PieceJustificativeServiceImpl implements PieceJustificativeService 
     public PieceJustificativeServiceImpl(
         PieceJustificativeRepository pieceJustificativeRepository,
         PieceJustificativeMapper pieceJustificativeMapper,
-        DemandePriseEnChargeRepository demandePriseEnChargeRepository
+        DemandePriseEnChargeRepository demandePriseEnChargeRepository,
+        Parametres parametres
     ) {
+        this.parametres = parametres;
         this.pieceJustificativeRepository = pieceJustificativeRepository;
         this.pieceJustificativeMapper = pieceJustificativeMapper;
         this.demandePriseEnChargeRepository = demandePriseEnChargeRepository;

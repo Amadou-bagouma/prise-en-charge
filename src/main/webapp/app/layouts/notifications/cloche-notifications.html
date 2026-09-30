@@ -35,7 +35,7 @@
       « il y a quelque chose » se remet à plus tard.
     -->
     @if (nonLus()) {
-      <span class="cloche__n" data-cy="clocheCompteur">{{ nonLus() }}</span>
+      <span class="cloche__n" data-cy="clocheCompteur">{{ nonLus() > 9 ? '9+' : nonLus() }}</span>
     }
   </button>
 

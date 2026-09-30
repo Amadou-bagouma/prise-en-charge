@@ -170,9 +170,9 @@ public class UserService {
         user.setLogin(userDTO.getLogin().toLowerCase());
         user.setFirstName(userDTO.getFirstName());
         user.setLastName(userDTO.getLastName());
-        if (userDTO.getEmail() != null) {
-            user.setEmail(userDTO.getEmail().toLowerCase());
-        }
+        // Une adresse vide est enregistree comme absente : deux chaines vides se ressemblent
+        // au regard de la contrainte d'unicite, deux absences ne se comparent pas.
+        user.setEmail(courrielNormalise(userDTO.getEmail()));
         user.setImageUrl(userDTO.getImageUrl());
         user.setSignature(userDTO.getSignature());
         user.setSignatureContentType(userDTO.getSignatureContentType());
@@ -352,6 +352,11 @@ public class UserService {
         this.clearUserCaches(user);
         LOG.info("Compte {} {}", login, actif ? "ouvert" : "ferme");
         return new AdminUserDTO(user);
+    }
+
+    /** L'adresse en minuscules, ou {@code null} si elle est absente ou vide. */
+    private static String courrielNormalise(String courriel) {
+        return courriel == null || courriel.isBlank() ? null : courriel.toLowerCase();
     }
 
     public void deleteUser(String login) {

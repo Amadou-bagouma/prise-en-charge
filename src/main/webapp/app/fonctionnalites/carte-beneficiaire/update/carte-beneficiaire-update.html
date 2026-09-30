@@ -1,192 +1,184 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-      <h2
-        id="jhi-carte-beneficiaire-heading"
-        data-cy="CarteBeneficiaireCreateUpdateHeading"
-        jhiTranslate="peccnssApp.carteBeneficiaire.home.createOrEditLabel"
-      >
-        Créer ou éditer un Carte Beneficiaire
-      </h2>
+<div class="pec-ecran pec-carte-ecran">
+  <div class="pec-titre-ecran">
+    <h1 data-cy="CarteBeneficiaireCreateUpdateHeading">
+      @if (etablissement()) {
+        Établir une carte de bénéficiaire
+      } @else {
+        Corriger la carte {{ carteBeneficiaire?.numeroCarte }}
+      }
+    </h1>
+  </div>
 
-      <div>
-        <jhi-alert-error />
+  <jhi-alert-error />
 
-        @if (editForm.controls.id.value !== null) {
-          <div class="mb-3">
-            <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
-            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
-          </div>
-        }
-
-        @let numeroCarteRef = editForm.get('numeroCarte')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_numeroCarte" jhiTranslate="peccnssApp.carteBeneficiaire.numeroCarte">Numero Carte</label>
-          <input
-            type="text"
-            class="form-control"
-            name="numeroCarte"
-            id="field_numeroCarte"
-            data-cy="numeroCarte"
-            formControlName="numeroCarte"
-          />
-          @if (numeroCarteRef.invalid && (numeroCarteRef.dirty || numeroCarteRef.touched)) {
-            <div>
-              @if (numeroCarteRef.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
-              }
-            </div>
-          }
-        </div>
-
-        @let typeBeneficiaireRef = editForm.get('typeBeneficiaire')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_typeBeneficiaire" jhiTranslate="peccnssApp.carteBeneficiaire.typeBeneficiaire"
-            >Type Beneficiaire</label
-          >
+  @if (etablissement()) {
+    <!--
+      Établir ne demande que le bénéficiaire. Le numéro, la période de validité et la date
+      d'émission sont posés par le serveur : les faire saisir ouvrait la porte à deux cartes du
+      même numéro et à des périodes antidatées, que rien dans l'application n'aurait relevées.
+    -->
+    <section class="pec-panneau">
+      <div class="pec-panneau__tete">
+        <span class="pec-panneau__titre">Pour qui</span>
+      </div>
+      <div class="pec-panneau__corps">
+        <div class="pec-champ">
+          <label class="pec-champ__lib" for="field_agent">Agent <span class="pec-champ__req" aria-hidden="true">*</span></label>
           <select
-            class="form-control"
-            name="typeBeneficiaire"
-            formControlName="typeBeneficiaire"
-            id="field_typeBeneficiaire"
-            data-cy="typeBeneficiaire"
+            class="pec-champ__ctrl"
+            id="field_agent"
+            data-cy="agent"
+            name="agent"
+            [compareWith]="compareAgent"
+            [ngModel]="agentChoisi()"
+            (ngModelChange)="choisirAgent($event)"
           >
-            <option [ngValue]="null">{{ 'peccnssApp.TypeBeneficiaire.null' | translate }}</option>
-            @for (typeBeneficiaire of typeBeneficiaireValues; track $index) {
-              <option [value]="typeBeneficiaire">{{ 'peccnssApp.TypeBeneficiaire.' + typeBeneficiaire | translate }}</option>
+            <option [ngValue]="null">—</option>
+            @for (agentOption of agentsSharedCollection(); track agentOption.id) {
+              <option [ngValue]="agentOption">{{ agentOption.matricule }} — {{ agentOption.nom }} {{ agentOption.prenom }}</option>
             }
           </select>
-          @if (typeBeneficiaireRef.invalid && (typeBeneficiaireRef.dirty || typeBeneficiaireRef.touched)) {
-            <div>
-              @if (typeBeneficiaireRef.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
-              }
-            </div>
-          }
+          <span class="pec-champ__aide">L'agent auquel la couverture est rattachée.</span>
         </div>
 
-        @let dateDebutValiditeRef = editForm.get('dateDebutValidite')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_dateDebutValidite" jhiTranslate="peccnssApp.carteBeneficiaire.dateDebutValidite"
-            >Date Debut Validite</label
-          >
-          <div class="input-group">
-            <input
-              id="field_dateDebutValidite"
-              data-cy="dateDebutValidite"
-              type="text"
-              class="form-control"
-              name="dateDebutValidite"
-              ngbDatepicker
-              #dateDebutValiditeDp="ngbDatepicker"
-              formControlName="dateDebutValidite"
-            />
-            <button type="button" class="btn btn-secondary" (click)="dateDebutValiditeDp.toggle()"><fa-icon icon="calendar-alt" /></button>
-          </div>
-          @if (dateDebutValiditeRef.invalid && (dateDebutValiditeRef.dirty || dateDebutValiditeRef.touched)) {
-            <div>
-              @if (dateDebutValiditeRef.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
-              }
-            </div>
-          }
-        </div>
-
-        @let dateFinValiditeRef = editForm.get('dateFinValidite')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_dateFinValidite" jhiTranslate="peccnssApp.carteBeneficiaire.dateFinValidite"
-            >Date Fin Validite</label
-          >
-          <div class="input-group">
-            <input
-              id="field_dateFinValidite"
-              data-cy="dateFinValidite"
-              type="text"
-              class="form-control"
-              name="dateFinValidite"
-              ngbDatepicker
-              #dateFinValiditeDp="ngbDatepicker"
-              formControlName="dateFinValidite"
-            />
-            <button type="button" class="btn btn-secondary" (click)="dateFinValiditeDp.toggle()"><fa-icon icon="calendar-alt" /></button>
-          </div>
-          @if (dateFinValiditeRef.invalid && (dateFinValiditeRef.dirty || dateFinValiditeRef.touched)) {
-            <div>
-              @if (dateFinValiditeRef.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
-              }
-            </div>
-          }
-        </div>
-
-        @let dateEmissionRef = editForm.get('dateEmission')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_dateEmission" jhiTranslate="peccnssApp.carteBeneficiaire.dateEmission">Date Emission</label>
-          <div class="input-group">
-            <input
-              id="field_dateEmission"
-              data-cy="dateEmission"
-              type="text"
-              class="form-control"
-              name="dateEmission"
-              ngbDatepicker
-              #dateEmissionDp="ngbDatepicker"
-              formControlName="dateEmission"
-            />
-            <button type="button" class="btn btn-secondary" (click)="dateEmissionDp.toggle()"><fa-icon icon="calendar-alt" /></button>
-          </div>
-          @if (dateEmissionRef.invalid && (dateEmissionRef.dirty || dateEmissionRef.touched)) {
-            <div>
-              @if (dateEmissionRef.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
-              }
-            </div>
-          }
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_agent" jhiTranslate="peccnssApp.carteBeneficiaire.agent">Agent</label>
-          <select class="form-control" id="field_agent" data-cy="agent" name="agent" formControlName="agent" [compareWith]="compareAgent">
-            <option [ngValue]="null"></option>
-            @for (agentOption of agentsSharedCollection(); track $index) {
-              <option [ngValue]="agentOption">{{ agentOption.matricule }}</option>
-            }
-          </select>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_ayantDroit" jhiTranslate="peccnssApp.carteBeneficiaire.ayantDroit">Ayant Droit</label>
+        <div class="pec-champ">
+          <label class="pec-champ__lib" for="field_ayantDroit">Ayant droit</label>
           <select
-            class="form-control"
+            class="pec-champ__ctrl"
             id="field_ayantDroit"
             data-cy="ayantDroit"
             name="ayantDroit"
-            formControlName="ayantDroit"
+            [disabled]="!agentChoisi()"
             [compareWith]="compareAyantDroit"
+            [ngModel]="ayantDroitChoisi()"
+            (ngModelChange)="ayantDroitChoisi.set($event)"
           >
-            <option [ngValue]="null"></option>
-            @for (ayantDroitOption of ayantDroitsSharedCollection(); track $index) {
-              <option [ngValue]="ayantDroitOption">{{ ayantDroitOption.nom }}</option>
+            <option [ngValue]="null">Aucun — la carte est celle de l'agent</option>
+            @for (ayantDroitOption of ayantsDroitDeLAgent(); track ayantDroitOption.id) {
+              <option [ngValue]="ayantDroitOption">{{ ayantDroitOption.nom }} {{ ayantDroitOption.prenom }}</option>
             }
           </select>
+          <!--
+            Seulement les ayants droit de l'agent choisi : proposer ceux de toute l'institution
+            ferait établir une carte à l'enfant d'un autre sur une simple homonymie.
+          -->
+          <span class="pec-champ__aide">
+            @if (!agentChoisi()) {
+              Choisissez d'abord l'agent.
+            } @else if (ayantsDroitDeLAgent().length === 0) {
+              Cet agent n'a aucun ayant droit dont le rattachement soit vérifié.
+            } @else {
+              Laissez vide pour établir la carte de l'agent lui-même.
+            }
+          </span>
+        </div>
+
+        <p class="pec-muted">
+          Le numéro, la période de validité (trois ans) et la date d'émission sont posés à l'établissement. La carte s'ouvre ensuite pour
+          impression.
+        </p>
+
+        <div class="pec-carte-actions">
+          <button type="button" class="pec-btn pec-btn--discret" (click)="previousState()" data-cy="entityCreateCancelButton">
+            <fa-icon class="pec-btn__ico" icon="ban" />
+            <span jhiTranslate="entity.action.cancel">Annuler</span>
+          </button>
+          <button
+            type="button"
+            class="pec-btn pec-btn--primaire"
+            (click)="etablir()"
+            [disabled]="!agentChoisi() || isSaving()"
+            data-cy="etablirCarte"
+          >
+            <fa-icon class="pec-btn__ico" icon="id-card" />
+            <span>Établir la carte</span>
+          </button>
         </div>
       </div>
+    </section>
+  } @else {
+    <!--
+      Corriger ne porte que sur ce qui reste discutable : les dates. Le numéro et le titulaire
+      d'une carte déjà remise ne se réécrivent pas — il faut en établir une autre.
+    -->
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <section class="pec-panneau">
+        <div class="pec-panneau__tete">
+          <span class="pec-panneau__titre">Période de validité</span>
+        </div>
+        <div class="pec-panneau__corps">
+          <dl class="pec-defs">
+            <dt>Numéro</dt>
+            <dd class="pec-defs--mono">{{ carteBeneficiaire?.numeroCarte }}</dd>
 
-      <div>
-        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Annuler</span>
-        </button>
+            <dt>Titulaire</dt>
+            <dd>
+              @if (carteBeneficiaire?.ayantDroit) {
+                {{ carteBeneficiaire?.ayantDroit?.nom }}
+              } @else {
+                {{ carteBeneficiaire?.agent?.matricule }}
+              }
+            </dd>
+          </dl>
 
-        <button
-          type="submit"
-          id="save-entity"
-          data-cy="entityCreateSaveButton"
-          [disabled]="editForm.invalid || isSaving()"
-          class="btn btn-primary"
-        >
-          <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Sauvegarder</span>
-        </button>
-      </div>
+          @let dateDebutValiditeRef = editForm.get('dateDebutValidite')!;
+          <div class="pec-champ" [class.pec-champ--erreur]="dateDebutValiditeRef.invalid && dateDebutValiditeRef.touched">
+            <label class="pec-champ__lib" for="field_dateDebutValidite">Début de validité</label>
+            <div class="input-group">
+              <input
+                id="field_dateDebutValidite"
+                data-cy="dateDebutValidite"
+                type="text"
+                class="pec-champ__ctrl"
+                name="dateDebutValidite"
+                ngbDatepicker
+                #dateDebutValiditeDp="ngbDatepicker"
+                formControlName="dateDebutValidite"
+              />
+              <button type="button" class="pec-btn pec-btn--discret" (click)="dateDebutValiditeDp.toggle()">
+                <fa-icon icon="calendar-alt" />
+              </button>
+            </div>
+          </div>
+
+          @let dateFinValiditeRef = editForm.get('dateFinValidite')!;
+          <div class="pec-champ" [class.pec-champ--erreur]="dateFinValiditeRef.invalid && dateFinValiditeRef.touched">
+            <label class="pec-champ__lib" for="field_dateFinValidite">Fin de validité</label>
+            <div class="input-group">
+              <input
+                id="field_dateFinValidite"
+                data-cy="dateFinValidite"
+                type="text"
+                class="pec-champ__ctrl"
+                name="dateFinValidite"
+                ngbDatepicker
+                #dateFinValiditeDp="ngbDatepicker"
+                formControlName="dateFinValidite"
+              />
+              <button type="button" class="pec-btn pec-btn--discret" (click)="dateFinValiditeDp.toggle()">
+                <fa-icon icon="calendar-alt" />
+              </button>
+            </div>
+            <span class="pec-champ__aide">Abréger cette date remplace la carte : elle cesse alors d'être valable.</span>
+          </div>
+
+          <div class="pec-carte-actions">
+            <button type="button" class="pec-btn pec-btn--discret" (click)="previousState()" data-cy="entityCreateCancelButton">
+              <fa-icon class="pec-btn__ico" icon="ban" />
+              <span jhiTranslate="entity.action.cancel">Annuler</span>
+            </button>
+            <button
+              type="submit"
+              class="pec-btn pec-btn--primaire"
+              [disabled]="editForm.invalid || isSaving()"
+              data-cy="entityCreateSaveButton"
+            >
+              <fa-icon class="pec-btn__ico" icon="save" />
+              <span jhiTranslate="entity.action.save">Enregistrer</span>
+            </button>
+          </div>
+        </div>
+      </section>
     </form>
-  </div>
+  }
 </div>

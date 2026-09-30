@@ -1,13 +1,17 @@
 package com.mycompany.myapp.config;
 
 import com.mycompany.myapp.domain.Authority;
+import com.mycompany.myapp.domain.Parametre;
 import com.mycompany.myapp.domain.Profil;
 import com.mycompany.myapp.domain.User;
+import com.mycompany.myapp.domain.enumeration.TypeParametre;
 import com.mycompany.myapp.repository.AuthorityRepository;
+import com.mycompany.myapp.repository.ParametreRepository;
 import com.mycompany.myapp.repository.ProfilRepository;
 import com.mycompany.myapp.repository.UserRepository;
 import com.mycompany.myapp.security.ActionsConstants;
 import com.mycompany.myapp.security.AuthoritiesConstants;
+import com.mycompany.myapp.service.Parametres;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -398,28 +402,152 @@ public class InitData {
 
     private final CacheManager cacheManager;
 
+    private final ParametreRepository parametreRepository;
+
     public InitData(
         AuthorityRepository authorityRepository,
         ProfilRepository profilRepository,
         UserRepository userRepository,
-        CacheManager cacheManager
+        CacheManager cacheManager,
+        ParametreRepository parametreRepository
     ) {
         this.authorityRepository = authorityRepository;
         this.profilRepository = profilRepository;
         this.userRepository = userRepository;
         this.cacheManager = cacheManager;
+        this.parametreRepository = parametreRepository;
     }
 
     @EventListener(ApplicationReadyEvent.class)
     @Transactional
     public void initialiser() {
         try {
+            creerLesParametresManquants();
             creerLesHabilitationsManquantes();
             creerLesProfilsManquants();
             completerLeSuperAdmin();
             repercuterSurLesTitulaires();
         } catch (RuntimeException e) {
             LOG.error("Le referentiel des habilitations fines n'a pas pu etre initialise au demarrage", e);
+        }
+    }
+
+    /**
+     * Un reglage du socle : son code, ce qu'il regle, sa valeur d'origine et son type.
+     *
+     * @param code le code interroge par le programme, stable et jamais traduit.
+     * @param libelle ce que le reglage regle, lu par celui qui l'ajuste.
+     * @param description ce que la valeur change, et dans quelles limites elle a du sens.
+     * @param valeur la valeur d'origine ; vide pour une image, qui se depose ensuite.
+     * @param type comment lire la valeur.
+     */
+    private record ParametreSocle(String code, String libelle, String description, String valeur, TypeParametre type) {}
+
+    /**
+     * Les reglages que l'application pose si elle ne les trouve pas.
+     *
+     * <p>Leur valeur d'origine est celle qui etait ecrite en dur dans le code : poser le
+     * referentiel ne change donc rien au comportement tant que personne n'y touche. C'est
+     * voulu - une migration qui modifie en meme temps la structure et les regles ne se verifie
+     * pas.
+     */
+    private static final List<ParametreSocle> PARAMETRES = List.of(
+        new ParametreSocle(
+            Parametres.VALIDITE_PRISE_EN_CHARGE_JOURS,
+            "Validite d'une prise en charge (jours)",
+            "Delai au-dela duquel un dossier expire : il ne poursuit plus le circuit et ne s'imprime plus. Il reste consultable.",
+            "14",
+            TypeParametre.ENTIER
+        ),
+        new ParametreSocle(
+            Parametres.VALIDITE_CARTE_ANNEES,
+            "Validite d'une carte de beneficiaire (annees)",
+            "Duree pour laquelle une carte est etablie. Assez longue pour ne pas refaire le geste chaque annee, assez courte pour que la photo reste juste.",
+            "3",
+            TypeParametre.ENTIER
+        ),
+        new ParametreSocle(
+            Parametres.ALERTE_CARTE_JOURS,
+            "Alerte avant echeance d'une carte (jours)",
+            "En deca de ce delai, une carte encore valide est signalee comme a renouveler.",
+            "30",
+            TypeParametre.ENTIER
+        ),
+        new ParametreSocle(
+            Parametres.TAILLE_MAX_PIECE_MO,
+            "Taille maximale d'une piece jointe (Mo)",
+            "Au-dela, c'est un scan a reprendre plutot qu'une piece a joindre.",
+            "10",
+            TypeParametre.ENTIER
+        ),
+        new ParametreSocle(
+            Parametres.NOM_DIRECTEUR_GENERAL,
+            "Nom du directeur general",
+            "Imprime sous la signature, sur les cartes et les imprimes.",
+            "",
+            TypeParametre.TEXTE
+        ),
+        new ParametreSocle(
+            Parametres.SIGNATURE_DIRECTEUR_GENERAL,
+            "Signature du directeur general",
+            "Image apposee sur les cartes de beneficiaire. Un fond transparent (PNG) se pose proprement sur la carte.",
+            "",
+            TypeParametre.IMAGE
+        ),
+        new ParametreSocle(
+            Parametres.NOM_INSTITUTION,
+            "Nom de l'institution",
+            "Tel qu'il s'imprime en tete des cartes et des imprimes.",
+            "Caisse Nationale de Securite Sociale",
+            TypeParametre.TEXTE
+        ),
+        new ParametreSocle(
+            Parametres.PAYS_INSTITUTION,
+            "Pays",
+            "Tel qu'il s'imprime au dos des cartes.",
+            "Republique du Niger",
+            TypeParametre.TEXTE
+        )
+    );
+
+    /**
+     * Cree les reglages absents.
+     *
+     * <p>Un reglage deja present n'est jamais ecrase : sa valeur a pu etre ajustee, et c'est
+     * tout l'objet du referentiel. Seuls son libelle et sa description sont completes quand ils
+     * manquent, pour qu'un ajout de documentation atteigne les bases existantes.
+     */
+    private void creerLesParametresManquants() {
+        int crees = 0;
+        for (ParametreSocle modele : PARAMETRES) {
+            Parametre parametre = parametreRepository.findOneByCode(modele.code()).orElse(null);
+            if (parametre == null) {
+                parametre = new Parametre();
+                parametre.setCode(modele.code());
+                parametre.setLibelle(modele.libelle());
+                parametre.setDescription(modele.description());
+                parametre.setValeur(modele.valeur());
+                parametre.setType(modele.type());
+                parametre.setSocle(true);
+                parametreRepository.save(parametre);
+                crees++;
+                continue;
+            }
+            boolean complete = false;
+            if (parametre.getDescription() == null || parametre.getDescription().isBlank()) {
+                parametre.setDescription(modele.description());
+                complete = true;
+            }
+            if (!parametre.isSocle()) {
+                parametre.setSocle(true);
+                complete = true;
+            }
+            if (complete) {
+                parametreRepository.save(parametre);
+            }
+        }
+        if (crees > 0) {
+            LOG.info("Parametres : {} cree(s)", crees);
         }
     }
 

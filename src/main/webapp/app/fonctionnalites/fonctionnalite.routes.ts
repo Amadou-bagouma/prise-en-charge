@@ -93,6 +93,12 @@ const routes: Routes = [
     title: 'Mon espace',
     loadChildren: () => import('./espace-agent/espace-agent.routes'),
   },
+  {
+    // Les reglages de l'application : durees de validite, mentions imprimees, signature.
+    path: 'parametre',
+    title: 'Paramètres',
+    loadChildren: () => import('./parametre/parametre.routes'),
+  },
   // jhipster-needle-add-entity-route - JHipster will add entity modules routes here
 ];
 

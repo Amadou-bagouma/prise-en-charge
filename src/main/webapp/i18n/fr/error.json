@@ -9,6 +9,44 @@
       "500": "Erreur interne du serveur."
     },
     "concurrencyFailure": "Un autre utilisateur a modifié ces données en même temps que vous. Vos changements n'ont pas été sauvegardés.",
-    "validation": "Erreur de validation côté serveur."
+    "validation": {
+      "dejafaite": "Ce rattachement a déjà été vérifié."
+    },
+    "carte": {
+      "dejavalide": "Une carte valide existe déjà pour ce bénéficiaire. Abrégez la validité de la précédente avant d'en établir une autre."
+    },
+    "beneficiaire": {
+      "obligatoire": "Choisissez le bénéficiaire de la carte."
+    },
+    "agent": {
+      "introuvable": "Cet agent n'existe pas.",
+      "dejarattache": "Cet agent a déjà un accès à l'application."
+    },
+    "ayantdroit": {
+      "introuvable": "Cet ayant droit n'existe pas.",
+      "nonvalide": "Le rattachement de cet ayant droit n'a pas été vérifié : il n'ouvre pas encore droit."
+    },
+    "modification": {
+      "soumise": "Ce dossier a été soumis et ne peut plus être modifié. Il peut être annulé."
+    },
+    "suppression": {
+      "instruite": "Ce dossier porte déjà des décisions et ne peut plus être supprimé. Il peut être annulé."
+    },
+    "workflow": {
+      "expiree": "Ce dossier a dépassé son délai de validité et ne peut plus être traité.",
+      "invalidstatus": "Ce dossier n'est pas à l'étape où cette action se fait."
+    },
+    "rapport": {
+      "expiree": "Ce dossier a expiré : son imprimé n'est plus délivré."
+    },
+    "profil": {
+      "enusage": "Ce profil est attribué à au moins un compte et ne peut pas être supprimé.",
+      "obligatoire": "Le profil est obligatoire.",
+      "introuvable": "Ce profil n'existe pas."
+    },
+    "activation": {
+      "soi-meme": "Vous ne pouvez pas fermer votre propre compte."
+    },
+    "idnotfound": "Cet élément n'existe pas, ou n'existe plus."
   }
 }

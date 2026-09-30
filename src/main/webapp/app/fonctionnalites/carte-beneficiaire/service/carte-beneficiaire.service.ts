@@ -81,6 +81,19 @@ export class CarteBeneficiaireService extends CarteBeneficiairesService {
       .pipe(map(res => this.convertResponseFromServer(res)));
   }
 
+  /**
+   * Établit une carte pour un bénéficiaire.
+   *
+   * Seul le bénéficiaire est envoyé : le numéro, la période de validité et la date d'émission
+   * sont posés par le serveur. Les laisser saisir ouvrait la porte à deux cartes du même
+   * numéro, et c'est au guichet qu'on l'aurait découvert.
+   */
+  generer(typeBeneficiaire: 'AGENT' | 'AYANT_DROIT', beneficiaireId: number): Observable<ICarteBeneficiaire> {
+    return this.http
+      .post<RestCarteBeneficiaire>(`${this.resourceUrl}/generer`, null, { params: { typeBeneficiaire, beneficiaireId } })
+      .pipe(map(res => this.convertResponseFromServer(res)));
+  }
+
   find(id: number): Observable<ICarteBeneficiaire> {
     return this.http
       .get<RestCarteBeneficiaire>(`${this.resourceUrl}/${encodeURIComponent(id)}`)

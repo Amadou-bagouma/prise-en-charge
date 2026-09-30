@@ -10,8 +10,9 @@ import { IAgent, NewAgent } from '../agent.model';
 
 export type PartialUpdateAgent = Partial<IAgent> & Pick<IAgent, 'id'>;
 
-type RestOf<T extends IAgent | NewAgent> = Omit<T, 'dateNaissance' | 'dateStatut'> & {
+type RestOf<T extends IAgent | NewAgent> = Omit<T, 'dateNaissance' | 'dateEmbauche' | 'dateStatut'> & {
   dateNaissance?: string | null;
+  dateEmbauche?: string | null;
   dateStatut?: string | null;
 };
 
@@ -44,6 +45,7 @@ export class AgentsService {
     return {
       ...restAgent,
       dateNaissance: restAgent.dateNaissance ? dayjs(restAgent.dateNaissance) : undefined,
+      dateEmbauche: restAgent.dateEmbauche ? dayjs(restAgent.dateEmbauche) : undefined,
       dateStatut: restAgent.dateStatut ? dayjs(restAgent.dateStatut) : undefined,
     };
   }
@@ -129,6 +131,7 @@ export class AgentService extends AgentsService {
     return {
       ...agent,
       dateNaissance: agent.dateNaissance?.format(DATE_FORMAT) ?? null,
+      dateEmbauche: agent.dateEmbauche?.format(DATE_FORMAT) ?? null,
       dateStatut: agent.dateStatut?.toJSON() ?? null,
     };
   }

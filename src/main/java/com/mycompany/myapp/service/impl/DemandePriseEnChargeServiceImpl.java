@@ -27,6 +27,7 @@ import com.mycompany.myapp.security.SecurityUtils;
 import com.mycompany.myapp.service.AvisTempsReel;
 import com.mycompany.myapp.service.DemandePriseEnChargeService;
 import com.mycompany.myapp.service.ExpirationDemande;
+import com.mycompany.myapp.service.Parametres;
 import com.mycompany.myapp.service.dto.DemandePriseEnChargeDTO;
 import com.mycompany.myapp.service.dto.TypeSoinDTO;
 import com.mycompany.myapp.service.mapper.DemandePriseEnChargeMapper;
@@ -85,6 +86,8 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
 
     private final AvisTempsReel avisTempsReel;
 
+    private final Parametres parametres;
+
     private static final List<StatutTache> STATUTS_TACHE_CLOTURES = List.of(StatutTache.TERMINEE, StatutTache.ANNULEE);
 
     private static final DateTimeFormatter REFERENCE_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyMMdd");
@@ -100,7 +103,8 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         AgentRepository agentRepository,
         AyantDroitRepository ayantDroitRepository,
         ExpirationDemande expirationDemande,
-        AvisTempsReel avisTempsReel
+        AvisTempsReel avisTempsReel,
+        Parametres parametres
     ) {
         this.demandePriseEnChargeRepository = demandePriseEnChargeRepository;
         this.demandePriseEnChargeMapper = demandePriseEnChargeMapper;
@@ -113,6 +117,7 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         this.ayantDroitRepository = ayantDroitRepository;
         this.expirationDemande = expirationDemande;
         this.avisTempsReel = avisTempsReel;
+        this.parametres = parametres;
     }
 
     @Override
@@ -133,7 +138,7 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         // Le terme est pose des l'ouverture et n'est pas laisse au client : c'est lui qui decide
         // si le dossier peut encore avancer, et une echeance choisie par l'appelant n'aurait
         // aucune valeur.
-        demandePriseEnCharge.setDateEcheance(now.plus(VALIDITE_JOURS, ChronoUnit.DAYS));
+        demandePriseEnCharge.setDateEcheance(now.plus(validiteJours(), ChronoUnit.DAYS));
         demandePriseEnCharge.setStatut(StatutDemande.EN_SAISIE);
         demandePriseEnCharge = demandePriseEnChargeRepository.save(demandePriseEnCharge);
         logHistorique(demandePriseEnCharge, currentUser, "CREATION", "Dossier ouvert, en cours de saisie");
@@ -219,9 +224,9 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
         // Le constat est ecrit dans une transaction propre : celle-ci va etre annulee par le
         // refus qui suit, et l'expiration doit lui survivre.
         expirationDemande.constater(demande.getId());
-        LOG.info("Dossier {} expire : delai de {} jours depasse", demande.getReference(), VALIDITE_JOURS);
+        LOG.info("Dossier {} expire : delai de {} jours depasse", demande.getReference(), validiteJours());
         throw new BadRequestAlertException(
-            "Ce dossier a depasse son delai de validite de %d jours et ne peut plus etre traite.".formatted(VALIDITE_JOURS),
+            "Ce dossier a depasse son delai de validite de %d jours et ne peut plus etre traite.".formatted(validiteJours()),
             ENTITY_NAME,
             "workflow.expiree"
         );
@@ -357,7 +362,18 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
      * <p>Le delai court a partir de l'ouverture du dossier. Passe ce terme, le dossier expire :
      * il ne poursuit plus le circuit et ne s'imprime plus.
      */
-    public static final int VALIDITE_JOURS = 14;
+    public static final int VALIDITE_JOURS_PAR_DEFAUT = 14;
+
+    /**
+     * La duree de validite en vigueur.
+     *
+     * <p>Lue au referentiel a chaque usage, et non mise en cache : c'est une decision de
+     * service, et un changement doit valoir pour le dossier suivant, pas pour le prochain
+     * redemarrage.
+     */
+    private int validiteJours() {
+        return parametres.entier(Parametres.VALIDITE_PRISE_EN_CHARGE_JOURS, VALIDITE_JOURS_PAR_DEFAUT);
+    }
 
     /** Les etats ou plus rien n'est attendu : l'expiration ne les concerne pas. */
     private static final List<StatutDemande> STATUTS_TERMINAUX = List.of(
@@ -650,7 +666,7 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
     private String genererReference() {
         String prefixeDate = REFERENCE_DATE_FORMATTER.format(LocalDate.now(ZoneId.systemDefault()));
         long sequence = demandePriseEnChargeRepository.nextReferenceSequenceValue();
-        return prefixeDate + String.format("%07d", sequence);
+        return prefixeDate + String.format("%03d", sequence);
     }
 
     private DemandePriseEnCharge getDemandeOrThrow(Long id) {

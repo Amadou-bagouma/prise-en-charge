@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Sequence dediee au numero de carte, comme celle de la reference d'un dossier.
+
+        Le numero etait saisi a la main : deux cartes pouvaient porter le meme, et rien dans
+        l'application ne s'en apercevait - c'est le guichet qui l'aurait decouvert, une carte a
+        la main. Il est desormais pose par le serveur.
+
+        Separee de la sequence partagee « sequence_generator », qui alloue par lots de cinquante
+        pour toutes les entites : les numeros y sauteraient par paquets, et un numero de carte se
+        lit, se recopie et se dicte au telephone.
+    -->
+    <changeSet id="20260930120000-1" author="cnss">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="carte_beneficiaire_numero_seq"/>
+            </not>
+        </preConditions>
+        <createSequence sequenceName="carte_beneficiaire_numero_seq" startValue="1" incrementBy="1"/>
+    </changeSet>
+</databaseChangeLog>

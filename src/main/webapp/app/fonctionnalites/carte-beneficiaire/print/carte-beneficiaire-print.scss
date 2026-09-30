@@ -1,8 +1,18 @@
+/*
+  La carte est dessinée à la taille où elle sera fabriquée : CR80, 85,6 × 54 mm — le format
+  d'une carte bancaire, celui des imprimantes à sublimation sur PVC.
+
+  Les dimensions sont en millimètres et non en pixels : une carte dessinée en pixels sort à une
+  taille qui dépend de la résolution d'impression, et il faut la rogner à la main.
+
+  Le fond perdu (bleed) de 2 mm de chaque côté est la marge que l'imprimante mord : sans lui,
+  un liseré blanc apparaît au bord après découpe, là où le papier n'a pas été encré.
+*/
 :host {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
+  gap: 16px;
   padding: 24px;
 }
 
@@ -11,89 +21,217 @@
   gap: 8px;
 }
 
-.carte-card {
-  width: 340px;
-  border: 2px solid #0a3d62;
-  border-radius: 10px;
-  overflow: hidden;
-  font-family: Arial, sans-serif;
-  box-shadow: 0 2px 6px rgb(0 0 0 / 15%);
+.print-aide {
+  max-width: 44rem;
+  color: #6c757d;
+  font-size: 0.85rem;
+  text-align: center;
 }
 
-.carte-card__header {
-  background: #0a3d62;
-  color: #fff;
-  padding: 8px 12px;
+.cartes {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.8rem;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+}
+
+.carte {
+  /* CR80 exact. Le fond perdu est ajouté par la règle d'impression plus bas. */
+  width: 85.6mm;
+  height: 54mm;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 3mm; /* rayon normalisé d'une carte CR80 */
+  background: #fff;
+  color: #10233a;
+  font-family: Arial, Helvetica, sans-serif;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 18%);
+
+  /* Sans cela le navigateur retire les aplats à l'impression pour économiser l'encre, et la
+     carte sort en blanc sur blanc. */
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
 }
 
-.carte-card__logo {
-  width: 48px;
-  height: 48px;
-  flex-shrink: 0;
+.carte__face {
+  font-size: 2.6mm;
+  line-height: 1.35;
+}
+
+/* ------------------------------------------------------------------- recto */
+.carte__bandeau {
+  display: flex;
+  align-items: center;
+  gap: 2mm;
+  padding: 2mm 3mm;
+  background: #0a3d62;
+  color: #fff;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.carte__logo {
+  width: 9mm;
+  height: 9mm;
+  flex: 0 0 auto;
   object-fit: contain;
-  background: #fff;
   border-radius: 50%;
+  background: #fff;
+  padding: 0.5mm;
 }
 
-.carte-card__header-text {
-  flex: 1;
+.carte__institution {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  text-align: center;
+  min-width: 0;
 }
 
-.carte-card__title {
-  font-weight: bold;
-  font-size: 0.95rem;
+.carte__institution b {
+  font-size: 2.9mm;
+  letter-spacing: 0.02em;
 }
 
-.carte-card__numero {
-  margin-top: 2px;
-  font-weight: bold;
-  letter-spacing: 0.5px;
+.carte__institution span {
+  font-size: 2.2mm;
+  opacity: 0.9;
 }
 
-.carte-card__body {
+.carte__corps {
+  flex: 1 1 auto;
   display: flex;
-  gap: 12px;
-  padding: 12px;
+  gap: 3mm;
+  padding: 2.5mm 3mm;
+  min-height: 0;
 }
 
-.carte-card__photo img,
-.carte-card__photo-placeholder {
-  width: 90px;
-  height: 110px;
+.carte__photo {
+  width: 17mm;
+  height: 22mm;
+  flex: 0 0 auto;
   object-fit: cover;
-  border: 1px solid #ccc;
-  background: #f1f1f1;
+  border: 0.3mm solid #c7d0da;
+  background: #eef1f4;
 }
 
-.carte-card__identity {
+.carte__identite {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  font-size: 0.8rem;
+  gap: 0.8mm;
+  min-width: 0;
 }
 
-.carte-card__name {
-  font-weight: bold;
-  font-size: 0.95rem;
-  margin-bottom: 4px;
+.carte__nom {
+  font-size: 3.4mm;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
+.carte__ligne {
+  display: flex;
+  gap: 1.5mm;
+}
+
+.carte__ligne dt {
+  margin: 0;
+  color: #5a6b7d;
+  font-weight: 400;
+}
+
+.carte__ligne dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.carte__pied {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2mm;
+  padding: 1.5mm 3mm;
+  background: #eef2f6;
+  font-size: 2.4mm;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* Le numéro se lit, se recopie et se dicte : en chasse fixe et espacé. */
+.carte__numero {
+  font-family: 'Courier New', monospace;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+/* ------------------------------------------------------------------- verso */
+.carte--verso {
+  padding: 3mm;
+  gap: 2mm;
+}
+
+.carte--verso .carte__bande {
+  /* La piste magnétique des cartes CR80 : réservée même si elle n'est pas encodée, sans quoi
+     l'impression déborderait dessus sur les cartes pré-encodées. */
+  height: 9mm;
+  margin: 0 -3mm;
+  background: #1c1c1c;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.carte__mentions {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1mm;
+  font-size: 2.3mm;
+  color: #33475b;
+}
+
+.carte__mentions strong {
+  color: #10233a;
+}
+
+/* --------------------------------------------------------------- impression */
 @media print {
   .no-print {
     display: none !important;
   }
 
-  .carte-card {
+  /*
+    Une page de la taille exacte d'une carte, sans marge : l'imprimante à PVC reçoit une page
+    par carte. Sur une imprimante à papier, la carte sort à sa taille réelle, à découper.
+  */
+  @page {
+    size: 85.6mm 54mm;
+    margin: 0;
+  }
+
+  :host {
+    padding: 0;
+    gap: 0;
+  }
+
+  .cartes {
+    display: block;
+  }
+
+  .carte {
+    /* Le fond perdu : la carte déborde de 2 mm, que la découpe emporte. */
+    width: 89.6mm;
+    height: 58mm;
+    margin: 0;
+    padding: 2mm;
+    border-radius: 0;
     box-shadow: none;
+    page-break-after: always;
+    break-after: page;
+  }
+
+  .carte:last-child {
+    page-break-after: auto;
+    break-after: auto;
   }
 }

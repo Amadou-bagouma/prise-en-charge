@@ -1,5 +1,6 @@
 package com.mycompany.myapp.web.rest;
 
+import com.mycompany.myapp.domain.enumeration.TypeBeneficiaire;
 import com.mycompany.myapp.repository.CarteBeneficiaireRepository;
 import com.mycompany.myapp.security.ActionsConstants;
 import com.mycompany.myapp.security.AuthoritiesConstants;
@@ -72,6 +73,48 @@ public class CarteBeneficiaireResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new carteBeneficiaireDTO, or with status {@code 400 (Bad Request)} if the carteBeneficiaire has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    /**
+     * {@code POST  /carte-beneficiaires/generer} : etablit une carte pour un beneficiaire.
+     *
+     * <p>Rien n'est demande que le beneficiaire : le numero, la periode de validite et la date
+     * d'emission sont poses par le serveur. C'est le geste qu'on accomplit depuis la fiche d'un
+     * agent ou d'un ayant droit, sans passer par un formulaire.
+     *
+     * @param typeBeneficiaire {@code AGENT} ou {@code AYANT_DROIT}.
+     * @param beneficiaireId l'agent ou l'ayant droit concerne.
+     * @return {@link ResponseEntity} avec le statut {@code 201 (Created)} et la carte etablie.
+     */
+    @PostMapping("/generer")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.CARTE_CREER + "', '" + AuthoritiesConstants.ADMIN + "')")
+    public ResponseEntity<CarteBeneficiaireDTO> genererCarteBeneficiaire(
+        @RequestParam("typeBeneficiaire") TypeBeneficiaire typeBeneficiaire,
+        @RequestParam("beneficiaireId") Long beneficiaireId
+    ) throws URISyntaxException {
+        LOG.debug("REST request to generate CarteBeneficiaire for {} {}", typeBeneficiaire, beneficiaireId);
+        CarteBeneficiaireDTO carte = carteBeneficiaireService.generer(typeBeneficiaire, beneficiaireId);
+        return ResponseEntity.created(new URI("/api/carte-beneficiaires/" + carte.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, carte.getId().toString()))
+            .body(carte);
+    }
+
+    /**
+     * {@code POST /carte-beneficiaires/:id/duplicata} : etablit le duplicata d'une carte perdue.
+     *
+     * @param id la carte perdue.
+     * @param motif ce qui est arrive, conserve au journal.
+     * @return {@link ResponseEntity} avec le statut {@code 201 (Created)} et le duplicata.
+     */
+    @PostMapping("/{id}/duplicata")
+    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.CARTE_CREER + "', '" + AuthoritiesConstants.ADMIN + "')")
+    public ResponseEntity<CarteBeneficiaireDTO> dupliquerCarteBeneficiaire(@PathVariable("id") Long id, @RequestParam("motif") String motif)
+        throws URISyntaxException {
+        LOG.debug("REST request to duplicate CarteBeneficiaire {}", id);
+        CarteBeneficiaireDTO duplicata = carteBeneficiaireService.dupliquer(id, motif);
+        return ResponseEntity.created(new URI("/api/carte-beneficiaires/" + duplicata.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, duplicata.getId().toString()))
+            .body(duplicata);
+    }
+
     @PostMapping("")
     @PreAuthorize("hasAnyAuthority('" + ActionsConstants.CARTE_CREER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<CarteBeneficiaireDTO> createCarteBeneficiaire(@Valid @RequestBody CarteBeneficiaireDTO carteBeneficiaireDTO)

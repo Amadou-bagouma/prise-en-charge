@@ -327,6 +327,17 @@
                   <span jhiTranslate="global.menu.entities.region">Region</span>
                 </a>
               </li>
+              <li
+                class="sidebar-nav-item"
+                *jhiHasAnyAuthority="['ROLE_REFERENTIEL_CONSULTER', 'ROLE_ADMIN']"
+                routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: true }"
+              >
+                <a class="sidebar-link" title="Paramètres" routerLink="/parametre" (click)="collapseNavbar()" data-cy="menuParametre">
+                  <fa-icon icon="wrench" [fixedWidth]="true" />
+                  <span>Paramètres</span>
+                </a>
+              </li>
             </ul>
           </li>
         }

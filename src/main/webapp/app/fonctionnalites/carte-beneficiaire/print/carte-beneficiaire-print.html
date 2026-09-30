@@ -1,60 +1,94 @@
 @if (carteBeneficiaire(); as carte) {
   <div class="print-toolbar no-print">
-    <button type="button" (click)="previousState()" class="btn btn-info">
-      <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Retour</span>
+    <button type="button" (click)="previousState()" class="pec-btn pec-btn--discret">
+      <fa-icon class="pec-btn__ico" icon="arrow-left" />
+      <span jhiTranslate="entity.action.back">Retour</span>
     </button>
 
-    <button type="button" (click)="print()" class="btn btn-primary">
-      <fa-icon icon="print" />&nbsp;<span jhiTranslate="peccnssApp.carteBeneficiaire.print">Imprimer</span>
+    <button type="button" (click)="print()" class="pec-btn pec-btn--primaire" data-cy="imprimerCarte">
+      <fa-icon class="pec-btn__ico" icon="print" />
+      <span jhiTranslate="peccnssApp.carteBeneficiaire.print">Imprimer</span>
     </button>
   </div>
 
-  <div class="carte-card">
-    <div class="carte-card__header">
-      <img class="carte-card__logo" src="content/images/logo-cnss.png" alt="CNSS" />
-      <div class="carte-card__header-text">
-        <span jhiTranslate="peccnssApp.carteBeneficiaire.printView.organism">Caisse Nationale de Sécurité Sociale</span>
-        <span class="carte-card__title" jhiTranslate="peccnssApp.carteBeneficiaire.printView.title">Carte de bénéficiaire</span>
-        <span class="carte-card__numero">
-          <span jhiTranslate="peccnssApp.carteBeneficiaire.printView.numero">N° de carte</span> : {{ carte.numeroCarte }}
+  <!--
+    Dit avant d'imprimer, pas après : une carte sortie au mauvais format se jette, et le PVC
+    coûte. Le format est celui de l'impression, pas celui de l'écran.
+  -->
+  <p class="print-aide no-print">
+    Format carte bancaire (CR80, 85,6 × 54 mm), recto et verso sur deux pages. Dans la fenêtre d'impression, choisissez le format de papier
+    <strong>85,6 × 54 mm</strong>, des marges <strong>nulles</strong> et cochez <strong>graphiques d'arrière-plan</strong> — sans quoi les
+    aplats ne sont pas encrés.
+  </p>
+
+  <div class="cartes">
+    <!-- ------------------------------------------------------------- recto -->
+    <div class="carte carte__face" data-cy="carteRecto">
+      <div class="carte__bandeau">
+        <img class="carte__logo" src="content/images/logo-cnss.png" alt="" />
+        <div class="carte__institution">
+          <b jhiTranslate="peccnssApp.carteBeneficiaire.printView.organism">Caisse Nationale de Sécurité Sociale</b>
+          <span jhiTranslate="peccnssApp.carteBeneficiaire.printView.title">Carte de bénéficiaire</span>
+        </div>
+      </div>
+
+      <div class="carte__corps">
+        @if (photo(); as photoValue) {
+          <img class="carte__photo" [src]="'data:' + photoContentType() + ';base64,' + photoValue" alt="" />
+        } @else {
+          <div class="carte__photo"></div>
+        }
+
+        <dl class="carte__identite">
+          <div class="carte__nom">{{ titulairePrenom() }} {{ titulaireNom() }}</div>
+
+          <div class="carte__ligne">
+            <dt jhiTranslate="peccnssApp.carteBeneficiaire.printView.matricule">Matricule</dt>
+            <dd>{{ matricule() }}</dd>
+          </div>
+
+          @if (carte.typeBeneficiaire === 'AGENT') {
+            <div class="carte__ligne">
+              <dt jhiTranslate="peccnssApp.carteBeneficiaire.printView.fonction">Fonction</dt>
+              <dd>{{ agent()?.fonction }}</dd>
+            </div>
+          } @else {
+            <div class="carte__ligne">
+              <dt jhiTranslate="peccnssApp.carteBeneficiaire.printView.lien">Lien</dt>
+              <dd [jhiTranslate]="'peccnssApp.LienParente.' + (ayantDroit()?.lien ?? 'null')">{{ ayantDroit()?.lien }}</dd>
+            </div>
+          }
+
+          <div class="carte__ligne">
+            <dt>Valable</dt>
+            <dd>{{ carte.dateDebutValidite | formatMediumDate }} — {{ carte.dateFinValidite | formatMediumDate }}</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="carte__pied">
+        <span class="carte__numero">{{ carte.numeroCarte }}</span>
+        <span>
+          <span jhiTranslate="peccnssApp.carteBeneficiaire.printView.issuedOn">Émise le</span>
+          {{ carte.dateEmission | formatMediumDate }}
         </span>
       </div>
     </div>
 
-    <div class="carte-card__body">
-      <div class="carte-card__photo">
-        @if (photo(); as photoValue) {
-          <img [src]="'data:' + photoContentType() + ';base64,' + photoValue" alt="photo" />
-        } @else {
-          <div class="carte-card__photo-placeholder"></div>
-        }
+    <!-- ------------------------------------------------------------- verso -->
+    <div class="carte carte__face carte--verso" data-cy="carteVerso">
+      <div class="carte__bande"></div>
+
+      <div class="carte__mentions">
+        <p><strong>Cette carte est personnelle.</strong> Elle est présentée avec une pièce d'identité.</p>
+        <p>Elle atteste de la qualité de bénéficiaire ; elle ne vaut pas prise en charge : celle-ci s'obtient dossier par dossier.</p>
+        <p>Toute perte ou vol se déclare sans délai à la Caisse, qui établit une nouvelle carte.</p>
+        <p>Carte trouvée : la remettre à la Caisse Nationale de Sécurité Sociale — République du Niger.</p>
       </div>
 
-      <div class="carte-card__identity">
-        <div class="carte-card__name">{{ titulairePrenom() }} {{ titulaireNom() }}</div>
-
-        @if (carte.typeBeneficiaire === 'AGENT') {
-          <div><span jhiTranslate="peccnssApp.carteBeneficiaire.printView.matricule">Matricule</span> : {{ matricule() }}</div>
-          <div><span jhiTranslate="peccnssApp.carteBeneficiaire.printView.fonction">Fonction</span> : {{ agent()?.fonction }}</div>
-        } @else {
-          <div>
-            <span jhiTranslate="peccnssApp.carteBeneficiaire.printView.lien">Lien de parenté</span> :
-            <span [jhiTranslate]="'peccnssApp.LienParente.' + (ayantDroit()?.lien ?? 'null')">{{ ayantDroit()?.lien }}</span>
-          </div>
-          <div><span jhiTranslate="peccnssApp.carteBeneficiaire.printView.matricule">Matricule</span> : {{ matricule() }}</div>
-        }
-
-        <div>
-          <span jhiTranslate="peccnssApp.carteBeneficiaire.printView.validFrom">Valable du</span>
-          {{ carte.dateDebutValidite | formatMediumDate }}
-          <span jhiTranslate="peccnssApp.carteBeneficiaire.printView.validTo">au</span>
-          {{ carte.dateFinValidite | formatMediumDate }}
-        </div>
-
-        <div>
-          <span jhiTranslate="peccnssApp.carteBeneficiaire.printView.issuedOn">Émise le</span>
-          {{ carte.dateEmission | formatMediumDate }}
-        </div>
+      <div class="carte__pied">
+        <span class="carte__numero">{{ carte.numeroCarte }}</span>
+        <span>CNSS — Niger</span>
       </div>
     </div>
   </div>

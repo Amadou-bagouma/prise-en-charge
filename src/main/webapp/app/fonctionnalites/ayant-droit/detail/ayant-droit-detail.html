@@ -102,6 +102,32 @@
             <span jhiTranslate="entity.action.edit">Edit</span>
           </button>
 
+          <!--
+            La carte s'etablit d'ici, sans formulaire : le numero, la periode et la date
+            d'emission sont poses par le serveur, et aucun des quatre champs ne releve d'un choix.
+          -->
+          <!--
+            La carte qui court se montre ; elle ne se refait pas. Proposer « Établir » à qui en a
+            déjà une offrait un bouton refusé — le refus est juste, mais il arrive après le geste.
+          -->
+          @if (carteValide(); as carte) {
+            <a [routerLink]="['/carte-beneficiaire', carte.id, 'print']" class="pec-btn pec-btn--secondaire" data-cy="voirCarte">
+              <fa-icon class="pec-btn__ico" icon="id-card" />
+              <span>Voir la carte {{ carte.numeroCarte }}</span>
+            </a>
+          } @else if (peutEtablirCarte()) {
+            <button
+              type="button"
+              (click)="etablirCarte()"
+              [disabled]="carteEnCours()"
+              class="pec-btn pec-btn--secondaire"
+              data-cy="etablirCarteAyantDroit"
+            >
+              <fa-icon class="pec-btn__ico" icon="id-card" />
+              <span>Établir la carte</span>
+            </button>
+          }
+
           <button
             type="button"
             (click)="previousState()"

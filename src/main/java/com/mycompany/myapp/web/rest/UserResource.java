@@ -112,7 +112,7 @@ public class UserResource {
             // Lowercase the user login before comparing with database
         } else if (userRepository.findOneByLogin(userDTO.getLogin().toLowerCase()).isPresent()) {
             throw new LoginAlreadyUsedException();
-        } else if (userRepository.findOneByEmailIgnoreCase(userDTO.getEmail()).isPresent()) {
+        } else if (courrielDejaUtilise(userDTO.getEmail(), null)) {
             throw new EmailAlreadyUsedException();
         } else {
             User newUser = userService.createUser(userDTO);
@@ -121,6 +121,26 @@ public class UserResource {
                 .headers(HeaderUtil.createAlert(applicationName, "userManagement.created", newUser.getLogin()))
                 .body(newUser);
         }
+    }
+
+    /**
+     * Dit si ce courriel est deja celui d'un autre compte.
+     *
+     * <p>Une adresse absente n'est comparee a rien : le courriel est facultatif - tous les
+     * agents n'en ont pas - et comparer des absences faisait repondre « courriel deja utilise »
+     * a qui n'en avait saisi aucun.
+     *
+     * @param courriel l'adresse saisie, eventuellement absente.
+     * @param compteCourant l'identifiant du compte modifie, ou {@code null} a la creation.
+     */
+    private boolean courrielDejaUtilise(String courriel, Long compteCourant) {
+        if (courriel == null || courriel.isBlank()) {
+            return false;
+        }
+        return userRepository
+            .findOneByEmailIgnoreCase(courriel)
+            .filter(compte -> compteCourant == null || !compte.getId().equals(compteCourant))
+            .isPresent();
     }
 
     /**
@@ -138,11 +158,10 @@ public class UserResource {
         @Valid @RequestBody AdminUserDTO userDTO
     ) {
         LOG.debug("REST request to update User : {}", userDTO);
-        Optional<User> existingUser = userRepository.findOneByEmailIgnoreCase(userDTO.getEmail());
-        if (existingUser.isPresent() && !existingUser.orElseThrow().getId().equals(userDTO.getId())) {
+        if (courrielDejaUtilise(userDTO.getEmail(), userDTO.getId())) {
             throw new EmailAlreadyUsedException();
         }
-        existingUser = userRepository.findOneByLogin(userDTO.getLogin().toLowerCase());
+        Optional<User> existingUser = userRepository.findOneByLogin(userDTO.getLogin().toLowerCase());
         if (existingUser.isPresent() && !existingUser.orElseThrow().getId().equals(userDTO.getId())) {
             throw new LoginAlreadyUsedException();
         }

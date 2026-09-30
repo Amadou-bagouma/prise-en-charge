@@ -1,6 +1,6 @@
 import { NgClass } from '@angular/common';
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbDropdown, NgbDropdownItem, NgbDropdownMenu, NgbDropdownToggle } from '@ng-bootstrap/ng-bootstrap/dropdown';
@@ -13,6 +13,8 @@ import { DataUtils } from 'app/core/util/data-util.service';
 import { AyantDroitDeleteDialog } from 'app/fonctionnalites/ayant-droit/delete/ayant-droit-delete-dialog';
 import { AyantDroitDialog } from 'app/fonctionnalites/ayant-droit/dialog/ayant-droit-dialog';
 import { AgentService } from 'app/fonctionnalites/agent/service/agent.service';
+import { ICarteBeneficiaire } from 'app/fonctionnalites/carte-beneficiaire/carte-beneficiaire.model';
+import { CarteBeneficiaireService } from 'app/fonctionnalites/carte-beneficiaire/service/carte-beneficiaire.service';
 import { ChangementStatutDialog, ResultatChangementStatut } from 'app/shared/statut/changement-statut-dialog';
 import { STATUTS_AGENT, STATUTS_AYANT_DROIT, libelleStatut, tonStatut } from 'app/shared/statut/statuts';
 import { IAyantDroit } from 'app/fonctionnalites/ayant-droit/ayant-droit.model';
@@ -22,6 +24,7 @@ import { FormatMediumDatePipe, FormatMediumDatetimePipe } from 'app/shared/date'
 import { TranslateDirective } from 'app/shared/language';
 import { enSaisie, libelleValidation, tonValidation } from 'app/fonctionnalites/ayant-droit/validation-rattachement';
 import { AccountService } from 'app/core/auth';
+import { Action } from 'app/shared/jhipster/actions.constants';
 import { Authority } from 'app/shared/jhipster/constants';
 import { IAgent } from '../agent.model';
 
@@ -102,6 +105,21 @@ export class AgentDetail {
 
   protected dataUtils = inject(DataUtils);
   protected readonly accountService = inject(AccountService);
+  protected readonly carteService = inject(CarteBeneficiaireService);
+  protected readonly routeur = inject(Router);
+
+  /** Établir une carte relève du même droit que la créer au formulaire. */
+  readonly peutEtablirCarte = computed(() => this.accountService.hasAnyAuthority([Action.CARTE_CREER, Authority.ADMIN]));
+
+  readonly carteEnCours = signal(false);
+
+  /**
+   * La carte en cours de validite, s'il y en a une.
+   *
+   * Chargee a l'ouverture de la fiche : sans elle, l'ecran proposerait d'etablir une carte a qui
+   * en a deja une, et le refus n'arriverait qu'apres le geste.
+   */
+  readonly carteValide = signal<ICarteBeneficiaire | null>(null);
 
   /** Le controle RH prononce la verification d'un rattachement ; les autres la lisent. */
   readonly peutVerifier = computed(() => this.accountService.hasAnyAuthority([Authority.VERIFICATEUR_RH, Authority.ADMIN]));
@@ -115,6 +133,11 @@ export class AgentDetail {
 
   constructor() {
     effect(() => this.chargerAyantsDroit(this.agent()?.id));
+    // La carte en cours, pour ne pas proposer d'en etablir une a qui en a deja une.
+    effect(() => {
+      this.agent();
+      this.chargerCarte();
+    });
   }
 
   /**
@@ -218,6 +241,47 @@ export class AgentDetail {
       return;
     }
     this.ayantDroitService.valider(ayantDroit.id).subscribe(() => this.chargerAyantsDroit(this.agent()?.id, { discret: true }));
+  }
+
+  /**
+   * Établit la carte de l'agent, puis l'ouvre pour impression.
+   *
+   * Rien n'est demandé : le serveur pose le numéro, la période et la date d'émission. Passer
+   * par le formulaire obligerait à saisir quatre champs dont aucun ne relève d'un choix.
+   */
+  /** Recherche la carte en cours de validite du titulaire. */
+  private chargerCarte(): void {
+    const id = this.agent()?.id;
+    if (!id) {
+      this.carteValide.set(null);
+      return;
+    }
+    this.carteService.query({ 'agentId.equals': id, size: 20, sort: ['dateFinValidite,desc'] }).subscribe({
+      next: reponse => {
+        const aujourdhui = dayjs();
+        this.carteValide.set(
+          (reponse.body ?? []).find(carte => !!carte.dateFinValidite && !carte.dateFinValidite.isBefore(aujourdhui, 'day')) ?? null,
+        );
+      },
+      error: () => this.carteValide.set(null),
+    });
+  }
+
+  etablirCarte(): void {
+    const agent = this.agent();
+    if (!agent?.id || this.carteEnCours()) {
+      return;
+    }
+    this.carteEnCours.set(true);
+    this.carteService.generer('AGENT', agent.id).subscribe({
+      next: carte => {
+        this.carteEnCours.set(false);
+        this.carteValide.set(carte);
+        void this.routeur.navigate(['/carte-beneficiaire', carte.id, 'print']);
+      },
+      // Le refus - une carte valide existe deja - est affiche par l'intercepteur d'alertes.
+      error: () => this.carteEnCours.set(false),
+    });
   }
 
   ajouterAyantDroit(): void {

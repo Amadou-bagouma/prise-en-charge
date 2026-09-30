@@ -33,6 +33,12 @@ public class AdminUserDTO implements Serializable {
     @Size(max = 50)
     private String lastName;
 
+    /**
+     * Le courriel du compte, facultatif.
+     *
+     * <p>Tous les agents n'en ont pas, et l'exiger obligeait a en inventer un. Sans adresse, la
+     * reinitialisation du mot de passe passe par l'administration plutot que par un envoi.
+     */
     @Email
     @Size(min = 5, max = 254)
     private String email;

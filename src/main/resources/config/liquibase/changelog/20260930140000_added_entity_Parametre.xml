@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Les reglages de l'application, modifiables sans livraison.
+
+        La duree de validite d'une prise en charge, celle d'une carte, le nom du directeur
+        general et sa signature vivaient dans des constantes Java. Les changer supposait une
+        livraison : quatorze jours devenaient un chiffre gele, alors que c'est une decision de
+        service, revisable.
+
+        La valeur est stockee en texte quel que soit le type : une colonne par type multiplierait
+        les colonnes vides, et un reglage change parfois de nature - un delai en jours devient un
+        delai en mois - sans qu'il faille migrer la table.
+    -->
+    <changeSet id="20260930140000-1" author="cnss">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="parametre"/>
+            </not>
+        </preConditions>
+        <createTable tableName="parametre">
+            <column name="id" type="bigint" autoIncrement="false">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="code" type="varchar(100)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_parametre__code"/>
+            </column>
+            <column name="libelle" type="varchar(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(1000)"/>
+            <column name="valeur" type="varchar(2000)"/>
+            <column name="type" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="valeur_binaire" type="${blobType}"/>
+            <column name="valeur_binaire_content_type" type="varchar(255)"/>
+            <column name="socle" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>
