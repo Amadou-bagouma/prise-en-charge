@@ -1,6 +1,7 @@
 package com.mycompany.myapp.service.dto;
 
 import com.mycompany.myapp.config.Constants;
+import com.mycompany.myapp.domain.Agent;
 import com.mycompany.myapp.domain.Authority;
 import com.mycompany.myapp.domain.Profil;
 import com.mycompany.myapp.domain.User;
@@ -63,6 +64,15 @@ public class AdminUserDTO implements Serializable {
      */
     private ProfilDTO profil;
 
+    /**
+     * L'agent dont ce compte est l'acces personnel, s'il en est un.
+     *
+     * <p>Facultatif : la plupart des comptes sont ceux du personnel administratif, qui instruit
+     * les dossiers des autres sans etre lui-meme beneficiaire. Renseigne, il decide de ce que
+     * l'espace personnel montre - voir {@code PerimetreAgent}.
+     */
+    private AgentDTO agent;
+
     private boolean mustChangePassword = false;
 
     @Size(min = 2, max = 10)
@@ -100,6 +110,26 @@ public class AdminUserDTO implements Serializable {
         this.lastModifiedDate = user.getLastModifiedDate();
         this.authorities = user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet());
         this.profil = toProfilDTO(user.getProfil());
+        this.agent = toAgentDTO(user.getAgent());
+    }
+
+    /**
+     * L'agent, reduit a ce qui l'identifie.
+     *
+     * <p>Ni sa direction, ni sa situation, ni ses ayants droit : la fiche du compte sert a
+     * choisir un agent, pas a le consulter. Les charger rapatrierait un dossier entier pour
+     * afficher un matricule.
+     */
+    private static AgentDTO toAgentDTO(Agent agent) {
+        if (agent == null) {
+            return null;
+        }
+        AgentDTO dto = new AgentDTO();
+        dto.setId(agent.getId());
+        dto.setMatricule(agent.getMatricule());
+        dto.setNom(agent.getNom());
+        dto.setPrenom(agent.getPrenom());
+        return dto;
     }
 
     private static ProfilDTO toProfilDTO(Profil profil) {
@@ -258,6 +288,14 @@ public class AdminUserDTO implements Serializable {
         this.profil = profil;
     }
 
+    public AgentDTO getAgent() {
+        return agent;
+    }
+
+    public void setAgent(AgentDTO agent) {
+        this.agent = agent;
+    }
+
     // prettier-ignore
     @Override
     public String toString() {
@@ -276,6 +314,7 @@ public class AdminUserDTO implements Serializable {
             ", lastModifiedDate=" + lastModifiedDate +
             ", authorities=" + authorities +
             ", profil=" + (profil == null ? null : profil.getNom()) +
+            ", agent=" + (agent == null ? null : agent.getMatricule()) +
             "}";
     }
 }

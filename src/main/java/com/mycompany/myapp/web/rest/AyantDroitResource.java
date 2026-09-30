@@ -9,6 +9,7 @@ import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.service.AyantDroitQueryService;
 import com.mycompany.myapp.service.AyantDroitService;
 import com.mycompany.myapp.service.GenerateurCodeAyantDroit;
+import com.mycompany.myapp.service.PerimetreAgent;
 import com.mycompany.myapp.service.criteria.AyantDroitCriteria;
 import com.mycompany.myapp.service.dto.AyantDroitDTO;
 import com.mycompany.myapp.service.dto.ChangementStatutDTO;
@@ -30,6 +31,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import tech.jhipster.service.filter.LongFilter;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
@@ -48,6 +50,8 @@ public class AyantDroitResource {
     @Value("${jhipster.clientApp.name:peccnss}")
     private String applicationName;
 
+    private final PerimetreAgent perimetreAgent;
+
     private final AyantDroitService ayantDroitService;
 
     private final AyantDroitRepository ayantDroitRepository;
@@ -63,8 +67,10 @@ public class AyantDroitResource {
         AyantDroitRepository ayantDroitRepository,
         AyantDroitQueryService ayantDroitQueryService,
         AgentRepository agentRepository,
-        GenerateurCodeAyantDroit generateurCodeAyantDroit
+        GenerateurCodeAyantDroit generateurCodeAyantDroit,
+        PerimetreAgent perimetreAgent
     ) {
+        this.perimetreAgent = perimetreAgent;
         this.ayantDroitService = ayantDroitService;
         this.ayantDroitRepository = ayantDroitRepository;
         this.ayantDroitQueryService = ayantDroitQueryService;
@@ -216,6 +222,13 @@ public class AyantDroitResource {
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
     ) {
         LOG.debug("REST request to get AyantDroits by criteria: {}", criteria);
+        // Un agent connecte a son espace ne voit que ce qui le concerne : le critere est impose
+        // ici, apres celui que l'appelant a pu envoyer, de sorte qu'il ne puisse pas l'elargir.
+        perimetreAgent.agentDuCompteCourant().ifPresent(sien -> {
+            LongFilter siens = new LongFilter();
+            siens.setEquals(sien);
+            criteria.setAgentId(siens);
+        });
 
         Page<AyantDroitDTO> page = ayantDroitQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
@@ -232,6 +245,13 @@ public class AyantDroitResource {
     @PreAuthorize("hasAnyAuthority('" + ActionsConstants.AYANT_DROIT_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<Long> countAyantDroits(AyantDroitCriteria criteria) {
         LOG.debug("REST request to count AyantDroits by criteria: {}", criteria);
+        // Un agent connecte a son espace ne voit que ce qui le concerne : le critere est impose
+        // ici, apres celui que l'appelant a pu envoyer, de sorte qu'il ne puisse pas l'elargir.
+        perimetreAgent.agentDuCompteCourant().ifPresent(sien -> {
+            LongFilter siens = new LongFilter();
+            siens.setEquals(sien);
+            criteria.setAgentId(siens);
+        });
         return ResponseEntity.ok().body(ayantDroitQueryService.countByCriteria(criteria));
     }
 
@@ -263,6 +283,12 @@ public class AyantDroitResource {
     @PreAuthorize("hasAnyAuthority('" + ActionsConstants.AYANT_DROIT_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<AyantDroitDTO> getAyantDroit(@PathVariable("id") Long id) {
         LOG.debug("REST request to get AyantDroit : {}", id);
+        // Une adresse tapee a la main ne doit pas ouvrir la fiche d'un autre.
+        ayantDroitService
+            .findOne(id)
+            .ifPresent(ayantDroit ->
+                perimetreAgent.exigerDansLePerimetre(ayantDroit.getAgent() == null ? null : ayantDroit.getAgent().getId())
+            );
         Optional<AyantDroitDTO> ayantDroitDTO = ayantDroitService.findOne(id);
         return ResponseUtil.wrapOrNotFound(ayantDroitDTO);
     }

@@ -70,5 +70,6 @@
     <include file="config/liquibase/changelog/20260925180000_historique_action_cible.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260929100000_piece_justificative_fichier.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260929120000_ayant_droit_validation.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260930100000_user_agent.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>

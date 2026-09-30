@@ -5,6 +5,7 @@ import com.mycompany.myapp.security.ActionsConstants;
 import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.service.AgentQueryService;
 import com.mycompany.myapp.service.AgentService;
+import com.mycompany.myapp.service.PerimetreAgent;
 import com.mycompany.myapp.service.criteria.AgentCriteria;
 import com.mycompany.myapp.service.dto.AgentDTO;
 import com.mycompany.myapp.service.dto.ChangementStatutDTO;
@@ -26,6 +27,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import tech.jhipster.service.filter.LongFilter;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
@@ -44,13 +46,21 @@ public class AgentResource {
     @Value("${jhipster.clientApp.name:peccnss}")
     private String applicationName;
 
+    private final PerimetreAgent perimetreAgent;
+
     private final AgentService agentService;
 
     private final AgentRepository agentRepository;
 
     private final AgentQueryService agentQueryService;
 
-    public AgentResource(AgentService agentService, AgentRepository agentRepository, AgentQueryService agentQueryService) {
+    public AgentResource(
+        AgentService agentService,
+        AgentRepository agentRepository,
+        AgentQueryService agentQueryService,
+        PerimetreAgent perimetreAgent
+    ) {
+        this.perimetreAgent = perimetreAgent;
         this.agentService = agentService;
         this.agentRepository = agentRepository;
         this.agentQueryService = agentQueryService;
@@ -181,6 +191,13 @@ public class AgentResource {
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
     ) {
         LOG.debug("REST request to get Agents by criteria: {}", criteria);
+        // Un agent connecte a son espace ne voit que ce qui le concerne : le critere est impose
+        // ici, apres celui que l'appelant a pu envoyer, de sorte qu'il ne puisse pas l'elargir.
+        perimetreAgent.agentDuCompteCourant().ifPresent(sien -> {
+            LongFilter siens = new LongFilter();
+            siens.setEquals(sien);
+            criteria.setId(siens);
+        });
 
         Page<AgentDTO> page = agentQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
@@ -197,6 +214,13 @@ public class AgentResource {
     @PreAuthorize("hasAnyAuthority('" + ActionsConstants.AGENT_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<Long> countAgents(AgentCriteria criteria) {
         LOG.debug("REST request to count Agents by criteria: {}", criteria);
+        // Un agent connecte a son espace ne voit que ce qui le concerne : le critere est impose
+        // ici, apres celui que l'appelant a pu envoyer, de sorte qu'il ne puisse pas l'elargir.
+        perimetreAgent.agentDuCompteCourant().ifPresent(sien -> {
+            LongFilter siens = new LongFilter();
+            siens.setEquals(sien);
+            criteria.setId(siens);
+        });
         return ResponseEntity.ok().body(agentQueryService.countByCriteria(criteria));
     }
 
@@ -210,6 +234,8 @@ public class AgentResource {
     @PreAuthorize("hasAnyAuthority('" + ActionsConstants.AGENT_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<AgentDTO> getAgent(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Agent : {}", id);
+        // Une adresse tapee a la main ne doit pas ouvrir la fiche d'un autre.
+        perimetreAgent.exigerDansLePerimetre(id);
         Optional<AgentDTO> agentDTO = agentService.findOne(id);
         return ResponseUtil.wrapOrNotFound(agentDTO);
     }

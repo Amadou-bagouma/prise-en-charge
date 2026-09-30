@@ -99,5 +99,15 @@ public final class ActionsConstants {
     public static final String HABILITATION_CONSULTER = "ROLE_HABILITATION_CONSULTER";
     public static final String HABILITATION_MODIFIER = "ROLE_HABILITATION_MODIFIER";
 
+    // ------------------------------------------------------------ espace agent
+    /**
+     * Acces a son propre espace : ses dossiers, ses ayants droit, sa carte.
+     *
+     * <p>Se distingue des habilitations de consultation ci-dessus, qui ouvrent le dossier de
+     * tous. Portee seule, elle borne ce que l'agent voit a ce qui le concerne - voir
+     * {@code PerimetreAgent}.
+     */
+    public static final String ESPACE_AGENT = "ROLE_ESPACE_AGENT";
+
     private ActionsConstants() {}
 }

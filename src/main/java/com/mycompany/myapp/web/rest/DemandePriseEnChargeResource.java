@@ -9,6 +9,7 @@ import com.mycompany.myapp.security.SecurityUtils;
 import com.mycompany.myapp.service.DemandePriseEnChargeQueryService;
 import com.mycompany.myapp.service.DemandePriseEnChargeService;
 import com.mycompany.myapp.service.NotificationDecisionService;
+import com.mycompany.myapp.service.PerimetreAgent;
 import com.mycompany.myapp.service.RapportDemandeService;
 import com.mycompany.myapp.service.criteria.DemandePriseEnChargeCriteria;
 import com.mycompany.myapp.service.dto.DemandePriseEnChargeDTO;
@@ -36,6 +37,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import tech.jhipster.service.filter.LongFilter;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
@@ -53,6 +55,8 @@ public class DemandePriseEnChargeResource {
 
     @Value("${jhipster.clientApp.name:peccnss}")
     private String applicationName;
+
+    private final PerimetreAgent perimetreAgent;
 
     private final DemandePriseEnChargeService demandePriseEnChargeService;
 
@@ -72,8 +76,10 @@ public class DemandePriseEnChargeResource {
         DemandePriseEnChargeQueryService demandePriseEnChargeQueryService,
         RapportDemandeService rapportDemandeService,
         NotificationDecisionService notificationDecisionService,
-        UserRepository userRepository
+        UserRepository userRepository,
+        PerimetreAgent perimetreAgent
     ) {
+        this.perimetreAgent = perimetreAgent;
         this.demandePriseEnChargeService = demandePriseEnChargeService;
         this.demandePriseEnChargeRepository = demandePriseEnChargeRepository;
         this.demandePriseEnChargeQueryService = demandePriseEnChargeQueryService;
@@ -94,6 +100,11 @@ public class DemandePriseEnChargeResource {
      * @return {@code null} pour « aucune restriction », sinon l'identifiant auquel se limiter.
      */
     private Long restrictToUserIdUnlessAdminOrValidateur() {
+        // Un agent ne saisit pas ses propres dossiers : le restreindre a ceux dont il est
+        // l'auteur lui rendrait un espace vide. C'est le perimetre par agent qui le borne.
+        if (perimetreAgent.estBorne()) {
+            return null;
+        }
         if (
             SecurityUtils.hasCurrentUserAnyOfAuthorities(
                 AuthoritiesConstants.ADMIN,
@@ -115,6 +126,10 @@ public class DemandePriseEnChargeResource {
      * {@link #restrictToUserIdUnlessAdminOrValidateur()}.
      */
     private void checkCanViewDemande(DemandePriseEnChargeDTO demande) {
+        if (perimetreAgent.estBorne()) {
+            perimetreAgent.exigerDansLePerimetre(demande.getAgent() == null ? null : demande.getAgent().getId());
+            return;
+        }
         Long restrictToUserId = restrictToUserIdUnlessAdminOrValidateur();
         if (restrictToUserId == null) {
             return;
@@ -233,6 +248,13 @@ public class DemandePriseEnChargeResource {
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
     ) {
         LOG.debug("REST request to get DemandePriseEnCharges by criteria: {}", criteria);
+        // Un agent connecte a son espace ne voit que ses dossiers et ceux de ses ayants droit :
+        // le critere est impose apres celui de l'appelant, pour qu'il ne puisse pas l'elargir.
+        perimetreAgent.agentDuCompteCourant().ifPresent(sien -> {
+            LongFilter siens = new LongFilter();
+            siens.setEquals(sien);
+            criteria.setAgentId(siens);
+        });
 
         Page<DemandePriseEnChargeDTO> page = demandePriseEnChargeQueryService.findByCriteria(
             criteria,
@@ -253,6 +275,13 @@ public class DemandePriseEnChargeResource {
     @PreAuthorize("hasAnyAuthority('" + ActionsConstants.DEMANDE_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<Long> countDemandePriseEnCharges(DemandePriseEnChargeCriteria criteria) {
         LOG.debug("REST request to count DemandePriseEnCharges by criteria: {}", criteria);
+        // Un agent connecte a son espace ne voit que ses dossiers et ceux de ses ayants droit :
+        // le critere est impose apres celui de l'appelant, pour qu'il ne puisse pas l'elargir.
+        perimetreAgent.agentDuCompteCourant().ifPresent(sien -> {
+            LongFilter siens = new LongFilter();
+            siens.setEquals(sien);
+            criteria.setAgentId(siens);
+        });
         return ResponseEntity.ok().body(
             demandePriseEnChargeQueryService.countByCriteria(criteria, restrictToUserIdUnlessAdminOrValidateur())
         );

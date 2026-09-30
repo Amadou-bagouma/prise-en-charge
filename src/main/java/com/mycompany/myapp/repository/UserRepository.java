@@ -34,7 +34,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * i.e. outside the transaction - a lazily-fetched collection would throw
      * LazyInitializationException there.
      */
-    @EntityGraph(attributePaths = { "authorities", "profil.authorities" })
+    // « agent » figure dans le graphe : un graphe de chargement rend paresseux tout ce qu il ne
+    // nomme pas, et la fiche du compte lit le rattachement une fois l entite detachee.
+    @EntityGraph(attributePaths = { "authorities", "profil.authorities", "agent" })
     @Cacheable(cacheNames = USERS_BY_LOGIN_CACHE, unless = "#result == null")
     Optional<User> findOneWithAuthoritiesByLogin(String login);
 
@@ -51,6 +53,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     /** Les comptes portant ce profil, pour leur repercuter un changement de droits. */
     @EntityGraph(attributePaths = "authorities")
     List<User> findAllByProfilId(Long profilId);
+
+    /** Le compte rattache a cet agent, s'il en existe un : un agent n'a qu'un acces. */
+    Optional<User> findOneByAgentId(Long agentId);
 
     /**
      * Combien d'agents portent ce profil.

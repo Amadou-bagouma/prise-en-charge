@@ -1,6 +1,7 @@
 import dayjs from 'dayjs/esm';
 
 import { LANGUAGES } from 'app/config';
+import { IAgent } from 'app/fonctionnalites/agent/agent.model';
 import { IProfil } from 'app/fonctionnalites/profil/profil.model';
 
 export interface IUserManagement {
@@ -26,6 +27,14 @@ export interface IUserManagement {
   authorities?: string[] | null;
   /** The profil (bundle of authorities) assigned to this user. Mandatory. */
   profil?: Pick<IProfil, 'id' | 'nom' | 'authorities'> | null;
+  /**
+   * L'agent dont ce compte est l'accès personnel, s'il en est un.
+   *
+   * Facultatif : la plupart des comptes sont ceux du personnel administratif, qui instruit les
+   * dossiers des autres sans être lui-même bénéficiaire. Renseigné, il décide de ce que l'espace
+   * personnel montre — le serveur borne alors les listes à ce seul agent.
+   */
+  agent?: Pick<IAgent, 'id' | 'matricule' | 'nom' | 'prenom'> | null;
 }
 
 export type NewUserManagement = Omit<IUserManagement, 'login'> & { login: null };

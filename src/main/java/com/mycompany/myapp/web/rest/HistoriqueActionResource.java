@@ -3,9 +3,12 @@ package com.mycompany.myapp.web.rest;
 import com.mycompany.myapp.repository.HistoriqueActionRepository;
 import com.mycompany.myapp.security.ActionsConstants;
 import com.mycompany.myapp.security.AuthoritiesConstants;
+import com.mycompany.myapp.service.DemandePriseEnChargeService;
 import com.mycompany.myapp.service.HistoriqueActionQueryService;
 import com.mycompany.myapp.service.HistoriqueActionService;
+import com.mycompany.myapp.service.PerimetreAgent;
 import com.mycompany.myapp.service.criteria.HistoriqueActionCriteria;
+import com.mycompany.myapp.service.dto.DemandePriseEnChargeDTO;
 import com.mycompany.myapp.service.dto.HistoriqueActionDTO;
 import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
@@ -22,6 +25,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -43,6 +47,10 @@ public class HistoriqueActionResource {
     @Value("${jhipster.clientApp.name:peccnss}")
     private String applicationName;
 
+    private final PerimetreAgent perimetreAgent;
+
+    private final DemandePriseEnChargeService demandePriseEnChargeService;
+
     private final HistoriqueActionService historiqueActionService;
 
     private final HistoriqueActionRepository historiqueActionRepository;
@@ -52,8 +60,12 @@ public class HistoriqueActionResource {
     public HistoriqueActionResource(
         HistoriqueActionService historiqueActionService,
         HistoriqueActionRepository historiqueActionRepository,
-        HistoriqueActionQueryService historiqueActionQueryService
+        HistoriqueActionQueryService historiqueActionQueryService,
+        PerimetreAgent perimetreAgent,
+        DemandePriseEnChargeService demandePriseEnChargeService
     ) {
+        this.perimetreAgent = perimetreAgent;
+        this.demandePriseEnChargeService = demandePriseEnChargeService;
         this.historiqueActionService = historiqueActionService;
         this.historiqueActionRepository = historiqueActionRepository;
         this.historiqueActionQueryService = historiqueActionQueryService;
@@ -165,6 +177,8 @@ public class HistoriqueActionResource {
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
     ) {
         LOG.debug("REST request to get HistoriqueActions by criteria: {}", criteria);
+        // Un agent borne ne consulte le journal que dossier par dossier, et seulement des siens.
+        exigerJournalDansLePerimetre(criteria);
 
         Page<HistoriqueActionDTO> page = historiqueActionQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
@@ -181,7 +195,30 @@ public class HistoriqueActionResource {
     @PreAuthorize("hasAnyAuthority('" + ActionsConstants.HISTORIQUE_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<Long> countHistoriqueActions(HistoriqueActionCriteria criteria) {
         LOG.debug("REST request to count HistoriqueActions by criteria: {}", criteria);
+        // Un agent borne ne consulte le journal que dossier par dossier, et seulement des siens.
+        exigerJournalDansLePerimetre(criteria);
         return ResponseEntity.ok().body(historiqueActionQueryService.countByCriteria(criteria));
+    }
+
+    /**
+     * Refuse a un agent borne le journal d'un dossier qui n'est pas le sien.
+     *
+     * <p>Le filtre par dossier est exige plutot qu'impose : un journal sans dossier est celui de
+     * toute l'institution, et le borner a ses seuls dossiers demanderait une jointure que le
+     * critere ne sait pas exprimer. Le refus dit ce qui manque.
+     */
+    private void exigerJournalDansLePerimetre(HistoriqueActionCriteria criteria) {
+        if (!perimetreAgent.estBorne()) {
+            return;
+        }
+        Long demandeId = criteria.getDemandeId() == null ? null : criteria.getDemandeId().getEquals();
+        if (demandeId == null) {
+            throw new AccessDeniedException("Le journal ne se consulte que dossier par dossier");
+        }
+        DemandePriseEnChargeDTO dossier = demandePriseEnChargeService
+            .findOne(demandeId)
+            .orElseThrow(() -> new AccessDeniedException("Ce dossier ne releve pas de votre espace personnel"));
+        perimetreAgent.exigerDansLePerimetre(dossier.getAgent() == null ? null : dossier.getAgent().getId());
     }
 
     /**

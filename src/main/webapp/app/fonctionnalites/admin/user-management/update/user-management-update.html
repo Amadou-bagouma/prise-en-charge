@@ -188,6 +188,25 @@
             </div>
           }
         </div>
+
+        <!--
+          Le rattachement à un agent, facultatif : il ne concerne que les comptes ouverts aux
+          agents eux-mêmes. C'est lui qui décide de ce que l'espace personnel montre — sans lui,
+          un compte au profil « Agent » se connecte sur un espace vide.
+        -->
+        <div class="jhi-field jhi-field-full">
+          <label class="form-label" for="field_agent">Agent rattaché</label>
+          <select class="form-control" id="field_agent" data-cy="agent" name="agent" formControlName="agent" [compareWith]="compareAgent">
+            <option [ngValue]="null">Aucun — compte du personnel administratif</option>
+            @for (agentOption of agents(); track agentOption.id) {
+              <option [ngValue]="agentOption">{{ agentOption.matricule }} — {{ agentOption.nom }} {{ agentOption.prenom }}</option>
+            }
+          </select>
+          <small class="form-text text-muted">
+            À renseigner pour un compte ouvert à un agent : son espace personnel ne montrera que ses dossiers, ses ayants droit et sa carte.
+            Un agent n'a qu'un accès.
+          </small>
+        </div>
       </div>
 
       <div class="jhi-form-actions">

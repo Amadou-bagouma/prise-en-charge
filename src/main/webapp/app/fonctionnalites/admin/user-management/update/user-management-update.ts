@@ -10,6 +10,7 @@ import { AlertError } from 'app/shared/alert';
 import { ConfirmService } from 'app/shared/confirm';
 import { AlertService } from 'app/core/util/alert.service';
 import { DataUtils, FileLoadError } from 'app/core/util/data-util.service';
+import { AgentService } from 'app/fonctionnalites/agent/service/agent.service';
 import { ProfilService } from 'app/fonctionnalites/profil/service/profil.service';
 import { FindLanguageFromKeyPipe, TranslateDirective } from 'app/shared/language';
 import { UserManagementService } from '../service/user-management.service';
@@ -32,6 +33,7 @@ export class UserManagementUpdate implements OnInit {
   protected activatedRoute = inject(ActivatedRoute);
   protected readonly confirmService = inject(ConfirmService);
   protected readonly profilService = inject(ProfilService);
+  protected readonly agentService = inject(AgentService);
   protected dataUtils = inject(DataUtils);
   protected alertService = inject(AlertService);
   protected elementRef = inject(ElementRef);
@@ -40,6 +42,10 @@ export class UserManagementUpdate implements OnInit {
   readonly profils = this.profilService.profils;
   // eslint-disable-next-line @typescript-eslint/member-ordering
   readonly compareProfil = this.profilService.compareProfil.bind(this.profilService);
+  // eslint-disable-next-line @typescript-eslint/member-ordering
+  readonly agents = this.agentService.agents;
+  // eslint-disable-next-line @typescript-eslint/member-ordering
+  readonly compareAgent = this.agentService.compareAgent.bind(this.agentService);
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   editForm: UserManagementFormGroup = this.userManagementFormService.createUserManagementFormGroup();
@@ -48,6 +54,9 @@ export class UserManagementUpdate implements OnInit {
     // Load the profils used by the profil select - a plain reference-data list, so a single
     // large page (matching the Gestion/Region/Direction picker convention) is enough.
     this.profilService.profilsParams.set({ size: 100 });
+    // Les agents proposes au rattachement. Une seule page, large : paginer un choix oblige a
+    // chercher un matricule qui se trouve peut-etre a la page suivante, sans le dire.
+    this.agentService.agentsParams.set({ size: 500, sort: ['matricule,asc'] });
     this.activatedRoute.data.subscribe(({ userManagement }) => {
       this.userManagement = userManagement;
       if (userManagement) {

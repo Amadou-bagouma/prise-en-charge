@@ -157,32 +157,42 @@
                         </td>
                         <td class="pec-tbl__num">{{ (piece.dateAjout | formatMediumDatetime) || '—' }}</td>
                         <td class="pec-tbl__droite">
-                          @if (piece.contenuContentType) {
-                            <button
-                              type="button"
-                              (click)="ouvrirPiece(piece)"
-                              class="pec-btn pec-btn--discret pec-btn--sm"
-                              data-cy="ouvrirPiece"
-                            >
-                              <fa-icon class="pec-btn__ico" icon="eye" />
-                              <span>Ouvrir</span>
+                          <!--
+                            Les actions sont regroupées : alignées, elles occupaient plus de place
+                            que le nom du document, et la ligne se lisait de droite à gauche.
+                          -->
+                          <div ngbDropdown container="body" class="d-inline-block">
+                            <button type="button" class="pec-btn pec-btn--discret pec-btn--sm" ngbDropdownToggle data-cy="actionsPiece">
+                              <span jhiTranslate="entity.action.actions">Actions</span>
                             </button>
-                          }
-                          @if (canSaisir() && piecesModifiables()) {
-                            <a [routerLink]="['/piece-justificative', piece.id, 'edit']" class="pec-btn pec-btn--discret pec-btn--sm">
-                              <fa-icon class="pec-btn__ico" icon="pencil-alt" />
-                              <span jhiTranslate="entity.action.edit">Edit</span>
-                            </a>
-                            <button
-                              type="button"
-                              (click)="supprimerPiece(piece)"
-                              class="pec-btn pec-btn--discret pec-btn--sm"
-                              data-cy="supprimerPiece"
-                            >
-                              <fa-icon class="pec-btn__ico" icon="times" />
-                              <span jhiTranslate="entity.action.delete">Delete</span>
-                            </button>
-                          }
+                            <div ngbDropdownMenu>
+                              @if (piece.contenuContentType) {
+                                <button ngbDropdownItem type="button" (click)="ouvrirPiece(piece)" data-cy="ouvrirPiece">
+                                  <fa-icon icon="eye" class="me-1" />
+                                  <span>Consulter le document</span>
+                                </button>
+                              }
+                              <a ngbDropdownItem [routerLink]="['/piece-justificative', piece.id, 'view']" data-cy="voirPiece">
+                                <fa-icon icon="file" class="me-1" />
+                                <span>Voir la fiche</span>
+                              </a>
+                              <!--
+                                Une pièce ne se modifie que tant que le dossier est en saisie :
+                                au-delà, elle a servi de base à une décision. Le serveur le refuse
+                                déjà — l'écran retire l'entrée plutôt que de la laisser échouer.
+                              -->
+                              @if (canSaisir() && piecesModifiables()) {
+                                <a ngbDropdownItem [routerLink]="['/piece-justificative', piece.id, 'edit']" data-cy="modifierPiece">
+                                  <fa-icon icon="pencil-alt" class="me-1" />
+                                  <span jhiTranslate="entity.action.edit">Modifier</span>
+                                </a>
+                                <button ngbDropdownItem type="button" (click)="supprimerPiece(piece)" data-cy="supprimerPiece">
+                                  <fa-icon icon="times" class="me-1" />
+                                  <span jhiTranslate="entity.action.delete">Supprimer</span>
+                                </button>
+                              }
+                            </div>
+                          </div>
                         </td>
                       </tr>
                     }

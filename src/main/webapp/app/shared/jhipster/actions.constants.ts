@@ -90,4 +90,13 @@ export enum Action {
 
   HABILITATION_CONSULTER = 'ROLE_HABILITATION_CONSULTER',
   HABILITATION_MODIFIER = 'ROLE_HABILITATION_MODIFIER',
+
+  // ------------------------------------------------------------- espace agent
+  /**
+   * Accès à son propre espace : ses dossiers, ses ayants droit, sa carte.
+   *
+   * Portée seule, elle borne ce que l'agent voit à ce qui le concerne. Le bornage est fait au
+   * serveur : l'écran s'en sert seulement pour proposer l'espace, jamais pour le protéger.
+   */
+  ESPACE_AGENT = 'ROLE_ESPACE_AGENT',
 }

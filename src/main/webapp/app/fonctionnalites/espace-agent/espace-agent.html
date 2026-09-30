@@ -1,0 +1,191 @@
+<div class="pec-ecran">
+  <div class="pec-titre-ecran">
+    <h1 data-cy="espaceAgentHeading">Mon espace</h1>
+    @if (identite()) {
+      <span class="pec-muted">{{ identite() }}</span>
+    }
+    @if (moi(); as agent) {
+      <span class="pec-num">{{ agent.matricule }}</span>
+    }
+  </div>
+
+  <jhi-alert-error />
+  <jhi-alert />
+
+  @if (!rattache()) {
+    <!--
+      Une page vide se lirait comme une panne, et l'on chercherait du côté de l'application ce
+      qui relève de l'administration des comptes.
+    -->
+    <div class="pec-alerte pec-alerte--warn" role="status" data-cy="sansRattachement">
+      <fa-icon class="pec-alerte__ico" icon="lock" />
+      <div class="pec-alerte__corps">
+        <span class="pec-alerte__titre">Votre compte n'est rattaché à aucun agent</span>
+        <span class="pec-alerte__txt">
+          Tant qu'il ne l'est pas, cet espace n'a rien à montrer. Demandez à l'administration de rattacher votre compte à votre matricule.
+        </span>
+      </div>
+    </div>
+  } @else {
+    <div class="pec-espace">
+      <!-- Ce qu'on vient vérifier en premier : suis-je couvert, et jusqu'à quand. -->
+      <section class="pec-panneau">
+        <div class="pec-panneau__tete">
+          <span class="pec-panneau__titre">Ma couverture</span>
+        </div>
+        <div class="pec-panneau__corps">
+          <dl class="pec-defs">
+            <dt>Matricule</dt>
+            <dd class="pec-defs--mono">{{ moi()?.matricule || '—' }}</dd>
+
+            <dt>Situation</dt>
+            <dd>
+              @if (moi()) {
+                <span class="pec-badge" [ngClass]="'pec-badge--' + tonMaSituation()" data-cy="maSituation">
+                  <span class="pec-badge__pt"></span>
+                  <span>{{ libelleMaSituation() }}</span>
+                </span>
+              } @else {
+                <span class="pec-muted">—</span>
+              }
+            </dd>
+
+            <dt>Carte</dt>
+            <dd>
+              @if (carte(); as maCarte) {
+                <span class="pec-num">{{ maCarte.numeroCarte }}</span>
+                <span class="pec-badge" [ngClass]="'pec-badge--' + tonValiditeCarte()" data-cy="validiteCarte">
+                  <span class="pec-badge__pt"></span>
+                  <span>{{ libelleValiditeCarte() }}</span>
+                </span>
+                <div class="pec-muted">jusqu'au {{ maCarte.dateFinValidite | formatMediumDate }}</div>
+              } @else {
+                <span class="pec-muted">Aucune carte établie</span>
+              }
+            </dd>
+          </dl>
+        </div>
+      </section>
+
+      <!-- Les dossiers : là où l'on en est, et ce qui attend encore. -->
+      <section class="pec-panneau pec-espace__large">
+        <div class="pec-panneau__tete">
+          <span class="pec-panneau__titre">Mes prises en charge</span>
+          @if (enCours()) {
+            <span class="pec-panneau__n">{{ enCours() }} en cours</span>
+          }
+          <a class="pec-btn pec-btn--primaire pec-btn--sm" [routerLink]="['/demande-prise-en-charge/new']" data-cy="ouvrirDemande">
+            <fa-icon class="pec-btn__ico" icon="plus" />
+            <span>Ouvrir une demande</span>
+          </a>
+        </div>
+        <div class="pec-panneau__corps">
+          @if (chargement()) {
+            <span class="pec-muted">Chargement…</span>
+          } @else if (dossiers().length === 0) {
+            <span class="pec-muted">Aucune demande à ce jour.</span>
+          } @else {
+            <div class="pec-tbl-zone">
+              <table class="pec-tbl">
+                <thead>
+                  <tr>
+                    <th>Référence</th>
+                    <th>Bénéficiaire</th>
+                    <th>Ouverte le</th>
+                    <th>État</th>
+                    <th class="pec-tbl__droite"><span class="visually-hidden">Actions</span></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (dossier of dossiers(); track dossier.id) {
+                    <tr data-cy="monDossier">
+                      <td>
+                        <a class="pec-num" [routerLink]="['/demande-prise-en-charge', dossier.id, 'view']">{{ dossier.reference }}</a>
+                      </td>
+                      <td>
+                        @if (dossier.ayantDroit) {
+                          {{ dossier.ayantDroit.nom }}
+                        } @else {
+                          Moi-même
+                        }
+                      </td>
+                      <td class="pec-tbl__num">{{ dossier.dateCreation | formatMediumDatetime }}</td>
+                      <td>
+                        <span class="pec-badge pec-badge--info">
+                          <span class="pec-badge__pt"></span>
+                          <span [jhiTranslate]="'peccnssApp.StatutDemande.' + (dossier.statut ?? 'null')">{{ dossier.statut }}</span>
+                        </span>
+                      </td>
+                      <td class="pec-tbl__droite">
+                        <a class="pec-btn pec-btn--discret pec-btn--sm" [routerLink]="['/demande-prise-en-charge', dossier.id, 'view']">
+                          <span>Ouvrir</span>
+                        </a>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+            <a class="pec-muted" [routerLink]="['/demande-prise-en-charge']">Voir toutes mes demandes</a>
+          }
+        </div>
+      </section>
+
+      <!-- Qui d'autre est couvert par mon rattachement. -->
+      <section class="pec-panneau pec-espace__large">
+        <div class="pec-panneau__tete">
+          <span class="pec-panneau__titre">Mes ayants droit</span>
+          @if (ayantsDroit().length) {
+            <span class="pec-panneau__n">{{ ayantsDroit().length }}</span>
+          }
+        </div>
+        <div class="pec-panneau__corps">
+          @if (ayantsDroit().length === 0) {
+            <span class="pec-muted">Aucun ayant droit rattaché. Le rattachement se demande auprès des ressources humaines.</span>
+          } @else {
+            <div class="pec-tbl-zone">
+              <table class="pec-tbl">
+                <thead>
+                  <tr>
+                    <th>Nom</th>
+                    <th>Lien de parenté</th>
+                    <th>Situation</th>
+                    <th>Rattachement</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (ayantDroit of ayantsDroit(); track ayantDroit.id) {
+                    <tr data-cy="monAyantDroit">
+                      <td>
+                        <a [routerLink]="['/ayant-droit', ayantDroit.id, 'view']">{{ ayantDroit.prenom }} {{ ayantDroit.nom }}</a>
+                      </td>
+                      <td>
+                        <span [jhiTranslate]="'peccnssApp.LienParente.' + (ayantDroit.lien ?? 'null')">{{ ayantDroit.lien }}</span>
+                      </td>
+                      <td>
+                        <span class="pec-badge" [ngClass]="'pec-badge--' + tonStatutAyantDroit(ayantDroit)">
+                          <span class="pec-badge__pt"></span>
+                          <span>{{ libelleStatutAyantDroit(ayantDroit) }}</span>
+                        </span>
+                      </td>
+                      <td>
+                        <!--
+                          Un rattachement non vérifié ne fonde aucune prise en charge : le dire
+                          ici évite de découvrir le refus au moment d'ouvrir un dossier.
+                        -->
+                        <span class="pec-badge" [ngClass]="'pec-badge--' + tonValidationAyantDroit(ayantDroit)">
+                          <span class="pec-badge__pt"></span>
+                          <span>{{ libelleValidationAyantDroit(ayantDroit) }}</span>
+                        </span>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      </section>
+    </div>
+  }
+</div>

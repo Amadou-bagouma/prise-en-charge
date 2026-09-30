@@ -1,9 +1,11 @@
 package com.mycompany.myapp.service;
 
 import com.mycompany.myapp.config.Constants;
+import com.mycompany.myapp.domain.Agent;
 import com.mycompany.myapp.domain.Authority;
 import com.mycompany.myapp.domain.Profil;
 import com.mycompany.myapp.domain.User;
+import com.mycompany.myapp.repository.AgentRepository;
 import com.mycompany.myapp.repository.AuthorityRepository;
 import com.mycompany.myapp.repository.ProfilRepository;
 import com.mycompany.myapp.repository.UserRepository;
@@ -45,6 +47,8 @@ public class UserService {
 
     private final ProfilRepository profilRepository;
 
+    private final AgentRepository agentRepository;
+
     private final CacheManager cacheManager;
 
     private final DemandePriseEnChargeService demandePriseEnChargeService;
@@ -54,6 +58,7 @@ public class UserService {
         PasswordEncoder passwordEncoder,
         AuthorityRepository authorityRepository,
         ProfilRepository profilRepository,
+        AgentRepository agentRepository,
         CacheManager cacheManager,
         DemandePriseEnChargeService demandePriseEnChargeService
     ) {
@@ -61,6 +66,7 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
         this.authorityRepository = authorityRepository;
         this.profilRepository = profilRepository;
+        this.agentRepository = agentRepository;
         this.cacheManager = cacheManager;
         this.demandePriseEnChargeService = demandePriseEnChargeService;
     }
@@ -188,6 +194,7 @@ public class UserService {
         user.setActivated(true);
         Profil profil = resolveProfilOrThrow(userDTO);
         user.setProfil(profil);
+        user.setAgent(resoudreAgent(userDTO, null));
         Set<String> nouvellesAutorites = profil.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet());
         user.setAuthorities(new HashSet<>(profil.getAuthorities()));
         userRepository.save(user);
@@ -207,6 +214,41 @@ public class UserService {
         return profilRepository
             .findOneWithAuthoritiesById(userDTO.getProfil().getId())
             .orElseThrow(() -> new BadRequestAlertException("Profil introuvable", "userManagement", "profil.introuvable"));
+    }
+
+    /**
+     * L'agent dont ce compte est l'acces personnel, s'il en est un.
+     *
+     * <p>Facultatif : un compte sans agent est celui du personnel administratif, qui instruit les
+     * dossiers des autres. Le rattachement est verifie plutot que pris au mot : un identifiant
+     * inexistant poserait un espace personnel qui ne montrerait jamais rien, sans que rien ne
+     * l'explique.
+     *
+     * <p>Unique : un agent n'a qu'un acces. Deux comptes pour la meme personne rendraient son
+     * historique illisible, et l'on ne saurait plus lequel a agi.
+     *
+     * @param userDTO le compte tel que l'administration l'a saisi.
+     * @param compteCourant l'identifiant du compte modifie, ou {@code null} a la creation.
+     */
+    private Agent resoudreAgent(AdminUserDTO userDTO, Long compteCourant) {
+        if (userDTO.getAgent() == null || userDTO.getAgent().getId() == null) {
+            return null;
+        }
+        Long agentId = userDTO.getAgent().getId();
+        Agent agent = agentRepository
+            .findById(agentId)
+            .orElseThrow(() -> new BadRequestAlertException("Agent introuvable", "userManagement", "agent.introuvable"));
+        userRepository
+            .findOneByAgentId(agentId)
+            .filter(deja -> !deja.getId().equals(compteCourant))
+            .ifPresent(deja -> {
+                throw new BadRequestAlertException(
+                    "Cet agent a deja un acces : le compte " + deja.getLogin(),
+                    "userManagement",
+                    "agent.dejarattache"
+                );
+            });
+        return agent;
     }
 
     /**
@@ -234,6 +276,7 @@ public class UserService {
                 user.setLangKey(userDTO.getLangKey());
                 Profil profil = resolveProfilOrThrow(userDTO);
                 user.setProfil(profil);
+                user.setAgent(resoudreAgent(userDTO, user.getId()));
                 Set<Authority> managedAuthorities = user.getAuthorities();
                 managedAuthorities.clear();
                 managedAuthorities.addAll(profil.getAuthorities());

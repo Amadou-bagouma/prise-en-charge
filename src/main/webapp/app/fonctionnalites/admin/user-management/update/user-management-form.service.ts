@@ -31,7 +31,7 @@ type NewUserManagementFormRawValue = FormValueOf<NewUserManagement>;
 
 type UserManagementFormDefaults = Pick<
   NewUserManagement,
-  'login' | 'activated' | 'langKey' | 'createdDate' | 'lastModifiedDate' | 'profil'
+  'login' | 'activated' | 'langKey' | 'createdDate' | 'lastModifiedDate' | 'profil' | 'agent'
 >;
 
 type UserManagementFormGroupContent = {
@@ -50,6 +50,7 @@ type UserManagementFormGroupContent = {
   lastModifiedBy: FormControl<UserManagementFormRawValue['lastModifiedBy']>;
   lastModifiedDate: FormControl<UserManagementFormRawValue['lastModifiedDate']>;
   profil: FormControl<UserManagementFormRawValue['profil']>;
+  agent: FormControl<UserManagementFormRawValue['agent']>;
 };
 
 export type UserManagementFormGroup = FormGroup<UserManagementFormGroupContent>;
@@ -97,6 +98,9 @@ export class UserManagementFormService {
       profil: new FormControl(userManagementRawValue.profil, {
         validators: [Validators.required],
       }),
+      // Facultatif : la plupart des comptes sont ceux du personnel administratif, qui instruit
+      // les dossiers des autres sans etre lui-meme beneficiaire.
+      agent: new FormControl(userManagementRawValue.agent ?? null),
     });
   }
 
@@ -121,6 +125,7 @@ export class UserManagementFormService {
       createdDate: currentTime,
       lastModifiedDate: currentTime,
       profil: null,
+      agent: null,
     };
   }
 
@@ -142,6 +147,7 @@ export class UserManagementFormService {
       createdDate: userManagement.createdDate ? userManagement.createdDate.format(DATE_TIME_FORMAT) : undefined,
       lastModifiedDate: userManagement.lastModifiedDate ? userManagement.lastModifiedDate.format(DATE_TIME_FORMAT) : undefined,
       profil: userManagement.profil ?? null,
+      agent: userManagement.agent ?? null,
     };
   }
 }

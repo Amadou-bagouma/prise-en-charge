@@ -176,6 +176,12 @@ public class InitData {
         HABILITATIONS.put(ActionsConstants.PROFIL_SUPPRIMER, "Supprimer un profil qui n'est attribue a personne.");
         HABILITATIONS.put(ActionsConstants.HABILITATION_CONSULTER, "Consulter le referentiel des habilitations.");
         HABILITATIONS.put(ActionsConstants.HABILITATION_MODIFIER, "Modifier le libelle d'une habilitation.");
+
+        // ---------------------------------------------------------- espace agent
+        HABILITATIONS.put(
+            ActionsConstants.ESPACE_AGENT,
+            "Acceder a son propre espace : ses dossiers, ses ayants droit, sa carte. Portee seule, elle borne ce que l'agent voit a ce qui le concerne."
+        );
     }
 
     /**
@@ -335,6 +341,45 @@ public class InitData {
                     ActionsConstants.CARTE_MODIFIER,
                     ActionsConstants.CARTE_SUPPRIMER,
                     ActionsConstants.CARTE_IMPRIMER
+                )
+            )
+        ),
+        new ProfilType(
+            "Agent",
+            "Acces d'un agent a son propre espace : ses dossiers, ses ayants droit, sa carte.",
+            concatener(
+                // Pas le socle entier : un agent n'a ni boite de reception ni taches. Les lui
+                // ouvrir afficherait deux ecrans vides, qu'il prendrait pour une panne.
+                List.of(
+                    AuthoritiesConstants.USER,
+                    ActionsConstants.NOTIFICATION_CONSULTER,
+                    ActionsConstants.NOTIFICATION_MARQUER_LUE,
+                    ActionsConstants.HISTORIQUE_CONSULTER
+                ),
+                List.of(
+                    // C'est elle qui borne : sans les habilitations de consultation d'ensemble,
+                    // l'agent ne voit que ce qui le concerne. Voir PerimetreAgent.
+                    ActionsConstants.ESPACE_AGENT,
+                    ActionsConstants.AGENT_CONSULTER,
+                    ActionsConstants.AYANT_DROIT_CONSULTER,
+                    ActionsConstants.CARTE_CONSULTER,
+                    ActionsConstants.CARTE_IMPRIMER,
+                    // Le referentiel lui sert a designer un etablissement et un type de soin :
+                    // sans lui, le formulaire d'ouverture de dossier serait vide.
+                    ActionsConstants.REFERENTIEL_CONSULTER,
+                    ActionsConstants.DEMANDE_CONSULTER,
+                    ActionsConstants.DEMANDE_CREER,
+                    ActionsConstants.DEMANDE_MODIFIER,
+                    ActionsConstants.DEMANDE_SUPPRIMER,
+                    ActionsConstants.DEMANDE_SOUMETTRE,
+                    ActionsConstants.DEMANDE_RESOUMETTRE,
+                    ActionsConstants.DEMANDE_ANNULER,
+                    ActionsConstants.DEMANDE_IMPRIMER,
+                    ActionsConstants.DEMANDE_NOTIFIER,
+                    ActionsConstants.PIECE_CONSULTER,
+                    ActionsConstants.PIECE_AJOUTER,
+                    ActionsConstants.PIECE_MODIFIER,
+                    ActionsConstants.PIECE_SUPPRIMER
                 )
             )
         ),

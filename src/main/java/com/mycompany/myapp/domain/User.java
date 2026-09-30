@@ -120,6 +120,21 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
     private Profil profil;
 
+    /**
+     * L'agent dont ce compte est l'acces personnel, s'il en est un.
+     *
+     * <p>Sans ce rattachement, rien ne permet de savoir quel agent se cache derriere un compte
+     * connecte : son espace personnel lui montrerait tous les agents au lieu de lui seul, ce qui
+     * serait pire que de ne rien lui montrer.
+     *
+     * <p>Facultatif, et unique : la plupart des comptes sont ceux du personnel administratif, qui
+     * instruit les dossiers des autres sans etre lui-meme beneficiaire, et un agent n'a qu'un
+     * acces - deux comptes pour la meme personne rendraient son historique illisible.
+     */
+    @ManyToOne
+    @JoinColumn(name = "agent_id", unique = true)
+    private Agent agent;
+
     @JsonIgnore
     @ManyToMany
     @JoinTable(
@@ -266,6 +281,14 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
 
     public void setProfil(Profil profil) {
         this.profil = profil;
+    }
+
+    public Agent getAgent() {
+        return agent;
+    }
+
+    public void setAgent(Agent agent) {
+        this.agent = agent;
     }
 
     @Override

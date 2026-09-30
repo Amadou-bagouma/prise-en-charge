@@ -2126,3 +2126,26 @@ Formulaires : lecture en deux colonnes, champs groupés, barre d'actions collant
 .pec-compte__droits li {
   margin-bottom: 0.2rem;
 }
+
+/* ------------------------------------------------------------------------- *
+   Espace de l'agent
+
+   Sa couverture d'abord — c'est ce qu'il vient vérifier — puis ses dossiers et
+   ses ayants droit, qui ont besoin de toute la largeur pour rester lisibles.
+ * ------------------------------------------------------------------------- */
+.pec-espace {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+
+.pec-espace__large {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 62rem) {
+  .pec-espace {
+    grid-template-columns: 1fr;
+  }
+}

@@ -5,6 +5,7 @@ import com.mycompany.myapp.security.ActionsConstants;
 import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.service.CarteBeneficiaireQueryService;
 import com.mycompany.myapp.service.CarteBeneficiaireService;
+import com.mycompany.myapp.service.PerimetreAgent;
 import com.mycompany.myapp.service.criteria.CarteBeneficiaireCriteria;
 import com.mycompany.myapp.service.dto.CarteBeneficiaireDTO;
 import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
@@ -25,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import tech.jhipster.service.filter.LongFilter;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
@@ -43,6 +45,8 @@ public class CarteBeneficiaireResource {
     @Value("${jhipster.clientApp.name:peccnss}")
     private String applicationName;
 
+    private final PerimetreAgent perimetreAgent;
+
     private final CarteBeneficiaireService carteBeneficiaireService;
 
     private final CarteBeneficiaireRepository carteBeneficiaireRepository;
@@ -52,8 +56,10 @@ public class CarteBeneficiaireResource {
     public CarteBeneficiaireResource(
         CarteBeneficiaireService carteBeneficiaireService,
         CarteBeneficiaireRepository carteBeneficiaireRepository,
-        CarteBeneficiaireQueryService carteBeneficiaireQueryService
+        CarteBeneficiaireQueryService carteBeneficiaireQueryService,
+        PerimetreAgent perimetreAgent
     ) {
+        this.perimetreAgent = perimetreAgent;
         this.carteBeneficiaireService = carteBeneficiaireService;
         this.carteBeneficiaireRepository = carteBeneficiaireRepository;
         this.carteBeneficiaireQueryService = carteBeneficiaireQueryService;
@@ -165,6 +171,13 @@ public class CarteBeneficiaireResource {
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
     ) {
         LOG.debug("REST request to get CarteBeneficiaires by criteria: {}", criteria);
+        // Un agent connecte a son espace ne voit que ce qui le concerne : le critere est impose
+        // ici, apres celui que l'appelant a pu envoyer, de sorte qu'il ne puisse pas l'elargir.
+        perimetreAgent.agentDuCompteCourant().ifPresent(sien -> {
+            LongFilter siens = new LongFilter();
+            siens.setEquals(sien);
+            criteria.setAgentId(siens);
+        });
 
         Page<CarteBeneficiaireDTO> page = carteBeneficiaireQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
@@ -181,6 +194,13 @@ public class CarteBeneficiaireResource {
     @PreAuthorize("hasAnyAuthority('" + ActionsConstants.CARTE_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<Long> countCarteBeneficiaires(CarteBeneficiaireCriteria criteria) {
         LOG.debug("REST request to count CarteBeneficiaires by criteria: {}", criteria);
+        // Un agent connecte a son espace ne voit que ce qui le concerne : le critere est impose
+        // ici, apres celui que l'appelant a pu envoyer, de sorte qu'il ne puisse pas l'elargir.
+        perimetreAgent.agentDuCompteCourant().ifPresent(sien -> {
+            LongFilter siens = new LongFilter();
+            siens.setEquals(sien);
+            criteria.setAgentId(siens);
+        });
         return ResponseEntity.ok().body(carteBeneficiaireQueryService.countByCriteria(criteria));
     }
 
@@ -194,6 +214,10 @@ public class CarteBeneficiaireResource {
     @PreAuthorize("hasAnyAuthority('" + ActionsConstants.CARTE_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<CarteBeneficiaireDTO> getCarteBeneficiaire(@PathVariable("id") Long id) {
         LOG.debug("REST request to get CarteBeneficiaire : {}", id);
+        // Une adresse tapee a la main ne doit pas ouvrir la fiche d'un autre.
+        carteBeneficiaireService
+            .findOne(id)
+            .ifPresent(carte -> perimetreAgent.exigerDansLePerimetre(carte.getAgent() == null ? null : carte.getAgent().getId()));
         Optional<CarteBeneficiaireDTO> carteBeneficiaireDTO = carteBeneficiaireService.findOne(id);
         return ResponseUtil.wrapOrNotFound(carteBeneficiaireDTO);
     }

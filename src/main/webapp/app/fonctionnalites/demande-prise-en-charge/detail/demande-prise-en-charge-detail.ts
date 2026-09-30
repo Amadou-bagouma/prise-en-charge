@@ -3,6 +3,7 @@ import { Component, computed, effect, inject, input, signal } from '@angular/cor
 import { Router, RouterLink } from '@angular/router';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { NgbDropdown, NgbDropdownItem, NgbDropdownMenu, NgbDropdownToggle } from '@ng-bootstrap/ng-bootstrap/dropdown';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap/modal';
 import { catchError, filter, of, tap } from 'rxjs';
 
@@ -50,7 +51,19 @@ const ETAPES_CIRCUIT: { libelle: string; statuts: string[] }[] = [
 @Component({
   selector: 'jhi-demande-prise-en-charge-detail',
   templateUrl: './demande-prise-en-charge-detail.html',
-  imports: [NgClass, FontAwesomeModule, Alert, AlertError, TranslateDirective, RouterLink, FormatMediumDatetimePipe],
+  imports: [
+    NgClass,
+    FontAwesomeModule,
+    Alert,
+    AlertError,
+    TranslateDirective,
+    RouterLink,
+    FormatMediumDatetimePipe,
+    NgbDropdown,
+    NgbDropdownItem,
+    NgbDropdownMenu,
+    NgbDropdownToggle,
+  ],
 })
 export class DemandePriseEnChargeDetail {
   readonly demandePriseEnCharge = input<IDemandePriseEnCharge | null>(null);

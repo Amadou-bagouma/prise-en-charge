@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Un compte peut etre l'acces personnel d'un agent.
+
+        Le rattachement avait ete retire par 20260916170000_drop_agent_user.xml, au motif qu'il
+        n'etait lu nulle part. Il le redevient : sans lui, rien ne permet de savoir quel agent se
+        cache derriere un compte connecte, et son espace personnel lui montrerait tous les agents
+        au lieu de lui seul.
+
+        Il est porte par le compte et non par l'agent : c'est en partant du compte connecte qu'on
+        a besoin de la reponse, et l'agent reste une fiche du referentiel, qui existe qu'un acces
+        lui soit ouvert ou non.
+
+        Facultatif : la plupart des comptes sont ceux du personnel administratif, qui instruit les
+        dossiers des autres sans etre lui-meme beneficiaire.
+
+        Unique : deux comptes pour la meme personne rendraient son historique illisible, et l'on
+        ne saurait plus lequel a agi.
+    -->
+    <changeSet id="20260930100000-1" author="cnss">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="jhi_user" columnName="agent_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="jhi_user">
+            <column name="agent_id" type="bigint">
+                <constraints nullable="true" unique="true" uniqueConstraintName="ux_jhi_user__agent_id"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20260930100000-2" author="cnss">
+        <addForeignKeyConstraint
+            baseColumnNames="agent_id"
+            baseTableName="jhi_user"
+            constraintName="fk_jhi_user__agent_id"
+            referencedColumnNames="id"
+            referencedTableName="agent"
+            onDelete="SET NULL"/>
+    </changeSet>
+</databaseChangeLog>

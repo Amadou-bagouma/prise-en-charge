@@ -11,6 +11,8 @@ import { environment } from 'environments/environment';
 
 import { LANGUAGES } from 'app/config';
 import { AccountService, StateStorageService } from 'app/core/auth';
+import { Action } from 'app/shared/jhipster/actions.constants';
+import { Authority } from 'app/shared/jhipster/constants';
 import { ChargeTravailService } from 'app/layouts/charge-travail.service';
 import { LayoutService } from 'app/layouts/layout.service';
 import { ClocheNotifications } from 'app/layouts/notifications/cloche-notifications';
@@ -60,10 +62,23 @@ export default class Navbar implements OnInit {
   readonly languages = LANGUAGES;
   readonly openAPIEnabled = signal(false);
   readonly version: string;
-  readonly account = inject(AccountService).account;
+  protected readonly accountService = inject(AccountService);
+  // eslint-disable-next-line @typescript-eslint/member-ordering
+  readonly account = this.accountService.account;
 
   readonly layoutService = inject(LayoutService);
   readonly chargeTravail = inject(ChargeTravailService);
+
+  /**
+   * Vrai pour un compte qui n'a acces qu'a son propre espace.
+   *
+   * Sert a retirer du menu ce qui ne le concerne pas. Il ne protege rien : le serveur borne
+   * deja ce que chaque ecran rapporte.
+   */
+  // eslint-disable-next-line @typescript-eslint/member-ordering
+  readonly estAgent = computed(
+    () => this.accountService.hasAnyAuthority(Action.ESPACE_AGENT) && !this.accountService.hasAnyAuthority(Authority.ADMIN),
+  );
 
   private readonly loginService = inject(LoginService);
   private readonly translateService = inject(TranslateService);

@@ -86,6 +86,13 @@ const routes: Routes = [
     title: 'peccnssApp.carteBeneficiaire.home.title',
     loadChildren: () => import('./carte-beneficiaire/carte-beneficiaire.routes'),
   },
+  {
+    // L'espace d'un agent : ses dossiers, ses ayants droit, sa carte. Le serveur borne deja ce
+    // que les listes lui rapportent ; cet ecran les rassemble en une page.
+    path: 'mon-espace',
+    title: 'Mon espace',
+    loadChildren: () => import('./espace-agent/espace-agent.routes'),
+  },
   // jhipster-needle-add-entity-route - JHipster will add entity modules routes here
 ];
 
