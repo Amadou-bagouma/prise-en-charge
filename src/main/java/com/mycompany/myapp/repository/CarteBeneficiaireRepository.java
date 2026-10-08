@@ -42,8 +42,9 @@ public interface CarteBeneficiaireRepository extends JpaRepository<CarteBenefici
     )
     Optional<CarteBeneficiaire> findOneWithToOneRelationships(@Param("id") Long id);
 
-    @Query(value = "select nextval('carte_beneficiaire_numero_seq')", nativeQuery = true)
-    long nextNumeroSequenceValue();
+    /** Les numeros deja portes par les cartes commencant ainsi (ceux des ayants droit d'un agent). */
+    @Query("select distinct c.numeroCarte from CarteBeneficiaire c where c.numeroCarte like concat(:prefixe, '%')")
+    List<String> findNumerosCommencantPar(@Param("prefixe") String prefixe);
 
     /** Les cartes deja etablies pour cet agent, de la plus recente a la plus ancienne. */
     List<CarteBeneficiaire> findByAgentIdOrderByDateFinValiditeDesc(Long agentId);

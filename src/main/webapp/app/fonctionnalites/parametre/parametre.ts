@@ -43,6 +43,9 @@ export class Parametre {
 
   readonly accept = TYPES_IMAGE.join(',');
 
+  /** L'aperçu de chaque image déposée, par code de réglage. */
+  readonly images = signal<Record<string, string>>({});
+
   protected readonly parametreService = inject(ParametreService);
 
   constructor() {
@@ -55,16 +58,18 @@ export class Parametre {
       next: parametres => {
         this.parametres.set(parametres);
         this.chargement.set(false);
+        parametres.filter(p => p.valeurBinaireContentType).forEach(p => this.chargerImage(p.code));
       },
       error: () => this.chargement.set(false),
     });
   }
 
-  /** L'adresse de l'image d'un réglage, pour l'afficher telle qu'elle s'imprimera. */
-  urlImage(parametre: IParametre): string {
-    // L'horodatage force le navigateur à recharger après un dépôt : sans lui, il rendrait
-    // l'image précédente, et l'on croirait le dépôt sans effet.
-    return `${this.parametreService.urlImage(parametre.code)}?v=${this.enregistre() === parametre.id ? Date.now() : 0}`;
+  /**
+   * L'image d'un réglage, pour l'afficher telle qu'elle s'imprimera : `undefined` tant qu'elle
+   * se charge, vide si elle n'a pas pu l'être.
+   */
+  apercu(parametre: IParametre): string | undefined {
+    return this.images()[parametre.code];
   }
 
   enregistrer(parametre: IParametre): void {
@@ -75,6 +80,11 @@ export class Parametre {
         this.enregistrement.set(null);
         this.enregistre.set(misAJour.id);
         this.parametres.update(liste => liste.map(p => (p.id === misAJour.id ? { ...misAJour, valeurBinaire: null } : p)));
+        // Recharger l'aperçu après un dépôt : sans cela, l'écran montrerait l'image précédente,
+        // et l'on croirait le dépôt sans effet.
+        if (misAJour.valeurBinaireContentType) {
+          this.chargerImage(misAJour.code);
+        }
       },
       // Le refus — un nombre attendu, une valeur négative — est affiché par jhi-alert-error.
       error: () => this.enregistrement.set(null),
@@ -106,7 +116,7 @@ export class Parametre {
     const lecteur = new FileReader();
     lecteur.onload = () => {
       // `readAsDataURL` rend « data:<type>;base64,<contenu> » : seule la part encodée est envoyée.
-      const resultat = String(lecteur.result ?? '');
+      const resultat = typeof lecteur.result === 'string' ? lecteur.result : '';
       this.enregistrer({
         ...parametre,
         valeurBinaire: resultat.slice(resultat.indexOf(',') + 1),
@@ -115,5 +125,16 @@ export class Parametre {
     };
     lecteur.onerror = () => this.refus.set("Ce fichier n'a pas pu être lu.");
     lecteur.readAsDataURL(fichier);
+  }
+
+  /**
+   * Charge l'aperçu d'une image avec le jeton de connexion : une balise `<img>` pointée sur
+   * l'adresse de l'image partirait sans lui, et le serveur la refuserait.
+   */
+  private chargerImage(code: string): void {
+    this.parametreService.imageEnDonnees(code).subscribe({
+      next: image => this.images.update(images => ({ ...images, [code]: image })),
+      error: () => this.images.update(images => ({ ...images, [code]: '' })),
+    });
   }
 }

@@ -67,7 +67,15 @@ public class EtablissementSanteResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_CREER + "', '" + AuthoritiesConstants.ADMIN + "')")
+    @PreAuthorize(
+        "hasAnyAuthority('" +
+            ActionsConstants.REFERENTIEL_CREER +
+            "', '" +
+            ActionsConstants.ETABLISSEMENT_CREER +
+            "', '" +
+            AuthoritiesConstants.ADMIN +
+            "')"
+    )
     public ResponseEntity<EtablissementSanteDTO> createEtablissementSante(@Valid @RequestBody EtablissementSanteDTO etablissementSanteDTO)
         throws URISyntaxException {
         LOG.debug("REST request to save EtablissementSante : {}", etablissementSanteDTO);

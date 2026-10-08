@@ -3,6 +3,7 @@ package com.mycompany.myapp.service.impl;
 import com.mycompany.myapp.domain.Agent;
 import com.mycompany.myapp.domain.AyantDroit;
 import com.mycompany.myapp.domain.CarteBeneficiaire;
+import com.mycompany.myapp.domain.enumeration.LienParente;
 import com.mycompany.myapp.domain.enumeration.StatutValidationAyantDroit;
 import com.mycompany.myapp.domain.enumeration.TypeBeneficiaire;
 import com.mycompany.myapp.repository.AgentRepository;
@@ -77,8 +78,11 @@ public class CarteBeneficiaireServiceImpl implements CarteBeneficiaireService {
         return parametres.entier(Parametres.VALIDITE_CARTE_ANNEES, VALIDITE_ANNEES_PAR_DEFAUT);
     }
 
-    /** Prefixe du numero de carte, pour qu'il se reconnaisse hors de l'application. */
-    private static final String PREFIXE_NUMERO = "CNSS";
+    /**
+     * Le rang de l'ayant droit suit le matricule sans separateur : 1234201. Les matricules
+     * ont tous quatre chiffres, la frontiere entre les deux ne peut donc pas preter a confusion.
+     */
+    private static final String SEPARATEUR_RANG = "";
 
     @Override
     public CarteBeneficiaireDTO generer(TypeBeneficiaire typeBeneficiaire, Long beneficiaireId) {
@@ -93,7 +97,14 @@ public class CarteBeneficiaireServiceImpl implements CarteBeneficiaireService {
             Agent agent = agentRepository
                 .findById(beneficiaireId)
                 .orElseThrow(() -> new BadRequestAlertException("Cet agent n'existe pas", ENTITY_NAME, "agent.introuvable"));
-            exigerAucuneCarteValide(carteBeneficiaireRepository.findByAgentIdOrderByDateFinValiditeDesc(beneficiaireId));
+            // Les cartes de ses ayants droit sont aussi rattachees a l'agent : seules les siennes comptent.
+            exigerAucuneCarteValide(
+                carteBeneficiaireRepository
+                    .findByAgentIdOrderByDateFinValiditeDesc(beneficiaireId)
+                    .stream()
+                    .filter(existante -> existante.getAyantDroit() == null)
+                    .toList()
+            );
             carte.setAgent(agent);
         } else {
             AyantDroit ayantDroit = ayantDroitRepository
@@ -114,7 +125,7 @@ public class CarteBeneficiaireServiceImpl implements CarteBeneficiaireService {
         }
 
         LocalDate aujourdhui = LocalDate.now(ZoneId.systemDefault());
-        carte.setNumeroCarte(genererNumero(aujourdhui));
+        carte.setNumeroCarte(genererNumero(carte));
         carte.setDateEmission(aujourdhui);
         carte.setDateDebutValidite(aujourdhui);
         carte.setDateFinValidite(aujourdhui.plusYears(validiteAnnees()));
@@ -152,7 +163,8 @@ public class CarteBeneficiaireServiceImpl implements CarteBeneficiaireService {
         duplicata.setTypeBeneficiaire(perdue.getTypeBeneficiaire());
         duplicata.setAgent(perdue.getAgent());
         duplicata.setAyantDroit(perdue.getAyantDroit());
-        duplicata.setNumeroCarte(genererNumero(aujourdhui));
+        // Meme titulaire, meme numero : seule la periode de validite distingue le duplicata.
+        duplicata.setNumeroCarte(perdue.getNumeroCarte());
         duplicata.setDateEmission(aujourdhui);
         duplicata.setDateDebutValidite(aujourdhui);
         duplicata.setDateFinValidite(terme);
@@ -191,15 +203,51 @@ public class CarteBeneficiaireServiceImpl implements CarteBeneficiaireService {
     }
 
     /**
-     * Le numero : prefixe, annee, et un rang qui ne se repete pas.
+     * Le numero : le matricule de l'agent, suivi pour un ayant droit d'un rang dans sa famille.
      *
-     * <p>Pose par le serveur et non saisi : deux cartes pouvaient porter le meme numero, et
-     * c'est au guichet qu'on l'aurait decouvert. Le rang vient d'une sequence dediee, pour que
-     * les numeros se suivent - un numero de carte se lit, se recopie et se dicte.
+     * <p>Agent : 1234. Conjoints : 1234201, 1234202... Enfants : 1234301, 1234302...
+     * Autres ayants droit : 1234401... Un ayant droit qui a deja eu une carte garde son
+     * numero ; un nouveau prend le rang suivant le plus haut deja attribue, pour qu'un numero
+     * ne passe jamais d'une personne a une autre.
      */
-    private String genererNumero(LocalDate jour) {
-        long rang = carteBeneficiaireRepository.nextNumeroSequenceValue();
-        return "%s-%d-%06d".formatted(PREFIXE_NUMERO, jour.getYear(), rang);
+    private String genererNumero(CarteBeneficiaire carte) {
+        Agent agent = carte.getAgent();
+        String matricule = agent == null ? null : agent.getMatricule();
+        if (matricule == null || matricule.isBlank()) {
+            throw new BadRequestAlertException("L'agent n'a pas de matricule", ENTITY_NAME, "agent.matricule");
+        }
+        matricule = matricule.trim();
+        AyantDroit ayantDroit = carte.getAyantDroit();
+        if (ayantDroit == null) {
+            return matricule;
+        }
+
+        Optional<String> numeroAttribue = carteBeneficiaireRepository
+            .findByAyantDroitIdOrderByDateFinValiditeDesc(ayantDroit.getId())
+            .stream()
+            .map(CarteBeneficiaire::getNumeroCarte)
+            .filter(numero -> numero != null && !numero.isBlank())
+            .findFirst();
+        if (numeroAttribue.isPresent()) {
+            return numeroAttribue.orElseThrow();
+        }
+
+        LienParente lien = ayantDroit.getLien();
+        int base = lien == LienParente.CONJOINT ? 200 : lien == LienParente.ENFANT ? 300 : 400;
+        String prefixe = matricule + SEPARATEUR_RANG;
+        int plusHaut = carteBeneficiaireRepository
+            .findNumerosCommencantPar(prefixe)
+            .stream()
+            .map(numero -> numero.substring(prefixe.length()))
+            .filter(rang -> rang.matches("\\d{3}"))
+            .mapToInt(Integer::parseInt)
+            .filter(rang -> rang > base && rang < base + 100)
+            .max()
+            .orElse(base);
+        if (plusHaut >= base + 99) {
+            throw new BadRequestAlertException("Plus aucun rang libre pour cet ayant droit", ENTITY_NAME, "carte.rang");
+        }
+        return prefixe + (plusHaut + 1);
     }
 
     @Override

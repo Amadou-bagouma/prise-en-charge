@@ -160,6 +160,8 @@ public class InitData {
         HABILITATIONS.put(ActionsConstants.REFERENTIEL_CREER, "Ajouter une entree a un referentiel.");
         HABILITATIONS.put(ActionsConstants.REFERENTIEL_MODIFIER, "Corriger une entree d'un referentiel.");
         HABILITATIONS.put(ActionsConstants.REFERENTIEL_SUPPRIMER, "Supprimer une entree d'un referentiel.");
+        HABILITATIONS.put(ActionsConstants.ETABLISSEMENT_CREER, "Ajouter un etablissement de sante, sans toucher aux autres referentiels.");
+        HABILITATIONS.put(ActionsConstants.DIRECTION_CREER, "Ajouter une direction, sans toucher aux autres referentiels.");
 
         // --------------------------------------------------------- administration
         HABILITATIONS.put(ActionsConstants.UTILISATEUR_CONSULTER, "Consulter les comptes d'acces a l'application.");
@@ -388,6 +390,55 @@ public class InitData {
             )
         ),
         new ProfilType(
+            "Agent de Saisie",
+            "Saisit les demandes de prise en charge, et les agents, ayants droit et etablissements de sante qu'elles requierent.",
+            concatener(
+                SOCLE,
+                List.of(
+                    // Pas d'espace agent ici : porte par un compte de saisie, il bornerait ce
+                    // compte a son propre dossier, et la saisie pour les autres deviendrait impossible.
+                    ActionsConstants.AGENT_CONSULTER,
+                    ActionsConstants.AGENT_CREER,
+                    ActionsConstants.AGENT_MODIFIER,
+                    ActionsConstants.AGENT_SUPPRIMER,
+                    ActionsConstants.AYANT_DROIT_CONSULTER,
+                    ActionsConstants.AYANT_DROIT_CREER,
+                    ActionsConstants.AYANT_DROIT_MODIFIER,
+                    ActionsConstants.AYANT_DROIT_SUPPRIMER,
+                    // Le formulaire de demande y choisit l'etablissement et le type de soin.
+                    ActionsConstants.REFERENTIEL_CONSULTER,
+                    ActionsConstants.ETABLISSEMENT_CREER,
+                    ActionsConstants.DEMANDE_CONSULTER,
+                    ActionsConstants.DEMANDE_CREER,
+                    ActionsConstants.DEMANDE_MODIFIER,
+                    ActionsConstants.DEMANDE_SOUMETTRE,
+                    ActionsConstants.PIECE_CONSULTER,
+                    ActionsConstants.PIECE_AJOUTER,
+                    ActionsConstants.PIECE_MODIFIER
+                )
+            )
+        ),
+        new ProfilType(
+            "Agent de Saisie prod",
+            "Saisit les agents et les ayants droit de toute l'institution, et rien d'autre.",
+            List.of(
+                // Pas le socle : sans demande a traiter, la boite et les taches seraient deux
+                // ecrans vides. Pas d'espace agent non plus : il bornerait le compte a son dossier.
+                AuthoritiesConstants.USER,
+                ActionsConstants.AGENT_CONSULTER,
+                ActionsConstants.AGENT_CREER,
+                ActionsConstants.AGENT_MODIFIER,
+                ActionsConstants.AGENT_SUPPRIMER,
+                ActionsConstants.AYANT_DROIT_CONSULTER,
+                ActionsConstants.AYANT_DROIT_CREER,
+                ActionsConstants.AYANT_DROIT_MODIFIER,
+                ActionsConstants.AYANT_DROIT_SUPPRIMER,
+                // En lecture seule : la fiche d'un agent se rattache a une direction choisie
+                // dans le referentiel, et sans elle la liste serait vide.
+                ActionsConstants.REFERENTIEL_CONSULTER
+            )
+        ),
+        new ProfilType(
             "Consultation",
             "Consulte les dossiers et les beneficiaires, sans rien pouvoir modifier.",
             concatener(SOCLE, LECTURE_BENEFICIAIRES, List.of(ActionsConstants.DEMANDE_CONSULTER, ActionsConstants.PIECE_CONSULTER))
@@ -506,6 +557,20 @@ public class InitData {
             "Pays",
             "Tel qu'il s'imprime au dos des cartes.",
             "Republique du Niger",
+            TypeParametre.TEXTE
+        ),
+        new ParametreSocle(
+            Parametres.TELEPHONE_DIRECTION_GENERALE,
+            "Telephone de la direction generale",
+            "Imprime au pied des cartes, pour qui trouve une carte perdue.",
+            "20728500",
+            TypeParametre.TEXTE
+        ),
+        new ParametreSocle(
+            Parametres.TELEPHONE_INFIRMERIE,
+            "Telephone de l'infirmerie du personnel",
+            "Numero de la flotte de l'infirmerie, imprime au pied des cartes.",
+            "",
             TypeParametre.TEXTE
         )
     );

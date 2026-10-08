@@ -666,7 +666,7 @@ public class DemandePriseEnChargeServiceImpl implements DemandePriseEnChargeServ
     private String genererReference() {
         String prefixeDate = REFERENCE_DATE_FORMATTER.format(LocalDate.now(ZoneId.systemDefault()));
         long sequence = demandePriseEnChargeRepository.nextReferenceSequenceValue();
-        return prefixeDate + String.format("%03d", sequence);
+        return prefixeDate + "%03d".formatted(sequence);
     }
 
     private DemandePriseEnCharge getDemandeOrThrow(Long id) {

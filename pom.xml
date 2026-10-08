@@ -78,6 +78,12 @@
             <artifactId>openpdf</artifactId>
             <version>3.0.5</version>
         </dependency>
+        <!-- Lecture des signatures deposees en WebP, format qu'OpenPDF ne sait pas lire. -->
+        <dependency>
+            <groupId>com.twelvemonkeys.imageio</groupId>
+            <artifactId>imageio-webp</artifactId>
+            <version>3.15.2</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>

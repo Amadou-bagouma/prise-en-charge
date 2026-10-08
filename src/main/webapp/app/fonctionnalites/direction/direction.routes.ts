@@ -35,7 +35,7 @@ const directionRoute: Routes = [
       direction: DirectionResolve,
     },
     data: {
-      authorities: [Action.REFERENTIEL_CREER, Authority.ADMIN],
+      authorities: [Action.REFERENTIEL_CREER, Action.DIRECTION_CREER, Authority.ADMIN],
     },
     canActivate: [userRouteAccessService],
   },

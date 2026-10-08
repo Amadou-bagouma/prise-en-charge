@@ -55,7 +55,16 @@
           >
             <option [ngValue]="null">Aucun — la carte est celle de l'agent</option>
             @for (ayantDroitOption of ayantsDroitDeLAgent(); track ayantDroitOption.id) {
-              <option [ngValue]="ayantDroitOption">{{ ayantDroitOption.nom }} {{ ayantDroitOption.prenom }}</option>
+              <!--
+                Un rattachement non vérifié reste visible mais ne se choisit pas : le serveur
+                refuserait la carte, et le masquer laisserait croire que l'ayant droit manque.
+              -->
+              <option [ngValue]="ayantDroitOption" [disabled]="ayantDroitOption.statutValidation !== 'VALIDE'">
+                {{ ayantDroitOption.nom }} {{ ayantDroitOption.prenom }}
+                @if (ayantDroitOption.statutValidation !== 'VALIDE') {
+                  — rattachement à valider
+                }
+              </option>
             }
           </select>
           <!--
@@ -66,7 +75,9 @@
             @if (!agentChoisi()) {
               Choisissez d'abord l'agent.
             } @else if (ayantsDroitDeLAgent().length === 0) {
-              Cet agent n'a aucun ayant droit dont le rattachement soit vérifié.
+              Cet agent n'a aucun ayant droit.
+            } @else if (aucunAyantDroitValide()) {
+              Aucun ayant droit de cet agent n'a un rattachement validé : faites-le valider depuis sa fiche avant d'établir sa carte.
             } @else {
               Laissez vide pour établir la carte de l'agent lui-même.
             }

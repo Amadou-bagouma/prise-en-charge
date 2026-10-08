@@ -50,6 +50,12 @@ public class Parametres {
     /** Pays de l'institution, tel qu'il s'imprime. */
     public static final String PAYS_INSTITUTION = "PAYS_INSTITUTION";
 
+    /** Telephone de la direction generale, imprime au pied des cartes. */
+    public static final String TELEPHONE_DIRECTION_GENERALE = "TELEPHONE_DIRECTION_GENERALE";
+
+    /** Telephone (flotte) de l'infirmerie du personnel, imprime au pied des cartes. */
+    public static final String TELEPHONE_INFIRMERIE = "TELEPHONE_INFIRMERIE";
+
     private final ParametreRepository parametreRepository;
 
     public Parametres(ParametreRepository parametreRepository) {

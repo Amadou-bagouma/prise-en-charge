@@ -35,7 +35,7 @@ const etablissementSanteRoute: Routes = [
       etablissementSante: EtablissementSanteResolve,
     },
     data: {
-      authorities: [Action.REFERENTIEL_CREER, Authority.ADMIN],
+      authorities: [Action.REFERENTIEL_CREER, Action.ETABLISSEMENT_CREER, Authority.ADMIN],
     },
     canActivate: [userRouteAccessService],
   },

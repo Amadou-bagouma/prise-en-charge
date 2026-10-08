@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Service, inject } from '@angular/core';
 
-import { Observable } from 'rxjs';
+import { Observable, switchMap } from 'rxjs';
 
 import { serverApiUrl } from 'app/config';
 import { IParametre } from '../parametre.model';
@@ -34,5 +34,38 @@ export class ParametreService {
    */
   urlImage(code: string): string {
     return `${this.resourceUrl}/${encodeURIComponent(code)}/image`;
+  }
+
+  /**
+   * L'image d'un réglage, chargée avec le jeton de connexion.
+   *
+   * Une balise `<img>` pointée sur `urlImage` part sans l'en-tête `Authorization` : le serveur
+   * la refuse, et l'image ne s'affiche pas. Passer par le client HTTP fait poser le jeton.
+   */
+  image(code: string): Observable<Blob> {
+    return this.http.get(this.urlImage(code), { responseType: 'blob' });
+  }
+
+  /**
+   * L'image d'un réglage en adresse `data:`, prête à poser dans un `<img>`.
+   *
+   * Une adresse `data:` ne dépend d'aucune session ni d'aucune adresse temporaire : elle reste
+   * lisible par la fenêtre d'impression et n'a rien à libérer.
+   */
+  imageEnDonnees(code: string): Observable<string> {
+    return this.image(code).pipe(
+      switchMap(
+        blob =>
+          new Observable<string>(abonne => {
+            const lecteur = new FileReader();
+            lecteur.onload = () => {
+              abonne.next(typeof lecteur.result === 'string' ? lecteur.result : '');
+              abonne.complete();
+            };
+            lecteur.onerror = () => abonne.error(lecteur.error);
+            lecteur.readAsDataURL(blob);
+          }),
+      ),
+    );
   }
 }

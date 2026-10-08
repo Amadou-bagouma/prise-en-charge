@@ -233,8 +233,16 @@ public class RapportDemandeService {
             return null;
         }
         try {
-            return Image.getInstance(validateur.getSignature());
-        } catch (IOException | BadElementException e) {
+            Image image = ImagesPdf.lire(validateur.getSignature());
+            if (image == null) {
+                LOG.warn(
+                    "La signature de {} ({}) est dans un format illisible : elle n'apparait pas sur la prise en charge",
+                    validateur.getLogin(),
+                    validateur.getSignatureContentType()
+                );
+            }
+            return image;
+        } catch (IOException | RuntimeException e) {
             LOG.warn("Could not render the signature of user {} on the rapport", validateur.getLogin(), e);
             return null;
         }
@@ -355,21 +363,25 @@ public class RapportDemandeService {
         PdfPTable table = new PdfPTable(2);
         table.setWidthPercentage(100);
 
-        table.addCell(signatureCell("VISA DU MEDECIN CNSS", validateurInfirmerie, font));
-        table.addCell(signatureCell("LE DIRECTEUR DES RESSOURCES HUMAINES", validateurDrh, font));
+        table.addCell(signatureCell("VISA DU MEDECIN CNSS", validateurInfirmerie, font, false));
+        table.addCell(signatureCell("LE DIRECTEUR DES RESSOURCES HUMAINES", validateurDrh, font, true));
 
         return table;
     }
 
-    private PdfPCell signatureCell(String libelle, User validateur, Font font) {
+    private PdfPCell signatureCell(String libelle, User validateur, Font font, boolean centree) {
         PdfPCell cell = new PdfPCell();
         cell.setBorder(PdfPCell.NO_BORDER);
         cell.setMinimumHeight(70);
-        cell.addElement(new Phrase(libelle, font));
+        // In composite mode the cell's own alignment is ignored: each element carries its own.
+        Paragraph titre = new Paragraph(libelle, font);
+        titre.setAlignment(centree ? Element.ALIGN_CENTER : Element.ALIGN_LEFT);
+        cell.addElement(titre);
         Image signature = signatureImage(validateur);
         if (signature != null) {
             signature.scaleToFit(120, 50);
             signature.setSpacingBefore(4);
+            signature.setAlignment(centree ? Image.MIDDLE : Image.LEFT);
             cell.addElement(signature);
         }
         return cell;

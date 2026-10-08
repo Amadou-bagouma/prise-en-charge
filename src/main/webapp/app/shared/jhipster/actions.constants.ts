@@ -74,6 +74,10 @@ export enum Action {
   REFERENTIEL_CREER = 'ROLE_REFERENTIEL_CREER',
   REFERENTIEL_MODIFIER = 'ROLE_REFERENTIEL_MODIFIER',
   REFERENTIEL_SUPPRIMER = 'ROLE_REFERENTIEL_SUPPRIMER',
+  /** Ajouter un établissement de santé, sans toucher aux autres référentiels. */
+  ETABLISSEMENT_CREER = 'ROLE_ETABLISSEMENT_CREER',
+  /** Ajouter une direction, sans toucher aux autres référentiels. */
+  DIRECTION_CREER = 'ROLE_DIRECTION_CREER',
 
   // ----------------------------------------------------------- administration
   UTILISATEUR_CONSULTER = 'ROLE_UTILISATEUR_CONSULTER',

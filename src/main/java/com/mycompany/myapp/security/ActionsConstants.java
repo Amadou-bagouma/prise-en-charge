@@ -82,6 +82,16 @@ public final class ActionsConstants {
     public static final String REFERENTIEL_CREER = "ROLE_REFERENTIEL_CREER";
     public static final String REFERENTIEL_MODIFIER = "ROLE_REFERENTIEL_MODIFIER";
     public static final String REFERENTIEL_SUPPRIMER = "ROLE_REFERENTIEL_SUPPRIMER";
+    /**
+     * Ajouter un etablissement de sante, et seulement cela.
+     *
+     * <p>Plus etroite que {@link #REFERENTIEL_CREER} : celui qui saisit une demande doit pouvoir
+     * enregistrer la structure ou le soin est donne, sans pour autant creer des regions, des
+     * directions ou des types de soin.
+     */
+    public static final String ETABLISSEMENT_CREER = "ROLE_ETABLISSEMENT_CREER";
+    /** Ajouter une direction, et seulement cela : meme raison que {@link #ETABLISSEMENT_CREER}. */
+    public static final String DIRECTION_CREER = "ROLE_DIRECTION_CREER";
 
     // ---------------------------------------------------------- administration
     public static final String UTILISATEUR_CONSULTER = "ROLE_UTILISATEUR_CONSULTER";

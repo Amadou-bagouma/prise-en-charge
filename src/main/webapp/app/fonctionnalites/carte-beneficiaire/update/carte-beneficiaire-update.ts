@@ -68,6 +68,10 @@ export class CarteBeneficiaireUpdate implements OnInit {
   // eslint-disable-next-line @typescript-eslint/member-ordering
   readonly ayantsDroitDeLAgent = signal<IAyantDroit[]>([]);
 
+  /** Vrai quand l'agent a des ayants droit, mais aucun dont le rattachement soit validé. */
+  // eslint-disable-next-line @typescript-eslint/member-ordering
+  readonly aucunAyantDroitValide = computed(() => this.ayantsDroitDeLAgent().every(a => a.statutValidation !== 'VALIDE'));
+
   // eslint-disable-next-line @typescript-eslint/member-ordering
   editForm: CarteBeneficiaireFormGroup = this.carteBeneficiaireFormService.createCarteBeneficiaireFormGroup();
 

@@ -16,95 +16,88 @@
     coûte. Le format est celui de l'impression, pas celui de l'écran.
   -->
   <p class="print-aide no-print">
-    Format carte bancaire (CR80, 85,6 × 54 mm), recto et verso sur deux pages. Dans la fenêtre d'impression, choisissez le format de papier
-    <strong>85,6 × 54 mm</strong>, des marges <strong>nulles</strong> et cochez <strong>graphiques d'arrière-plan</strong> — sans quoi les
-    aplats ne sont pas encrés.
+    Carte PVC au format CR80 (85,6 × 54 mm) : page 1 le recto, page 2 le verso. Dans la fenêtre d'impression, choisissez l'<strong
+      >imprimante à cartes</strong
+    >, le format <strong>CR80</strong>, des marges <strong>nulles</strong>, l'échelle <strong>100 %</strong> et cochez
+    <strong>graphiques d'arrière-plan</strong> — sans quoi les aplats ne sont pas encrés. Activez le <strong>recto-verso</strong> dans les
+    préférences de l'imprimante si elle le permet ; sinon, imprimez la page 1, retournez la carte, puis la page 2.
   </p>
 
   <div class="cartes">
     <!-- ------------------------------------------------------------- recto -->
     <div class="carte carte__face" data-cy="carteRecto">
       <div class="carte__bandeau">
-        <img class="carte__logo" src="content/images/logo-cnss.png" alt="" />
+        <span class="carte__logo"><img src="content/images/logo-cnss.png" alt="" /></span>
         <div class="carte__institution">
-          <b jhiTranslate="peccnssApp.carteBeneficiaire.printView.organism">Caisse Nationale de Sécurité Sociale</b>
-          <span jhiTranslate="peccnssApp.carteBeneficiaire.printView.title">Carte de bénéficiaire</span>
+          <b>Caisse Nationale de Sécurité Sociale</b>
+          <span class="carte__titre">Carte de santé</span>
+          <span class="carte__numero">N° {{ carte.numeroCarte }}</span>
         </div>
       </div>
 
       <div class="carte__corps">
+        <div class="carte__identite">
+          <div class="carte__nom">{{ titulairePrenom() }} {{ titulaireNom() }}</div>
+
+          <dl class="carte__infos">
+            @if (carte.typeBeneficiaire === 'AGENT') {
+              <div>
+                <dt>Fonction :</dt>
+                <dd>{{ agent()?.fonction }}</dd>
+              </div>
+            }
+            <div>
+              <dt>Né(e) le :</dt>
+              <dd>{{ dateNaissance() }}</dd>
+            </div>
+            <div>
+              <dt>Téléphone :</dt>
+              <dd>{{ telephone() }}</dd>
+            </div>
+            <div>
+              <dt>Validité :</dt>
+              <dd>{{ jour(carte.dateFinValidite) }}</dd>
+            </div>
+          </dl>
+        </div>
+
         @if (photo(); as photoValue) {
           <img class="carte__photo" [src]="'data:' + photoContentType() + ';base64,' + photoValue" alt="" />
         } @else {
           <div class="carte__photo"></div>
         }
-
-        <dl class="carte__identite">
-          <div class="carte__nom">{{ titulairePrenom() }} {{ titulaireNom() }}</div>
-
-          <div class="carte__ligne">
-            <dt jhiTranslate="peccnssApp.carteBeneficiaire.printView.matricule">Matricule</dt>
-            <dd>{{ matricule() }}</dd>
-          </div>
-
-          @if (carte.typeBeneficiaire === 'AGENT') {
-            <div class="carte__ligne">
-              <dt jhiTranslate="peccnssApp.carteBeneficiaire.printView.fonction">Fonction</dt>
-              <dd>{{ agent()?.fonction }}</dd>
-            </div>
-          } @else {
-            <div class="carte__ligne">
-              <dt jhiTranslate="peccnssApp.carteBeneficiaire.printView.lien">Lien</dt>
-              <dd [jhiTranslate]="'peccnssApp.LienParente.' + (ayantDroit()?.lien ?? 'null')">{{ ayantDroit()?.lien }}</dd>
-            </div>
-          }
-
-          <div class="carte__ligne">
-            <dt>Valable</dt>
-            <dd>{{ carte.dateDebutValidite | formatMediumDate }} — {{ carte.dateFinValidite | formatMediumDate }}</dd>
-          </div>
-        </dl>
-      </div>
-
-      <div class="carte__pied">
-        <span class="carte__emission">
-          <span class="carte__numero">{{ carte.numeroCarte }}</span>
-          <span>
-            <span jhiTranslate="peccnssApp.carteBeneficiaire.printView.issuedOn">Émise le</span>
-            {{ carte.dateEmission | formatMediumDate }}
-          </span>
-        </span>
-        <!--
-          La signature fait de l'imprimé une pièce de l'institution. Le nom l'accompagne : une
-          signature seule ne se lit pas. L'emplacement reste vide si rien n'a été déposé au
-          référentiel — bloquer l'impression pour cela priverait l'agent de sa carte.
-        -->
-        <span class="carte__signature">
-          @if (signature(); as image) {
-            <img [src]="image" alt="" />
-          }
-          @if (nomDirecteur(); as nom) {
-            <span class="carte__signataire">{{ nom }}</span>
-          }
-          <span class="carte__qualite">Le Directeur général</span>
-        </span>
       </div>
     </div>
 
     <!-- ------------------------------------------------------------- verso -->
     <div class="carte carte__face carte--verso" data-cy="carteVerso">
-      <div class="carte__bande"></div>
+      <p class="carte__appel">
+        En cas de perte ou de découverte,<br />
+        prière de la retourner à l'adresse suivante :
+      </p>
+      <p class="carte__adresse">
+        CNSS - Direction générale<br />
+        @if (telephoneDirection(); as tel) {
+          Tél : {{ tel }}<br />
+        }
+        @if (telephoneInfirmerie(); as tel) {
+          Flotte infirmerie du personnel : {{ tel }}
+        }
+      </p>
 
-      <div class="carte__mentions">
-        <p><strong>Cette carte est personnelle.</strong> Elle est présentée avec une pièce d'identité.</p>
-        <p>Elle atteste de la qualité de bénéficiaire ; elle ne vaut pas prise en charge : celle-ci s'obtient dossier par dossier.</p>
-        <p>Toute perte ou vol se déclare sans délai à la Caisse, qui établit une nouvelle carte.</p>
-        <p>Carte trouvée : la remettre à la Caisse Nationale de Sécurité Sociale — République du Niger.</p>
-      </div>
-
-      <div class="carte__pied">
-        <span class="carte__numero">{{ carte.numeroCarte }}</span>
-        <span>CNSS — Niger</span>
+      <!--
+        La signature fait de l'imprimé une pièce de l'institution, et le nom l'accompagne : une
+        signature seule ne se lit pas. L'emplacement reste vide si rien n'a été déposé au
+        référentiel — bloquer l'impression pour cela priverait l'agent de sa carte.
+      -->
+      <div class="carte__directeur">
+        <span class="carte__qualite">Le Directeur général</span>
+        @if (signature(); as image) {
+          <img [src]="image" alt="" />
+        }
+        @if (nomDirecteur(); as nom) {
+          <span class="carte__signataire">{{ nom }}</span>
+        }
       </div>
     </div>
   </div>

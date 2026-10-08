@@ -54,12 +54,23 @@ public class ParametreResource {
     /**
      * {@code GET /parametres} : tous les reglages, dans l'ordre de leur libelle.
      *
+     * <p>Ouvert aussi a qui imprime les cartes : le nom du directeur general et les telephones
+     * imprimes au verso s'y lisent.
+     *
      * <p>Pas de pagination : ils se comptent sur les doigts, et une liste de reglages se
      * parcourt d'un regard. Paginer ferait chercher a la page suivante un reglage dont on
      * ignore le nom exact.
      */
     @GetMapping("")
-    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
+    @PreAuthorize(
+        "hasAnyAuthority('" +
+            ActionsConstants.REFERENTIEL_CONSULTER +
+            "', '" +
+            ActionsConstants.CARTE_IMPRIMER +
+            "', '" +
+            AuthoritiesConstants.ADMIN +
+            "')"
+    )
     public List<ParametreDTO> getAllParametres() {
         LOG.debug("REST request to get all Parametres");
         return parametreRepository
@@ -75,10 +86,19 @@ public class ParametreResource {
      *
      * <p>Servie a part et non dans la liste : une signature pese quelques dizaines de
      * kilo-octets, et les rapatrier toutes pour afficher un tableau de reglages n'aurait pas de
-     * sens. Accessible a la simple consultation - elle figure sur les cartes imprimees.
+     * sens. Accessible a la simple consultation, et a qui imprime les cartes : la signature y
+     * figure.
      */
     @GetMapping("/{code}/image")
-    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_CONSULTER + "', '" + AuthoritiesConstants.ADMIN + "')")
+    @PreAuthorize(
+        "hasAnyAuthority('" +
+            ActionsConstants.REFERENTIEL_CONSULTER +
+            "', '" +
+            ActionsConstants.CARTE_IMPRIMER +
+            "', '" +
+            AuthoritiesConstants.ADMIN +
+            "')"
+    )
     public ResponseEntity<byte[]> getImage(@PathVariable("code") String code) {
         LOG.debug("REST request to get image of Parametre {}", code);
         return parametreRepository
@@ -170,7 +190,9 @@ public class ParametreResource {
             Parametres.NOM_DIRECTEUR_GENERAL,
             Parametres.SIGNATURE_DIRECTEUR_GENERAL,
             Parametres.NOM_INSTITUTION,
-            Parametres.PAYS_INSTITUTION
+            Parametres.PAYS_INSTITUTION,
+            Parametres.TELEPHONE_DIRECTION_GENERALE,
+            Parametres.TELEPHONE_INFIRMERIE
         );
     }
 

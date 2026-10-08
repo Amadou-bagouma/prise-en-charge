@@ -53,7 +53,14 @@
                   @case ('IMAGE') {
                     <div class="pec-param__image">
                       @if (parametre.valeurBinaireContentType) {
-                        <img [src]="urlImage(parametre)" [alt]="parametre.libelle" />
+                        @let image = apercu(parametre);
+                        @if (image) {
+                          <img [src]="image" [alt]="parametre.libelle" />
+                        } @else if (image === '') {
+                          <span class="pec-muted">L'image n'a pas pu être chargée.</span>
+                        } @else {
+                          <span class="pec-muted">Chargement de l'image…</span>
+                        }
                       } @else {
                         <span class="pec-muted">Aucune image déposée</span>
                       }

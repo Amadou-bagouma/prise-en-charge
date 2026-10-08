@@ -29,7 +29,7 @@ public class CarteBeneficiaire implements Serializable {
     private Long id;
 
     @NotNull
-    @Column(name = "numero_carte", nullable = false, unique = true)
+    @Column(name = "numero_carte", nullable = false)
     private String numeroCarte;
 
     @NotNull

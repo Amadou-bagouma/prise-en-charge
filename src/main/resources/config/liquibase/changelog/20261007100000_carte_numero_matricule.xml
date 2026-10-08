@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Le numero de carte est desormais le matricule de l'agent (suivi d'un rang pour un ayant
+        droit : 1234201, 1234202... pour un conjoint, 1234301, 1234302... pour un enfant).
+
+        Il n'est donc plus unique : le duplicata d'une carte perdue et la carte renouvelee apres
+        expiration reprennent le numero de la precedente - c'est la meme personne. Ce qui
+        distingue deux cartes du meme numero, c'est leur periode de validite.
+    -->
+    <changeSet id="20261007100000-1" author="cnss">
+        <preConditions onFail="MARK_RAN">
+            <indexExists tableName="carte_beneficiaire" indexName="ux_carte_beneficiaire__numero_carte"/>
+        </preConditions>
+        <dropUniqueConstraint tableName="carte_beneficiaire" constraintName="ux_carte_beneficiaire__numero_carte"/>
+    </changeSet>
+
+    <changeSet id="20261007100000-2" author="cnss">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="carte_beneficiaire" indexName="ix_carte_beneficiaire__numero_carte"/>
+            </not>
+        </preConditions>
+        <createIndex tableName="carte_beneficiaire" indexName="ix_carte_beneficiaire__numero_carte">
+            <column name="numero_carte"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

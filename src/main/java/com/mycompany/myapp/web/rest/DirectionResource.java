@@ -67,7 +67,15 @@ public class DirectionResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    @PreAuthorize("hasAnyAuthority('" + ActionsConstants.REFERENTIEL_CREER + "', '" + AuthoritiesConstants.ADMIN + "')")
+    @PreAuthorize(
+        "hasAnyAuthority('" +
+            ActionsConstants.REFERENTIEL_CREER +
+            "', '" +
+            ActionsConstants.DIRECTION_CREER +
+            "', '" +
+            AuthoritiesConstants.ADMIN +
+            "')"
+    )
     public ResponseEntity<DirectionDTO> createDirection(@Valid @RequestBody DirectionDTO directionDTO) throws URISyntaxException {
         LOG.debug("REST request to save Direction : {}", directionDTO);
         if (directionDTO.getId() != null) {
