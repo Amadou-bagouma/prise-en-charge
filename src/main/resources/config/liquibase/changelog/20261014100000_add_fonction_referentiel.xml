@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Fait de la fonction de l'agent un referentiel.
+
+        Jusqu'ici, agent.fonction etait un texte libre : la meme fonction s'y ecrivait de
+        plusieurs facons. On la remplace par une reference vers une table `fonction`, SANS perdre
+        ce qui a ete saisi :
+
+        1. Cree la table fonction.
+        2. Y verse chaque fonction deja saisie, une seule fois (espaces de bord retires).
+        3. Ajoute agent.fonction_id et sa cle etrangere.
+        4. Rattache chaque agent a la fonction qui porte son ancien libelle.
+        5. Ne supprime l'ancienne colonne qu'une fois le report fait.
+
+        L'ordre compte : le changeSet 5 ne doit jamais s'executer avant le 4.
+    -->
+
+    <changeSet id="20261014100000-1" author="manual">
+        <createTable tableName="fonction">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <!-- 255 comme l'ancienne colonne agent.fonction : aucune valeur saisie ne peut etre tronquee. -->
+            <column name="libelle" type="varchar(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_fonction__libelle"/>
+            </column>
+            <column name="created_by" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="timestamp"/>
+            <column name="last_modified_by" type="varchar(50)"/>
+            <column name="last_modified_date" type="timestamp"/>
+        </createTable>
+    </changeSet>
+
+    <!--
+        Les identifiants viennent du sequence_generator partage, comme pour toute entite : Hibernate
+        reserve ses blocs au-dela de la valeur courante, la collision est impossible.
+    -->
+    <changeSet id="20261014100000-2" author="manual">
+        <sql>
+            INSERT INTO fonction (id, libelle, created_by, created_date)
+            SELECT nextval('sequence_generator'), libelle, 'system', now()
+            FROM (
+                SELECT DISTINCT trim(fonction) AS libelle
+                FROM agent
+                WHERE fonction IS NOT NULL AND trim(fonction) &lt;&gt; ''
+            ) saisies
+        </sql>
+    </changeSet>
+
+    <changeSet id="20261014100000-3" author="manual">
+        <addColumn tableName="agent">
+            <column name="fonction_id" type="bigint"/>
+        </addColumn>
+        <addForeignKeyConstraint baseColumnNames="fonction_id"
+                                 baseTableName="agent"
+                                 constraintName="fk_agent__fonction_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="fonction"/>
+    </changeSet>
+
+    <changeSet id="20261014100000-4" author="manual">
+        <sql>
+            UPDATE agent a
+            SET fonction_id = f.id
+            FROM fonction f
+            WHERE f.libelle = trim(a.fonction)
+        </sql>
+    </changeSet>
+
+    <changeSet id="20261014100000-5" author="manual">
+        <dropColumn tableName="agent" columnName="fonction"/>
+    </changeSet>
+</databaseChangeLog>

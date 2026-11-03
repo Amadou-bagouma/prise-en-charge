@@ -61,7 +61,7 @@
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
-            <th scope="col" jhiSortBy="fonction">
+            <th scope="col" jhiSortBy="fonction.libelle">
               <div class="d-flex">
                 <span>Fonction</span>
                 <fa-icon class="p-1" icon="sort" />
@@ -97,18 +97,22 @@
               <td>
                 <a class="pec-strong" [routerLink]="['/agent', agent.id, 'view']">{{ agent.nom }} {{ agent.prenom }}</a>
               </td>
-              <td class="pec-tbl__libre">{{ agent.fonction || '—' }}</td>
+              <td class="pec-tbl__libre">{{ agent.fonction?.libelle || '—' }}</td>
               <td class="pec-num">{{ agent.telephone || '—' }}</td>
               <td>
-                @if (agent.direction) {
+                @if (agent.direction && voitReferentiel()) {
                   <a [routerLink]="['/direction', agent.direction.id, 'view']">{{ agent.direction.nom }}</a>
+                } @else if (agent.direction) {
+                  {{ agent.direction.nom }}
                 } @else {
                   <span class="pec-muted">—</span>
                 }
               </td>
               <td>
-                @if (agent.gestion) {
+                @if (agent.gestion && voitReferentiel()) {
                   <a [routerLink]="['/gestion', agent.gestion.id, 'view']">{{ agent.gestion.nom }}</a>
+                } @else if (agent.gestion) {
+                  {{ agent.gestion.nom }}
                 } @else {
                   <span class="pec-muted">—</span>
                 }

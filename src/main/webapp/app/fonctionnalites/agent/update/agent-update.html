@@ -46,6 +46,19 @@
         </div>
 
         <div class="jhi-field">
+          <label class="form-label" for="field_lieuNaissance" jhiTranslate="peccnssApp.agent.lieuNaissance">Lieu de naissance</label>
+          <input
+            type="text"
+            class="form-control"
+            name="lieuNaissance"
+            id="field_lieuNaissance"
+            data-cy="lieuNaissance"
+            formControlName="lieuNaissance"
+            maxlength="255"
+          />
+        </div>
+
+        <div class="jhi-field">
           <label class="form-label" for="field_dateEmbauche" jhiTranslate="peccnssApp.agent.dateEmbauche">Date Embauche</label>
           <div class="input-group">
             <input
@@ -95,7 +108,19 @@
 
         <div class="jhi-field">
           <label class="form-label" for="field_fonction" jhiTranslate="peccnssApp.agent.fonction">Fonction</label>
-          <input type="text" class="form-control" name="fonction" id="field_fonction" data-cy="fonction" formControlName="fonction" />
+          <select
+            class="form-control"
+            id="field_fonction"
+            data-cy="fonction"
+            name="fonction"
+            formControlName="fonction"
+            [compareWith]="compareFonction"
+          >
+            <option [ngValue]="null"></option>
+            @for (fonctionOption of fonctionsSharedCollection(); track $index) {
+              <option [ngValue]="fonctionOption">{{ fonctionOption.libelle }}</option>
+            }
+          </select>
         </div>
 
         <div class="jhi-field">

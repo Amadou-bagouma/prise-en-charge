@@ -178,10 +178,15 @@ export class AyantDroitDetail {
   }
 
   /** Établit la carte de l'ayant droit, puis l'ouvre pour impression. */
-  /** Recherche la carte en cours de validite du titulaire. */
+  /**
+   * Recherche la carte en cours de validite du titulaire.
+   *
+   * Pas sans le droit de consulter les cartes : le serveur refuserait, et un compte de saisie
+   * verrait une erreur a chaque fiche ouverte.
+   */
   private chargerCarte(): void {
     const id = this.ayantDroitAffiche()?.id;
-    if (!id) {
+    if (!id || !this.accountService.hasAnyAuthority([Action.CARTE_CONSULTER, Authority.ADMIN])) {
       this.carteValide.set(null);
       return;
     }

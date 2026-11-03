@@ -4,7 +4,8 @@
       "null": "",
       "NORMALE": "Normal",
       "IMPORTANTE": "Important",
-      "URGENTE": "Urgent"
+      "URGENTE": "Urgent",
+      "REGULARISATION": "Regularization"
     }
   }
 }

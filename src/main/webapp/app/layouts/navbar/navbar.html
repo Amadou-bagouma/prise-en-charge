@@ -235,8 +235,8 @@
           </ul>
         </li>
 
-        <!-- Le referentiel sert a remplir un formulaire, pas a etre parcouru par un agent. -->
-        @if (!estAgent()) {
+        <!-- Le referentiel sert a remplir un formulaire, pas a etre parcouru par un agent ou un agent de saisie prod. -->
+        @if (voitReferentiel()) {
           <li class="sidebar-nav-item" *jhiHasAnyAuthority="['ROLE_REFERENTIEL_CONSULTER', 'ROLE_ADMIN']">
             <button
               type="button"
@@ -314,6 +314,22 @@
                 >
                   <fa-icon icon="sitemap" [fixedWidth]="true" />
                   <span jhiTranslate="global.menu.entities.gestion">Gestion</span>
+                </a>
+              </li>
+              <li
+                class="sidebar-nav-item"
+                *jhiHasAnyAuthority="['ROLE_REFERENTIEL_CONSULTER', 'ROLE_ADMIN']"
+                routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: true }"
+              >
+                <a
+                  class="sidebar-link"
+                  [title]="'global.menu.entities.fonction' | translate"
+                  routerLink="/fonction"
+                  (click)="collapseNavbar()"
+                >
+                  <fa-icon icon="id-badge" [fixedWidth]="true" />
+                  <span jhiTranslate="global.menu.entities.fonction">Fonction</span>
                 </a>
               </li>
               <li

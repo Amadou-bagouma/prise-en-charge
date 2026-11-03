@@ -18,7 +18,7 @@ import { LayoutService } from 'app/layouts/layout.service';
 import { ClocheNotifications } from 'app/layouts/notifications/cloche-notifications';
 import { ProfileService } from 'app/layouts/profiles/profile.service';
 import { LoginService } from 'app/login/login.service';
-import { HasAnyAuthorityDirective } from 'app/shared/auth';
+import { HasAnyAuthorityDirective, voitReferentiel } from 'app/shared/auth';
 import { FindLanguageFromKeyPipe, TranslateDirective } from 'app/shared/language';
 
 import ActiveMenuDirective from './active-menu.directive';
@@ -30,7 +30,7 @@ const SEGMENTS_BENEFICIAIRES = ['agent', 'ayant-droit', 'carte-beneficiaire'];
 const SEGMENTS_ADMINISTRATION = ['user-management', 'authority', 'profil'];
 
 /** Les écrans du référentiel, dans l'ordre du menu. */
-const SEGMENTS_REFERENTIEL = ['etablissement-sante', 'type-soin', 'direction', 'gestion', 'region'];
+const SEGMENTS_REFERENTIEL = ['etablissement-sante', 'type-soin', 'direction', 'gestion', 'fonction', 'region'];
 
 @Component({
   selector: 'jhi-navbar',
@@ -80,6 +80,10 @@ export default class Navbar implements OnInit {
     () => this.accountService.hasAnyAuthority(Action.ESPACE_AGENT) && !this.accountService.hasAnyAuthority(Authority.ADMIN),
   );
 
+  /** Le groupe « Référentiel » du menu suit la même règle que l'accès à ses écrans. */
+  // eslint-disable-next-line @typescript-eslint/member-ordering
+  readonly voitReferentiel = computed(() => voitReferentiel(this.accountService));
+
   private readonly loginService = inject(LoginService);
   private readonly translateService = inject(TranslateService);
   private readonly stateStorageService = inject(StateStorageService);
@@ -109,6 +113,7 @@ export default class Navbar implements OnInit {
     const CLES: Record<string, string> = {
       profil: 'global.menu.entities.profil',
       gestion: 'global.menu.entities.gestion',
+      fonction: 'global.menu.entities.fonction',
       region: 'global.menu.entities.region',
       direction: 'global.menu.entities.direction',
       agent: 'global.menu.entities.agent',

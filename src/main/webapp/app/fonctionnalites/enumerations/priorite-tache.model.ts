@@ -4,4 +4,6 @@ export enum PrioriteTache {
   IMPORTANTE = 'IMPORTANTE',
 
   URGENTE = 'URGENTE',
+
+  REGULARISATION = 'REGULARISATION',
 }

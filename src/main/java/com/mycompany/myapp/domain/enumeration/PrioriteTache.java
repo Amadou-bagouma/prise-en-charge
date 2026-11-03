@@ -7,4 +7,5 @@ public enum PrioriteTache {
     NORMALE,
     IMPORTANTE,
     URGENTE,
+    REGULARISATION,
 }

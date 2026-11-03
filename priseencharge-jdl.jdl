@@ -51,9 +51,14 @@ entity Agent {
   nom String required
   prenom String required
   dateNaissance LocalDate
+  lieuNaissance String maxlength(255)
   dateEmbauche LocalDate
   telephone String
-  fonction String
+}
+
+
+entity Fonction {
+  libelle String required unique maxlength(255)
 }
 
 
@@ -65,6 +70,7 @@ entity AyantDroit {
   nom String required
   prenom String required
   dateNaissance LocalDate
+  lieuNaissance String maxlength(255)
   lien LienParente required
 }
 
@@ -72,6 +78,7 @@ entity AyantDroit {
 enum LienParente {
   CONJOINT
   ENFANT
+  ADOPTE
   AUTRE
 }
 
@@ -159,6 +166,7 @@ enum PrioriteDemande {
   NORMALE
   IMPORTANTE
   URGENTE
+  REGULARISATION
 }
 
 
@@ -207,6 +215,7 @@ enum PrioriteTache {
   NORMALE
   IMPORTANTE
   URGENTE
+  REGULARISATION
 }
 
 
@@ -278,6 +287,8 @@ relationship ManyToOne {
   Agent{direction(nom)} to Direction
 
   Agent{gestion(nom)} to Gestion
+
+  Agent{fonction(libelle)} to Fonction
 
   AyantDroit{agent(matricule)} to Agent
 }
@@ -384,21 +395,21 @@ relationship ManyToOne {
 // PAGINATION
 // =========================================================
 
-paginate Region, Direction, Gestion, Agent, AyantDroit, EtablissementSante, DemandePriseEnCharge, PieceJustificative, Tache, BoiteReception, Notification, HistoriqueAction, CarteBeneficiaire with pagination
+paginate Region, Direction, Gestion, Fonction, Agent, AyantDroit, EtablissementSante, DemandePriseEnCharge, PieceJustificative, Tache, BoiteReception, Notification, HistoriqueAction, CarteBeneficiaire with pagination
 
 
 // =========================================================
 // SERVICES
 // =========================================================
 
-service Region, Direction, Gestion, Agent, AyantDroit, EtablissementSante, DemandePriseEnCharge, PieceJustificative, Tache, BoiteReception, Notification, HistoriqueAction, CarteBeneficiaire with serviceImpl
+service Region, Direction, Gestion, Fonction, Agent, AyantDroit, EtablissementSante, DemandePriseEnCharge, PieceJustificative, Tache, BoiteReception, Notification, HistoriqueAction, CarteBeneficiaire with serviceImpl
 
 
 // =========================================================
 // DTO MAPSTRUCT
 // =========================================================
 
-dto Region, Direction, Gestion, Agent, AyantDroit, EtablissementSante, DemandePriseEnCharge, PieceJustificative, Tache, BoiteReception, Notification, HistoriqueAction, CarteBeneficiaire with mapstruct
+dto Region, Direction, Gestion, Fonction, Agent, AyantDroit, EtablissementSante, DemandePriseEnCharge, PieceJustificative, Tache, BoiteReception, Notification, HistoriqueAction, CarteBeneficiaire with mapstruct
 
 
 // =========================================================

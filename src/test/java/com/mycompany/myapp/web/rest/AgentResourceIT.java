@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.mycompany.myapp.IntegrationTest;
 import com.mycompany.myapp.domain.Agent;
 import com.mycompany.myapp.domain.Direction;
+import com.mycompany.myapp.domain.Fonction;
 import com.mycompany.myapp.domain.Gestion;
 import com.mycompany.myapp.repository.AgentRepository;
 import com.mycompany.myapp.service.AgentService;
@@ -59,11 +60,11 @@ class AgentResourceIT {
     private static final LocalDate UPDATED_DATE_NAISSANCE = LocalDate.parse("2023-12-25");
     private static final LocalDate SMALLER_DATE_NAISSANCE = LocalDate.ofEpochDay(-1L);
 
+    private static final String DEFAULT_LIEU_NAISSANCE = "AAAAAAAAAA";
+    private static final String UPDATED_LIEU_NAISSANCE = "BBBBBBBBBB";
+
     private static final String DEFAULT_TELEPHONE = "AAAAAAAAAA";
     private static final String UPDATED_TELEPHONE = "BBBBBBBBBB";
-
-    private static final String DEFAULT_FONCTION = "AAAAAAAAAA";
-    private static final String UPDATED_FONCTION = "BBBBBBBBBB";
 
     private static final String ENTITY_API_URL = "/api/agents";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -108,8 +109,8 @@ class AgentResourceIT {
             .nom(DEFAULT_NOM)
             .prenom(DEFAULT_PRENOM)
             .dateNaissance(DEFAULT_DATE_NAISSANCE)
-            .telephone(DEFAULT_TELEPHONE)
-            .fonction(DEFAULT_FONCTION);
+            .lieuNaissance(DEFAULT_LIEU_NAISSANCE)
+            .telephone(DEFAULT_TELEPHONE);
     }
 
     /**
@@ -124,8 +125,8 @@ class AgentResourceIT {
             .nom(UPDATED_NOM)
             .prenom(UPDATED_PRENOM)
             .dateNaissance(UPDATED_DATE_NAISSANCE)
-            .telephone(UPDATED_TELEPHONE)
-            .fonction(UPDATED_FONCTION);
+            .lieuNaissance(UPDATED_LIEU_NAISSANCE)
+            .telephone(UPDATED_TELEPHONE);
     }
 
     @BeforeEach
@@ -250,8 +251,8 @@ class AgentResourceIT {
             .andExpect(jsonPath("$.[*].nom").value(hasItem(DEFAULT_NOM)))
             .andExpect(jsonPath("$.[*].prenom").value(hasItem(DEFAULT_PRENOM)))
             .andExpect(jsonPath("$.[*].dateNaissance").value(hasItem(DEFAULT_DATE_NAISSANCE.toString())))
-            .andExpect(jsonPath("$.[*].telephone").value(hasItem(DEFAULT_TELEPHONE)))
-            .andExpect(jsonPath("$.[*].fonction").value(hasItem(DEFAULT_FONCTION)));
+            .andExpect(jsonPath("$.[*].lieuNaissance").value(hasItem(DEFAULT_LIEU_NAISSANCE)))
+            .andExpect(jsonPath("$.[*].telephone").value(hasItem(DEFAULT_TELEPHONE)));
     }
 
     @SuppressWarnings({ "unchecked" })
@@ -287,8 +288,8 @@ class AgentResourceIT {
             .andExpect(jsonPath("$.nom").value(DEFAULT_NOM))
             .andExpect(jsonPath("$.prenom").value(DEFAULT_PRENOM))
             .andExpect(jsonPath("$.dateNaissance").value(DEFAULT_DATE_NAISSANCE.toString()))
-            .andExpect(jsonPath("$.telephone").value(DEFAULT_TELEPHONE))
-            .andExpect(jsonPath("$.fonction").value(DEFAULT_FONCTION));
+            .andExpect(jsonPath("$.lieuNaissance").value(DEFAULT_LIEU_NAISSANCE))
+            .andExpect(jsonPath("$.telephone").value(DEFAULT_TELEPHONE));
     }
 
     @Test
@@ -588,51 +589,23 @@ class AgentResourceIT {
     @Test
     @Transactional
     void getAllAgentsByFonctionIsEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedAgent = agentRepository.saveAndFlush(agent);
+        Fonction fonction;
+        if (TestUtil.findAll(em, Fonction.class).isEmpty()) {
+            agentRepository.saveAndFlush(agent);
+            fonction = FonctionResourceIT.createEntity();
+        } else {
+            fonction = TestUtil.findAll(em, Fonction.class).get(0);
+        }
+        em.persist(fonction);
+        em.flush();
+        agent.setFonction(fonction);
+        agentRepository.saveAndFlush(agent);
+        Long fonctionId = fonction.getId();
+        // Get all the agentList where fonction equals to fonctionId
+        defaultAgentShouldBeFound("fonctionId.equals=" + fonctionId);
 
-        // Get all the agentList where fonction equals to
-        defaultAgentFiltering("fonction.equals=" + DEFAULT_FONCTION, "fonction.equals=" + UPDATED_FONCTION);
-    }
-
-    @Test
-    @Transactional
-    void getAllAgentsByFonctionIsInShouldWork() throws Exception {
-        // Initialize the database
-        insertedAgent = agentRepository.saveAndFlush(agent);
-
-        // Get all the agentList where fonction in
-        defaultAgentFiltering("fonction.in=" + DEFAULT_FONCTION + "," + UPDATED_FONCTION, "fonction.in=" + UPDATED_FONCTION);
-    }
-
-    @Test
-    @Transactional
-    void getAllAgentsByFonctionIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        insertedAgent = agentRepository.saveAndFlush(agent);
-
-        // Get all the agentList where fonction is not null
-        defaultAgentFiltering("fonction.specified=true", "fonction.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllAgentsByFonctionContainsSomething() throws Exception {
-        // Initialize the database
-        insertedAgent = agentRepository.saveAndFlush(agent);
-
-        // Get all the agentList where fonction contains
-        defaultAgentFiltering("fonction.contains=" + DEFAULT_FONCTION, "fonction.contains=" + UPDATED_FONCTION);
-    }
-
-    @Test
-    @Transactional
-    void getAllAgentsByFonctionNotContainsSomething() throws Exception {
-        // Initialize the database
-        insertedAgent = agentRepository.saveAndFlush(agent);
-
-        // Get all the agentList where fonction does not contain
-        defaultAgentFiltering("fonction.doesNotContain=" + UPDATED_FONCTION, "fonction.doesNotContain=" + DEFAULT_FONCTION);
+        // Get all the agentList where fonction equals to (fonctionId + 1)
+        defaultAgentShouldNotBeFound("fonctionId.equals=" + (fonctionId + 1));
     }
 
     @Test
@@ -697,8 +670,8 @@ class AgentResourceIT {
             .andExpect(jsonPath("$.[*].nom").value(hasItem(DEFAULT_NOM)))
             .andExpect(jsonPath("$.[*].prenom").value(hasItem(DEFAULT_PRENOM)))
             .andExpect(jsonPath("$.[*].dateNaissance").value(hasItem(DEFAULT_DATE_NAISSANCE.toString())))
-            .andExpect(jsonPath("$.[*].telephone").value(hasItem(DEFAULT_TELEPHONE)))
-            .andExpect(jsonPath("$.[*].fonction").value(hasItem(DEFAULT_FONCTION)));
+            .andExpect(jsonPath("$.[*].lieuNaissance").value(hasItem(DEFAULT_LIEU_NAISSANCE)))
+            .andExpect(jsonPath("$.[*].telephone").value(hasItem(DEFAULT_TELEPHONE)));
 
         // Check, that the count call also returns 1
         restAgentMockMvc
@@ -751,8 +724,8 @@ class AgentResourceIT {
             .nom(UPDATED_NOM)
             .prenom(UPDATED_PRENOM)
             .dateNaissance(UPDATED_DATE_NAISSANCE)
-            .telephone(UPDATED_TELEPHONE)
-            .fonction(UPDATED_FONCTION);
+            .lieuNaissance(UPDATED_LIEU_NAISSANCE)
+            .telephone(UPDATED_TELEPHONE);
         AgentDTO agentDTO = agentMapper.toDto(updatedAgent);
 
         restAgentMockMvc
@@ -871,8 +844,8 @@ class AgentResourceIT {
             .nom(UPDATED_NOM)
             .prenom(UPDATED_PRENOM)
             .dateNaissance(UPDATED_DATE_NAISSANCE)
-            .telephone(UPDATED_TELEPHONE)
-            .fonction(UPDATED_FONCTION);
+            .lieuNaissance(UPDATED_LIEU_NAISSANCE)
+            .telephone(UPDATED_TELEPHONE);
 
         restAgentMockMvc
             .perform(

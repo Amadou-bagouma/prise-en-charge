@@ -74,5 +74,7 @@
     <include file="config/liquibase/changelog/20260930120000_carte_numero_sequence.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260930140000_added_entity_Parametre.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20261007100000_carte_numero_matricule.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20261014100000_add_fonction_referentiel.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20261015100000_add_agent_lieu_naissance.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>

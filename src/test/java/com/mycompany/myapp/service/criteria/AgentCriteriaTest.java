@@ -77,7 +77,7 @@ class AgentCriteriaTest {
         agentCriteria.prenom();
         agentCriteria.dateNaissance();
         agentCriteria.telephone();
-        agentCriteria.fonction();
+        agentCriteria.fonctionId();
         agentCriteria.directionId();
         agentCriteria.gestionId();
         agentCriteria.distinct();
@@ -92,7 +92,7 @@ class AgentCriteriaTest {
                 condition.apply(criteria.getPrenom()) &&
                 condition.apply(criteria.getDateNaissance()) &&
                 condition.apply(criteria.getTelephone()) &&
-                condition.apply(criteria.getFonction()) &&
+                condition.apply(criteria.getFonctionId()) &&
                 condition.apply(criteria.getDirectionId()) &&
                 condition.apply(criteria.getGestionId()) &&
                 condition.apply(criteria.getDistinct()),
@@ -109,7 +109,7 @@ class AgentCriteriaTest {
                 condition.apply(criteria.getPrenom(), copy.getPrenom()) &&
                 condition.apply(criteria.getDateNaissance(), copy.getDateNaissance()) &&
                 condition.apply(criteria.getTelephone(), copy.getTelephone()) &&
-                condition.apply(criteria.getFonction(), copy.getFonction()) &&
+                condition.apply(criteria.getFonctionId(), copy.getFonctionId()) &&
                 condition.apply(criteria.getDirectionId(), copy.getDirectionId()) &&
                 condition.apply(criteria.getGestionId(), copy.getGestionId()) &&
                 condition.apply(criteria.getDistinct(), copy.getDistinct()),

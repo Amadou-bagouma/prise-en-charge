@@ -185,6 +185,8 @@ export class BoiteReception {
         return 'danger';
       case 'IMPORTANTE':
         return 'warn';
+      case 'REGULARISATION':
+        return 'info';
       default:
         return 'neutre';
     }

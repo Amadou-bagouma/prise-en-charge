@@ -1,5 +1,5 @@
 import { HttpHeaders } from '@angular/common/http';
-import { Component, effect, inject, signal, untracked } from '@angular/core';
+import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Data, ParamMap, Router, RouterLink } from '@angular/router';
 
@@ -11,7 +11,8 @@ import { combineLatest, filter, map, tap } from 'rxjs';
 
 import { DEFAULT_SORT_DATA, ITEMS_PER_PAGE, ITEM_DELETED_EVENT, PAGE_HEADER, SORT, TOTAL_COUNT_RESPONSE_HEADER } from 'app/config';
 import { Alert, AlertError } from 'app/shared/alert';
-import { HasAnyAuthorityDirective } from 'app/shared/auth';
+import { AccountService } from 'app/core/auth';
+import { HasAnyAuthorityDirective, voitReferentiel } from 'app/shared/auth';
 import { Filter, FilterOption, FilterOptions, IFilterOption, IFilterOptions } from 'app/shared/filter';
 import { TranslateDirective } from 'app/shared/language';
 import { ItemCount } from 'app/shared/pagination';
@@ -67,6 +68,11 @@ export class Agent {
   protected readonly sortService = inject(SortService);
   protected readonly filterOptions = toSignal(this.filters.filterChanges);
   protected modalService = inject(NgbModal);
+  protected readonly accountService = inject(AccountService);
+
+  /** La direction et la gestion ne mènent à leur fiche que pour qui voit le référentiel. */
+  // eslint-disable-next-line @typescript-eslint/member-ordering
+  readonly voitReferentiel = computed(() => voitReferentiel(this.accountService));
 
   constructor() {
     effect(() => {

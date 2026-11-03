@@ -4,7 +4,8 @@
       "null": "",
       "CONJOINT": "Conjoint",
       "ENFANT": "Enfant",
-      "AUTRE": "Autre proche"
+      "ADOPTE": "Enfant adopté",
+      "AUTRE": "Enfant en charge"
     }
   }
 }

@@ -41,7 +41,7 @@
       "fieldName": "priorite",
       "fieldType": "PrioriteTache",
       "fieldValidateRules": ["required"],
-      "fieldValues": "NORMALE,IMPORTANTE,URGENTE"
+      "fieldValues": "NORMALE,IMPORTANTE,URGENTE,REGULARISATION"
     },
     {
       "fieldName": "lu",

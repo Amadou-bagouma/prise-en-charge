@@ -27,15 +27,17 @@ public interface AgentRepository extends JpaRepository<Agent, Long>, JpaSpecific
     }
 
     @Query(
-        value = "select agent from Agent agent left join fetch agent.direction left join fetch agent.gestion",
+        value = "select agent from Agent agent left join fetch agent.direction left join fetch agent.gestion left join fetch agent.fonction",
         countQuery = "select count(agent) from Agent agent"
     )
     Page<Agent> findAllWithToOneRelationships(Pageable pageable);
 
-    @Query("select agent from Agent agent left join fetch agent.direction left join fetch agent.gestion")
+    @Query("select agent from Agent agent left join fetch agent.direction left join fetch agent.gestion left join fetch agent.fonction")
     List<Agent> findAllWithToOneRelationships();
 
-    @Query("select agent from Agent agent left join fetch agent.direction left join fetch agent.gestion where agent.id =:id")
+    @Query(
+        "select agent from Agent agent left join fetch agent.direction left join fetch agent.gestion left join fetch agent.fonction where agent.id =:id"
+    )
     Optional<Agent> findOneWithToOneRelationships(@Param("id") Long id);
 
     Optional<Agent> findByMatricule(String matricule);

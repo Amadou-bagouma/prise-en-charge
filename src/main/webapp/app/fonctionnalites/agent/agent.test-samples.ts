@@ -14,7 +14,6 @@ export const sampleWithPartialData: IAgent = {
   matricule: 'neatly buzzing ice-cream',
   nom: 'splay clearly',
   prenom: 'white regulate',
-  fonction: 'fearless woot dependable',
 };
 
 export const sampleWithFullData: IAgent = {
@@ -24,7 +23,6 @@ export const sampleWithFullData: IAgent = {
   prenom: 'amongst jungle',
   dateNaissance: dayjs('2023-12-25'),
   telephone: '405-749-2621 x0573',
-  fonction: 'pro anxiously',
 };
 
 export const sampleWithNewData: NewAgent = {

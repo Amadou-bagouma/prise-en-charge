@@ -60,6 +60,9 @@
                 }
               </dd>
 
+              <dt jhiTranslate="peccnssApp.agent.lieuNaissance">Lieu de naissance</dt>
+              <dd>{{ agentRef.lieuNaissance || '—' }}</dd>
+
               <dt jhiTranslate="peccnssApp.agent.dateEmbauche">Date Embauche</dt>
               <dd class="pec-defs--mono">
                 {{ (agentRef.dateEmbauche | formatMediumDate) || '—' }}
@@ -72,7 +75,7 @@
               <dd class="pec-defs--mono">{{ agentRef.telephone || '—' }}</dd>
 
               <dt jhiTranslate="peccnssApp.agent.fonction">Fonction</dt>
-              <dd>{{ agentRef.fonction || '—' }}</dd>
+              <dd>{{ agentRef.fonction?.libelle || '—' }}</dd>
             </dl>
           </div>
         </section>
@@ -272,7 +275,7 @@
                 <span class="pec-fiche__nom">{{ identite() }}</span>
                 <span class="pec-fiche__mat">{{ agentRef.matricule }}</span>
                 @if (agentRef.fonction) {
-                  <span class="pec-fiche__meta">{{ agentRef.fonction }}</span>
+                  <span class="pec-fiche__meta">{{ agentRef.fonction.libelle }}</span>
                 }
               </span>
             </div>
@@ -287,16 +290,20 @@
             <dl class="pec-defs">
               <dt jhiTranslate="peccnssApp.agent.direction">Direction</dt>
               <dd>
-                @if (agentRef.direction) {
+                @if (agentRef.direction && voitReferentiel()) {
                   <a [routerLink]="['/direction', agentRef.direction.id, 'view']">{{ agentRef.direction.nom }}</a>
+                } @else if (agentRef.direction) {
+                  {{ agentRef.direction.nom }}
                 } @else {
                   <span class="pec-muted">—</span>
                 }
               </dd>
               <dt jhiTranslate="peccnssApp.agent.gestion">Gestion</dt>
               <dd>
-                @if (agentRef.gestion) {
+                @if (agentRef.gestion && voitReferentiel()) {
                   <a [routerLink]="['/gestion', agentRef.gestion.id, 'view']">{{ agentRef.gestion.nom }}</a>
+                } @else if (agentRef.gestion) {
+                  {{ agentRef.gestion.nom }}
                 } @else {
                   <span class="pec-muted">—</span>
                 }

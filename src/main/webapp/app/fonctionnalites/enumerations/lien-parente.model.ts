@@ -3,5 +3,7 @@ export enum LienParente {
 
   ENFANT = 'ENFANT',
 
+  ADOPTE = 'ADOPTE',
+
   AUTRE = 'AUTRE',
 }

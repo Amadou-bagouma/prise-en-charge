@@ -24,6 +24,7 @@ import { FormatMediumDatePipe, FormatMediumDatetimePipe } from 'app/shared/date'
 import { TranslateDirective } from 'app/shared/language';
 import { enSaisie, libelleValidation, tonValidation } from 'app/fonctionnalites/ayant-droit/validation-rattachement';
 import { AccountService } from 'app/core/auth';
+import { voitReferentiel } from 'app/shared/auth';
 import { Action } from 'app/shared/jhipster/actions.constants';
 import { Authority } from 'app/shared/jhipster/constants';
 import { IAgent } from '../agent.model';
@@ -110,6 +111,9 @@ export class AgentDetail {
 
   /** Établir une carte relève du même droit que la créer au formulaire. */
   readonly peutEtablirCarte = computed(() => this.accountService.hasAnyAuthority([Action.CARTE_CREER, Authority.ADMIN]));
+
+  /** La direction et la gestion ne mènent à leur fiche que pour qui voit le référentiel. */
+  readonly voitReferentiel = computed(() => voitReferentiel(this.accountService));
 
   readonly carteEnCours = signal(false);
 
@@ -249,10 +253,15 @@ export class AgentDetail {
    * Rien n'est demandé : le serveur pose le numéro, la période et la date d'émission. Passer
    * par le formulaire obligerait à saisir quatre champs dont aucun ne relève d'un choix.
    */
-  /** Recherche la carte en cours de validite du titulaire. */
+  /**
+   * Recherche la carte en cours de validite du titulaire.
+   *
+   * Pas sans le droit de consulter les cartes : le serveur refuserait, et un compte de saisie
+   * verrait une erreur a chaque fiche ouverte.
+   */
   private chargerCarte(): void {
     const id = this.agent()?.id;
-    if (!id) {
+    if (!id || !this.accountService.hasAnyAuthority([Action.CARTE_CONSULTER, Authority.ADMIN])) {
       this.carteValide.set(null);
       return;
     }

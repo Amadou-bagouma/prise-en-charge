@@ -205,7 +205,7 @@ public class CarteBeneficiaireServiceImpl implements CarteBeneficiaireService {
     /**
      * Le numero : le matricule de l'agent, suivi pour un ayant droit d'un rang dans sa famille.
      *
-     * <p>Agent : 1234. Conjoints : 1234201, 1234202... Enfants : 1234301, 1234302...
+     * <p>Agent : 1234. Conjoints : 1234201, 1234202... Enfants, adoptes compris : 1234301, 1234302...
      * Autres ayants droit : 1234401... Un ayant droit qui a deja eu une carte garde son
      * numero ; un nouveau prend le rang suivant le plus haut deja attribue, pour qu'un numero
      * ne passe jamais d'une personne a une autre.
@@ -233,7 +233,7 @@ public class CarteBeneficiaireServiceImpl implements CarteBeneficiaireService {
         }
 
         LienParente lien = ayantDroit.getLien();
-        int base = lien == LienParente.CONJOINT ? 200 : lien == LienParente.ENFANT ? 300 : 400;
+        int base = lien == LienParente.CONJOINT ? 200 : lien == LienParente.ENFANT || lien == LienParente.ADOPTE ? 300 : 400;
         String prefixe = matricule + SEPARATEUR_RANG;
         int plusHaut = carteBeneficiaireRepository
             .findNumerosCommencantPar(prefixe)

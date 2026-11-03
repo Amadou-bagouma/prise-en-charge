@@ -1,0 +1,45 @@
+@if (fonction(); as fonctionRef) {
+  <div class="pec-ecran">
+    <div class="pec-titre-ecran">
+      <h1 data-cy="fonctionDetailsHeading">{{ fonctionRef.libelle }}</h1>
+    </div>
+
+    <jhi-alert-error />
+    <jhi-alert />
+
+    <section class="pec-panneau">
+      <div class="pec-panneau__tete">
+        <span class="pec-panneau__titre" jhiTranslate="peccnssApp.fonction.detail.title">Fonction</span>
+      </div>
+      <div class="pec-panneau__corps">
+        <dl class="pec-defs">
+          <dt jhiTranslate="peccnssApp.fonction.libelle">Libellé</dt>
+          <dd>{{ fonctionRef.libelle || '—' }}</dd>
+        </dl>
+      </div>
+    </section>
+
+    <div class="pec-dossier__actions">
+      <button
+        type="button"
+        [routerLink]="['/fonction', fonctionRef.id, 'edit']"
+        *jhiHasAnyAuthority="['ROLE_REFERENTIEL_MODIFIER', 'ROLE_ADMIN']"
+        class="pec-btn pec-btn--primaire"
+        data-cy="entityEditButton"
+      >
+        <fa-icon class="pec-btn__ico" icon="pencil-alt" />
+        <span jhiTranslate="entity.action.edit">Editer</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="previousState()"
+        class="pec-btn pec-btn--discret pec-dossier__actions--fin"
+        data-cy="entityDetailsBackButton"
+      >
+        <fa-icon class="pec-btn__ico" icon="arrow-left" />
+        <span jhiTranslate="entity.action.back">Retour</span>
+      </button>
+    </div>
+  </div>
+}

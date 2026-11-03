@@ -56,7 +56,7 @@ public class AgentCriteria implements Serializable, Criteria {
 
     private StringFilter telephone;
 
-    private StringFilter fonction;
+    private LongFilter fonctionId;
 
     private LongFilter directionId;
 
@@ -74,7 +74,7 @@ public class AgentCriteria implements Serializable, Criteria {
         this.prenom = other.optionalPrenom().map(StringFilter::copy).orElse(null);
         this.dateNaissance = other.optionalDateNaissance().map(LocalDateFilter::copy).orElse(null);
         this.telephone = other.optionalTelephone().map(StringFilter::copy).orElse(null);
-        this.fonction = other.optionalFonction().map(StringFilter::copy).orElse(null);
+        this.fonctionId = other.optionalFonctionId().map(LongFilter::copy).orElse(null);
         this.directionId = other.optionalDirectionId().map(LongFilter::copy).orElse(null);
         this.gestionId = other.optionalGestionId().map(LongFilter::copy).orElse(null);
         this.distinct = other.distinct;
@@ -218,23 +218,23 @@ public class AgentCriteria implements Serializable, Criteria {
         this.telephone = telephone;
     }
 
-    public StringFilter getFonction() {
-        return fonction;
+    public LongFilter getFonctionId() {
+        return fonctionId;
     }
 
-    public Optional<StringFilter> optionalFonction() {
-        return Optional.ofNullable(fonction);
+    public Optional<LongFilter> optionalFonctionId() {
+        return Optional.ofNullable(fonctionId);
     }
 
-    public StringFilter fonction() {
-        if (fonction == null) {
-            setFonction(new StringFilter());
+    public LongFilter fonctionId() {
+        if (fonctionId == null) {
+            setFonctionId(new LongFilter());
         }
-        return fonction;
+        return fonctionId;
     }
 
-    public void setFonction(StringFilter fonction) {
-        this.fonction = fonction;
+    public void setFonctionId(LongFilter fonctionId) {
+        this.fonctionId = fonctionId;
     }
 
     public LongFilter getDirectionId() {
@@ -311,7 +311,7 @@ public class AgentCriteria implements Serializable, Criteria {
             Objects.equals(prenom, that.prenom) &&
             Objects.equals(dateNaissance, that.dateNaissance) &&
             Objects.equals(telephone, that.telephone) &&
-            Objects.equals(fonction, that.fonction) &&
+            Objects.equals(fonctionId, that.fonctionId) &&
             Objects.equals(directionId, that.directionId) &&
             Objects.equals(gestionId, that.gestionId) &&
             Objects.equals(distinct, that.distinct)
@@ -320,7 +320,7 @@ public class AgentCriteria implements Serializable, Criteria {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, statut, matricule, nom, prenom, dateNaissance, telephone, fonction, directionId, gestionId, distinct);
+        return Objects.hash(id, statut, matricule, nom, prenom, dateNaissance, telephone, fonctionId, directionId, gestionId, distinct);
     }
 
     // prettier-ignore
@@ -334,7 +334,7 @@ public class AgentCriteria implements Serializable, Criteria {
             optionalPrenom().map(f -> "prenom=" + f + ", ").orElse("") +
             optionalDateNaissance().map(f -> "dateNaissance=" + f + ", ").orElse("") +
             optionalTelephone().map(f -> "telephone=" + f + ", ").orElse("") +
-            optionalFonction().map(f -> "fonction=" + f + ", ").orElse("") +
+            optionalFonctionId().map(f -> "fonctionId=" + f + ", ").orElse("") +
             optionalDirectionId().map(f -> "directionId=" + f + ", ").orElse("") +
             optionalGestionId().map(f -> "gestionId=" + f + ", ").orElse("") +
             optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +

@@ -11,6 +11,8 @@ import { DataUtils, FileLoadError } from 'app/core/util/data-util.service';
 import { AlertService } from 'app/core/util/alert.service';
 import { IDirection } from 'app/fonctionnalites/direction/direction.model';
 import { DirectionService } from 'app/fonctionnalites/direction/service/direction.service';
+import { IFonction } from 'app/fonctionnalites/fonction/fonction.model';
+import { FonctionService } from 'app/fonctionnalites/fonction/service/fonction.service';
 import { IGestion } from 'app/fonctionnalites/gestion/gestion.model';
 import { GestionService } from 'app/fonctionnalites/gestion/service/gestion.service';
 import { AlertError } from 'app/shared/alert';
@@ -32,6 +34,7 @@ export class AgentUpdate implements OnInit {
 
   directionsSharedCollection = signal<IDirection[]>([]);
   gestionsSharedCollection = signal<IGestion[]>([]);
+  fonctionsSharedCollection = signal<IFonction[]>([]);
 
   protected dataUtils = inject(DataUtils);
   protected alertService = inject(AlertService);
@@ -39,6 +42,7 @@ export class AgentUpdate implements OnInit {
   protected agentFormService = inject(AgentFormService);
   protected directionService = inject(DirectionService);
   protected gestionService = inject(GestionService);
+  protected fonctionService = inject(FonctionService);
   protected activatedRoute = inject(ActivatedRoute);
   protected readonly confirmService = inject(ConfirmService);
   protected elementRef = inject(ElementRef);
@@ -50,6 +54,8 @@ export class AgentUpdate implements OnInit {
   compareDirection = (o1: IDirection | null, o2: IDirection | null): boolean => this.directionService.compareDirection(o1, o2);
 
   compareGestion = (o1: IGestion | null, o2: IGestion | null): boolean => this.gestionService.compareGestion(o1, o2);
+
+  compareFonction = (o1: IFonction | null, o2: IFonction | null): boolean => this.fonctionService.compareFonction(o1, o2);
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ agent }) => {
@@ -134,6 +140,9 @@ export class AgentUpdate implements OnInit {
     this.gestionsSharedCollection.update(gestions =>
       this.gestionService.addGestionToCollectionIfMissing<IGestion>(gestions, agent.gestion),
     );
+    this.fonctionsSharedCollection.update(fonctions =>
+      this.fonctionService.addFonctionToCollectionIfMissing<IFonction>(fonctions, agent.fonction),
+    );
   }
 
   protected loadRelationshipsOptions(): void {
@@ -152,5 +161,14 @@ export class AgentUpdate implements OnInit {
       .pipe(map((res: HttpResponse<IGestion[]>) => res.body ?? []))
       .pipe(map((gestions: IGestion[]) => this.gestionService.addGestionToCollectionIfMissing<IGestion>(gestions, this.agent?.gestion)))
       .subscribe((gestions: IGestion[]) => this.gestionsSharedCollection.set(gestions));
+
+    // Toute la liste, par ordre alphabetique : la page par defaut (20) en laisserait de cote.
+    this.fonctionService
+      .query({ size: 1000, sort: ['libelle,asc'] })
+      .pipe(map((res: HttpResponse<IFonction[]>) => res.body ?? []))
+      .pipe(
+        map((fonctions: IFonction[]) => this.fonctionService.addFonctionToCollectionIfMissing<IFonction>(fonctions, this.agent?.fonction)),
+      )
+      .subscribe((fonctions: IFonction[]) => this.fonctionsSharedCollection.set(fonctions));
   }
 }

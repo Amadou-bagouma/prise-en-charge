@@ -44,14 +44,18 @@ public class Agent extends AbstractAuditingEntity<Long> implements Serializable 
     @Column(name = "date_naissance")
     private LocalDate dateNaissance;
 
+    @Size(max = 255)
+    @Column(name = "lieu_naissance", length = 255)
+    private String lieuNaissance;
+
     @Column(name = "date_embauche")
     private LocalDate dateEmbauche;
 
     @Column(name = "telephone")
     private String telephone;
 
-    @Column(name = "fonction")
-    private String fonction;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Fonction fonction;
 
     @Lob
     @Column(name = "photo")
@@ -154,6 +158,19 @@ public class Agent extends AbstractAuditingEntity<Long> implements Serializable 
         this.dateNaissance = dateNaissance;
     }
 
+    public String getLieuNaissance() {
+        return this.lieuNaissance;
+    }
+
+    public Agent lieuNaissance(String lieuNaissance) {
+        this.setLieuNaissance(lieuNaissance);
+        return this;
+    }
+
+    public void setLieuNaissance(String lieuNaissance) {
+        this.lieuNaissance = lieuNaissance;
+    }
+
     public LocalDate getDateEmbauche() {
         return this.dateEmbauche;
     }
@@ -180,16 +197,16 @@ public class Agent extends AbstractAuditingEntity<Long> implements Serializable 
         this.telephone = telephone;
     }
 
-    public String getFonction() {
+    public Fonction getFonction() {
         return this.fonction;
     }
 
-    public Agent fonction(String fonction) {
+    public Agent fonction(Fonction fonction) {
         this.setFonction(fonction);
         return this;
     }
 
-    public void setFonction(String fonction) {
+    public void setFonction(Fonction fonction) {
         this.fonction = fonction;
     }
 
@@ -312,9 +329,9 @@ public class Agent extends AbstractAuditingEntity<Long> implements Serializable 
             ", nom='" + getNom() + "'" +
             ", prenom='" + getPrenom() + "'" +
             ", dateNaissance='" + getDateNaissance() + "'" +
+            ", lieuNaissance='" + getLieuNaissance() + "'" +
             ", dateEmbauche='" + getDateEmbauche() + "'" +
             ", telephone='" + getTelephone() + "'" +
-            ", fonction='" + getFonction() + "'" +
             ", statut='" + getStatut() + "'" +
             "}";
     }

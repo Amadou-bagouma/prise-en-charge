@@ -7,4 +7,5 @@ public enum PrioriteDemande {
     NORMALE,
     IMPORTANTE,
     URGENTE,
+    REGULARISATION,
 }

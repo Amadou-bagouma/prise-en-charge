@@ -14,6 +14,7 @@
         "adminAuthority": "Authority",
         "profil": "Profil",
         "gestion": "Gestion",
+        "fonction": "Job title",
         "region": "Region",
         "direction": "Direction",
         "agent": "Agent",

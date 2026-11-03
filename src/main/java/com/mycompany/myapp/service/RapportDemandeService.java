@@ -15,6 +15,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -53,6 +54,8 @@ public class RapportDemandeService {
     private static final Logger LOG = LoggerFactory.getLogger(RapportDemandeService.class);
 
     private static final String ENTITY_NAME = "demandePriseEnCharge";
+
+    private static final DateTimeFormatter FORMAT_DATE = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     /**
      * Optional CNSS logo, printed top-left of the report. Drop a PNG/JPG file at this
@@ -195,7 +198,7 @@ public class RapportDemandeService {
         titleCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         table.addCell(titleCell);
 
-        PdfPCell refCell = new PdfPCell(new Phrase("N° " + demande.getReference() + " /", headerFont));
+        PdfPCell refCell = new PdfPCell(new Phrase("N° " + demande.getReference(), headerFont));
         refCell.setBorder(PdfPCell.NO_BORDER);
         refCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
         refCell.setVerticalAlignment(Element.ALIGN_TOP);
@@ -276,9 +279,14 @@ public class RapportDemandeService {
         body.add(new Chunk(" Mle ", normal));
         body.add(new Chunk(agent.getMatricule(), bold));
         body.add(new Chunk(" est en service a la Caisse Nationale de Securite Sociale", normal));
-        if (agent.getFonction() != null && !agent.getFonction().isBlank()) {
+        // La date d'entree a la CNSS : sans date d'embauche connue, la phrase reste juste en l'omettant.
+        if (agent.getDateEmbauche() != null) {
+            body.add(new Chunk(" depuis le ", normal));
+            body.add(new Chunk(agent.getDateEmbauche().format(FORMAT_DATE), bold));
+        }
+        if (agent.getFonction() != null) {
             body.add(new Chunk(" en qualite de ", normal));
-            body.add(new Chunk(agent.getFonction(), bold));
+            body.add(new Chunk(agent.getFonction().getLibelle(), bold));
         }
         body.add(
             new Chunk(
@@ -306,8 +314,9 @@ public class RapportDemandeService {
         }
         return switch (lien) {
             case ENFANT -> "son enfant";
+            case ADOPTE -> "son enfant adoptif";
             case CONJOINT -> "son (sa) conjoint(e)";
-            case AUTRE -> "son proche";
+            case AUTRE -> "son enfant à charge";
         };
     }
 

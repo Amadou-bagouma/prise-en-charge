@@ -9,6 +9,8 @@ import { Subject, from, of } from 'rxjs';
 
 import { IDirection } from 'app/fonctionnalites/direction/direction.model';
 import { DirectionService } from 'app/fonctionnalites/direction/service/direction.service';
+import { IFonction } from 'app/fonctionnalites/fonction/fonction.model';
+import { FonctionService } from 'app/fonctionnalites/fonction/service/fonction.service';
 import { IGestion } from 'app/fonctionnalites/gestion/gestion.model';
 import { GestionService } from 'app/fonctionnalites/gestion/service/gestion.service';
 import { ConfirmService } from 'app/shared/confirm';
@@ -27,6 +29,7 @@ describe('Agent Management Update Component', () => {
   let agentService: AgentService;
   let directionService: DirectionService;
   let gestionService: GestionService;
+  let fonctionService: FonctionService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -51,6 +54,7 @@ describe('Agent Management Update Component', () => {
     agentService = TestBed.inject(AgentService);
     directionService = TestBed.inject(DirectionService);
     gestionService = TestBed.inject(GestionService);
+    fonctionService = TestBed.inject(FonctionService);
 
     comp = fixture.componentInstance;
   });
@@ -98,6 +102,24 @@ describe('Agent Management Update Component', () => {
         ...additionalGestions.map(i => expect.objectContaining(i) as typeof i),
       );
       expect(comp.gestionsSharedCollection()).toEqual(expectedCollection);
+    });
+
+    it('should call Fonction query and add missing value', () => {
+      const agent: IAgent = { id: 18913 };
+      const fonction: IFonction = { id: 4120, libelle: 'Chauffeur' };
+      agent.fonction = fonction;
+
+      const fonctionCollection: IFonction[] = [{ id: 4121, libelle: 'Comptable' }];
+      vi.spyOn(fonctionService, 'query').mockReturnValue(of(new HttpResponse({ body: fonctionCollection })));
+      const expectedCollection: IFonction[] = [fonction, ...fonctionCollection];
+      vi.spyOn(fonctionService, 'addFonctionToCollectionIfMissing').mockReturnValue(expectedCollection);
+
+      activatedRoute.data = of({ agent });
+      comp.ngOnInit();
+
+      expect(fonctionService.query).toHaveBeenCalledWith(expect.objectContaining({ sort: ['libelle,asc'] }));
+      expect(fonctionService.addFonctionToCollectionIfMissing).toHaveBeenCalledWith(fonctionCollection, expect.objectContaining(fonction));
+      expect(comp.fonctionsSharedCollection()).toEqual(expectedCollection);
     });
 
     it('should update editForm', () => {

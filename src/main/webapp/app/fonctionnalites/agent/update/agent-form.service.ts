@@ -22,6 +22,7 @@ type AgentFormGroupContent = {
   nom: FormControl<IAgent['nom']>;
   prenom: FormControl<IAgent['prenom']>;
   dateNaissance: FormControl<IAgent['dateNaissance']>;
+  lieuNaissance: FormControl<IAgent['lieuNaissance']>;
   dateEmbauche: FormControl<IAgent['dateEmbauche']>;
   telephone: FormControl<IAgent['telephone']>;
   fonction: FormControl<IAgent['fonction']>;
@@ -59,6 +60,9 @@ export class AgentFormService {
         validators: [Validators.required],
       }),
       dateNaissance: new FormControl(agentRawValue.dateNaissance),
+      lieuNaissance: new FormControl(agentRawValue.lieuNaissance, {
+        validators: [Validators.maxLength(255)],
+      }),
       dateEmbauche: new FormControl(agentRawValue.dateEmbauche),
       telephone: new FormControl(agentRawValue.telephone),
       fonction: new FormControl(agentRawValue.fonction),

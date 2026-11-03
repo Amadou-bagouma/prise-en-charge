@@ -22,6 +22,7 @@
       "nom": "Nom",
       "prenom": "Prenom",
       "dateNaissance": "Date Naissance",
+      "lieuNaissance": "Place of birth",
       "dateEmbauche": "Hire Date",
       "telephone": "Telephone",
       "fonction": "Fonction",

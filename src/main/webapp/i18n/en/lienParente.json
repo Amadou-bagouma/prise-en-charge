@@ -4,7 +4,8 @@
       "null": "",
       "CONJOINT": "Spouse",
       "ENFANT": "Child",
-      "AUTRE": "Other dependant"
+      "ADOPTE": "Adopted child",
+      "AUTRE": "Dependent child"
     }
   }
 }

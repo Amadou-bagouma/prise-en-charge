@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Ajoute le lieu de naissance de l'agent. Facultatif : les agents deja enregistres n'en ont pas.
+    -->
+    <changeSet id="20261015100000-1" author="manual">
+        <addColumn tableName="agent">
+            <column name="lieu_naissance" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

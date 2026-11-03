@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 
+import { referentielVisibleGuard } from 'app/shared/auth';
+
 const routes: Routes = [
   {
     path: 'user-management',
@@ -18,21 +20,31 @@ const routes: Routes = [
   },
   {
     path: 'gestion',
+    canActivate: [referentielVisibleGuard],
     title: 'peccnssApp.gestion.home.title',
     loadChildren: () => import('./gestion/gestion.routes'),
   },
   {
+    path: 'fonction',
+    canActivate: [referentielVisibleGuard],
+    title: 'peccnssApp.fonction.home.title',
+    loadChildren: () => import('./fonction/fonction.routes'),
+  },
+  {
     path: 'type-soin',
+    canActivate: [referentielVisibleGuard],
     title: 'peccnssApp.typeSoin.home.title',
     loadChildren: () => import('./type-soin/type-soin.routes'),
   },
   {
     path: 'region',
+    canActivate: [referentielVisibleGuard],
     title: 'peccnssApp.region.home.title',
     loadChildren: () => import('./region/region.routes'),
   },
   {
     path: 'direction',
+    canActivate: [referentielVisibleGuard],
     title: 'peccnssApp.direction.home.title',
     loadChildren: () => import('./direction/direction.routes'),
   },
@@ -48,6 +60,7 @@ const routes: Routes = [
   },
   {
     path: 'etablissement-sante',
+    canActivate: [referentielVisibleGuard],
     title: 'peccnssApp.etablissementSante.home.title',
     loadChildren: () => import('./etablissement-sante/etablissement-sante.routes'),
   },
@@ -96,6 +109,7 @@ const routes: Routes = [
   {
     // Les reglages de l'application : durees de validite, mentions imprimees, signature.
     path: 'parametre',
+    canActivate: [referentielVisibleGuard],
     title: 'Paramètres',
     loadChildren: () => import('./parametre/parametre.routes'),
   },

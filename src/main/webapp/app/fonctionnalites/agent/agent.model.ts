@@ -1,6 +1,7 @@
 import dayjs from 'dayjs/esm';
 
 import { IDirection } from 'app/fonctionnalites/direction/direction.model';
+import { IFonction } from 'app/fonctionnalites/fonction/fonction.model';
 import { IGestion } from 'app/fonctionnalites/gestion/gestion.model';
 
 /** Situation d'un agent au regard de la couverture médicale. */
@@ -16,9 +17,10 @@ export interface IAgent {
   nom?: string | null;
   prenom?: string | null;
   dateNaissance?: dayjs.Dayjs | null;
+  lieuNaissance?: string | null;
   dateEmbauche?: dayjs.Dayjs | null;
   telephone?: string | null;
-  fonction?: string | null;
+  fonction?: Pick<IFonction, 'id' | 'libelle'> | null;
   photo?: string | null;
   photoContentType?: string | null;
   direction?: Pick<IDirection, 'id' | 'nom'> | null;

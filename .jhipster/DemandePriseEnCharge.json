@@ -39,7 +39,7 @@
       "fieldName": "priorite",
       "fieldType": "PrioriteDemande",
       "fieldValidateRules": ["required"],
-      "fieldValues": "NORMALE,IMPORTANTE,URGENTE"
+      "fieldValues": "NORMALE,IMPORTANTE,URGENTE,REGULARISATION"
     },
     {
       "fieldName": "dateAssignation",

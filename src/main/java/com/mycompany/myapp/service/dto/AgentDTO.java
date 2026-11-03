@@ -28,11 +28,14 @@ public class AgentDTO implements Serializable {
 
     private LocalDate dateNaissance;
 
+    @Size(max = 255)
+    private String lieuNaissance;
+
     private LocalDate dateEmbauche;
 
     private String telephone;
 
-    private String fonction;
+    private FonctionDTO fonction;
 
     private byte[] photo;
 
@@ -90,6 +93,14 @@ public class AgentDTO implements Serializable {
         this.dateNaissance = dateNaissance;
     }
 
+    public String getLieuNaissance() {
+        return lieuNaissance;
+    }
+
+    public void setLieuNaissance(String lieuNaissance) {
+        this.lieuNaissance = lieuNaissance;
+    }
+
     public LocalDate getDateEmbauche() {
         return dateEmbauche;
     }
@@ -106,11 +117,11 @@ public class AgentDTO implements Serializable {
         this.telephone = telephone;
     }
 
-    public String getFonction() {
+    public FonctionDTO getFonction() {
         return fonction;
     }
 
-    public void setFonction(String fonction) {
+    public void setFonction(FonctionDTO fonction) {
         this.fonction = fonction;
     }
 
@@ -200,9 +211,10 @@ public class AgentDTO implements Serializable {
             ", nom='" + getNom() + "'" +
             ", prenom='" + getPrenom() + "'" +
             ", dateNaissance='" + getDateNaissance() + "'" +
+            ", lieuNaissance='" + getLieuNaissance() + "'" +
             ", dateEmbauche='" + getDateEmbauche() + "'" +
             ", telephone='" + getTelephone() + "'" +
-            ", fonction='" + getFonction() + "'" +
+            ", fonction=" + getFonction() +
             ", direction=" + getDirection() +
             ", gestion=" + getGestion() +
             ", statut='" + getStatut() + "'" +

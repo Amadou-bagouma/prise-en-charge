@@ -74,7 +74,7 @@ public class GenerateurCodeAyantDroit {
     /**
      * Le chiffre qui dit la nature du lien.
      *
-     * <p>2 pour le conjoint, 3 pour les enfants et les autres proches. Le {@code switch} est
+     * <p>2 pour le conjoint, 3 pour les enfants (adoptes compris) et les autres proches. Le {@code switch} est
      * exhaustif sur l'enumeration : ajouter un lien sans decider de son chiffre ne compilera pas,
      * ce qui vaut mieux qu'un code attribue au hasard.
      */
@@ -88,7 +88,7 @@ public class GenerateurCodeAyantDroit {
         }
         return switch (lien) {
             case CONJOINT -> '2';
-            case ENFANT, AUTRE -> '3';
+            case ENFANT, ADOPTE, AUTRE -> '3';
         };
     }
 

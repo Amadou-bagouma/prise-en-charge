@@ -51,8 +51,8 @@ public class AgentAsserts {
             .satisfies(a -> assertThat(a.getNom()).as("check nom").isEqualTo(expected.getNom()))
             .satisfies(a -> assertThat(a.getPrenom()).as("check prenom").isEqualTo(expected.getPrenom()))
             .satisfies(a -> assertThat(a.getDateNaissance()).as("check dateNaissance").isEqualTo(expected.getDateNaissance()))
-            .satisfies(a -> assertThat(a.getTelephone()).as("check telephone").isEqualTo(expected.getTelephone()))
-            .satisfies(a -> assertThat(a.getFonction()).as("check fonction").isEqualTo(expected.getFonction()));
+            .satisfies(a -> assertThat(a.getLieuNaissance()).as("check lieuNaissance").isEqualTo(expected.getLieuNaissance()))
+            .satisfies(a -> assertThat(a.getTelephone()).as("check telephone").isEqualTo(expected.getTelephone()));
     }
 
     /**
@@ -65,6 +65,7 @@ public class AgentAsserts {
         assertThat(actual)
             .as("Verify Agent relationships")
             .satisfies(a -> assertThat(a.getDirection()).as("check direction").isEqualTo(expected.getDirection()))
-            .satisfies(a -> assertThat(a.getGestion()).as("check gestion").isEqualTo(expected.getGestion()));
+            .satisfies(a -> assertThat(a.getGestion()).as("check gestion").isEqualTo(expected.getGestion()))
+            .satisfies(a -> assertThat(a.getFonction()).as("check fonction").isEqualTo(expected.getFonction()));
     }
 }

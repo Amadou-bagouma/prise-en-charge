@@ -43,7 +43,7 @@
             @if (carte.typeBeneficiaire === 'AGENT') {
               <div>
                 <dt>Fonction :</dt>
-                <dd>{{ agent()?.fonction }}</dd>
+                <dd>{{ agent()?.fonction?.libelle }}</dd>
               </div>
             }
             <div>

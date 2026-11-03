@@ -1,0 +1,24 @@
+{
+  "peccnssApp": {
+    "fonction": {
+      "home": {
+        "title": "Fonctions",
+        "refreshListLabel": "Actualiser",
+        "createLabel": "Créer une fonction",
+        "createOrEditLabel": "Créer ou modifier une fonction",
+        "notFound": "Aucune fonction"
+      },
+      "created": "La fonction {{ param }} a été créée",
+      "updated": "La fonction {{ param }} a été mise à jour",
+      "deleted": "La fonction {{ param }} a été supprimée",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer la fonction {{ id }} ?"
+      },
+      "detail": {
+        "title": "Fonction"
+      },
+      "id": "ID",
+      "libelle": "Libellé"
+    }
+  }
+}
