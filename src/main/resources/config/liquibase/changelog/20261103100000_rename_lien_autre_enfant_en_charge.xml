@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Le lien « Autre proche » (AUTRE) devient « Enfant en charge » (ENFANT_EN_CHARGE).
+        Les ayants droit deja enregistres avec l'ancienne valeur prennent la nouvelle.
+    -->
+    <changeSet id="20261103100000-1" author="manual">
+        <update tableName="ayant_droit">
+            <column name="lien" value="ENFANT_EN_CHARGE"/>
+            <where>lien = 'AUTRE'</where>
+        </update>
+        <rollback>
+            <update tableName="ayant_droit">
+                <column name="lien" value="AUTRE"/>
+                <where>lien = 'ENFANT_EN_CHARGE'</where>
+            </update>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

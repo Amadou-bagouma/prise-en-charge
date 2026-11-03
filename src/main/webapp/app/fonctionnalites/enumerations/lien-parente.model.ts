@@ -5,5 +5,5 @@ export enum LienParente {
 
   ADOPTE = 'ADOPTE',
 
-  AUTRE = 'AUTRE',
+  ENFANT_EN_CHARGE = 'ENFANT_EN_CHARGE',
 }

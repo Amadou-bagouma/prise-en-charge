@@ -76,5 +76,6 @@
     <include file="config/liquibase/changelog/20261007100000_carte_numero_matricule.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20261014100000_add_fonction_referentiel.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20261015100000_add_agent_lieu_naissance.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20261103100000_rename_lien_autre_enfant_en_charge.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>

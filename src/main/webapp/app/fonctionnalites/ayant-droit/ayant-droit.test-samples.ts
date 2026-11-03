@@ -14,7 +14,7 @@ export const sampleWithPartialData: IAyantDroit = {
   nom: 'coin sheepishly',
   prenom: 'reassuringly aside',
   dateNaissance: dayjs('2023-12-24'),
-  lien: 'AUTRE',
+  lien: 'ENFANT_EN_CHARGE',
 };
 
 export const sampleWithFullData: IAyantDroit = {
@@ -22,7 +22,7 @@ export const sampleWithFullData: IAyantDroit = {
   nom: 'lest',
   prenom: 'all however defrag',
   dateNaissance: dayjs('2023-12-24'),
-  lien: 'AUTRE',
+  lien: 'ENFANT_EN_CHARGE',
 };
 
 export const sampleWithNewData: NewAyantDroit = {

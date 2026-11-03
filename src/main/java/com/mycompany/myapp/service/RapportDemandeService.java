@@ -316,7 +316,7 @@ public class RapportDemandeService {
             case ENFANT -> "son enfant";
             case ADOPTE -> "son enfant adoptif";
             case CONJOINT -> "son (sa) conjoint(e)";
-            case AUTRE -> "son enfant à charge";
+            case ENFANT_EN_CHARGE -> "son enfant à charge";
         };
     }
 

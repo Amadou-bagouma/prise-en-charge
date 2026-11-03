@@ -5,7 +5,7 @@
       "CONJOINT": "Spouse",
       "ENFANT": "Child",
       "ADOPTE": "Adopted child",
-      "AUTRE": "Dependent child"
+      "ENFANT_EN_CHARGE": "Dependent child"
     }
   }
 }

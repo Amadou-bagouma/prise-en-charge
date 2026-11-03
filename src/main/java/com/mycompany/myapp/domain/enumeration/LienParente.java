@@ -9,5 +9,5 @@ public enum LienParente {
     CONJOINT,
     ENFANT,
     ADOPTE,
-    AUTRE,
+    ENFANT_EN_CHARGE,
 }

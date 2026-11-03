@@ -23,7 +23,7 @@
       "fieldName": "lien",
       "fieldType": "LienParente",
       "fieldValidateRules": ["required"],
-      "fieldValues": "CONJOINT,ENFANT,AUTRE"
+      "fieldValues": "CONJOINT,ENFANT,ADOPTE,ENFANT_EN_CHARGE"
     }
   ],
   "jpaMetamodelFiltering": true,
