@@ -28,6 +28,32 @@
           }
         </div>
 
+        @let nomRef = editForm.get('nom')!;
+        <div class="jhi-field">
+          <label class="form-label" for="field_nom" jhiTranslate="peccnssApp.agent.nom">Nom</label>
+          <input type="text" class="form-control" name="nom" id="field_nom" data-cy="nom" formControlName="nom" />
+          @if (nomRef.invalid && (nomRef.dirty || nomRef.touched)) {
+            <div>
+              @if (nomRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let prenomRef = editForm.get('prenom')!;
+        <div class="jhi-field">
+          <label class="form-label" for="field_prenom" jhiTranslate="peccnssApp.agent.prenom">Prenom</label>
+          <input type="text" class="form-control" name="prenom" id="field_prenom" data-cy="prenom" formControlName="prenom" />
+          @if (prenomRef.invalid && (prenomRef.dirty || prenomRef.touched)) {
+            <div>
+              @if (prenomRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
         <div class="jhi-field">
           <label class="form-label" for="field_dateNaissance" jhiTranslate="peccnssApp.agent.dateNaissance">Date Naissance</label>
           <div class="input-group">
@@ -73,32 +99,6 @@
             />
             <button type="button" class="btn btn-secondary" (click)="dateEmbaucheDp.toggle()"><fa-icon icon="calendar-alt" /></button>
           </div>
-        </div>
-
-        @let nomRef = editForm.get('nom')!;
-        <div class="jhi-field">
-          <label class="form-label" for="field_nom" jhiTranslate="peccnssApp.agent.nom">Nom</label>
-          <input type="text" class="form-control" name="nom" id="field_nom" data-cy="nom" formControlName="nom" />
-          @if (nomRef.invalid && (nomRef.dirty || nomRef.touched)) {
-            <div>
-              @if (nomRef.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-            </div>
-          }
-        </div>
-
-        @let prenomRef = editForm.get('prenom')!;
-        <div class="jhi-field">
-          <label class="form-label" for="field_prenom" jhiTranslate="peccnssApp.agent.prenom">Prenom</label>
-          <input type="text" class="form-control" name="prenom" id="field_prenom" data-cy="prenom" formControlName="prenom" />
-          @if (prenomRef.invalid && (prenomRef.dirty || prenomRef.touched)) {
-            <div>
-              @if (prenomRef.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-            </div>
-          }
         </div>
 
         <div class="jhi-field">
