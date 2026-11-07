@@ -78,5 +78,6 @@
     <include file="config/liquibase/changelog/20261015100000_add_agent_lieu_naissance.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20261103100000_rename_lien_autre_enfant_en_charge.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20261107100000_add_agent_sexe_groupe.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20261108100000_insert_fonctions_referentiel.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>

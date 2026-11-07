@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Alimente le referentiel des fonctions.
+
+        Ids fixes a partir de 2 : le sequence_generator demarre a 1050, ces ids ne peuvent pas
+        entrer en collision avec ceux attribues par l'application. Une fonction deja presente
+        (meme libelle ou meme id) est ignoree plutot que de faire echouer la migration.
+    -->
+    <changeSet id="20261108100000-1" author="manual">
+        <sql>
+            INSERT INTO fonction (id, libelle, created_by, created_date, last_modified_by, last_modified_date)
+            VALUES
+                (2, 'CHEF SERVICE CM', 'system', now(), NULL, NULL),
+                (3, 'CHEF SECTION CM', 'system', now(), NULL, NULL),
+                (4, 'MEDECIN CHEF', 'system', now(), NULL, NULL),
+                (5, 'DIRECTEUR CENTRAL ASS', 'system', now(), NULL, NULL),
+                (6, 'PERSONNEL ASS', 'system', now(), NULL, NULL),
+                (7, 'MEDECIN CONSEIL', 'system', now(), NULL, NULL)
+            ON CONFLICT DO NOTHING
+        </sql>
+    </changeSet>
+</databaseChangeLog>
