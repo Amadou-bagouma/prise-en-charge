@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Nettoie les libelles de fonction saisis par copier-coller (Excel) : retire les retours a la
+        ligne et tabulations, ramene les espaces multiples a un seul, retire les espaces de bord.
+
+        Un libelle dont la version nettoyee existe deja n'est pas touche, pour ne pas violer
+        l'unicite de fonction.libelle.
+    -->
+    <changeSet id="20261108130000-1" author="manual">
+        <sql>
+            UPDATE fonction f
+            SET libelle = trim(regexp_replace(f.libelle, '[[:space:]]+', ' ', 'g')),
+                last_modified_by = 'system',
+                last_modified_date = now()
+            WHERE f.libelle &lt;&gt; trim(regexp_replace(f.libelle, '[[:space:]]+', ' ', 'g'))
+              AND NOT EXISTS (
+                  SELECT 1 FROM fonction autre
+                  WHERE autre.id &lt;&gt; f.id
+                    AND autre.libelle = trim(regexp_replace(f.libelle, '[[:space:]]+', ' ', 'g'))
+              )
+        </sql>
+    </changeSet>
+</databaseChangeLog>
