@@ -83,5 +83,6 @@
     <include file="config/liquibase/changelog/20261108120000_rename_direction_drc.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20261108130000_nettoie_libelles_fonction.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20261108140000_insert_directions_maradi.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20261108150000_insert_directions_zinder.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>
