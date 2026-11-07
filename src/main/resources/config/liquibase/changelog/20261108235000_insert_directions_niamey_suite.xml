@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Ajoute quinze directions dans la region de Niamey (codes 525 a 539).
+
+        Ids pris dans le sequence_generator, comme ceux attribues par l'application. La region est
+        retrouvee par son nom ; une direction dont le code existe deja est ignoree.
+    -->
+    <changeSet id="20261108235000-1" author="manual">
+        <sql>
+            INSERT INTO direction (id, code, nom, region_id, created_by, created_date)
+            SELECT nextval('sequence_generator'), d.code, d.nom, r.id, 'system', now()
+            FROM (VALUES
+                ('525', 'CENTRE MEDICAL KALLEY'),
+                ('526', 'CENTRE MEDICAL MAOUREY'),
+                ('527', 'CENTRE PAIEMENT BOUKOKI'),
+                ('528', 'CENTRE PAIEMENT NOUVEAU MARCHE'),
+                ('529', 'CENTRE PAIEMENT YANTALA'),
+                ('530', 'CENTRE PROMOTION SOCIALE (CPS)'),
+                ('531', 'DIRECTION DE LA GESTION DES ASSURES'),
+                ('532', 'DIRECTION DE L''ACTION SANITAIRE ET SOCIALE'),
+                ('533', 'DIRECTION DU BUDGET ET DES INVESTISSEMENTS'),
+                ('534', 'DIRECTION GENERALE'),
+                ('535', 'DOCUMENTATION DES ARCHIVES ET DE L'' INFORMATION P'),
+                ('536', 'INSPECTION ET AUDIT INTERNE'),
+                ('537', 'INSPECTION GENERALE'),
+                ('538', 'PREVENTION DES ACCIDENTS DU TRAVAIL ET MALADIES PR'),
+                ('539', 'SECRETARIAT GENERAL')
+            ) AS d(code, nom)
+            JOIN region r ON upper(trim(r.nom)) = 'NIAMEY'
+            ON CONFLICT DO NOTHING
+        </sql>
+    </changeSet>
+</databaseChangeLog>

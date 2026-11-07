@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Donne leur nom complet aux directions de Niamey encore designees par un sigle :
+        CCQ, DRH et DSI.
+
+        On renomme les directions existantes plutot que d'en creer de nouvelles : leurs codes ne
+        changent pas et les agents rattaches le restent. Sans effet sur une base qui n'a pas ces
+        sigles a Niamey.
+    -->
+    <changeSet id="20261108236000-1" author="manual">
+        <sql>
+            UPDATE direction d
+            SET nom = v.nouveau,
+                last_modified_by = 'system',
+                last_modified_date = now()
+            FROM region r,
+                 (VALUES
+                     ('CCQ', 'CELLULE COMMUNICATION ET QUALITE'),
+                     ('DRH', 'DIRECTION DES RESSOURCES HUMAINES'),
+                     ('DSI', 'DIRECTION DES SYSTEMES D''INFORMATION')
+                 ) AS v(sigle, nouveau)
+            WHERE r.id = d.region_id
+              AND upper(trim(r.nom)) = 'NIAMEY'
+              AND upper(trim(d.nom)) = v.sigle
+        </sql>
+    </changeSet>
+</databaseChangeLog>

@@ -91,5 +91,10 @@
     <include file="config/liquibase/changelog/20261108200000_insert_agence_konni.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20261108210000_insert_direction_dosso.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20261108220000_insert_direction_tillabery.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20261108230000_insert_agence_comptable.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20261108233000_insert_directions_niamey.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20261108234000_insert_centre_paiement_talladje.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20261108235000_insert_directions_niamey_suite.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20261108236000_rename_directions_sigles_niamey.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>

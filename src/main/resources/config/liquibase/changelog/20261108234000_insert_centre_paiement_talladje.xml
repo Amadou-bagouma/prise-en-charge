@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Ajoute le centre de paiement de Talladje (code 524) dans la region de Niamey.
+
+        Id pris dans le sequence_generator, comme ceux attribues par l'application. La region est
+        retrouvee par son nom ; ignoree si le code existe deja.
+    -->
+    <changeSet id="20261108234000-1" author="manual">
+        <sql>
+            INSERT INTO direction (id, code, nom, region_id, created_by, created_date)
+            SELECT nextval('sequence_generator'), '524', 'CENTRE DE PAIEMENT TALLADJE', r.id, 'system', now()
+            FROM region r
+            WHERE upper(trim(r.nom)) = 'NIAMEY'
+            ON CONFLICT DO NOTHING
+        </sql>
+    </changeSet>
+</databaseChangeLog>
