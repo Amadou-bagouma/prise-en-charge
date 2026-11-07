@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Complete le referentiel des fonctions (59 libelles, ids 8 a 66).
+
+        Suite de 20261108100000 (ids 2 a 7) : les libelles deja inseres par celle-ci n'y figurent
+        pas. Ids fixes sous 1050, debut du sequence_generator : aucune collision possible avec ceux
+        attribues par l'application. Une fonction deja presente est ignoree.
+    -->
+    <changeSet id="20261108110000-1" author="manual">
+        <sql>
+            INSERT INTO fonction (id, libelle, created_by, created_date, last_modified_by, last_modified_date)
+            VALUES
+                (8, 'PERSONNEL ASS CMS', 'system', now(), NULL, NULL),
+                (9, 'AGENT DE PERCEPTION CM', 'system', now(), NULL, NULL),
+                (10, 'SAGE FEMME', 'system', now(), NULL, NULL),
+                (11, 'SECRETAIRE DE DIRECTION', 'system', now(), NULL, NULL),
+                (12, 'CHAUFFEUR ASS CM', 'system', now(), NULL, NULL),
+                (13, 'AMBULANCIER', 'system', now(), NULL, NULL),
+                (14, 'FILLE DE SALLE', 'system', now(), NULL, NULL),
+                (15, 'GARDIEN', 'system', now(), NULL, NULL),
+                (16, 'AGENT', 'system', now(), NULL, NULL),
+                (17, 'INSPECTEUR', 'system', now(), NULL, NULL),
+                (18, 'DIRECTEUR CENTRAL', 'system', now(), NULL, NULL),
+                (19, 'DIRECTEUR REGIONAL', 'system', now(), NULL, NULL),
+                (20, 'CHEF CELLULE CMTION ET QUALITE', 'system', now(), NULL, NULL),
+                (21, 'SECRETAIRE GENERAL', 'system', now(), NULL, NULL),
+                (22, 'INSPECTEUR GENERAL', 'system', now(), NULL, NULL),
+                (23, 'CHEF DE SECTION SPA &amp; DRC', 'system', now(), NULL, NULL),
+                (24, 'INGENIEUR INFORMATIQUE', 'system', now(), NULL, NULL),
+                (25, 'CHEF SECT MAINTENANCE', 'system', now(), NULL, NULL),
+                (26, 'CHEF SERVICE SECURITE &amp; MAINTE', 'system', now(), NULL, NULL),
+                (27, 'DIRECTEUR SERVICE PREVENTION', 'system', now(), NULL, NULL),
+                (28, 'CHEF SERVICE ETUDES ET METHODE', 'system', now(), NULL, NULL),
+                (29, 'AGENT RECOUVREMENT DRC', 'system', now(), NULL, NULL),
+                (30, 'DIRECTEUR CENTRAL ADJOINT', 'system', now(), NULL, NULL),
+                (31, 'CHEF DE SERVICE', 'system', now(), NULL, NULL),
+                (32, 'CONTROLEUR DES EMPLOYEURS', 'system', now(), NULL, NULL),
+                (33, 'AGENT COMPTABLE', 'system', now(), NULL, NULL),
+                (34, 'DIRECTEUR REGIONAL ADJOINT', 'system', now(), NULL, NULL),
+                (35, 'CHEF DE CENTRE', 'system', now(), NULL, NULL),
+                (36, 'INSPECTEUR CHEF DE SERVICE', 'system', now(), NULL, NULL),
+                (37, 'CHEF DE SECTION', 'system', now(), NULL, NULL),
+                (38, 'CHEF SECT. RECOUVREMENT DBI', 'system', now(), NULL, NULL),
+                (39, 'DIRECTEUR CENTRAL DRC', 'system', now(), NULL, NULL),
+                (40, 'CHEF DE SERVICE SPA &amp; DRC', 'system', now(), NULL, NULL),
+                (41, 'CHEF AGENCE', 'system', now(), NULL, NULL),
+                (42, 'CONTROLEUR DE PREVENTION RP', 'system', now(), NULL, NULL),
+                (43, 'INGENIEUR D''ETUDE', 'system', now(), NULL, NULL),
+                (44, 'CHEF DE SECTION CAISSIER PRINC', 'system', now(), NULL, NULL),
+                (45, 'CHEF SERVICE CONTENTIEUX', 'system', now(), NULL, NULL),
+                (46, 'CONTROLEUR A PRIORI', 'system', now(), NULL, NULL),
+                (47, 'DIRECTEUR CENTRAL ADJOINT DRC', 'system', now(), NULL, NULL),
+                (48, 'CHEF SECTION RECOUVREMENT DRC', 'system', now(), NULL, NULL),
+                (49, 'DIRECTEUR GENERAL', 'system', now(), NULL, NULL),
+                (50, 'AGENT DE GUICHET', 'system', now(), NULL, NULL),
+                (51, 'CAISSIER', 'system', now(), NULL, NULL),
+                (52, 'CHEF SECT. SAISIE COMPTABILITE', 'system', now(), NULL, NULL),
+                (53, 'AGENT DE SAISIE', 'system', now(), NULL, NULL),
+                (54, 'CHEF DE SERVICE COMPTE INDIVID', 'system', now(), NULL, NULL),
+                (55, 'CHEF DE SECTION COMPTE INDIVID', 'system', now(), NULL, NULL),
+                (56, 'CAISSIER SECONDAIRE', 'system', now(), NULL, NULL),
+                (57, 'CHEF SERVICE DOCUMENTATION ARC', 'system', now(), NULL, NULL),
+                (58, 'ARCHIVISTE', 'system', now(), NULL, NULL),
+                (59, 'CHEF SECT. MAGASIN', 'system', now(), NULL, NULL),
+                (60, 'AGENT DE SECURITE', 'system', now(), NULL, NULL),
+                (61, 'CHAUFFEUR', 'system', now(), NULL, NULL),
+                (62, 'CHAUFFEUR SG', 'system', now(), NULL, NULL),
+                (63, 'CHAUFFEUR DG', 'system', now(), NULL, NULL),
+                (64, 'CHEF SECT. SECURITE', 'system', now(), NULL, NULL),
+                (65, 'REPROGRAPHE', 'system', now(), NULL, NULL),
+                (66, 'LIQUIDATEUR', 'system', now(), NULL, NULL)
+            ON CONFLICT DO NOTHING
+        </sql>
+    </changeSet>
+</databaseChangeLog>

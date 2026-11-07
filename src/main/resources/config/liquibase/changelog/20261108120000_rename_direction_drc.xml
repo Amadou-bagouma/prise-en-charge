@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Donne son nom complet a la direction DRC de la region de Niamey.
+
+        On renomme la direction existante plutot que d'en creer une seconde : les agents deja
+        rattaches a la DRC le restent. Sans effet sur une base qui n'a pas de DRC a Niamey.
+    -->
+    <changeSet id="20261108120000-1" author="manual">
+        <sql>
+            UPDATE direction d
+            SET nom = 'DIRECTION DU RECOUVREMENT ET DES COTISATIONS',
+                last_modified_by = 'system',
+                last_modified_date = now()
+            FROM region r
+            WHERE r.id = d.region_id
+              AND upper(trim(r.nom)) = 'NIAMEY'
+              AND upper(trim(d.nom)) = 'DRC'
+        </sql>
+    </changeSet>
+</databaseChangeLog>
