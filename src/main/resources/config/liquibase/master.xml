@@ -90,5 +90,6 @@
     <include file="config/liquibase/changelog/20261108190000_insert_directions_tahoua.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20261108200000_insert_agence_konni.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20261108210000_insert_direction_dosso.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20261108220000_insert_direction_tillabery.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>
