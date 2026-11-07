@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Ajoute le sexe (HOMME / FEMME) et le groupe (GROUPE_I / GROUPE_II / GROUPE_III) de l'agent.
+        Facultatifs : les agents deja enregistres n'en ont pas.
+    -->
+    <changeSet id="20261107100000-1" author="manual">
+        <addColumn tableName="agent">
+            <column name="sexe" type="varchar(255)"/>
+            <column name="groupe" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

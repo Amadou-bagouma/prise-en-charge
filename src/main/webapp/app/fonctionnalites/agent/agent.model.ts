@@ -3,6 +3,8 @@ import dayjs from 'dayjs/esm';
 import { IDirection } from 'app/fonctionnalites/direction/direction.model';
 import { IFonction } from 'app/fonctionnalites/fonction/fonction.model';
 import { IGestion } from 'app/fonctionnalites/gestion/gestion.model';
+import { GroupeAgent } from 'app/fonctionnalites/enumerations/groupe-agent.model';
+import { Sexe } from 'app/fonctionnalites/enumerations/sexe.model';
 
 /** Situation d'un agent au regard de la couverture médicale. */
 export type StatutAgent = 'ACTIF' | 'SUSPENDU' | 'RETRAITE' | 'RADIE' | 'DECEDE';
@@ -18,6 +20,8 @@ export interface IAgent {
   prenom?: string | null;
   dateNaissance?: dayjs.Dayjs | null;
   lieuNaissance?: string | null;
+  sexe?: keyof typeof Sexe | null;
+  groupe?: keyof typeof GroupeAgent | null;
   dateEmbauche?: dayjs.Dayjs | null;
   telephone?: string | null;
   fonction?: Pick<IFonction, 'id' | 'libelle'> | null;

@@ -1,0 +1,10 @@
+{
+  "peccnssApp": {
+    "GroupeAgent": {
+      "null": "",
+      "GROUPE_I": "Groupe I",
+      "GROUPE_II": "Groupe II",
+      "GROUPE_III": "Groupe III"
+    }
+  }
+}

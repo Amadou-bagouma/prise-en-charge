@@ -52,8 +52,23 @@ entity Agent {
   prenom String required
   dateNaissance LocalDate
   lieuNaissance String maxlength(255)
+  sexe Sexe
+  groupe GroupeAgent
   dateEmbauche LocalDate
   telephone String
+}
+
+
+enum Sexe {
+  HOMME
+  FEMME
+}
+
+
+enum GroupeAgent {
+  GROUPE_I
+  GROUPE_II
+  GROUPE_III
 }
 
 

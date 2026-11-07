@@ -63,6 +63,12 @@
               <dt jhiTranslate="peccnssApp.agent.lieuNaissance">Lieu de naissance</dt>
               <dd>{{ agentRef.lieuNaissance || '—' }}</dd>
 
+              <dt jhiTranslate="peccnssApp.agent.sexe">Sexe</dt>
+              <dd>{{ agentRef.sexe ? ('peccnssApp.Sexe.' + agentRef.sexe | translate) : '—' }}</dd>
+
+              <dt jhiTranslate="peccnssApp.agent.groupe">Groupe</dt>
+              <dd>{{ agentRef.groupe ? ('peccnssApp.GroupeAgent.' + agentRef.groupe | translate) : '—' }}</dd>
+
               <dt jhiTranslate="peccnssApp.agent.dateEmbauche">Date Embauche</dt>
               <dd class="pec-defs--mono">
                 {{ (agentRef.dateEmbauche | formatMediumDate) || '—' }}

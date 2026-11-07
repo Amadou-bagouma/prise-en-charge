@@ -1,6 +1,8 @@
 package com.mycompany.myapp.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.mycompany.myapp.domain.enumeration.GroupeAgent;
+import com.mycompany.myapp.domain.enumeration.Sexe;
 import com.mycompany.myapp.domain.enumeration.StatutAgent;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -47,6 +49,14 @@ public class Agent extends AbstractAuditingEntity<Long> implements Serializable 
     @Size(max = 255)
     @Column(name = "lieu_naissance", length = 255)
     private String lieuNaissance;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "sexe")
+    private Sexe sexe;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "groupe")
+    private GroupeAgent groupe;
 
     @Column(name = "date_embauche")
     private LocalDate dateEmbauche;
@@ -169,6 +179,32 @@ public class Agent extends AbstractAuditingEntity<Long> implements Serializable 
 
     public void setLieuNaissance(String lieuNaissance) {
         this.lieuNaissance = lieuNaissance;
+    }
+
+    public Sexe getSexe() {
+        return this.sexe;
+    }
+
+    public Agent sexe(Sexe sexe) {
+        this.setSexe(sexe);
+        return this;
+    }
+
+    public void setSexe(Sexe sexe) {
+        this.sexe = sexe;
+    }
+
+    public GroupeAgent getGroupe() {
+        return this.groupe;
+    }
+
+    public Agent groupe(GroupeAgent groupe) {
+        this.setGroupe(groupe);
+        return this;
+    }
+
+    public void setGroupe(GroupeAgent groupe) {
+        this.groupe = groupe;
     }
 
     public LocalDate getDateEmbauche() {
@@ -330,6 +366,8 @@ public class Agent extends AbstractAuditingEntity<Long> implements Serializable 
             ", prenom='" + getPrenom() + "'" +
             ", dateNaissance='" + getDateNaissance() + "'" +
             ", lieuNaissance='" + getLieuNaissance() + "'" +
+            ", sexe='" + getSexe() + "'" +
+            ", groupe='" + getGroupe() + "'" +
             ", dateEmbauche='" + getDateEmbauche() + "'" +
             ", telephone='" + getTelephone() + "'" +
             ", statut='" + getStatut() + "'" +

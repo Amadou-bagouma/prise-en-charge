@@ -23,6 +23,8 @@
       "prenom": "Prenom",
       "dateNaissance": "Date Naissance",
       "lieuNaissance": "Place of birth",
+      "sexe": "Sex",
+      "groupe": "Group",
       "dateEmbauche": "Hire Date",
       "telephone": "Telephone",
       "fonction": "Fonction",

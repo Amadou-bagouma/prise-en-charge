@@ -85,6 +85,26 @@
         </div>
 
         <div class="jhi-field">
+          <label class="form-label" for="field_sexe" jhiTranslate="peccnssApp.agent.sexe">Sexe</label>
+          <select class="form-control" name="sexe" formControlName="sexe" id="field_sexe" data-cy="sexe">
+            <option [ngValue]="null">{{ 'peccnssApp.Sexe.null' | translate }}</option>
+            @for (sexe of sexeValues; track $index) {
+              <option [value]="sexe">{{ 'peccnssApp.Sexe.' + sexe | translate }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="jhi-field">
+          <label class="form-label" for="field_groupe" jhiTranslate="peccnssApp.agent.groupe">Groupe</label>
+          <select class="form-control" name="groupe" formControlName="groupe" id="field_groupe" data-cy="groupe">
+            <option [ngValue]="null">{{ 'peccnssApp.GroupeAgent.null' | translate }}</option>
+            @for (groupe of groupeAgentValues; track $index) {
+              <option [value]="groupe">{{ 'peccnssApp.GroupeAgent.' + groupe | translate }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="jhi-field">
           <label class="form-label" for="field_dateEmbauche" jhiTranslate="peccnssApp.agent.dateEmbauche">Date Embauche</label>
           <div class="input-group">
             <input

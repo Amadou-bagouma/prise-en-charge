@@ -1,5 +1,7 @@
 package com.mycompany.myapp.service.dto;
 
+import com.mycompany.myapp.domain.enumeration.GroupeAgent;
+import com.mycompany.myapp.domain.enumeration.Sexe;
 import com.mycompany.myapp.domain.enumeration.StatutAgent;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
@@ -30,6 +32,10 @@ public class AgentDTO implements Serializable {
 
     @Size(max = 255)
     private String lieuNaissance;
+
+    private Sexe sexe;
+
+    private GroupeAgent groupe;
 
     private LocalDate dateEmbauche;
 
@@ -99,6 +105,22 @@ public class AgentDTO implements Serializable {
 
     public void setLieuNaissance(String lieuNaissance) {
         this.lieuNaissance = lieuNaissance;
+    }
+
+    public Sexe getSexe() {
+        return sexe;
+    }
+
+    public void setSexe(Sexe sexe) {
+        this.sexe = sexe;
+    }
+
+    public GroupeAgent getGroupe() {
+        return groupe;
+    }
+
+    public void setGroupe(GroupeAgent groupe) {
+        this.groupe = groupe;
     }
 
     public LocalDate getDateEmbauche() {
@@ -212,6 +234,8 @@ public class AgentDTO implements Serializable {
             ", prenom='" + getPrenom() + "'" +
             ", dateNaissance='" + getDateNaissance() + "'" +
             ", lieuNaissance='" + getLieuNaissance() + "'" +
+            ", sexe='" + getSexe() + "'" +
+            ", groupe='" + getGroupe() + "'" +
             ", dateEmbauche='" + getDateEmbauche() + "'" +
             ", telephone='" + getTelephone() + "'" +
             ", fonction=" + getFonction() +

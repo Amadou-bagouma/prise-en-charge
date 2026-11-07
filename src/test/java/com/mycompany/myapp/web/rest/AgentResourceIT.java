@@ -13,6 +13,8 @@ import com.mycompany.myapp.domain.Agent;
 import com.mycompany.myapp.domain.Direction;
 import com.mycompany.myapp.domain.Fonction;
 import com.mycompany.myapp.domain.Gestion;
+import com.mycompany.myapp.domain.enumeration.GroupeAgent;
+import com.mycompany.myapp.domain.enumeration.Sexe;
 import com.mycompany.myapp.repository.AgentRepository;
 import com.mycompany.myapp.service.AgentService;
 import com.mycompany.myapp.service.dto.AgentDTO;
@@ -63,6 +65,12 @@ class AgentResourceIT {
     private static final String DEFAULT_LIEU_NAISSANCE = "AAAAAAAAAA";
     private static final String UPDATED_LIEU_NAISSANCE = "BBBBBBBBBB";
 
+    private static final Sexe DEFAULT_SEXE = Sexe.HOMME;
+    private static final Sexe UPDATED_SEXE = Sexe.FEMME;
+
+    private static final GroupeAgent DEFAULT_GROUPE = GroupeAgent.GROUPE_I;
+    private static final GroupeAgent UPDATED_GROUPE = GroupeAgent.GROUPE_II;
+
     private static final String DEFAULT_TELEPHONE = "AAAAAAAAAA";
     private static final String UPDATED_TELEPHONE = "BBBBBBBBBB";
 
@@ -110,6 +118,8 @@ class AgentResourceIT {
             .prenom(DEFAULT_PRENOM)
             .dateNaissance(DEFAULT_DATE_NAISSANCE)
             .lieuNaissance(DEFAULT_LIEU_NAISSANCE)
+            .sexe(DEFAULT_SEXE)
+            .groupe(DEFAULT_GROUPE)
             .telephone(DEFAULT_TELEPHONE);
     }
 
@@ -126,6 +136,8 @@ class AgentResourceIT {
             .prenom(UPDATED_PRENOM)
             .dateNaissance(UPDATED_DATE_NAISSANCE)
             .lieuNaissance(UPDATED_LIEU_NAISSANCE)
+            .sexe(UPDATED_SEXE)
+            .groupe(UPDATED_GROUPE)
             .telephone(UPDATED_TELEPHONE);
     }
 
@@ -252,6 +264,8 @@ class AgentResourceIT {
             .andExpect(jsonPath("$.[*].prenom").value(hasItem(DEFAULT_PRENOM)))
             .andExpect(jsonPath("$.[*].dateNaissance").value(hasItem(DEFAULT_DATE_NAISSANCE.toString())))
             .andExpect(jsonPath("$.[*].lieuNaissance").value(hasItem(DEFAULT_LIEU_NAISSANCE)))
+            .andExpect(jsonPath("$.[*].sexe").value(hasItem(DEFAULT_SEXE.toString())))
+            .andExpect(jsonPath("$.[*].groupe").value(hasItem(DEFAULT_GROUPE.toString())))
             .andExpect(jsonPath("$.[*].telephone").value(hasItem(DEFAULT_TELEPHONE)));
     }
 
@@ -289,6 +303,8 @@ class AgentResourceIT {
             .andExpect(jsonPath("$.prenom").value(DEFAULT_PRENOM))
             .andExpect(jsonPath("$.dateNaissance").value(DEFAULT_DATE_NAISSANCE.toString()))
             .andExpect(jsonPath("$.lieuNaissance").value(DEFAULT_LIEU_NAISSANCE))
+            .andExpect(jsonPath("$.sexe").value(DEFAULT_SEXE.toString()))
+            .andExpect(jsonPath("$.groupe").value(DEFAULT_GROUPE.toString()))
             .andExpect(jsonPath("$.telephone").value(DEFAULT_TELEPHONE));
     }
 
@@ -671,6 +687,8 @@ class AgentResourceIT {
             .andExpect(jsonPath("$.[*].prenom").value(hasItem(DEFAULT_PRENOM)))
             .andExpect(jsonPath("$.[*].dateNaissance").value(hasItem(DEFAULT_DATE_NAISSANCE.toString())))
             .andExpect(jsonPath("$.[*].lieuNaissance").value(hasItem(DEFAULT_LIEU_NAISSANCE)))
+            .andExpect(jsonPath("$.[*].sexe").value(hasItem(DEFAULT_SEXE.toString())))
+            .andExpect(jsonPath("$.[*].groupe").value(hasItem(DEFAULT_GROUPE.toString())))
             .andExpect(jsonPath("$.[*].telephone").value(hasItem(DEFAULT_TELEPHONE)));
 
         // Check, that the count call also returns 1
@@ -725,6 +743,8 @@ class AgentResourceIT {
             .prenom(UPDATED_PRENOM)
             .dateNaissance(UPDATED_DATE_NAISSANCE)
             .lieuNaissance(UPDATED_LIEU_NAISSANCE)
+            .sexe(UPDATED_SEXE)
+            .groupe(UPDATED_GROUPE)
             .telephone(UPDATED_TELEPHONE);
         AgentDTO agentDTO = agentMapper.toDto(updatedAgent);
 
@@ -845,6 +865,8 @@ class AgentResourceIT {
             .prenom(UPDATED_PRENOM)
             .dateNaissance(UPDATED_DATE_NAISSANCE)
             .lieuNaissance(UPDATED_LIEU_NAISSANCE)
+            .sexe(UPDATED_SEXE)
+            .groupe(UPDATED_GROUPE)
             .telephone(UPDATED_TELEPHONE);
 
         restAgentMockMvc

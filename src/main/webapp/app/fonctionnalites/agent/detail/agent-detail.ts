@@ -5,6 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbDropdown, NgbDropdownItem, NgbDropdownMenu, NgbDropdownToggle } from '@ng-bootstrap/ng-bootstrap/dropdown';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap/modal';
+import { TranslatePipe } from '@ngx-translate/core';
 import dayjs from 'dayjs/esm';
 import { catchError, filter, of, tap } from 'rxjs';
 
@@ -52,6 +53,7 @@ function anneesRevolues(date?: dayjs.Dayjs | null): number | null {
     Alert,
     AlertError,
     TranslateDirective,
+    TranslatePipe,
     RouterLink,
     FormatMediumDatePipe,
     FormatMediumDatetimePipe,

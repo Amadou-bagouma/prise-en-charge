@@ -52,6 +52,8 @@ public class AgentAsserts {
             .satisfies(a -> assertThat(a.getPrenom()).as("check prenom").isEqualTo(expected.getPrenom()))
             .satisfies(a -> assertThat(a.getDateNaissance()).as("check dateNaissance").isEqualTo(expected.getDateNaissance()))
             .satisfies(a -> assertThat(a.getLieuNaissance()).as("check lieuNaissance").isEqualTo(expected.getLieuNaissance()))
+            .satisfies(a -> assertThat(a.getSexe()).as("check sexe").isEqualTo(expected.getSexe()))
+            .satisfies(a -> assertThat(a.getGroupe()).as("check groupe").isEqualTo(expected.getGroupe()))
             .satisfies(a -> assertThat(a.getTelephone()).as("check telephone").isEqualTo(expected.getTelephone()));
     }
 

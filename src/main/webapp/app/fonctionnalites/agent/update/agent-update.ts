@@ -4,6 +4,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { TranslatePipe } from '@ngx-translate/core';
 import { NgbInputDatepicker } from '@ng-bootstrap/ng-bootstrap/datepicker';
 import { Observable, finalize, map } from 'rxjs';
 
@@ -13,6 +14,8 @@ import { IDirection } from 'app/fonctionnalites/direction/direction.model';
 import { DirectionService } from 'app/fonctionnalites/direction/service/direction.service';
 import { IFonction } from 'app/fonctionnalites/fonction/fonction.model';
 import { FonctionService } from 'app/fonctionnalites/fonction/service/fonction.service';
+import { GroupeAgent } from 'app/fonctionnalites/enumerations/groupe-agent.model';
+import { Sexe } from 'app/fonctionnalites/enumerations/sexe.model';
 import { IGestion } from 'app/fonctionnalites/gestion/gestion.model';
 import { GestionService } from 'app/fonctionnalites/gestion/service/gestion.service';
 import { AlertError } from 'app/shared/alert';
@@ -26,11 +29,13 @@ import { AgentFormGroup, AgentFormService } from './agent-form.service';
 @Component({
   selector: 'jhi-agent-update',
   templateUrl: './agent-update.html',
-  imports: [TranslateDirective, FontAwesomeModule, AlertError, ReactiveFormsModule, NgbInputDatepicker],
+  imports: [TranslateDirective, TranslatePipe, FontAwesomeModule, AlertError, ReactiveFormsModule, NgbInputDatepicker],
 })
 export class AgentUpdate implements OnInit {
   readonly isSaving = signal(false);
   agent: IAgent | null = null;
+  sexeValues = Object.keys(Sexe);
+  groupeAgentValues = Object.keys(GroupeAgent);
 
   directionsSharedCollection = signal<IDirection[]>([]);
   gestionsSharedCollection = signal<IGestion[]>([]);
