@@ -85,5 +85,7 @@
     <include file="config/liquibase/changelog/20261108140000_insert_directions_maradi.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20261108150000_insert_directions_zinder.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20261108160000_insert_direction_diffa.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20261108170000_insert_agence_arlit.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20261108180000_insert_directions_agadez.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>

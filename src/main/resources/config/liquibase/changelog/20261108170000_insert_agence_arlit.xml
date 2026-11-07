@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Ajoute l'agence d'Arlit (code 513) dans la region d'Arlit.
+
+        Id pris dans le sequence_generator, comme ceux attribues par l'application. La region est
+        retrouvee par son nom ; ignoree si le code existe deja.
+    -->
+    <changeSet id="20261108170000-1" author="manual">
+        <sql>
+            INSERT INTO direction (id, code, nom, region_id, created_by, created_date)
+            SELECT nextval('sequence_generator'), '513', 'AGENCE ARLIT', r.id, 'system', now()
+            FROM region r
+            WHERE upper(trim(r.nom)) = 'ARLIT'
+            ON CONFLICT DO NOTHING
+        </sql>
+    </changeSet>
+</databaseChangeLog>
