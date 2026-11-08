@@ -97,5 +97,6 @@
     <include file="config/liquibase/changelog/20261108235000_insert_directions_niamey_suite.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20261108236000_rename_directions_sigles_niamey.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20261108240000_sexe_masculin_feminin.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20261108250000_insert_agents_agence_arlit.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>

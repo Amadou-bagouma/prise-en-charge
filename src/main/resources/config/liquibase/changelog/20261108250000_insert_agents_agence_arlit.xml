@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Ajoute trois agents de l'agence d'Arlit (matricules 1612, 1961, 1083).
+
+        Fonction, direction et gestion sont retrouvees par leur libelle ; un lien introuvable reste
+        vide plutot que de bloquer l'agent. Statut ACTIF par defaut. Un matricule deja present est
+        ignore. Ids pris dans le sequence_generator, comme ceux attribues par l'application.
+    -->
+    <changeSet id="20261108250000-1" author="manual">
+        <sql>
+            INSERT INTO agent (id, matricule, nom, prenom, sexe, groupe, date_naissance, date_embauche,
+                               fonction_id, direction_id, gestion_id, statut, created_by, created_date)
+            SELECT nextval('sequence_generator'), v.matricule, v.nom, v.prenom, v.sexe, v.groupe,
+                   v.date_naissance, v.date_embauche, f.id, d.id, g.id, 'ACTIF', 'system', now()
+            FROM (VALUES
+                ('1612', 'AMAR MOUMOUNE', 'BOUBACAR', 'MASCULIN', 'GROUPE_I', DATE '1984-01-01', DATE '2012-08-31', 'CHEF AGENCE', 'AGENCE ARLIT', 'OA'),
+                ('1961', 'NANA HADIZA', 'MAHAMAN GARBA', 'FEMININ', 'GROUPE_I', DATE '1989-07-25', DATE '2022-10-17', 'CONTROLEUR DES EMPLOYEURS', 'AGENCE ARLIT', 'OA'),
+                ('1083', 'SALIFOU', 'ZIRWANI', 'MASCULIN', 'GROUPE_II', DATE '1969-01-01', DATE '1988-11-02', 'CHEF DE SECTION', 'AGENCE ARLIT', 'OA')
+            ) AS v(matricule, nom, prenom, sexe, groupe, date_naissance, date_embauche, fonction, direction, gestion)
+            LEFT JOIN fonction f ON f.libelle = v.fonction
+            LEFT JOIN direction d ON d.nom = v.direction
+            LEFT JOIN gestion g ON g.nom = v.gestion
+            ON CONFLICT DO NOTHING
+        </sql>
+    </changeSet>
+</databaseChangeLog>
