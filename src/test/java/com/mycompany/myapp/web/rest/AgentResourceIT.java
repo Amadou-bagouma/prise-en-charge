@@ -65,8 +65,8 @@ class AgentResourceIT {
     private static final String DEFAULT_LIEU_NAISSANCE = "AAAAAAAAAA";
     private static final String UPDATED_LIEU_NAISSANCE = "BBBBBBBBBB";
 
-    private static final Sexe DEFAULT_SEXE = Sexe.HOMME;
-    private static final Sexe UPDATED_SEXE = Sexe.FEMME;
+    private static final Sexe DEFAULT_SEXE = Sexe.MASCULIN;
+    private static final Sexe UPDATED_SEXE = Sexe.FEMININ;
 
     private static final GroupeAgent DEFAULT_GROUPE = GroupeAgent.GROUPE_I;
     private static final GroupeAgent UPDATED_GROUPE = GroupeAgent.GROUPE_II;

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Le sexe de l'agent passe de HOMME / FEMME a MASCULIN / FEMININ. Convertit les valeurs
+        deja enregistrees pour qu'elles restent lisibles par l'enum Sexe.
+    -->
+    <changeSet id="20261108240000-1" author="manual">
+        <update tableName="agent">
+            <column name="sexe" value="MASCULIN"/>
+            <where>sexe = 'HOMME'</where>
+        </update>
+        <update tableName="agent">
+            <column name="sexe" value="FEMININ"/>
+            <where>sexe = 'FEMME'</where>
+        </update>
+    </changeSet>
+</databaseChangeLog>

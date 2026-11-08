@@ -2,8 +2,8 @@
   "peccnssApp": {
     "Sexe": {
       "null": "",
-      "HOMME": "Homme",
-      "FEMME": "Femme"
+      "MASCULIN": "Masculin",
+      "FEMININ": "Féminin"
     }
   }
 }
